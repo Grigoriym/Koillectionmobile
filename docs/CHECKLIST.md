@@ -1,6 +1,6 @@
 # koillectionmobile checklist
 
-**Current step:** M0.2 (not started). M0.1 done 2026-11-14. Plan §5 decisions 1 and 2 are settled.
+**Current step:** M0.3 (not started). M0.2 done 2026-11-14. Plan §5 decisions 1 and 2 are settled.
 
 ## How to use this
 
@@ -55,10 +55,20 @@ Model: deskmate's and wayprint's archived M0.
   `help` prints one Gradle 11 deprecation (`Configuration.setVisible`) from a third-party plugin
   in `build-logic`, not from our code.
   Confirmed: both green; the jar declares all seven `koillectionmobile.*` plugin ids.
-- [ ] **M0.2** — `androidApp` + `composeApp` skeletons with a placeholder screen.
+- [x] **M0.2** — `androidApp` + `composeApp` skeletons with a placeholder screen.
   `applicationId com.grappim.koillectionmobile`. Root `build.gradle.kts`,
   `config/detekt/detekt.yml`, `config/compose/stability_config.conf` (deskmate M0.1 note).
   **Verify:** the debug APK builds and shows the placeholder on the emulator.
+  **Note:** shape is deskmate's M0.2 (`KoillectionAppContent` "Koillection" text screen,
+  manifest `INTERNET`, `ACCESS_NETWORK_STATE`, `usesCleartextTraffic="true"` for LAN servers).
+  Root `build.gradle.kts` and both config files are deskmate's current copies; its `detekt.yml`
+  already has the four Compose rules re-enabled, so no suppressions came along. No launcher
+  icon yet. `local.properties` (gitignored) is needed locally for `sdk.dir`.
+  **Note:** the `store` flavors mean the APK tasks are `assembleGplayDebug` /
+  `assembleFdroidDebug` (ids `com.grappim.koillectionmobile.debug` / `.fdroid.debug`).
+  **Note:** emulator half of Verify skipped by the user's call: no emulator runs for
+  scaffolding-sized steps, only for real screens and flows (M2 on).
+  Confirmed: both debug APKs build; `ktlintCheck`, `detekt`, `:composeApp:build` green.
 - [ ] **M0.3** — Module skeletons per plan §5 decision 4, wired into `settings.gradle.kts`.
   grappim-kit modules under one `grappimKit` key, after reading `grappim-kit/CONSUMING.md`.
   **Verify:** `./gradlew build` succeeds.

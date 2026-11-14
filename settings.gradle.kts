@@ -34,4 +34,4 @@ plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
 }
 
-// Modules are added from M0.2 on.
+include(":androidApp", ":composeApp")
