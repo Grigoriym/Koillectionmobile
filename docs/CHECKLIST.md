@@ -90,14 +90,17 @@ Model: deskmate's and wayprint's archived M0.
   No injected-greeting proof on screen (not asked; no emulator for scaffolding).
   **Note:** `KoinGraphTest` is in `composeApp/src/jvmTest`, not `commonTest`: this project has
   `jvm` + iOS targets, and koin-test's `verify()` is JVM-only. `koin-test` is a `jvmTest` dep.
-  **Note:** `ktlintCheck` (not part of `build`) failed on M0.3's trailing commas in
-  `settings.gradle.kts`; fixed here. Run `ktlintCheck` alongside `build` from now on.
+  **Note:** `ktlintCheck` failed on M0.3's trailing commas in `settings.gradle.kts`; fixed here.
+  `build` never runs the root project's `:ktlintKotlinScriptCheck` (checked with `--dry-run`),
+  so `settings.gradle.kts` and root `build.gradle.kts` are only linted by `ktlintCheck`. Run it
+  alongside `build` from now on.
   Confirmed: `jvmTest --rerun` ran 1 test, 0 failures; a temporary `@Single class Broken(val
   missing: Missing)` failed it with `MissingKoinDefinitionException`, then was removed.
   `build ktlintCheck` green.
 - [ ] **M0.5** — Merge `../agentic-grappim/templates/CLAUDE.md.template` into root `CLAUDE.md`,
   keeping this project's facts.
-- [ ] **M0.6** — CI workflow (port deskmate's).
+- [ ] **M0.6** — CI workflow (port deskmate's). It must call `ktlintCheck` itself: `build`
+  skips the root `:ktlintKotlinScriptCheck` (M0.4 note).
   **Verify:** CI green on the pushed commit.
 
 ## M1 — `core:api` (rough scope)
