@@ -1,6 +1,6 @@
 # koillectionmobile checklist
 
-**Current step:** M0.4 (not started). M0.3 done 2026-11-14. Plan §5 decisions 1, 2 and 4 are settled.
+**Current step:** M0.5 (not started). M0.4 done 2026-11-14. Plan §5 decisions 1, 2 and 4 are settled.
 
 ## How to use this
 
@@ -82,8 +82,19 @@ Model: deskmate's and wayprint's archived M0.
   the other three in `core:api`; `uikit` in every `feature:*:ui`. No `core:storage` yet; M1
   decides whether token storage needs its own module.
   Confirmed: `./gradlew build` green.
-- [ ] **M0.4** — Koin skeleton, `AppModule`, a `KoinGraphTest`.
+- [x] **M0.4** — Koin skeleton, `AppModule`, a `KoinGraphTest`.
   **Verify:** the test runs (forced with `--rerun`) and passes.
+  **Note:** deskmate's shape: `composeApp/.../di/Koin.kt` (`AppModule` = `@Module @Configuration
+  @ComponentScan`, empty `includes` until features define modules; `@KoinApplication object
+  KoinApp`), `KoillectionApp : Application` calls `startKoin<KoinApp>` with `androidContext`.
+  No injected-greeting proof on screen (not asked; no emulator for scaffolding).
+  **Note:** `KoinGraphTest` is in `composeApp/src/jvmTest`, not `commonTest`: this project has
+  `jvm` + iOS targets, and koin-test's `verify()` is JVM-only. `koin-test` is a `jvmTest` dep.
+  **Note:** `ktlintCheck` (not part of `build`) failed on M0.3's trailing commas in
+  `settings.gradle.kts`; fixed here. Run `ktlintCheck` alongside `build` from now on.
+  Confirmed: `jvmTest --rerun` ran 1 test, 0 failures; a temporary `@Single class Broken(val
+  missing: Missing)` failed it with `MissingKoinDefinitionException`, then was removed.
+  `build ktlintCheck` green.
 - [ ] **M0.5** — Merge `../agentic-grappim/templates/CLAUDE.md.template` into root `CLAUDE.md`,
   keeping this project's facts.
 - [ ] **M0.6** — CI workflow (port deskmate's).

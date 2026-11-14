@@ -43,26 +43,26 @@ include(
     ":feature:auth:domain",
     ":feature:auth:dto",
     ":feature:auth:mapper",
-    ":feature:auth:ui",
+    ":feature:auth:ui"
 )
 include(
     ":feature:collections:data",
     ":feature:collections:domain",
     ":feature:collections:dto",
     ":feature:collections:mapper",
-    ":feature:collections:ui",
+    ":feature:collections:ui"
 )
 include(
     ":feature:items:data",
     ":feature:items:domain",
     ":feature:items:dto",
     ":feature:items:mapper",
-    ":feature:items:ui",
+    ":feature:items:ui"
 )
 include(
     ":feature:tags:data",
     ":feature:tags:domain",
     ":feature:tags:dto",
     ":feature:tags:mapper",
-    ":feature:tags:ui",
+    ":feature:tags:ui"
 )
