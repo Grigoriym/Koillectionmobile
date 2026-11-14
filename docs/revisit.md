@@ -14,3 +14,7 @@ cold session can act on it. Delete an entry when it's fixed.
   has no iOS targets so never saw it). Build is green. Fix options: make it `implementation`
   (every consuming `ui` module carries compose-runtime anyway), or `compileOnly` for
   `androidMain`/`jvmMain` + `implementation` for `iosMain`. Decide before iOS is ever built.
+- 2026-11-14 (M0.6) — CI run 43643554439 warns: `actions/upload-artifact@v4` targets Node.js 20,
+  which GitHub forces onto Node.js 24. Source: `.github/workflows/ci.yml` (the "Upload Kover XML
+  report" step, ported from deskmate, which has the same step). Fix: bump to the newest
+  `upload-artifact` major that targets Node 24, then check CI stays green.
