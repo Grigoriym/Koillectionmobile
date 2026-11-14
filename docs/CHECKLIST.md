@@ -1,6 +1,6 @@
 # koillectionmobile checklist
 
-**Current step:** M0.5 (not started). M0.4 done 2026-11-14. Plan §5 decisions 1, 2 and 4 are settled.
+**Current step:** M0.6 (not started). M0.5 done 2026-11-14. Plan §5 decisions 1, 2 and 4 are settled.
 
 ## How to use this
 
@@ -97,8 +97,13 @@ Model: deskmate's and wayprint's archived M0.
   Confirmed: `jvmTest --rerun` ran 1 test, 0 failures; a temporary `@Single class Broken(val
   missing: Missing)` failed it with `MissingKoinDefinitionException`, then was removed.
   `build ktlintCheck` green.
-- [ ] **M0.5** — Merge `../agentic-grappim/templates/CLAUDE.md.template` into root `CLAUDE.md`,
+- [x] **M0.5** — Merge `../agentic-grappim/templates/CLAUDE.md.template` into root `CLAUDE.md`,
   keeping this project's facts.
+  **Note:** shape is deskmate's merged file. Project parts: API contract (Koillection source
+  wins), checklist workflow, commit format (`M<n>.<m>: …` + `docs: … finalize`), two Gradle
+  verification rules (`ktlintCheck` with `build`, `--rerun` for tests), settled-decisions table
+  built only from plan §5 and the ground rules. Reference projects point to plan §4.
+  Confirmed: no `<PLACEHOLDER>` left (grep); no step had a Verify line.
 - [ ] **M0.6** — CI workflow (port deskmate's). It must call `ktlintCheck` itself: `build`
   skips the root `:ktlintKotlinScriptCheck` (M0.4 note).
   **Verify:** CI green on the pushed commit.
