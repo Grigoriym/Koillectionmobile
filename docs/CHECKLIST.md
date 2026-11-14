@@ -1,6 +1,6 @@
 # koillectionmobile checklist
 
-**Current step:** M0.3 (not started). M0.2 done 2026-11-14. Plan §5 decisions 1 and 2 are settled.
+**Current step:** M0.4 (not started). M0.3 done 2026-11-14. Plan §5 decisions 1, 2 and 4 are settled.
 
 ## How to use this
 
@@ -69,9 +69,19 @@ Model: deskmate's and wayprint's archived M0.
   **Note:** emulator half of Verify skipped by the user's call: no emulator runs for
   scaffolding-sized steps, only for real screens and flows (M2 on).
   Confirmed: both debug APKs build; `ktlintCheck`, `detekt`, `:composeApp:build` green.
-- [ ] **M0.3** — Module skeletons per plan §5 decision 4, wired into `settings.gradle.kts`.
+- [x] **M0.3** — Module skeletons per plan §5 decision 4, wired into `settings.gradle.kts`.
   grappim-kit modules under one `grappimKit` key, after reading `grappim-kit/CONSUMING.md`.
   **Verify:** `./gradlew build` succeeds.
+  **Note:** decision 4 settled by the user: wallosmobile-style full split (plan §5). 23 modules,
+  each with one `internal object Placeholder`. Plugins: `dto` library + serialization; `domain`
+  library + stability; `mapper` library + di (`api` dto + domain); `data` library + di + network;
+  `ui` library + compose + di; `core:api` library + di + network + serialization; `core:domain`
+  library + stability; `strings` library + compose (one `app_name` string).
+  **Note:** catalog gains kit `coroutines`, `domain`, `storage`, `customheaders` (0.1.8, all 200
+  on Maven Central). Wired so the build proves they resolve: `domain` as `api` in `core:domain`,
+  the other three in `core:api`; `uikit` in every `feature:*:ui`. No `core:storage` yet; M1
+  decides whether token storage needs its own module.
+  Confirmed: `./gradlew build` green.
 - [ ] **M0.4** — Koin skeleton, `AppModule`, a `KoinGraphTest`.
   **Verify:** the test runs (forced with `--rerun`) and passes.
 - [ ] **M0.5** — Merge `../agentic-grappim/templates/CLAUDE.md.template` into root `CLAUDE.md`,

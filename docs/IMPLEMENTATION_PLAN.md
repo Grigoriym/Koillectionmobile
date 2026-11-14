@@ -77,8 +77,9 @@ code without checking the licence terms are kept.
 3. **TLS**: the user's server is reached over Tailscale. `koi.py` turns off certificate
    checks. Check whether that was needed at all (Tailscale `ts.net` certs are normally
    valid) before the app supports custom or self-signed certificates.
-4. **Module layout** (M0.3): wallosmobile-style `feature:*` split or deskmate-style lean.
-   This app has more features than deskmate (collections, items, data, images, tags), so
-   probably somewhere between.
+4. **Module layout** — *decided 2026-11-14*: wallosmobile-style full split. `core:api`,
+   `core:domain`, `strings`, and `feature:<x>:{data,domain,dto,mapper,ui}` for `auth`,
+   `collections`, `items`, `tags`. The mapper exposes `dto` + `domain` as `api`; `data`
+   reaches both through it. No local `uikit` module: `ui` modules use `grappim-kit-uikit`.
 5. **MVP scope** (start of M2): proposed minimum is login, collection list, item list, item
    detail, and "add item with photos" into a chosen collection.
