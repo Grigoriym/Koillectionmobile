@@ -25,7 +25,7 @@ Ground rules:
   below is not binding.
 - Git workflow (decided 2026-11-14): commit and push straight to `master` until the user
   says the app is close to release; then switch to their usual `dev`/`main` branches + PRs.
-  GitHub remote: still to ask the user in M0.1.
+  GitHub remote: `Grigoriym/Koillectionmobile`, public (user chose it in M0.1).
 
 ## M0 — repo and module scaffolding
 
