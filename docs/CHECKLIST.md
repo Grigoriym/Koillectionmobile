@@ -103,7 +103,7 @@ Model: deskmate's and wayprint's archived M0.
   wins), checklist workflow, commit format (`M<n>.<m>: …` + `docs: … finalize`), two Gradle
   verification rules (`ktlintCheck` with `build`, `--rerun` for tests), settled-decisions table
   built only from plan §5 and the ground rules. Reference projects point to plan §4.
-  Confirmed: no `<PLACEHOLDER>` left (grep); no step had a Verify line.
+  Confirmed: no `<PLACEHOLDER>` left (grep); M0.5 has no Verify line.
 - [ ] **M0.6** — CI workflow (port deskmate's). It must call `ktlintCheck` itself: `build`
   skips the root `:ktlintKotlinScriptCheck` (M0.4 note).
   **Verify:** CI green on the pushed commit.
