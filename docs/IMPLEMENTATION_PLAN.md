@@ -66,6 +66,13 @@ start of any step that touches the API. Facts that shape the design:
 - Uploads are `multipart/form-data` POSTs to a sub-path: `/api/items/{id}/image` (field
   `file`), `/api/data/{id}/image` (field `fileImage`), also `/data/{id}/file` and
   `/data/{id}/video`.
+- Collections nest, and `GET /api/collections` returns every level: `Collection.php` has no
+  `#[ApiFilter]`, so there is no `parent` filter. A top-level list is a client-side filter on a
+  null `parent` (an IRI, not an object). `image` is a path relative to the server root
+  (`uploads/<user>/<file>`), as on items. Checked 2026-11-15 (M1.6).
+- Feature repositories return `Result` (`resultOf` from grappim-kit `domain`, as in
+  wallosmobile); the failure is the `KoillectionError` that `core:api` threw. `feature:auth` is
+  the exception: its `LoginResult` names each login outcome.
 - Item tags: the API takes only the full list, so changing tags means sending all of them.
 - Known server-side trap: Koillection's Docker entrypoint can regenerate `JWT_PASSPHRASE` on
   restart, which breaks API login with a 500 while the website keeps working. Upstream issues

@@ -20,3 +20,5 @@ entries get deleted — see /finalize.
   and failed `compileTestKotlinIosArm64`. Second time; a third makes it a rule in `CLAUDE.md`.
 - 2026-11-15 — Ktor `parseUrl("https:///sub")` returned a `Url` with a non-blank host, so a
   host check on the parsed URL passed a URL with no host. Read the host from the text instead.
+- 2026-11-15 — `request.url.fullPath` failed "Unresolved reference" (M1.6): an extension, needs
+  `import io.ktor.http.fullPath`. Second Ktor URL-extension import miss after `encodedPath`.

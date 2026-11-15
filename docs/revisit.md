@@ -18,3 +18,9 @@ cold session can act on it. Delete an entry when it's fixed.
   which GitHub forces onto Node.js 24. Source: `.github/workflows/ci.yml` (the "Upload Kover XML
   report" step, ported from deskmate, which has the same step). Fix: bump to the newest
   `upload-artifact` major that targets Node 24, then check CI stays green.
+- 2026-11-15 (M1.6) — `FakeSessionStorage` now exists three times, copied by hand:
+  `core/api/src/commonTest/.../core/api/FakeSessionStorage.kt`,
+  `feature/auth/data/src/commonTest/.../auth/data/FakeSessionStorage.kt`,
+  `feature/collections/data/src/jvmTest/.../collections/data/FakeSessionStorage.kt`. M1.7 and M1.8
+  will add two more. Fix: one copy in a shared test module (or `core:storage` test fixtures) that
+  the `data` modules take as a test dependency.
