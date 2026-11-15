@@ -1,0 +1,52 @@
+{
+  "@context": "/api/contexts/TagCategory",
+  "@id": "/api/tag_categories",
+  "@type": "Collection",
+  "totalItems": 4,
+  "member": [
+    {
+      "@id": "/api/tag_categories/01a1de6f-bee0-70ab-a6c9-079d04c2dcea",
+      "@type": "TagCategory",
+      "id": "01a1de6f-bee0-70ab-a6c9-079d04c2dcea",
+      "label": "Subject",
+      "description": null,
+      "color": "F3E5F5",
+      "owner": "/api/users/01a1de6f-03c6-7568-a2b7-9d7a173d6776",
+      "createdAt": "2026-11-15T10:00:27+01:00",
+      "updatedAt": null
+    },
+    {
+      "@id": "/api/tag_categories/01a1de6f-beeb-7dc6-9fb6-265318d4090d",
+      "@type": "TagCategory",
+      "id": "01a1de6f-beeb-7dc6-9fb6-265318d4090d",
+      "label": "Kind",
+      "description": null,
+      "color": "F3E5F5",
+      "owner": "/api/users/01a1de6f-03c6-7568-a2b7-9d7a173d6776",
+      "createdAt": "2026-11-15T10:00:27+01:00",
+      "updatedAt": null
+    },
+    {
+      "@id": "/api/tag_categories/01a1de6f-beee-7856-8748-654a94ab2b21",
+      "@type": "TagCategory",
+      "id": "01a1de6f-beee-7856-8748-654a94ab2b21",
+      "label": "Language",
+      "description": null,
+      "color": "E8EAF6",
+      "owner": "/api/users/01a1de6f-03c6-7568-a2b7-9d7a173d6776",
+      "createdAt": "2026-11-15T10:00:27+01:00",
+      "updatedAt": null
+    },
+    {
+      "@id": "/api/tag_categories/01a1de6f-bef1-7188-a3f8-67fa2ef390e6",
+      "@type": "TagCategory",
+      "id": "01a1de6f-bef1-7188-a3f8-67fa2ef390e6",
+      "label": "Other",
+      "description": null,
+      "color": "E3F2FD",
+      "owner": "/api/users/01a1de6f-03c6-7568-a2b7-9d7a173d6776",
+      "createdAt": "2026-11-15T10:00:27+01:00",
+      "updatedAt": null
+    }
+  ]
+}

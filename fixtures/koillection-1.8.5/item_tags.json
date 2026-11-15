@@ -1,0 +1,53 @@
+{
+  "@context": "/api/contexts/Tag",
+  "@id": "/api/items/01a1de6f-bff4-7eb7-8d9f-973b4ac86da8/tags",
+  "@type": "Collection",
+  "totalItems": 3,
+  "member": [
+    {
+      "@id": "/api/tags/01a1de6f-bf62-7f41-800a-2cec7f1399ad",
+      "@type": "Tag",
+      "id": "01a1de6f-bf62-7f41-800a-2cec7f1399ad",
+      "label": "Poetry",
+      "description": null,
+      "image": null,
+      "imageSmallThumbnail": null,
+      "owner": "/api/users/01a1de6f-03c6-7568-a2b7-9d7a173d6776",
+      "category": "/api/tag_categories/01a1de6f-beeb-7dc6-9fb6-265318d4090d",
+      "seenCounter": 0,
+      "visibility": "private",
+      "createdAt": "2026-11-15T10:00:27+01:00",
+      "updatedAt": null
+    },
+    {
+      "@id": "/api/tags/01a1de6f-bf73-78c3-a2c7-27dafa2e9030",
+      "@type": "Tag",
+      "id": "01a1de6f-bf73-78c3-a2c7-27dafa2e9030",
+      "label": "German",
+      "description": null,
+      "image": null,
+      "imageSmallThumbnail": null,
+      "owner": "/api/users/01a1de6f-03c6-7568-a2b7-9d7a173d6776",
+      "category": "/api/tag_categories/01a1de6f-beee-7856-8748-654a94ab2b21",
+      "seenCounter": 0,
+      "visibility": "private",
+      "createdAt": "2026-11-15T10:00:27+01:00",
+      "updatedAt": null
+    },
+    {
+      "@id": "/api/tags/01a1de6f-bf81-7729-b7cc-b575fa51aa7c",
+      "@type": "Tag",
+      "id": "01a1de6f-bf81-7729-b7cc-b575fa51aa7c",
+      "label": "Fraktur",
+      "description": null,
+      "image": null,
+      "imageSmallThumbnail": null,
+      "owner": "/api/users/01a1de6f-03c6-7568-a2b7-9d7a173d6776",
+      "category": "/api/tag_categories/01a1de6f-bef1-7188-a3f8-67fa2ef390e6",
+      "seenCounter": 0,
+      "visibility": "private",
+      "createdAt": "2026-11-15T10:00:27+01:00",
+      "updatedAt": null
+    }
+  ]
+}

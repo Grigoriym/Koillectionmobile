@@ -1,6 +1,6 @@
 # koillectionmobile checklist
 
-**Current step:** M1.1 (M1 broken into steps 2026-11-15). M0 done 2026-11-14 (archived). Plan §5 decisions 1, 2 and 4 are settled.
+**Current step:** M1.2 (M1.1 done 2026-11-15). M0 done 2026-11-14 (archived). Plan §5 decisions 1, 2 and 4 are settled.
 
 ## How to use this
 
@@ -39,7 +39,7 @@ Layout is plan §5 decision 4: shared plumbing in `core:api`, each resource in i
 `feature:<x>:{dto,domain,mapper,data}`. Datum (an item's field) lives in `feature:items`.
 Model for every step: `../wallosmobile/core/api` and its `feature:*:data` modules.
 
-- [ ] **M1.1** — Capture fixtures and settle two open questions. Fetch the server's OpenAPI
+- [x] **M1.1** — Capture fixtures and settle two open questions. Fetch the server's OpenAPI
   doc and real responses for: one page of `/api/collections`, one collection, one page of
   `/api/collections/{id}/items`, one item, `/api/items/{id}/data`, one page of `/api/tags`,
   `/api/tag_categories`, and the login error bodies (wrong password → 401). Use `koi.py`
@@ -49,6 +49,10 @@ Model for every step: `../wallosmobile/core/api` and its `feature:*:data` module
   fixture is committed. Never commit a token.
   **Verify:** fixtures are in the repo, `grep` finds no JWT (`eyJ`) in them, and plan §2 / §5.3
   record both answers.
+  Note: user asked for a test instance instead of capturing from the real server. A local
+  Koillection 1.8.5 copy of the real catalogue (`docs/local-info.md`) is the source of the
+  fixtures (`fixtures/koillection-1.8.5/`, script `fixtures/capture.py`), so no real ID is
+  in the repo. Full responses kept, not trimmed.
 - [ ] **M1.2** — `core:api` client: Ktor `HttpClient` factory (wallosmobile `NetworkModule`),
   base-URL provider, `Json` (`ignoreUnknownKeys`, `application/ld+json` and
   `application/merge-patch+json`), redacting logger, custom headers (grappim-kit

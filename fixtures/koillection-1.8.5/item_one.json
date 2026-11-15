@@ -1,0 +1,20 @@
+{
+  "@context": "/api/contexts/Item",
+  "@id": "/api/items/01a1de6f-bff4-7eb7-8d9f-973b4ac86da8",
+  "@type": "Item",
+  "id": "01a1de6f-bff4-7eb7-8d9f-973b4ac86da8",
+  "name": "Auswahl Deutscher Gedichte für höhere Schulen",
+  "quantity": 1,
+  "collection": "/api/collections/01a1de6f-bfad-78b6-a916-7266d9e3dfff",
+  "owner": "/api/users/01a1de6f-03c6-7568-a2b7-9d7a173d6776",
+  "image": "uploads/01a1de6f-03c6-7568-a2b7-9d7a173d6776/Cq7YNpThMJzPpVrKinW5.jpg",
+  "imageSmallThumbnail": "uploads/01a1de6f-03c6-7568-a2b7-9d7a173d6776/Cq7YNpThMJzPpVrKinW5_small.jpg",
+  "imageLargeThumbnail": "uploads/01a1de6f-03c6-7568-a2b7-9d7a173d6776/Cq7YNpThMJzPpVrKinW5_large.jpg",
+  "seenCounter": 0,
+  "visibility": "public",
+  "parentVisibility": "private",
+  "finalVisibility": "private",
+  "scrapedFromUrl": null,
+  "createdAt": "2026-11-15T10:00:28+01:00",
+  "updatedAt": "2026-11-15T10:09:44+01:00"
+}

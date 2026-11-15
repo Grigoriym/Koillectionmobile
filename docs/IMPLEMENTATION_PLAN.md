@@ -27,9 +27,18 @@ The Koillection source at `../../koillection` is the source of truth. Re-check i
 start of any step that touches the API. Facts that shape the design:
 
 - API Platform. JSON-LD by default (`application/ld+json`), plain JSON also accepted. Lists
-  come back as Hydra collections: entries under `member` (or `hydra:member`), paginated.
-- The server publishes OpenAPI docs (`jsonopenapi` docs format). Worth checking in M1
-  whether generating DTOs from it beats writing them by hand.
+  come back as Hydra collections, 30 entries per page. On 1.8.5 the keys have no `hydra:`
+  prefix: `member`, `totalItems`, and `view` with `first`/`last`/`previous`/`next` links.
+  The last page has no `next`; a list that fits on one page has no `view` at all (checked
+  2026-11-15 against the M1.1 fixtures). Older servers may still send `hydra:member`.
+- Error bodies are `{"code": <status>, "message": "..."}`. A wrong password and an unknown
+  user both give 401 `Invalid credentials.`; a missing token gives 401 `JWT Token not found`.
+- The server publishes OpenAPI 3.1 at `GET /api/docs` with `Accept:
+  application/vnd.openapi+json` (copy in `fixtures/koillection-1.8.5/openapi.json`).
+- **DTOs are hand-written** (decided M1.1, 2026-11-15). The OpenAPI doc is 3.1 (`type:
+  ["string","null"]`, Hydra `allOf` wrappers), which Kotlin generators handle poorly, and the
+  app reads a small subset of about six resources. Use the OpenAPI doc as the field
+  reference instead.
 - Login: `POST /api/authentication_token` with `{"username","password"}` → `{"token": JWT}`.
   Then `Authorization: Bearer <token>`.
 - `PATCH` takes `application/merge-patch+json`.
@@ -74,9 +83,9 @@ code without checking the licence terms are kept.
    fast test/coverage target. No `iosApp` / desktop app until the user asks for one.
 2. **Distribution** — *decided 2026-11-14*: both. Keep the `store` flavor dimension
    (`gplay`, `fdroid` with `.fdroid` suffix) from wallosmobile/Taiga; IzzyOnDroid first.
-3. **TLS**: the user's server is reached over Tailscale. `koi.py` turns off certificate
-   checks. Check whether that was needed at all (Tailscale `ts.net` certs are normally
-   valid) before the app supports custom or self-signed certificates.
+3. **TLS** — *answered 2026-11-15 (M1.1)*: the user's Tailscale `ts.net` server passes
+   Python's default certificate checks, so `koi.py`'s check-off was not needed. The app uses
+   normal platform TLS. No custom or self-signed certificate support until a user needs it.
 4. **Module layout** — *decided 2026-11-14*: wallosmobile-style full split. `core:api`,
    `core:domain`, `strings`, and `feature:<x>:{data,domain,dto,mapper,ui}` for `auth`,
    `collections`, `items`, `tags`. The mapper exposes `dto` + `domain` as `api`; `data`

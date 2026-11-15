@@ -1,0 +1,7 @@
+{
+  "@context": "/api/contexts/Collection",
+  "@id": "/api/collections/01a1de6f-bfad-78b6-a916-7266d9e3dfff/children",
+  "@type": "Collection",
+  "totalItems": 0,
+  "member": []
+}
