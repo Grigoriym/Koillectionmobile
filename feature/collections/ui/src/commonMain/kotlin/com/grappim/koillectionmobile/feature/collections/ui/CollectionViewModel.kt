@@ -4,11 +4,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.grappim.kit.uikit.NativeText
 import com.grappim.koillectionmobile.feature.collections.domain.CollectionsRepository
+import com.grappim.koillectionmobile.feature.items.domain.ItemListChanges
 import com.grappim.koillectionmobile.feature.items.domain.ItemsRepository
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.core.annotation.InjectedParam
@@ -20,12 +22,16 @@ import org.koin.core.annotation.KoinViewModel
  *
  * [collectionId] arrives through `parametersOf` at the call site. [InjectedParam] tells the Koin
  * compiler plugin not to look for a `String` definition in the graph.
+ *
+ * A new item in this collection ([ItemListChanges], from the add-item form) reads everything
+ * again, while the screen waits lower on the back stack.
  */
 @KoinViewModel
 class CollectionViewModel(
     @InjectedParam private val collectionId: String,
     private val collectionsRepository: CollectionsRepository,
-    private val itemsRepository: ItemsRepository
+    private val itemsRepository: ItemsRepository,
+    private val itemListChanges: ItemListChanges
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CollectionUiState(onRetry = ::retry))
@@ -33,6 +39,11 @@ class CollectionViewModel(
 
     init {
         load()
+        viewModelScope.launch {
+            itemListChanges.changedCollections
+                .filter { it == collectionId }
+                .collect { load() }
+        }
     }
 
     private fun retry() {

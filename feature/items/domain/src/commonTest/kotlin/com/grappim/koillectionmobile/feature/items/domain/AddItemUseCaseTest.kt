@@ -80,7 +80,7 @@ class AddItemUseCaseTest {
         useCase.addItem(BOOK) { progress += it }
 
         val total = ALL_CALLS.size
-        assertEquals((0..total).map { AddItemProgress(it, total) }, progress)
+        assertEquals((0..total).map { it to total }, progress.map { it.done to it.total })
     }
 
     @Test
@@ -92,8 +92,21 @@ class AddItemUseCaseTest {
         useCase.addItem(BOOK, failure.state) { progress += it }
 
         val total = ALL_CALLS.size
-        assertEquals(AddItemProgress(6, total), progress.first())
-        assertEquals(AddItemProgress(total, total), progress.last())
+        assertEquals(6 to total, progress.first().let { it.done to it.total })
+        assertEquals(total to total, progress.last().let { it.done to it.total })
+    }
+
+    @Test
+    fun `the state of the last progress before a stop resumes the save`() = runTest {
+        server.failOnce = "createTextDatum item-1 Year 1901 2"
+        val progress = mutableListOf<AddItemProgress>()
+        val failure = assertIs<AddItemResult.Failure>(useCase.addItem(BOOK) { progress += it })
+        assertEquals(failure.state, progress.last().state)
+
+        server.calls.clear()
+        useCase.addItem(BOOK, progress.last().state)
+
+        assertEquals(ALL_CALLS.drop(ALL_CALLS.indexOf("createTextDatum item-1 Year 1901 2")), server.calls)
     }
 
     /** Both repositories, recording each call as one line. [failOnce] fails the call with that line once. */

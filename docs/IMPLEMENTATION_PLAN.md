@@ -123,7 +123,11 @@ start of any step that touches the API. Facts that shape the design:
   image URLs, both tags. An image narrower than the server's thumbnail width gets no thumbnails,
   so the thumbnail URLs equal the image URL (`ThumbnailGenerator` returns early). `DELETE
   /api/items/{id}` answered 204; after it the item, its fields and both uploaded files gave 404.
-  Not checked: the upload quota 500, a server behind a subpath.
+  Not checked: a server behind a subpath.
+- Upload quota checked live 2026-11-15 (M3.6, emulator, local test instance): with
+  `disk_space_allowed` at 1 byte, `POST /api/items` and the text fields worked and the main-image
+  upload got HTTP 500 (the `HasEnoughSpaceForUpload` violation, not a 422). The add-item form names
+  the quota for a 500 at an image upload only.
 - Known server-side trap: Koillection's Docker entrypoint can regenerate `JWT_PASSPHRASE` on
   restart, which breaks API login with a 500 while the website keeps working. Upstream issues
   #1600, #1400, #1410. The app should show a clear message for a 500 at login, not a

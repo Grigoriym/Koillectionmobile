@@ -1,6 +1,6 @@
 # koillectionmobile checklist
 
-**Current step:** M3.6. M3.5 done 2026-11-15, M3.4 done 2026-11-15, M3.3 done 2026-11-15, M3.2 done 2026-11-15, M3.1 done 2026-11-15; M3 broken into steps 2026-11-15. M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6 and 7 are settled.
+**Current step:** M3.7. M3.6 done 2026-11-15, M3.5 done 2026-11-15, M3.4 done 2026-11-15, M3.3 done 2026-11-15, M3.2 done 2026-11-15, M3.1 done 2026-11-15; M3 broken into steps 2026-11-15. M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6 and 7 are settled.
 
 ## How to use this
 
@@ -102,7 +102,7 @@ in order, and a failure halfway must not lead to a second item on retry.
   `cacheDir/photos/`, as camera shots are: the picker's URI dies with the process, and a persisted
   grant has a per-app limit (512), so the user chose the copy. `KoinGraphTest` now lists
   `SavedStateHandle` as externally supplied.
-- [ ] **M3.6** — Save: run M3.3 from the form with a progress view, a retry on failure, and on
+- [x] **M3.6** — Save: run M3.3 from the form with a progress view, a retry on failure, and on
   success open the new item (the add screen leaves the back stack) and refresh the collection.
   An upload 500 names the disk quota as a likely cause (plan §2). Delete the photo files in
   `cacheDir/photos/` (M3.5) after a successful save, and when a photo is removed or the form is
@@ -111,6 +111,15 @@ in order, and a failure halfway must not lead to a second item on retry.
   page images and two tags is created on the local test instance, and the web UI shows the same
   item, upright and in order. A save with the server stopped halfway, then retried, gives one
   item, not two.
+  Note: `AddItemUseCase` and a new `ItemListChanges` (the refresh signal, `feature:items:domain`)
+  are bound in `ItemsDataModule`. `PhotoFiles` (prepare + delete) is bound per platform by
+  `PlatformPhotoModule` (`feature:items:ui`, expect/actual as `PlatformStorageModule`); the
+  ViewModel takes the collection id by `@InjectedParam`. `AddItemProgress` now carries the
+  `AddItemState`, so a save cut by process death resumes from saved state. Save is off while the
+  name or a label is blank, or a label is duplicate. "Server stopped halfway" was done with the
+  test user's quota at 1 byte: the item and text fields went through, the main-image upload got
+  HTTP 500 and the quota message; after `am kill`, quota back and "Try again", the same item got
+  the rest (one item, not two). The web UI showed it upright and in order; test items deleted.
 - [ ] **M3.7** — Device pass of the whole add flow, then the user confirms with screenshots. Fix
   what breaks, or put it in `docs/revisit.md` with evidence. Check `docs/revisit.md`'s M1.9 entry
   (IRIs without the server's subpath) against the user's real setup before M3 is called done:

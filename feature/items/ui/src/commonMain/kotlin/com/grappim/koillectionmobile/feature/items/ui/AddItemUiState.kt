@@ -20,10 +20,26 @@ data class PhotoRow(val id: Int, val uri: String, val rotation: Rotation = Rotat
 /** The tags of one category, sorted by label. [label] is null for tags without a category. */
 data class TagGroup(val label: String?, val tags: List<Tag>)
 
+/** The save, once it has started. While it is set, the screen shows it instead of the form. */
+sealed interface SaveStatus {
+    /** The photos are being turned into upload bytes. */
+    data object Preparing : SaveStatus
+
+    /** [done] of [total] server calls are finished. */
+    data class Sending(val done: Int, val total: Int) : SaveStatus
+
+    /**
+     * The save stopped. [isPartial]: the item exists on the server, so only a retry (which sends
+     * the rest) is offered, not a return to the form.
+     */
+    data class Failed(val message: NativeText, val isPartial: Boolean) : SaveStatus
+}
+
 /**
  * The add-item form: the [name], the free [fields] in order, the [photos] (the first is the main
  * image, the rest are image fields in order), and the tags picked from the server's [tagGroups].
  * [tagsError] is set when the tag load failed; the rest of the form still works.
+ * [savedItemId] is set once the item is saved: the screen then opens it.
  */
 data class AddItemUiState(
     val name: String = "",
@@ -33,6 +49,8 @@ data class AddItemUiState(
     val selectedTagIds: Set<String> = emptySet(),
     val isLoadingTags: Boolean = true,
     val tagsError: NativeText = NativeText.Empty,
+    val save: SaveStatus? = null,
+    val savedItemId: String? = null,
     val onNameChange: (String) -> Unit = {},
     val onAddField: () -> Unit = {},
     val onRemoveField: (Int) -> Unit = {},
@@ -44,7 +62,10 @@ data class AddItemUiState(
     val onPhotoRotate: (Int) -> Unit = {},
     val onPhotoRemove: (Int) -> Unit = {},
     val onPhotoMakeMain: (Int) -> Unit = {},
-    val onPhotoLabelChange: (Int, String) -> Unit = { _, _ -> }
+    val onPhotoLabelChange: (Int, String) -> Unit = { _, _ -> },
+    val onSave: () -> Unit = {},
+    val onRetrySave: () -> Unit = {},
+    val onEditForm: () -> Unit = {}
 ) {
     /**
      * The labels that more than one row uses, text rows and image fields together: both are data
@@ -59,4 +80,12 @@ data class AddItemUiState(
             .eachCount()
             .filterValues { it > 1 }
             .keys
+
+    /** The server rejects a blank label (`NotBlank`), so a text row or image field without one blocks the save. */
+    val hasBlankLabel: Boolean
+        get() = fields.any { it.label.isBlank() } || photos.drop(1).any { it.label.isBlank() }
+
+    /** The server needs a name (`NotBlank`) and unique, non-blank labels. */
+    val canSave: Boolean
+        get() = name.isNotBlank() && duplicateLabels.isEmpty() && !hasBlankLabel
 }

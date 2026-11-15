@@ -5,14 +5,13 @@ import com.grappim.kit.testing.MainDispatcherRule
 import com.grappim.kit.uikit.NativeText
 import com.grappim.koillectionmobile.core.domain.KoillectionError
 import com.grappim.koillectionmobile.core.image.Rotation
+import com.grappim.koillectionmobile.feature.items.domain.ItemListChanges
 import com.grappim.koillectionmobile.feature.tags.domain.Tag
 import com.grappim.koillectionmobile.feature.tags.domain.TagCategory
-import com.grappim.koillectionmobile.feature.tags.domain.TagsRepository
 import com.grappim.koillectionmobile.strings.RString
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_error_http
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_error_network
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_error_unexpected
-import kotlinx.coroutines.CompletableDeferred
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -37,7 +36,8 @@ class AddItemViewModelTest {
 
     private val savedStateHandle = SavedStateHandle()
 
-    private fun createSut() = AddItemViewModel(tags, savedStateHandle)
+    private fun createSut() =
+        AddItemViewModel("books", tags, FakeAddItemUseCase(), FakePhotoFiles(), ItemListChanges(), savedStateHandle)
 
     private fun answer(
         tagList: Result<List<Tag>> = Result.success(listOf(NOVEL, GERMAN, FRAKTUR, LOOSE)),
@@ -429,32 +429,6 @@ class AddItemViewModelTest {
         val state = second.uiState.value
         assertEquals(3, state.fields.map { it.id }.toSet().size)
         assertEquals(3, state.photos.map { it.id }.toSet().size)
-    }
-
-    private class FakeTagsRepository : TagsRepository {
-        val tags = ArrayDeque<CompletableDeferred<Result<List<Tag>>>>()
-        val categories = ArrayDeque<CompletableDeferred<Result<List<TagCategory>>>>()
-        var tagCalls = 0
-        var categoryCalls = 0
-
-        fun queue() {
-            tags.addLast(CompletableDeferred())
-            categories.addLast(CompletableDeferred())
-        }
-
-        override suspend fun getTags(): Result<List<Tag>> {
-            tagCalls++
-            return tags.first().await()
-        }
-
-        override suspend fun getTagCategories(): Result<List<TagCategory>> {
-            categoryCalls++
-            return categories.first().await()
-        }
-
-        override suspend fun getItemTags(itemId: String): Result<List<Tag>> = error("not used")
-
-        override suspend fun setItemTags(itemId: String, tagIds: List<String>): Result<Unit> = error("not used")
     }
 
     private companion object {

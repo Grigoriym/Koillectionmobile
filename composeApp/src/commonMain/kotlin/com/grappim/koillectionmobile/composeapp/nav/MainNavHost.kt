@@ -51,8 +51,16 @@ internal fun MainNavHost(modifier: Modifier = Modifier) {
             entry<ItemRoute> { route ->
                 ItemScreen(itemId = route.itemId, onBack = { backStack.removeLastOrNull() })
             }
-            entry<AddItemRoute> {
-                AddItemScreen(onBack = { backStack.removeLastOrNull() })
+            entry<AddItemRoute> { route ->
+                AddItemScreen(
+                    collectionId = route.collectionId,
+                    onBack = { backStack.removeLastOrNull() },
+                    // The new item replaces the form, so back goes to the collection.
+                    onOpenItem = { id ->
+                        backStack.removeLastOrNull()
+                        backStack.add(ItemRoute(id))
+                    }
+                )
             }
         }
     )

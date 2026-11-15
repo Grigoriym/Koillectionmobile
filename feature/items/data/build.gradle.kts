@@ -12,6 +12,8 @@ kotlin {
 
             // `dto` and `domain` arrive through the mapper, which exposes both as `api`.
             implementation(projects.feature.items.mapper)
+            // `TagsRepository`, for the `AddItemUseCase` binding.
+            implementation(projects.feature.tags.domain)
         }
         // `jvmTest`: the tests serve the M1.1 fixture files.
         jvmTest.dependencies {

@@ -8,6 +8,7 @@ import com.grappim.koillectionmobile.feature.collections.domain.CollectionsRepos
 import com.grappim.koillectionmobile.feature.items.domain.Datum
 import com.grappim.koillectionmobile.feature.items.domain.Image
 import com.grappim.koillectionmobile.feature.items.domain.Item
+import com.grappim.koillectionmobile.feature.items.domain.ItemListChanges
 import com.grappim.koillectionmobile.feature.items.domain.ItemsRepository
 import com.grappim.koillectionmobile.strings.RString
 import com.grappim.koillectionmobile.strings.generated.resources.collections_error_http
@@ -36,7 +37,9 @@ class CollectionViewModelTest {
         mainDispatcherRule.tearDown()
     }
 
-    private fun createSut() = CollectionViewModel(BOOKS.id, collections, items)
+    private val itemListChanges = ItemListChanges()
+
+    private fun createSut() = CollectionViewModel(BOOKS.id, collections, items, itemListChanges)
 
     private fun answerAll(
         collection: Result<Collection> = Result.success(BOOKS),
@@ -176,6 +179,30 @@ class CollectionViewModelTest {
         }
     }
 
+    @Test
+    fun `a new item in this collection loads the collection again`() {
+        queueAll()
+        val sut = createSut()
+        answerAll()
+        queueAll()
+
+        itemListChanges.notifyChanged(BOOKS.id)
+        answerAll(itemList = Result.success(listOf(DUNE, MESSIAH)))
+
+        assertEquals(listOf(DUNE, MESSIAH), sut.uiState.value.items)
+    }
+
+    @Test
+    fun `a new item in another collection loads nothing`() {
+        queueAll()
+        createSut()
+        answerAll()
+
+        itemListChanges.notifyChanged("other")
+
+        assertEquals(listOf(BOOKS.id), items.calls)
+    }
+
     private class FakeItemsRepository : ItemsRepository {
         val items = ArrayDeque<CompletableDeferred<Result<List<Item>>>>()
         val calls = mutableListOf<String>()
@@ -221,6 +248,7 @@ class CollectionViewModelTest {
     }
 
     private companion object {
+        val MESSIAH by lazy { DUNE.copy(id = "messiah", name = "Dune Messiah") }
         val BOOKS = Collection(id = "books", title = "Books", parentId = null, color = null, imageUrl = null)
         val NOVELS = Collection(id = "novels", title = "Novels", parentId = "books", color = null, imageUrl = null)
         val DUNE = Item(

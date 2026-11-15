@@ -44,7 +44,13 @@ cold session can act on it. Delete an entry when it's fixed.
 - 2026-11-15 — `docs/IMPLEMENTATION_PLAN.md:15` points to `~/claude/books/00service/` (`koi.py`,
   `add_book.py`) as the worked example of the API calls. That folder does not exist on the current
   machine. Ask the user where the scripts live now, then fix the path or drop the pointer.
-- 2026-11-15 (M3.5) — Every add-item photo is a file in `cacheDir/photos/` (camera shots, and
-  copies of picked photos: `PhotoSources.android.kt` in `feature/items/ui/src/androidMain`). Nothing
-  deletes them yet. Planned in the M3.6 step: delete after a successful save, and when a photo is
-  removed or the form is left.
+- 2026-11-15 (M3.6) — Add-item photo files in `cacheDir/photos/` are deleted on photo remove, on
+  save, and when the form leaves the back stack (`AddItemViewModel.onCleared`). A form that never
+  comes back (the task swiped away, so the saved draft is gone and `onCleared` never runs) leaves
+  its files behind: M3.6 found three such files from M3.5 on the emulator. Fix option: on app
+  start, delete files in `cache/photos/` that no saved draft names (or older than a day).
+- 2026-11-15 (M3.6) — A `createItem` whose response is lost (a timeout after the server created
+  the item) leaves no item id in `AddItemState`, so "Try again" creates a second item.
+  `AddItemUseCaseImpl.addItem` in `feature/items/domain/.../AddItemUseCase.kt`. The server has
+  no idempotency key. Fix option: before a retry with no item id, look for a new item of the same
+  name in the collection, or ask the user.

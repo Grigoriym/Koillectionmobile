@@ -35,8 +35,11 @@ data class AddItemState(
     val tagsDone: Boolean = false
 )
 
-/** [done] of [total] server calls are finished. */
-data class AddItemProgress(val done: Int, val total: Int)
+/**
+ * [done] of [total] server calls are finished. [state] is what exists on the server at this point:
+ * keep it, so a retry after a process death does not create a second item.
+ */
+data class AddItemProgress(val done: Int, val total: Int, val state: AddItemState)
 
 sealed interface AddItemResult {
     data class Success(val itemId: String) : AddItemResult
@@ -69,7 +72,7 @@ class AddItemUseCaseImpl(private val itemsRepository: ItemsRepository, private v
     ): AddItemResult {
         var current = state
         val total = totalCalls(newItem)
-        fun report() = onProgress(AddItemProgress(callsDone(current, newItem), total))
+        fun report() = onProgress(AddItemProgress(callsDone(current, newItem), total, current))
 
         report()
         val itemId = current.itemId ?: itemsRepository.createItem(newItem.collectionId, newItem.name)

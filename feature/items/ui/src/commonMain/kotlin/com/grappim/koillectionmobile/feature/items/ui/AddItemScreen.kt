@@ -18,11 +18,13 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -31,7 +33,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -40,9 +44,11 @@ import com.grappim.kit.uikit.asString
 import com.grappim.koillectionmobile.strings.RString
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_add_field
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_back
+import com.grappim.koillectionmobile.strings.generated.resources.add_item_edit_form
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_field_label
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_field_value
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_label_duplicate
+import com.grappim.koillectionmobile.strings.generated.resources.add_item_label_required
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_main_image
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_make_main
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_name_label
@@ -50,20 +56,37 @@ import com.grappim.koillectionmobile.strings.generated.resources.add_item_no_cat
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_no_tags
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_photo_label
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_pick_photos
+import com.grappim.koillectionmobile.strings.generated.resources.add_item_preparing
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_remove_field
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_remove_photo
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_retry
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_rotate_photo
+import com.grappim.koillectionmobile.strings.generated.resources.add_item_save
+import com.grappim.koillectionmobile.strings.generated.resources.add_item_save_partial
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_section_photos
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_section_tags
+import com.grappim.koillectionmobile.strings.generated.resources.add_item_sending
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_take_photo
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_title
+import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.parameter.parametersOf
 
+/** [onOpenItem] gets the new item's id once the save is done, to open it. */
 @Composable
-fun AddItemScreen(onBack: () -> Unit, modifier: Modifier = Modifier, viewModel: AddItemViewModel = koinViewModel()) {
+fun AddItemScreen(
+    collectionId: String,
+    onBack: () -> Unit,
+    onOpenItem: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: AddItemViewModel = koinViewModel { parametersOf(collectionId) }
+) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val currentOnSaved by rememberUpdatedState(onOpenItem)
+    LaunchedEffect(uiState.savedItemId) {
+        uiState.savedItemId?.let { currentOnSaved(it) }
+    }
     AddItemContent(uiState = uiState, onBack = onBack, modifier = modifier)
 }
 
@@ -82,10 +105,28 @@ private fun AddItemContent(uiState: AddItemUiState, onBack: () -> Unit, modifier
                             contentDescription = stringResource(RString.add_item_back)
                         )
                     }
+                },
+                actions = {
+                    if (uiState.save == null) {
+                        TextButton(onClick = uiState.onSave, enabled = uiState.canSave) {
+                            Text(stringResource(RString.add_item_save))
+                        }
+                    }
                 }
             )
         }
     ) { padding ->
+        val save = uiState.save
+        if (save != null) {
+            SaveView(
+                status = save,
+                uiState = uiState,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+            )
+            return@Scaffold
+        }
         val duplicates = uiState.duplicateLabels
         val photoSources = rememberPhotoSources(onPhotos = uiState.onPhotosAdd)
         LazyColumn(
@@ -118,7 +159,7 @@ private fun AddItemContent(uiState: AddItemUiState, onBack: () -> Unit, modifier
                 PhotoRowEditor(
                     photo = photo,
                     isMain = index == 0,
-                    isDuplicate = index > 0 && photo.label in duplicates,
+                    labelError = labelError(photo.label, duplicates),
                     uiState = uiState,
                     modifier = Modifier.padding(horizontal = PADDING)
                 )
@@ -141,7 +182,7 @@ private fun AddItemContent(uiState: AddItemUiState, onBack: () -> Unit, modifier
             items(uiState.fields, key = { "field-${it.id}" }) { row ->
                 FieldRowEditor(
                     row = row,
-                    isDuplicate = row.label in duplicates,
+                    labelError = labelError(row.label, duplicates),
                     onLabelChange = { uiState.onLabelChange(row.id, it) },
                     onValueChange = { uiState.onValueChange(row.id, it) },
                     onRemove = { uiState.onRemoveField(row.id) },
@@ -169,7 +210,7 @@ private fun AddItemContent(uiState: AddItemUiState, onBack: () -> Unit, modifier
 @Composable
 private fun FieldRowEditor(
     row: FieldRow,
-    isDuplicate: Boolean,
+    labelError: StringResource?,
     onLabelChange: (String) -> Unit,
     onValueChange: (String) -> Unit,
     onRemove: () -> Unit,
@@ -182,12 +223,8 @@ private fun FieldRowEditor(
                 onValueChange = onLabelChange,
                 label = { Text(stringResource(RString.add_item_field_label)) },
                 singleLine = true,
-                isError = isDuplicate,
-                supportingText = if (isDuplicate) {
-                    { Text(stringResource(RString.add_item_label_duplicate)) }
-                } else {
-                    null
-                },
+                isError = labelError != null,
+                supportingText = labelError?.let { { Text(stringResource(it)) } },
                 modifier = Modifier.fillMaxWidth()
             )
             OutlinedTextField(
@@ -211,7 +248,7 @@ private fun FieldRowEditor(
 private fun PhotoRowEditor(
     photo: PhotoRow,
     isMain: Boolean,
-    isDuplicate: Boolean,
+    labelError: StringResource?,
     uiState: AddItemUiState,
     modifier: Modifier = Modifier
 ) {
@@ -230,12 +267,8 @@ private fun PhotoRowEditor(
                     onValueChange = { uiState.onPhotoLabelChange(photo.id, it) },
                     label = { Text(stringResource(RString.add_item_photo_label)) },
                     singleLine = true,
-                    isError = isDuplicate,
-                    supportingText = if (isDuplicate) {
-                        { Text(stringResource(RString.add_item_label_duplicate)) }
-                    } else {
-                        null
-                    },
+                    isError = labelError != null,
+                    supportingText = labelError?.let { { Text(stringResource(it)) } },
                     modifier = Modifier.fillMaxWidth()
                 )
             }
@@ -259,6 +292,50 @@ private fun PhotoRowEditor(
                         imageVector = Icons.Filled.Delete,
                         contentDescription = stringResource(RString.add_item_remove_photo)
                     )
+                }
+            }
+        }
+    }
+}
+
+/** The message under a label field: a blank label, or one that another field uses. */
+private fun labelError(label: String, duplicates: Set<String>): StringResource? = when {
+    label.isBlank() -> RString.add_item_label_required
+    label in duplicates -> RString.add_item_label_duplicate
+    else -> null
+}
+
+/**
+ * The save instead of the form: a progress bar while it runs; on a failure the message and a
+ * retry, plus a way back to the form while nothing exists on the server.
+ */
+@Composable
+private fun SaveView(status: SaveStatus, uiState: AddItemUiState, modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier.padding(PADDING),
+        verticalArrangement = Arrangement.spacedBy(PADDING, Alignment.CenterVertically),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        when (status) {
+            SaveStatus.Preparing -> {
+                CircularProgressIndicator()
+                Text(stringResource(RString.add_item_preparing))
+            }
+
+            is SaveStatus.Sending -> {
+                LinearProgressIndicator(
+                    progress = { if (status.total == 0) 0f else status.done.toFloat() / status.total },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Text(stringResource(RString.add_item_sending, status.done, status.total))
+            }
+
+            is SaveStatus.Failed -> {
+                Text(text = status.message.asString(), color = MaterialTheme.colorScheme.error)
+                if (status.isPartial) Text(stringResource(RString.add_item_save_partial))
+                Button(onClick = uiState.onRetrySave) { Text(stringResource(RString.add_item_retry)) }
+                if (!status.isPartial) {
+                    OutlinedButton(onClick = uiState.onEditForm) { Text(stringResource(RString.add_item_edit_form)) }
                 }
             }
         }
