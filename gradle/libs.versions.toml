@@ -60,6 +60,8 @@ jetbrainsAndroidxLifecycle = "2.11.0"
 jetbrainsNav3 = "1.2.0"
 # https://github.com/JakeWharton/timber/releases
 timber = "5.0.1"
+# https://github.com/coil-kt/coil/releases
+coil = "3.6.3"
 # https://github.com/Grigoriym/grappim-kit — one shared VERSION_NAME for every wired module
 grappimKit = "0.1.8"
 
@@ -91,6 +93,9 @@ grappim-kit-storage = { module = "io.github.grigoriym:grappim-kit-storage", vers
 grappim-kit-customheaders = { module = "io.github.grigoriym:grappim-kit-customheaders", version.ref = "grappimKit" }
 
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
+
+coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }
+coil-ktor = { module = "io.coil-kt.coil3:coil-network-ktor3", version.ref = "coil" }
 
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlin-serialization-json" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }

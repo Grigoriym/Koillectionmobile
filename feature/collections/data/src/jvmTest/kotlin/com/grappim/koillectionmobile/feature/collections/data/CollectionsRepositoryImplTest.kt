@@ -35,6 +35,9 @@ class CollectionsRepositoryImplTest {
     private fun repository(vararg routes: Pair<String, Pair<HttpStatusCode, String>>): CollectionsRepositoryImpl {
         val byPath = routes.toMap()
         val session = FakeSessionStorage(serverUrl = "https://koi.example/sub", token = "jwt")
+        val baseUrlProvider = object : BaseUrlProvider {
+            override fun getBaseUrl(): String = session.serverUrl
+        }
         val client = HttpClient(
             MockEngine { request ->
                 requests += request
@@ -45,15 +48,17 @@ class CollectionsRepositoryImplTest {
         ) {
             configureKoillectionClient(
                 json = json,
-                baseUrlProvider = object : BaseUrlProvider {
-                    override fun getBaseUrl(): String = session.serverUrl
-                },
+                baseUrlProvider = baseUrlProvider,
                 sessionStorage = session,
                 customHeadersStorage = FakeCustomHeadersStorage(),
                 logLevel = LogLevel.NONE
             )
         }
-        return CollectionsRepositoryImpl(httpClient = client, mapper = CollectionMapper())
+        return CollectionsRepositoryImpl(
+            httpClient = client,
+            baseUrlProvider = baseUrlProvider,
+            mapper = CollectionMapper()
+        )
     }
 
     private fun fixture(name: String): String = File("../../../fixtures/koillection-1.8.5/$name").readText()
@@ -63,7 +68,7 @@ class CollectionsRepositoryImplTest {
         title = "Books",
         parentId = null,
         color = "EEEEEE",
-        imagePath = null
+        imageUrl = null
     )
 
     @Test
@@ -102,6 +107,19 @@ class CollectionsRepositoryImplTest {
         )
 
         assertEquals(books, repository.getCollection(BOOKS_ID).getOrThrow())
+    }
+
+    @Test
+    fun `an image path resolves against the stored server URL, subpath included`() = runTest {
+        val repository = repository(
+            "/sub/api/collections/a" to
+                (HttpStatusCode.OK to """{"id":"a","title":"A","image":"uploads/user/cover.jpg"}""")
+        )
+
+        assertEquals(
+            "https://koi.example/sub/uploads/user/cover.jpg",
+            repository.getCollection("a").getOrThrow().imageUrl
+        )
     }
 
     @Test

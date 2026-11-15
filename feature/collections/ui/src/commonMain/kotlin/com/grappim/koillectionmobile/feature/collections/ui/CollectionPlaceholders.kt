@@ -7,14 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 
-// M2.1 placeholders. M2.3 replaces the list, M2.4 the collection screen.
-
-@Composable
-fun CollectionListScreen(modifier: Modifier = Modifier) {
-    Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text(text = "Collections")
-    }
-}
+// M2.1 placeholder. M2.4 replaces the collection screen.
 
 @Composable
 fun CollectionScreen(collectionId: String, modifier: Modifier = Modifier) {

@@ -26,11 +26,6 @@ cold session can act on it. Delete an entry when it's fixed.
   the `data` modules take as a test dependency. M1.7 added the fourth:
   `feature/items/data/src/jvmTest/.../items/data/FakeSessionStorage.kt`.
   M1.8 added the fifth: `feature/tags/data/src/jvmTest/.../tags/data/FakeSessionStorage.kt`.
-- 2026-11-15 (M1.7) — Image paths are resolved in one feature and not in the other.
-  `feature:items` gives full URLs (`ItemMapper.toDomain(dto, serverUrl)`), but
-  `feature:collections` keeps `Collection.imagePath` relative (`CollectionMapper.kt`). M2's
-  collection list needs full URLs too. Fix: resolve in `CollectionMapper` the same way, or move
-  the resolve helper into `core:api` next to `normalizeBaseUrl` and use it in both.
 - 2026-11-15 (M1.9) — Write bodies send IRIs without the server's subpath (`/api/collections/<id>`,
   `/api/items/<id>`, `/api/tags/<id>`): `ItemsRepositoryImpl.createItem`/`itemIri` and
   `TagsRepositoryImpl.setItemTags`. The server's own IRIs carry its prefix (M1.4: `next` links).

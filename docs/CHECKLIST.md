@@ -1,6 +1,6 @@
 # koillectionmobile checklist
 
-**Current step:** M2.3 (M2.2 done 2026-11-15). M1 done 2026-11-15, M0 done 2026-11-14 (both archived). Plan §5 decisions 1, 2, 4, 5 and 6 are settled.
+**Current step:** M2.4 (M2.3 done 2026-11-15). M1 done 2026-11-15, M0 done 2026-11-14 (both archived). Plan §5 decisions 1, 2, 4, 5 and 6 are settled.
 
 ## How to use this
 
@@ -37,8 +37,8 @@ plan §5 decision 5 (settled 2026-11-15). Every screen is checked on the emulato
 local test instance (`docs/local-info.md`); the emulator reaches it at `http://10.0.2.2:8290`.
 
 Model: `../wallosmobile` `composeApp` (`WallosAppContent`, `LoginBranch`, `nav/MainNavHost`) and
-`feature/setup/ui` (`LoginViewModel` + its `commonTest`). Navigation 3 and the lifecycle
-ViewModel libraries are in the catalog already; Coil 3 is not. ViewModel tests use hand-written
+`feature/setup/ui` (`LoginViewModel` + its `commonTest`). Navigation 3, the lifecycle
+ViewModel libraries and Coil 3 (since M2.3) are in the catalog. ViewModel tests use hand-written
 fake repositories.
 
 - [x] **M2.1** — App shell. A "logged in" flow on `SessionStorage` (a stored token and
@@ -63,12 +63,18 @@ fake repositories.
   Note: `LoginViewModel` (`@KoinViewModel`, `AuthUiModule` in `AppModule`) has no navigation
   callback. No pre-filled server URL yet: that is M2.6. A `Failed` with an HTTP status names the
   status; any other `Failed` gets a generic message. Autodiscovery worked: OkHttp (plan §2).
-- [ ] **M2.3** — Collection list (`feature:collections:ui`): top-level collections (no
+- [x] **M2.3** — Collection list (`feature:collections:ui`): top-level collections (no
   `parentId`), name and image, loading / error / empty states, pull to refresh. Add Coil 3 (as
   in wallosmobile's catalog). Resolve collection image URLs as `feature:items` does: this fixes
   the `docs/revisit.md` entry from M1.7.
   **Verify:** ViewModel and mapper tests (`jvmTest --rerun`); on the emulator the list shows the
   test instance's collections with their images.
+  Note: the test instance's only collection (`Books`) has no image, so the device check added a
+  temporary top-level collection with an image and a child under it, then deleted both. The image
+  loaded, the child was filtered out, and a pull to refresh dropped the deleted one. A row without
+  an image shows the title's first letter. Tapping a row opens `CollectionRoute` (needed by M2.4's
+  Verify). Coil: `coil-compose` in `feature:collections:ui`, and `coil-network-ktor3` in
+  `:composeApp`, found by service loader; uploads are public files, so images need no token.
 - [ ] **M2.4** — Collection screen: its child collections, then its items (name and small
   thumbnail). Tapping a child opens that collection; tapping an item opens the item placeholder.
   `ItemsRepository.getItems` reads every page before it returns (445 items = 15 requests on the

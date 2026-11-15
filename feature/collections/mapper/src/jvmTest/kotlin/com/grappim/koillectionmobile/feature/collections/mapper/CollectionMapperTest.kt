@@ -25,9 +25,9 @@ class CollectionMapperTest {
                 title = "Books",
                 parentId = null,
                 color = "EEEEEE",
-                imagePath = null
+                imageUrl = null
             ),
-            mapper.toDomain(dto)
+            mapper.toDomain(dto, SERVER_URL)
         )
     }
 
@@ -36,13 +36,29 @@ class CollectionMapperTest {
         val dto = CollectionDto(
             id = "child",
             title = "Novels",
-            parent = "/koillection/api/collections/01a1de6f-bfad-78b6-a916-7266d9e3dfff",
-            image = "uploads/user/cover.jpg"
+            parent = "/koillection/api/collections/01a1de6f-bfad-78b6-a916-7266d9e3dfff"
         )
 
-        val collection = mapper.toDomain(dto)
+        val collection = mapper.toDomain(dto, SERVER_URL)
 
         assertEquals("01a1de6f-bfad-78b6-a916-7266d9e3dfff", collection.parentId)
-        assertEquals("uploads/user/cover.jpg", collection.imagePath)
+    }
+
+    @Test
+    fun `the image path resolves to a full URL under the server root`() {
+        val dto = CollectionDto(id = "a", title = "A", image = "uploads/user/cover.jpg")
+
+        assertEquals("https://koi.example/sub/uploads/user/cover.jpg", mapper.toDomain(dto, SERVER_URL).imageUrl)
+    }
+
+    @Test
+    fun `a leading slash on the image path does not double the slash`() {
+        val dto = CollectionDto(id = "a", title = "A", image = "/uploads/user/cover.jpg")
+
+        assertEquals("https://koi.example/sub/uploads/user/cover.jpg", mapper.toDomain(dto, SERVER_URL).imageUrl)
+    }
+
+    private companion object {
+        const val SERVER_URL = "https://koi.example/sub/"
     }
 }

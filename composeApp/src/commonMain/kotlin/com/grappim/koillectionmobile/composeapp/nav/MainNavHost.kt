@@ -22,7 +22,9 @@ internal fun MainNavHost(modifier: Modifier = Modifier) {
         modifier = modifier,
         onBack = { backStack.removeLastOrNull() },
         entryProvider = entryProvider {
-            entry<CollectionListRoute> { CollectionListScreen() }
+            entry<CollectionListRoute> {
+                CollectionListScreen(onCollectionClick = { id -> backStack.add(CollectionRoute(id)) })
+            }
             entry<CollectionRoute> { route -> CollectionScreen(collectionId = route.collectionId) }
             entry<ItemRoute> { route -> ItemScreen(itemId = route.itemId) }
         }

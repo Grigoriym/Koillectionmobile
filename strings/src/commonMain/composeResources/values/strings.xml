@@ -15,4 +15,11 @@
     <string name="login_error_server_jwt">The server failed to make a login token (HTTP 500). Usually its JWT keys do not match JWT_PASSPHRASE, for example after a container restart made a new passphrase. The website can still work in this state. Check JWT_PASSPHRASE and the JWT keys on the server.</string>
     <string name="login_error_http">The server answered with an error (HTTP %1$d).</string>
     <string name="login_error_unexpected">The login failed with an unexpected error.</string>
+
+    <string name="collections_title">Collections</string>
+    <string name="collections_empty">There are no collections yet.</string>
+    <string name="collections_retry">Try again</string>
+    <string name="collections_error_network">The server does not answer. Check the network connection.</string>
+    <string name="collections_error_http">The server answered with an error (HTTP %1$d).</string>
+    <string name="collections_error_unexpected">Loading the collections failed with an unexpected error.</string>
 </resources>
