@@ -6,8 +6,12 @@ this app.
 
 ## Device facts
 
-- AVD: `Medium_Phone_API_36.1` (1080x2400; a `screencap` has the same size, so the scale
-  factor is 1). Created 2026-11-15 in M2.1.
+- AVD: the name depends on the machine. `Medium_Phone_API_36.1` was created 2026-11-15 in M2.1.
+  The current machine has `koil36` (Pixel 6, `system-images;android-36;google_apis;x86_64`),
+  created 2026-11-15. Both are 1080x2400, and a `screencap` has the same size, so the scale
+  factor is 1. `emulator -list-avds` shows what exists.
+- Gradle needs `ANDROID_HOME=$HOME/Android/Sdk` on the current machine: the repo has no
+  `local.properties`.
 - Package ids: `com.grappim.koillectionmobile.debug` (`gplayDebug`, the day-to-day
   variant), `com.grappim.koillectionmobile.fdroid.debug` (`fdroidDebug`).
 - Activity: `com.grappim.koillectionmobile.MainActivity` (fully qualified: the package id

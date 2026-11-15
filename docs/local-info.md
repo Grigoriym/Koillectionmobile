@@ -20,24 +20,35 @@ is fixed in `compose.yaml`, so a restart does not break API login (plan §2 trap
 
 ## Data
 
-A copy of the real catalogue, made 2026-11-15 by
-`/home/gregory/data/koillection-test/copy_from_real.py`. The script only reads the real server
-(through `koi.py`) and writes to this instance. It copies tag categories, tags, collections,
-items with their main image, all data fields with their images, and each item's tags. The test
-copy has its own IDs and its own user, so no real ID appears in it.
+A full copy of the real catalogue, made 2026-11-15 (second time, on the current machine) from
+a database dump and the uploads folder. The real instance is the `koillection` container
+(`koillection/koillection:1.8.4`, compose in `/home/gregory/claude/koillection/`). Only read
+it: `pg_dump` and a file copy. The copy keeps the real IDs. The real user was renamed to
+`tester`, with the e-mail `tester@example.com`, the password above and a large upload quota.
+On the first start, 1.8.5 migrated the 1.8.4 data without errors.
 
-To reset to a fresh copy: stop the instance, delete `postgres/`, `uploads/` and `state.json` in
-the data folder, start it, create the `tester` user on `/first-connection` (username, e-mail
-`tester@example.com`, password above), then raise its upload quota (the default stops the
-copy after about 500 MB of images with a 422 "not enough space left on your account"):
+The first copy (also 2026-11-15, on another machine) used an API script, `copy_from_real.py`.
+That copy had its own IDs. The script is not on this machine, and the fixtures in
+`fixtures/koillection-1.8.5/` came from that first copy.
 
-    docker exec koillection-test-db psql -U koillection -d koillection \
-      -c "update koi_user set disk_space_allowed = 1000000000000 where username='tester';"
+To reset to a fresh copy (the real instance keeps running):
 
-Then run `python3 -I copy_from_real.py` in the data folder. It is resumable: run it again after
-an error. A finished copy ends `copy.log` with `done`. Check that line, not the
-exit status of a wrapping shell command: on 2026-11-15 the fixtures were first captured from a
-copy that had died at item 102.
+    cd /home/gregory/data/koillection-test
+    docker compose down && sudo rm -rf postgres && docker compose up -d db
+    docker exec koillection-db sh -c 'pg_dump -U "$POSTGRES_USER" -d "$POSTGRES_DB" -Fc' > real.dump
+    docker exec -i koillection-test-db pg_restore -U koillection -d koillection --no-owner < real.dump
+    rsync -a --delete /home/gregory/claude/koillection/data/uploads/ uploads/
+    docker compose up -d
+    H=$(docker exec koillection-test php /app/public/bin/console security:hash-password \
+      'koillection-test' 'App\Entity\User' -n | grep -oE '\$2y\$[^ ]+')
+    echo "update koi_user set username='tester', email='tester@example.com', password=:'h',
+      disk_space_allowed=1000000000000;" |
+      docker exec -i koillection-test-db psql -U koillection -d koillection -v h="$H"
+
+`psql` puts `:'h'` in only for SQL read from stdin or a file, not for `-c`.
+
+Run `pg_restore` before the app container starts the first time. If the app starts on an empty
+database first, it creates the schema and the restore conflicts with it.
 
 ## Fixtures
 
