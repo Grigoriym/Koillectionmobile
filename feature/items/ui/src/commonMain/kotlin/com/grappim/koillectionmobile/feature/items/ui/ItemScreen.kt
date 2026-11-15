@@ -1,16 +1,184 @@
 package com.grappim.koillectionmobile.feature.items.ui
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil3.compose.AsyncImage
+import com.grappim.kit.uikit.asString
+import com.grappim.koillectionmobile.feature.items.domain.Image
+import com.grappim.koillectionmobile.strings.RString
+import com.grappim.koillectionmobile.strings.generated.resources.item_field_not_shown
+import com.grappim.koillectionmobile.strings.generated.resources.item_image_full
+import com.grappim.koillectionmobile.strings.generated.resources.item_retry
+import com.grappim.koillectionmobile.strings.generated.resources.item_section_tags
+import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.parameter.parametersOf
 
-// M2.1 placeholder. M2.5 replaces it with the item detail.
 @Composable
-fun ItemScreen(itemId: String, modifier: Modifier = Modifier) {
-    Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text(text = "Item $itemId")
+fun ItemScreen(
+    itemId: String,
+    modifier: Modifier = Modifier,
+    viewModel: ItemViewModel = koinViewModel { parametersOf(itemId) }
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    ItemContent(uiState = uiState, modifier = modifier)
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun ItemContent(uiState: ItemUiState, modifier: Modifier = Modifier) {
+    // The full image on screen, or null. Kept across rotation.
+    var fullImageUrl by rememberSaveable { mutableStateOf<String?>(null) }
+
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        topBar = { TopAppBar(title = { Text(uiState.name) }) }
+    ) { padding ->
+        val contentModifier = Modifier
+            .fillMaxSize()
+            .padding(padding)
+        when {
+            uiState.isLoading -> Box(modifier = contentModifier, contentAlignment = Alignment.Center) {
+                CircularProgressIndicator()
+            }
+
+            uiState.error.isNotEmpty() -> Column(
+                modifier = contentModifier.padding(PADDING),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(PADDING, Alignment.CenterVertically)
+            ) {
+                Text(
+                    text = uiState.error.asString(),
+                    color = MaterialTheme.colorScheme.error,
+                    textAlign = TextAlign.Center
+                )
+                Button(onClick = uiState.onRetry) { Text(stringResource(RString.item_retry)) }
+            }
+
+            else -> ItemDetails(
+                uiState = uiState,
+                onImageClick = { fullImageUrl = it },
+                modifier = contentModifier
+            )
+        }
+    }
+
+    fullImageUrl?.let { url -> FullImage(url = url, onDismiss = { fullImageUrl = null }) }
+}
+
+@Composable
+private fun ItemDetails(uiState: ItemUiState, onImageClick: (String) -> Unit, modifier: Modifier = Modifier) {
+    LazyColumn(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(PADDING)
+    ) {
+        uiState.image?.let { image ->
+            item(key = "image") {
+                ItemImage(image = image, onClick = onImageClick, modifier = Modifier.padding(top = PADDING))
+            }
+        }
+        items(uiState.fields, key = { it.id }) { field ->
+            Field(field = field, onImageClick = onImageClick, modifier = Modifier.padding(horizontal = PADDING))
+        }
+        if (uiState.tags.isNotEmpty()) {
+            item(key = "tags") {
+                Column(modifier = Modifier.padding(horizontal = PADDING).padding(bottom = PADDING)) {
+                    Label(stringResource(RString.item_section_tags))
+                    FlowRow(horizontalArrangement = Arrangement.spacedBy(TAG_SPACING)) {
+                        uiState.tags.forEach { tag -> SuggestionChip(onClick = {}, label = { Text(tag) }) }
+                    }
+                }
+            }
+        }
     }
 }
+
+@Composable
+private fun Field(field: ItemField, onImageClick: (String) -> Unit, modifier: Modifier = Modifier) {
+    Column(modifier = modifier.fillMaxWidth()) {
+        Label(field.label)
+        when (field) {
+            is ItemField.Text -> Text(text = field.value, style = MaterialTheme.typography.bodyLarge)
+
+            is ItemField.Picture -> ItemImage(image = field.image, onClick = onImageClick)
+
+            is ItemField.NotShown -> Text(
+                text = stringResource(RString.item_field_not_shown, field.type),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+    }
+}
+
+@Composable
+private fun Label(text: String) {
+    Text(text = text, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
+}
+
+/** The large thumbnail, or the full image when the server sent no thumbnail. A tap opens the full image. */
+@Composable
+private fun ItemImage(image: Image, onClick: (String) -> Unit, modifier: Modifier = Modifier) {
+    AsyncImage(
+        model = image.largeThumbnailUrl ?: image.url,
+        contentDescription = null,
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable { onClick(image.url) },
+        contentScale = ContentScale.FillWidth
+    )
+}
+
+@Composable
+private fun FullImage(url: String, onDismiss: () -> Unit) {
+    Dialog(onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false)) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black)
+                .clickable(onClick = onDismiss),
+            contentAlignment = Alignment.Center
+        ) {
+            AsyncImage(
+                model = url,
+                contentDescription = stringResource(RString.item_image_full),
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Fit
+            )
+        }
+    }
+}
+
+private val PADDING = 16.dp
+private val TAG_SPACING = 8.dp

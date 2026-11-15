@@ -1,6 +1,6 @@
 # koillectionmobile checklist
 
-**Current step:** M2.5 (M2.4 done 2026-11-15). M1 done 2026-11-15, M0 done 2026-11-14 (both archived). Plan §5 decisions 1, 2, 4, 5 and 6 are settled.
+**Current step:** M2.6 (M2.5 done 2026-11-15). M1 done 2026-11-15, M0 done 2026-11-14 (both archived). Plan §5 decisions 1, 2, 4, 5 and 6 are settled.
 
 ## How to use this
 
@@ -88,12 +88,21 @@ fake repositories.
   on the emulator: under 2 s (one `uiautomator dump` poll); the host reads all 15 pages in 0.3 s.
   Not recorded in `docs/revisit.md`. The list ends with the server's last item (445 in total).
   Tapping a child collection was not checked on the device: the test instance has none.
-- [ ] **M2.5** — Item detail (`feature:items:ui`): main image (large thumbnail, full image on
+- [x] **M2.5** — Item detail (`feature:items:ui`): main image (large thumbnail, full image on
   tap), fields in `position` order (text-like types as text, `image` fields as images), and the
   item's tags. A field type the screen does not know shows its label and a "not shown" mark, not
   a crash.
   **Verify:** ViewModel tests (`jvmTest --rerun`); on the emulator one book shows its fields,
   page images and tags, and they match the web UI for the same item.
+  Note: `ItemViewModel` reads the item, its fields and its tags in parallel, all or none, with a
+  retry button (as M2.4). `feature:items:ui` now depends on `feature:tags:domain`. Text types are
+  `DatumTypeEnum::TEXT_TYPES` without `file`, shown raw (a `date` or `list` is not formatted).
+  `image` and `sign` with an uploaded image show the large thumbnail. Everything else, and an image
+  field without an image, shows "not shown". A tap on any image (main or field) opens the full
+  image. Tags are sorted by label: the web UI does, the API does not (plan §2). Checked on
+  "Ut mine Stromtid": 10 text fields, 2 page images, 3 tags, the same as the web page. The test
+  instance has only `text` and `image` fields (4007 and 1577), so the other types were not seen on
+  the device.
 - [ ] **M2.6** — Log out. A log-out action clears the session in `SessionStorage`, which returns
   the app to login through M2.1's flow. A failed re-login on a 401 (the stored password no longer
   works) also clears the session, so the user sees login and not an endless error.
