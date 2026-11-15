@@ -122,7 +122,9 @@ fake repositories.
   decorators. Device: a re-login showed the list without a collection deleted while logged out. The
   401 path was not checked on the device, only in `BearerAuthTest`.
 - [ ] **M2.7** — Device pass of the whole browse flow on the emulator: login, collection, item,
-  back to the top, rotation and process death (back stack kept), log out. Fix what breaks, or put
+  back to the top, rotation and process death (back stack kept), log out. Open two different
+  items in a row: before M2.6 the second showed the first one's data, and M2.5's device check
+  opened only one. Fix what breaks, or put
   it in `docs/revisit.md` with evidence.
   **Verify:** the flow passes on the emulator; screenshots go to the user, and the user confirms.
 

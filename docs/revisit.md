@@ -26,6 +26,7 @@ cold session can act on it. Delete an entry when it's fixed.
   the `data` modules take as a test dependency. M1.7 added the fourth:
   `feature/items/data/src/jvmTest/.../items/data/FakeSessionStorage.kt`.
   M1.8 added the fifth: `feature/tags/data/src/jvmTest/.../tags/data/FakeSessionStorage.kt`.
+  M2.6 added `clearSession()` to `SessionStorage` and had to edit all five copies.
 - 2026-11-15 (M1.9) — Write bodies send IRIs without the server's subpath (`/api/collections/<id>`,
   `/api/items/<id>`, `/api/tags/<id>`): `ItemsRepositoryImpl.createItem`/`itemIri` and
   `TagsRepositoryImpl.setItemTags`. The server's own IRIs carry its prefix (M1.4: `next` links).
@@ -34,9 +35,9 @@ cold session can act on it. Delete an entry when it's fixed.
   unprefixed IRIs against the user's server, but whether that server has a subpath is not
   recorded here. Check once against a subpath instance (or the user's setup) before M3 ships.
 - 2026-11-15 (M2.5) — The error mapping and the error view exist twice, copied by hand:
-  `Throwable.toMessage()` in `feature/collections/ui/.../CollectionListViewModel.kt:59` and
+  `Throwable.toMessage()` in `feature/collections/ui/.../CollectionListViewModel.kt:74` and
   `feature/items/ui/.../ItemViewModel.kt` (bottom), and `EmptyOrError` in
-  `feature/collections/ui/.../CollectionListScreen.kt:86` against the inline error `Column` in
+  `feature/collections/ui/.../CollectionListScreen.kt:97` against the inline error `Column` in
   `feature/items/ui/.../ItemScreen.kt`. Only the string resources differ. A third `ui` screen makes
   it worth one shared copy (a `core:ui` module, or a `KoillectionError` → message function that
   takes the strings).

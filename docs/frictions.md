@@ -38,3 +38,5 @@ entries get deleted — see /finalize.
   (M2.2), so the tap math got a list of numbers. Filter on `password="true"` instead.
 - 2026-11-15 — `grep -o 'text="[^"]\+"'` on a `uiautomator` dump (M2.5) skipped a field value that
   holds `"`: the dump does not escape it. It looked like a missing field until a screenshot showed it.
+- 2026-11-15 — A Python heredoc with Kotlin raw strings (`"""`) in a `"""`-delimited Python string failed with a
+  SyntaxError again (M2.6). Second time; `'''` delimiters in the Python fixed it.

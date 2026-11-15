@@ -43,3 +43,10 @@ this app.
   fields (Title page, Spine) and 3 tags. To compare with the web UI from the host, log in with
   `curl` (a cookie jar, `GET /` for `_csrf_token`, then `POST /` with `_login`, `_password` and the
   token) and read `/items/<id>`.
+- Log out (M2.6) is the "Log out" text button in the collection list's top bar. After it the
+  login form shows only the server URL. To prove that a re-login loads fresh data and does not
+  show the old screen state, change the server while logged out: create a temporary collection
+  through the API, log in, log out, delete it, log in again. The list must not show it.
+- Two different items in a row (`Books` → "Jörn Uhl", back, "Die Pappenheimer") must show
+  different authors (Gustav Frenssen, Julius Wolff). The same author twice means the entries
+  share one ViewModel (the M2.6 bug).
