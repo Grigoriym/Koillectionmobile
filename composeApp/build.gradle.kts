@@ -11,6 +11,8 @@ kotlin {
             implementation(projects.feature.auth.data)
             implementation(projects.feature.collections.data)
             implementation(projects.feature.collections.mapper)
+            implementation(projects.feature.items.data)
+            implementation(projects.feature.items.mapper)
         }
         // `KoinGraphTest` uses `verify()`, which koin-test ships for the JVM only.
         jvmTest.dependencies {
@@ -18,9 +20,10 @@ kotlin {
             implementation(libs.koin.test)
             // `HttpClientEngine` in `KoinGraphTest`'s extra types.
             implementation(libs.ktor.core)
-            // `AuthRepository` and `CollectionsRepository`, resolved in `KoinGraphTest`.
+            // `AuthRepository`, `CollectionsRepository` and `ItemsRepository`, resolved in `KoinGraphTest`.
             implementation(projects.feature.auth.domain)
             implementation(projects.feature.collections.domain)
+            implementation(projects.feature.items.domain)
         }
     }
 }

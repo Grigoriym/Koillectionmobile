@@ -70,6 +70,13 @@ start of any step that touches the API. Facts that shape the design:
   `#[ApiFilter]`, so there is no `parent` filter. A top-level list is a client-side filter on a
   null `parent` (an IRI, not an object). `image` is a path relative to the server root
   (`uploads/<user>/<file>`), as on items. Checked 2026-11-15 (M1.6).
+- Items (checked 2026-11-15, M1.7): `image`, `imageSmallThumbnail` and `imageLargeThumbnail`
+  on an item and on a Datum are paths relative to the server root. The server serves `/uploads/*`
+  as static files (`docker/Caddyfile`), so an image URL needs no JWT. `feature:items` resolves
+  the paths to full URLs. `GET /api/items/{id}/data` has no guaranteed `position` order: the
+  `OrderBy` on `Item::$data` is a Doctrine collection setting, and API Platform reads the Datum
+  rows with its own query (`Datum.php` sets no `order`). So `feature:items` sorts by `position`.
+  Not checked against a server with reordered fields: the fixture is already in `position` order.
 - Feature repositories return `Result` (`resultOf` from grappim-kit `domain`, as in
   wallosmobile); the failure is the `KoillectionError` that `core:api` threw. `feature:auth` is
   the exception: its `LoginResult` names each login outcome.

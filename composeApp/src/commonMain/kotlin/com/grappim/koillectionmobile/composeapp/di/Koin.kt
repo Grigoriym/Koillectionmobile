@@ -5,6 +5,8 @@ import com.grappim.koillectionmobile.core.storage.PlatformStorageModule
 import com.grappim.koillectionmobile.feature.auth.data.AuthDataModule
 import com.grappim.koillectionmobile.feature.collections.data.CollectionsDataModule
 import com.grappim.koillectionmobile.feature.collections.mapper.CollectionsMapperModule
+import com.grappim.koillectionmobile.feature.items.data.ItemsDataModule
+import com.grappim.koillectionmobile.feature.items.mapper.ItemsMapperModule
 import org.koin.core.annotation.ComponentScan
 import org.koin.core.annotation.Configuration
 import org.koin.core.annotation.KoinApplication
@@ -24,7 +26,9 @@ import org.koin.core.annotation.Module
         PlatformStorageModule::class,
         AuthDataModule::class,
         CollectionsMapperModule::class,
-        CollectionsDataModule::class
+        CollectionsDataModule::class,
+        ItemsMapperModule::class,
+        ItemsDataModule::class
     ]
 )
 @Configuration

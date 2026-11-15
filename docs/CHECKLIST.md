@@ -1,6 +1,6 @@
 # koillectionmobile checklist
 
-**Current step:** M1.7 (M1.6 done 2026-11-15). M0 done 2026-11-14 (archived). Plan §5 decisions 1, 2, 4 and 6 are settled.
+**Current step:** M1.8 (M1.7 done 2026-11-15). M0 done 2026-11-14 (archived). Plan §5 decisions 1, 2, 4 and 6 are settled.
 
 ## How to use this
 
@@ -106,9 +106,14 @@ Model for every step: `../wallosmobile/core/api` and its `feature:*:data` module
   (`uploads/...`), not resolved. The fixtures hold one collection with no children, so paging
   and a set `parent` are tested with inline bodies. Mutation-checked: no `@Single`, a wrong
   children path and an unparsed parent IRI each fail a test.
-- [ ] **M1.7** — `feature:items` read side: items of a collection (paged), get one item, the
+- [x] **M1.7** — `feature:items` read side: items of a collection (paged), get one item, the
   item's data (Datum) list, image URLs resolved against the server URL.
   **Verify:** mapper and repository tests against the M1.1 fixtures.
+  Note: `ItemsRepository` returns `Result`, as in M1.6. `ItemMapper.toDomain(dto, serverUrl)`
+  resolves image and thumbnail paths to full URLs; the repository passes the stored URL through
+  `normalizeBaseUrl` (`core:api`, now public). `getData` sorts by `position`: the server does not promise
+  that order (plan §2). `Datum.type` stays the server's string. Mutation-checked: no `@Single`, no
+  sort, no server URL in the image URL and an unnormalised server URL each fail a test.
 - [ ] **M1.8** — `feature:tags` dto/domain/mapper/data: list tags (paged), tag categories,
   an item's tags.
   **Verify:** mapper and repository tests against the M1.1 fixtures.

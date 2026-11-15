@@ -16,7 +16,7 @@ interface BaseUrlProvider {
  * URL's path only when that path ends in `/`. Without it, `https://host/koillection` +
  * `api/collections` resolves to `https://host/api/collections` (wallosmobile's finding).
  */
-internal fun normalizeBaseUrl(url: String): String {
+fun normalizeBaseUrl(url: String): String {
     val trimmed = url.trim()
     return if (trimmed.isEmpty()) "" else trimmed.trimEnd('/') + "/"
 }
