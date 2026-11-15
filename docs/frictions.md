@@ -29,3 +29,6 @@ entries get deleted — see /finalize.
   directory"; from the repo root it is `/home/gregory/proj/koillection`.
 - 2026-11-15 — A Python heredoc that spliced Kotlin raw strings (`"""`) into a test file failed with
   a SyntaxError (M1.9). Write the Kotlin to a scratchpad file and have Python read it.
+- 2026-11-15 — `../../koillection` resolved from the wrong directory again (M1.10): typed
+  `/home/gregory/proj/grappim/koillection`. Second time; a third makes the absolute path a
+  `CLAUDE.md` line.

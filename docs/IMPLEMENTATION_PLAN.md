@@ -65,7 +65,12 @@ start of any step that touches the API. Facts that shape the design:
   User, DisplayConfiguration, Field, Error.
 - Uploads are `multipart/form-data` POSTs to a sub-path: `/api/items/{id}/image` (field
   `file`), `/api/data/{id}/image` (field `fileImage`), also `/data/{id}/file` and
-  `/data/{id}/video`.
+  `/data/{id}/video`. Checked 2026-11-15 (M1.10): the server takes `image/png`, `image/jpeg`,
+  `image/webp` and `image/avif` (`Assert\Image` on `Item::$file`, `Datum::$fileImage`), and the
+  OpenAPI doc answers 201 with the updated resource. The server checks free space per user
+  (`HasEnoughSpaceForUpload`). `feature:items` sends one Ktor `ByteArray` part; Ktor reads the
+  bytes again on each send, so the `bearerAuth` repeat after a 401 sends the whole body (tested).
+  Not sent to a real server yet: M3.
 - Collections nest, and `GET /api/collections` returns every level: `Collection.php` has no
   `#[ApiFilter]`, so there is no `parent` filter. A top-level list is a client-side filter on a
   null `parent` (an IRI, not an object). `image` is a path relative to the server root
