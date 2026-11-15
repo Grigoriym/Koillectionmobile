@@ -2,6 +2,7 @@ package com.grappim.koillectionmobile.feature.items.data
 
 import com.grappim.kit.domain.resultOf
 import com.grappim.koillectionmobile.core.api.BaseUrlProvider
+import com.grappim.koillectionmobile.core.api.ContentTypeLdJson
 import com.grappim.koillectionmobile.core.api.getAllHydraPages
 import com.grappim.koillectionmobile.core.api.normalizeBaseUrl
 import com.grappim.koillectionmobile.feature.items.domain.Datum
@@ -9,15 +10,21 @@ import com.grappim.koillectionmobile.feature.items.domain.Item
 import com.grappim.koillectionmobile.feature.items.domain.ItemsRepository
 import com.grappim.koillectionmobile.feature.items.dto.DatumDto
 import com.grappim.koillectionmobile.feature.items.dto.ItemDto
+import com.grappim.koillectionmobile.feature.items.dto.NewDatumDto
+import com.grappim.koillectionmobile.feature.items.dto.NewItemDto
 import com.grappim.koillectionmobile.feature.items.mapper.ItemMapper
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.http.contentType
 import org.koin.core.annotation.Single
 
 /**
  * No cache: every call is a round trip. Paths are relative to the stored server URL, and image
- * paths resolve against the same URL.
+ * paths resolve against the same URL. A request body names other resources by IRI
+ * (`/api/collections/<id>`), as `add_book.py` does.
  */
 @Single(binds = [ItemsRepository::class])
 internal class ItemsRepositoryImpl(
@@ -47,7 +54,34 @@ internal class ItemsRepositoryImpl(
             .sortedWith(compareBy(nullsLast()) { it.position })
     }
 
+    override suspend fun createItem(collectionId: String, name: String): Result<Item> = resultOf {
+        val dto = httpClient.post(ITEMS_PATH) {
+            contentType(ContentTypeLdJson)
+            setBody(NewItemDto(name = name, collection = "/api/collections/$collectionId"))
+        }.body<ItemDto>()
+        mapper.toDomain(dto, serverUrl())
+    }
+
+    override suspend fun createTextDatum(itemId: String, label: String, value: String, position: Int): Result<Datum> =
+        createDatum(
+            NewDatumDto(item = itemIri(itemId), type = "text", label = label, position = position, value = value)
+        )
+
+    override suspend fun createImageDatum(itemId: String, label: String, position: Int): Result<Datum> =
+        createDatum(NewDatumDto(item = itemIri(itemId), type = "image", label = label, position = position))
+
+    private suspend fun createDatum(body: NewDatumDto): Result<Datum> = resultOf {
+        val dto = httpClient.post(DATA_PATH) {
+            contentType(ContentTypeLdJson)
+            setBody(body)
+        }.body<DatumDto>()
+        mapper.toDomain(dto, serverUrl())
+    }
+
+    private fun itemIri(itemId: String): String = "/$ITEMS_PATH/$itemId"
+
     private fun serverUrl(): String = normalizeBaseUrl(baseUrlProvider.getBaseUrl())
 }
 
 private const val ITEMS_PATH = "api/items"
+private const val DATA_PATH = "api/data"

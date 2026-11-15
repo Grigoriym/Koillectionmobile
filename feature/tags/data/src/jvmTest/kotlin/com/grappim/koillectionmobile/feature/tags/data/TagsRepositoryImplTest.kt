@@ -10,7 +10,9 @@ import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.request.HttpRequestData
+import io.ktor.content.TextContent
 import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.fullPath
 import io.ktor.http.headersOf
@@ -110,6 +112,34 @@ class TagsRepositoryImplTest {
         val repository = repository()
 
         assertIs<KoillectionError.NotFound>(repository.getItemTags("missing").exceptionOrNull())
+    }
+
+    @Test
+    fun `setItemTags patches the item with the full list of tag IRIs as merge-patch+json`() = runTest {
+        val repository = repository("/sub/api/items/$ITEM_ID" to (HttpStatusCode.OK to fixture("item_one.json")))
+
+        repository.setItemTags(ITEM_ID, listOf("tag-1", "tag-2")).getOrThrow()
+
+        val request = requests.single()
+        assertEquals(HttpMethod.Patch, request.method)
+        assertEquals("/sub/api/items/$ITEM_ID", request.url.fullPath)
+        assertEquals("application/merge-patch+json", request.body.contentType.toString())
+        assertEquals(
+            json.parseToJsonElement("""{"tags":["/api/tags/tag-1","/api/tags/tag-2"]}"""),
+            json.parseToJsonElement((request.body as TextContent).text)
+        )
+    }
+
+    @Test
+    fun `setItemTags with an empty list sends an empty tags array`() = runTest {
+        val repository = repository("/sub/api/items/$ITEM_ID" to (HttpStatusCode.OK to fixture("item_one.json")))
+
+        repository.setItemTags(ITEM_ID, emptyList()).getOrThrow()
+
+        assertEquals(
+            json.parseToJsonElement("""{"tags":[]}"""),
+            json.parseToJsonElement((requests.single().body as TextContent).text)
+        )
     }
 
     private companion object {

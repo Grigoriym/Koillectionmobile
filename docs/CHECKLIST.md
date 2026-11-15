@@ -1,6 +1,6 @@
 # koillectionmobile checklist
 
-**Current step:** M1.9 (M1.8 done 2026-11-15). M0 done 2026-11-14 (archived). Plan §5 decisions 1, 2, 4 and 6 are settled.
+**Current step:** M1.10 (M1.9 done 2026-11-15). M0 done 2026-11-14 (archived). Plan §5 decisions 1, 2, 4 and 6 are settled.
 
 ## How to use this
 
@@ -122,10 +122,16 @@ Model for every step: `../wallosmobile/core/api` and its `feature:*:data` module
   yet. The tags fixture is one full page (30 of 30), so paging is tested with an inline body.
   Mutation-checked: no `@Single`, a wrong item-tags path, an unparsed category IRI and a
   dropped second page each fail a test.
-- [ ] **M1.9** — Write side: create item, create Datum (text and image type), set an item's
+- [x] **M1.9** — Write side: create item, create Datum (text and image type), set an item's
   tags (full list, `merge-patch+json`, plan §2). Request shapes follow `add_book.py`, checked
   against the entity `write` groups in the Koillection source.
   **Verify:** mock-engine tests assert method, path, content type and body for each call.
+  Note: `ItemsRepository` gains `createItem`, `createTextDatum` and `createImageDatum`;
+  `TagsRepository` gains `setItemTags` (`PATCH /api/items/{id}`, tag IRIs). Bodies name other
+  resources by `/api/...` IRI without the server's subpath, as `add_book.py` does. An image field
+  is sent without a `value` key. Not sent to a server: writes are checked on device in M3.
+  Mutation-checked: a bare collection id, ld+json on the PATCH, `"value":null` on an image field
+  and a wrong datum path each fail a test.
 - [ ] **M1.10** — Multipart upload: `POST /api/items/{id}/image` (field `file`) and
   `POST /api/data/{id}/image` (field `fileImage`). Bytes in, no platform file APIs in
   `commonMain`.

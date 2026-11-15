@@ -1,7 +1,7 @@
 package com.grappim.koillectionmobile.feature.tags.domain
 
 /**
- * Read access to tags and tag categories. A failure is a `KoillectionError` (`core:domain`)
+ * Access to tags and tag categories, and to an item's tags. A failure is a `KoillectionError` (`core:domain`)
  * inside the [Result].
  */
 interface TagsRepository {
@@ -14,4 +14,10 @@ interface TagsRepository {
 
     /** The tags of item [itemId], from all pages. */
     suspend fun getItemTags(itemId: String): Result<List<Tag>>
+
+    /**
+     * Sets the tags of item [itemId] to exactly [tagIds]. The API takes only the full list, so a
+     * tag left out is removed, and an empty list removes every tag.
+     */
+    suspend fun setItemTags(itemId: String, tagIds: List<String>): Result<Unit>
 }

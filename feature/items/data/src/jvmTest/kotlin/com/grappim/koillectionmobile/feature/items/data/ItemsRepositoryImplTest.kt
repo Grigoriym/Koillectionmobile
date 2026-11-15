@@ -10,12 +10,15 @@ import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.request.HttpRequestData
+import io.ktor.content.TextContent
 import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.fullPath
 import io.ktor.http.headersOf
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonElement
 import java.io.File
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -133,7 +136,84 @@ class ItemsRepositoryImplTest {
         assertIs<KoillectionError.NotFound>(repository.getItem("missing").exceptionOrNull())
     }
 
+    @Test
+    fun `createItem posts the name and the collection IRI as ld+json`() = runTest {
+        val repository = repository("/sub/api/items" to (HttpStatusCode.Created to fixture("item_one.json")))
+
+        val item = repository.createItem(BOOKS_ID, "Auswahl").getOrThrow()
+
+        val request = requests.single()
+        assertEquals(HttpMethod.Post, request.method)
+        assertEquals("/sub/api/items", request.url.fullPath)
+        assertEquals("application/ld+json", request.body.contentType.toString())
+        assertEquals(
+            json.parseToJsonElement("""{"name":"Auswahl","collection":"/api/collections/$BOOKS_ID"}"""),
+            body(request)
+        )
+        assertEquals(ITEM_ID, item.id)
+    }
+
+    @Test
+    fun `createTextDatum posts a text field with its value and position`() = runTest {
+        val repository = repository("/sub/api/data" to (HttpStatusCode.Created to DATUM_TEXT))
+
+        val datum = repository.createTextDatum(ITEM_ID, "Author", "Theodor Echtermeyer", 1).getOrThrow()
+
+        val request = requests.single()
+        assertEquals(HttpMethod.Post, request.method)
+        assertEquals("/sub/api/data", request.url.fullPath)
+        assertEquals("application/ld+json", request.body.contentType.toString())
+        assertEquals(
+            json.parseToJsonElement(
+                """{"item":"/api/items/$ITEM_ID","type":"text","label":"Author","position":1,""" +
+                    """"value":"Theodor Echtermeyer"}"""
+            ),
+            body(request)
+        )
+        assertEquals("datum-1", datum.id)
+    }
+
+    @Test
+    fun `createImageDatum posts an image field without a value key`() = runTest {
+        val repository = repository("/sub/api/data" to (HttpStatusCode.Created to DATUM_IMAGE))
+
+        val datum = repository.createImageDatum(ITEM_ID, "Preface", 2).getOrThrow()
+
+        val request = requests.single()
+        assertEquals(HttpMethod.Post, request.method)
+        assertEquals("/sub/api/data", request.url.fullPath)
+        assertEquals("application/ld+json", request.body.contentType.toString())
+        assertEquals(
+            json.parseToJsonElement("""{"item":"/api/items/$ITEM_ID","type":"image","label":"Preface","position":2}"""),
+            body(request)
+        )
+        assertEquals("image", datum.type)
+        assertEquals(null, datum.image)
+    }
+
+    @Test
+    fun `a rejected create is a failed result that holds the KoillectionError`() = runTest {
+        val repository = repository(
+            "/sub/api/data" to (
+                HttpStatusCode.UnprocessableEntity to
+                    """{"title":"An error occurred","detail":"label: This value should not be blank."}"""
+                )
+        )
+
+        assertIs<KoillectionError.Validation>(repository.createTextDatum(ITEM_ID, "", "x", 1).exceptionOrNull())
+    }
+
+    private fun body(request: HttpRequestData): JsonElement =
+        json.parseToJsonElement((request.body as TextContent).text)
+
     private companion object {
+        /** The server's answer to `POST /api/data`: the new field in the `datum:read` group. */
+        const val DATUM_TEXT =
+            """{"id":"datum-1","item":"/api/items/01a1de6f-bff4-7eb7-8d9f-973b4ac86da8","type":"text",""" +
+                """"label":"Author","value":"Theodor Echtermeyer","position":1,"image":null}"""
+        const val DATUM_IMAGE =
+            """{"id":"datum-2","item":"/api/items/01a1de6f-bff4-7eb7-8d9f-973b4ac86da8","type":"image",""" +
+                """"label":"Preface","value":null,"position":2,"image":null}"""
         const val BOOKS_ID = "01a1de6f-bfad-78b6-a916-7266d9e3dfff"
         const val ITEM_ID = "01a1de6f-bff4-7eb7-8d9f-973b4ac86da8"
     }
