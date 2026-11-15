@@ -2,10 +2,13 @@ package com.grappim.koillectionmobile.core.storage
 
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.grappim.kit.testing.FakeSecretCipher
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 class SessionStorageImplTest {
 
@@ -55,6 +58,26 @@ class SessionStorageImplTest {
 
         assertNull(storage.getCredentials())
         assertNull(storage.getToken())
+    }
+
+    @Test
+    fun `logged in needs both the credentials and the token`() = runTest {
+        assertFalse(storage.isLoggedIn.first())
+
+        storage.saveCredentials(Credentials(username = "tester", password = "hunter2"))
+        assertFalse(storage.isLoggedIn.first())
+
+        storage.saveToken("jwt-1")
+        assertTrue(storage.isLoggedIn.first())
+    }
+
+    @Test
+    fun `a session that no longer decrypts is not logged in`() = runTest {
+        storage.saveCredentials(Credentials(username = "tester", password = "hunter2"))
+        storage.saveToken("jwt-1")
+        cipher.decryptResult = { null }
+
+        assertFalse(storage.isLoggedIn.first())
     }
 
     @Test

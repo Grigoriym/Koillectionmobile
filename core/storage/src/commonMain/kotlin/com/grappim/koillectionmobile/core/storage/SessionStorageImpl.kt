@@ -5,7 +5,10 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.grappim.kit.storage.SecretCipher
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
 import kotlin.concurrent.Volatile
 
@@ -25,6 +28,14 @@ class SessionStorageImpl(private val dataStore: DataStore<Preferences>, private 
      */
     override val serverUrl: String
         get() = cachedServerUrl ?: runBlocking { read(KEY_SERVER_URL) }.orEmpty().also { cachedServerUrl = it }
+
+    override val isLoggedIn: Flow<Boolean> = dataStore.data
+        .map { prefs ->
+            prefs[KEY_USERNAME] != null &&
+                prefs[KEY_PASSWORD]?.let(secretCipher::decrypt) != null &&
+                prefs[KEY_TOKEN]?.let(secretCipher::decrypt) != null
+        }
+        .distinctUntilChanged()
 
     override suspend fun saveServerUrl(url: String) {
         dataStore.edit { it[KEY_SERVER_URL] = url }

@@ -1,6 +1,6 @@
 # koillectionmobile checklist
 
-**Current step:** M2.1 (M2 broken into steps 2026-11-15). M1 done 2026-11-15, M0 done 2026-11-14 (both archived). Plan §5 decisions 1, 2, 4, 5 and 6 are settled.
+**Current step:** M2.2 (M2.1 done 2026-11-15). M1 done 2026-11-15, M0 done 2026-11-14 (both archived). Plan §5 decisions 1, 2, 4, 5 and 6 are settled.
 
 ## How to use this
 
@@ -41,7 +41,7 @@ Model: `../wallosmobile` `composeApp` (`WallosAppContent`, `LoginBranch`, `nav/M
 ViewModel libraries are in the catalog already; Coil 3 is not. ViewModel tests use hand-written
 fake repositories.
 
-- [ ] **M2.1** — App shell. A "logged in" flow on `SessionStorage` (a stored token and
+- [x] **M2.1** — App shell. A "logged in" flow on `SessionStorage` (a stored token and
   credentials). The startup branch is state on that flow, not navigation (wallosmobile
   `WallosAppContent`, including its `rememberSaveable` seed). The logged-in side is a Navigation 3
   `NavDisplay` with keys for collection list, collection (id) and item (id), each a placeholder
@@ -49,6 +49,11 @@ fake repositories.
   `grappim-kit-uikit`. First device run: create `docs/EMULATOR_TESTING.md` (`/emulator-testing`).
   **Verify:** `build ktlintCheck` green, `KoinGraphTest` passes (`--rerun`); on the emulator a
   fresh install shows the login placeholder.
+  Note: the routes and placeholder screens live in the feature `ui` modules (`CollectionListRoute`,
+  `CollectionRoute`, `ItemRoute`, `LoginScreen`), as in wallosmobile. One plain
+  `rememberNavBackStack`, no `grappim-kit-navigation`: there are no drawer sections. `isLoggedIn`
+  needs a username, and a password and a token that decrypt. First Android launch of the app
+  with the real Koin graph: no crash.
 - [ ] **M2.2** — Login screen (`feature:auth:ui`): server URL, username, password, one message per
   `LoginResult`. The 500 message names the JWT passphrase trap (plan §2). Success swaps to the
   logged-in side through M2.1's flow, not through a callback.

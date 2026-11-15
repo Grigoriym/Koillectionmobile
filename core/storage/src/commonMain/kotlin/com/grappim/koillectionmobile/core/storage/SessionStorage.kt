@@ -1,5 +1,7 @@
 package com.grappim.koillectionmobile.core.storage
 
+import kotlinx.coroutines.flow.Flow
+
 /**
  * The login session: the server URL, the credentials and the JWT.
  *
@@ -15,6 +17,12 @@ interface SessionStorage {
      * implementation keeps the value cached.
      */
     val serverUrl: String
+
+    /**
+     * `true` while a token and credentials are stored and decrypt. The app's startup branch reads
+     * it: a login swaps the app to the logged-in side, and clearing the session swaps it back.
+     */
+    val isLoggedIn: Flow<Boolean>
 
     suspend fun saveServerUrl(url: String)
 

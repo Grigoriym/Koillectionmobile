@@ -2,12 +2,18 @@ plugins {
     alias(libs.plugins.koillectionmobile.kmp.library)
     alias(libs.plugins.koillectionmobile.kmp.library.compose)
     alias(libs.plugins.koillectionmobile.kmp.di)
+    // The polymorphic `SerializersModule` in `nav/NavKeySerializers.kt`.
+    alias(libs.plugins.koillectionmobile.kmp.serialization)
 }
 
 kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(projects.core.api)
+            implementation(libs.grappim.kit.uikit)
+            implementation(projects.feature.auth.ui)
+            implementation(projects.feature.collections.ui)
+            implementation(projects.feature.items.ui)
             implementation(projects.feature.auth.data)
             implementation(projects.feature.collections.data)
             implementation(projects.feature.collections.mapper)
