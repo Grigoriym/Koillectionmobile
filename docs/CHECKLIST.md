@@ -33,7 +33,7 @@ M0 (repo and module scaffolding) is done; its steps and notes are in `docs/CHECK
 
 Ktor client, server URL + login (JWT), token storage (grappim-kit `storage`), Hydra list
 paging, DTOs for Collection / Item / Datum / Tag, multipart image upload. Fixture-tested
-against real JSON captured from the user's server. No screens: those are M2.
+against real JSON captured from the local test instance (`docs/local-info.md`). No screens: those are M2.
 
 Layout is plan §5 decision 4: shared plumbing in `core:api`, each resource in its
 `feature:<x>:{dto,domain,mapper,data}`. Datum (an item's field) lives in `feature:items`.
@@ -89,10 +89,10 @@ Model for every step: `../wallosmobile/core/api` and its `feature:*:data` module
   `POST /api/data/{id}/image` (field `fileImage`). Bytes in, no platform file APIs in
   `commonMain`.
   **Verify:** mock-engine tests assert the multipart parts, field names and content type.
-- [ ] **M1.11** — Live read-only smoke against the user's server: a JVM run (not part of
+- [ ] **M1.11** — Live read-only smoke against the local test instance: a JVM run (not part of
   `build` or CI) that logs in and reads one collection, its items and one item's data through
   the real repositories. No writes; writes get checked on device in M3.
-  **Verify:** the run prints real names from the server; the user confirms them.
+  **Verify:** the run prints real names from the test instance; the user confirms them.
 
 ## M2 — browse (rough scope)
 
