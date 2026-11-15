@@ -11,3 +11,5 @@ entries get deleted — see /finalize.
   XML report listed 4 of 14 tests and looked like the others were missing.
 - 2026-11-15 — A backtick test name with a comma compiled on JVM but failed
   `compileTestKotlinIosArm64` ("Name contains illegal characters"); only `build` caught it.
+- 2026-11-15 — `request.url.encodedPath` on a `URLBuilder` failed "Unresolved reference": it is
+  an extension and needs `import io.ktor.http.encodedPath`; the IDE-free compile gave no hint.

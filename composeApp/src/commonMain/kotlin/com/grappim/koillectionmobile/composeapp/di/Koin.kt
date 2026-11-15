@@ -8,9 +8,10 @@ import org.koin.core.annotation.KoinApplication
 import org.koin.core.annotation.Module
 
 /**
- * The whole graph, listed once. A `@Module` in another Gradle module is invisible to this
- * compilation's `@Configuration` discovery, so each feature's module class goes into `includes`
- * here as it appears.
+ * The whole graph, listed once. Each feature's module class goes into `includes` here as it
+ * appears. On JVM a `@Configuration` module in another Gradle module is found without this list
+ * (M1.3: `KoinApp` still resolved `PlatformStorageModule` with it removed). Keep the list anyway:
+ * other platforms are not checked.
  *
  * The `@ComponentScan` picks up this module's own definitions.
  */

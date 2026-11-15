@@ -17,7 +17,8 @@ import kotlin.test.Test
  * lives in `jvmTest`, not `commonTest`.
  *
  * Limit: it does not check a provider function's own parameters, only the bound type's
- * constructor (deskmate's M2.4 finding). Only a launch of the app catches that case.
+ * constructor (deskmate's M2.4 finding). A provider that returns an interface passes with any
+ * parameter unbound. The second test resolves the real JVM graph to cover that.
  */
 class KoinGraphTest {
     @Test

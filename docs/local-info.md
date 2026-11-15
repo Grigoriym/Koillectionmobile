@@ -43,3 +43,13 @@ copy that had died at item 102.
 
 `fixtures/capture.py` writes the JSON fixtures in `fixtures/koillection-1.8.5/` from this
 instance. It refuses nothing on its own: never change its `BASE` to the real server.
+
+## Probes
+
+An expired-JWT response without waiting an hour: send any token whose payload has `exp` 1. The
+server checks expiry before the signature (checked 2026-11-15):
+
+    curl -s -H 'Accept: application/ld+json' \
+      -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJleHAiOjF9.c2ln' \
+      http://127.0.0.1:8290/api/collections
+    # {"code":401,"message":"Expired JWT Token"}
