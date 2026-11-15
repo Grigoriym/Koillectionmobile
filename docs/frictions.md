@@ -46,3 +46,7 @@ entries get deleted — see /finalize.
   it is an extension, as the `CLAUDE.md` gotcha says. Used `header("Content-Type", ...)`.
 - 2026-11-15 — `./gradlew :core:image:jvmTest --rerun -q | grep PASSED` (M3.2) printed nothing: `-q` hides the
   test-logging events, so the run looked empty. Drop `-q` when the PASSED lines are the proof.
+- 2026-11-15 — `:androidApp:installDebug` failed "ambiguous": the app has store flavors. Use
+  `installGplayDebug` (or `installFdroidDebug`).
+- 2026-11-15 — `installGplayDebug` failed "SDK location not found": no `ANDROID_HOME` and no
+  `local.properties`. Prefixed the command with `ANDROID_HOME=$HOME/Android/Sdk`.
