@@ -1,6 +1,6 @@
 # koillectionmobile checklist
 
-**Current step:** M2.2 (M2.1 done 2026-11-15). M1 done 2026-11-15, M0 done 2026-11-14 (both archived). Plan §5 decisions 1, 2, 4, 5 and 6 are settled.
+**Current step:** M2.3 (M2.2 done 2026-11-15). M1 done 2026-11-15, M0 done 2026-11-14 (both archived). Plan §5 decisions 1, 2, 4, 5 and 6 are settled.
 
 ## How to use this
 
@@ -54,12 +54,15 @@ fake repositories.
   `rememberNavBackStack`, no `grappim-kit-navigation`: there are no drawer sections. `isLoggedIn`
   needs a username, and a password and a token that decrypt. First Android launch of the app
   with the real Koin graph: no crash.
-- [ ] **M2.2** — Login screen (`feature:auth:ui`): server URL, username, password, one message per
+- [x] **M2.2** — Login screen (`feature:auth:ui`): server URL, username, password, one message per
   `LoginResult`. The 500 message names the JWT passphrase trap (plan §2). Success swaps to the
   logged-in side through M2.1's flow, not through a callback.
   **Verify:** ViewModel tests for each `LoginResult` (`jvmTest --rerun`); on the emulator a wrong
   password shows its message, and a correct login shows the collection list placeholder. This is
   the first Android HTTP request: plan §2 records whether Ktor's engine autodiscovery worked.
+  Note: `LoginViewModel` (`@KoinViewModel`, `AuthUiModule` in `AppModule`) has no navigation
+  callback. No pre-filled server URL yet: that is M2.6. A `Failed` with an HTTP status names the
+  status; any other `Failed` gets a generic message. Autodiscovery worked: OkHttp (plan §2).
 - [ ] **M2.3** — Collection list (`feature:collections:ui`): top-level collections (no
   `parentId`), name and image, loading / error / empty states, pull to refresh. Add Coil 3 (as
   in wallosmobile's catalog). Resolve collection image URLs as `feature:items` does: this fixes

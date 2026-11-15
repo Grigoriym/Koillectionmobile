@@ -22,3 +22,7 @@ this app.
 - A fresh install has no session, so the app opens on the login side. The startup branch
   reads `SessionStorage.isLoggedIn` (a token and credentials that decrypt). `pm clear`
   returns the app to login.
+- The login form is centered vertically, so the keyboard moves every field when it opens.
+  Tap the server URL field once, then `KEYCODE_TAB` to the next field. A second tap by an
+  old coordinate put all three values into the URL field (M2.2). `KEYCODE_ENTER` in the
+  password field submits the form.

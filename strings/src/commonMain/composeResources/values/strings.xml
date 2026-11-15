@@ -1,3 +1,18 @@
 <resources>
     <string name="app_name">Koillection</string>
+
+    <string name="login_title">Log in to Koillection</string>
+    <string name="login_server_url_label">Server URL</string>
+    <string name="login_server_url_placeholder">https://koillection.example.com</string>
+    <string name="login_username_label">Username</string>
+    <string name="login_password_label">Password</string>
+    <string name="login_button">Log in</string>
+
+    <string name="login_error_invalid_server_url">Enter the full server address. It must start with http:// or https://.</string>
+    <string name="login_error_unreachable">The server does not answer. Check the address and the network connection.</string>
+    <string name="login_error_not_koillection">This address is not a Koillection login. Check the path in the URL: a missing or extra subpath is the usual cause.</string>
+    <string name="login_error_invalid_credentials">Wrong username or password.</string>
+    <string name="login_error_server_jwt">The server failed to make a login token (HTTP 500). Usually its JWT keys do not match JWT_PASSPHRASE, for example after a container restart made a new passphrase. The website can still work in this state. Check JWT_PASSPHRASE and the JWT keys on the server.</string>
+    <string name="login_error_http">The server answered with an error (HTTP %1$d).</string>
+    <string name="login_error_unexpected">The login failed with an unexpected error.</string>
 </resources>

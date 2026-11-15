@@ -11,5 +11,10 @@ kotlin {
             implementation(projects.strings)
             implementation(libs.grappim.kit.uikit)
         }
+        commonTest.dependencies {
+            implementation(kotlin("test"))
+            // `MainDispatcherRule`, and `runTest` through its kotlinx-coroutines-test.
+            implementation(libs.grappim.kit.testing)
+        }
     }
 }

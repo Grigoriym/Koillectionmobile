@@ -86,8 +86,11 @@ start of any step that touches the API. Facts that shape the design:
   instance at the root path): login, all collections, 445 items of one collection over every page
   (matches the server's `totalItems`, so the `next` links work), one item and its 23 fields. A
   resolved image URL returned 200 `image/jpeg` without a JWT. Not checked: a server behind a
-  subpath, and the Android HTTP engine (M1.2 left Ktor's engine autodiscovery on Android to the
-  first device run).
+  subpath.
+- Android HTTP engine (checked 2026-11-15, M2.2, emulator against the local test instance): Ktor's
+  engine autodiscovery works. `HttpClient {}` without an engine picks OkHttp, the only engine on
+  the Android classpath (`KmpNetworkConventionPlugin`). A wrong password got the server's 401 and a
+  correct one logged in, over plain HTTP (`usesCleartextTraffic`).
 - Tags (checked 2026-11-15, M1.8): `GET /api/tags`, `/api/tag_categories` and
   `/api/items/{id}/tags` are Hydra lists. A tag's `category` is an IRI or null. A tag has
   `image` and `imageSmallThumbnail` only (no large thumbnail); `feature:tags` does not read them.
