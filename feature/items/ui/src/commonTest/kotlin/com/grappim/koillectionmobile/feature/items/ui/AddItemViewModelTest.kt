@@ -1,8 +1,10 @@
 package com.grappim.koillectionmobile.feature.items.ui
 
+import androidx.lifecycle.SavedStateHandle
 import com.grappim.kit.testing.MainDispatcherRule
 import com.grappim.kit.uikit.NativeText
 import com.grappim.koillectionmobile.core.domain.KoillectionError
+import com.grappim.koillectionmobile.core.image.Rotation
 import com.grappim.koillectionmobile.feature.tags.domain.Tag
 import com.grappim.koillectionmobile.feature.tags.domain.TagCategory
 import com.grappim.koillectionmobile.feature.tags.domain.TagsRepository
@@ -33,7 +35,9 @@ class AddItemViewModelTest {
         mainDispatcherRule.tearDown()
     }
 
-    private fun createSut() = AddItemViewModel(tags)
+    private val savedStateHandle = SavedStateHandle()
+
+    private fun createSut() = AddItemViewModel(tags, savedStateHandle)
 
     private fun answer(
         tagList: Result<List<Tag>> = Result.success(listOf(NOVEL, GERMAN, FRAKTUR, LOOSE)),
@@ -293,6 +297,140 @@ class AddItemViewModelTest {
     }
 
     /** Each call takes the next queued response. Queue one with [queue] before the call. */
+    @Test
+    fun `added photos keep their order and the first is the main image`() {
+        tags.queue()
+        val sut = createSut()
+
+        sut.uiState.value.onPhotosAdd(listOf("content://a", "content://b"))
+        sut.uiState.value.onPhotosAdd(listOf("content://c"))
+
+        val photos = sut.uiState.value.photos
+        assertEquals(listOf("content://a", "content://b", "content://c"), photos.map { it.uri })
+        assertEquals(3, photos.map { it.id }.toSet().size)
+        assertTrue(photos.all { it.rotation == Rotation.NONE && it.label == "" })
+    }
+
+    @Test
+    fun `rotate turns only its own photo a quarter turn clockwise and wraps after 270`() {
+        tags.queue()
+        val sut = createSut()
+        sut.uiState.value.onPhotosAdd(listOf("content://a", "content://b"))
+        val (first, second) = sut.uiState.value.photos.map { it.id }
+
+        val seen = (1..4).map {
+            sut.uiState.value.onPhotoRotate(first)
+            sut.uiState.value.photos.first().rotation
+        }
+
+        assertEquals(listOf(Rotation.CW_90, Rotation.CW_180, Rotation.CW_270, Rotation.NONE), seen)
+        assertEquals(Rotation.NONE, sut.uiState.value.photos.single { it.id == second }.rotation)
+    }
+
+    @Test
+    fun `removing the main image makes the next photo the main image`() {
+        tags.queue()
+        val sut = createSut()
+        sut.uiState.value.onPhotosAdd(listOf("content://a", "content://b", "content://c"))
+
+        sut.uiState.value.onPhotoRemove(sut.uiState.value.photos.first().id)
+
+        assertEquals(listOf("content://b", "content://c"), sut.uiState.value.photos.map { it.uri })
+    }
+
+    @Test
+    fun `make main moves the photo to the front and keeps the others in order`() {
+        tags.queue()
+        val sut = createSut()
+        sut.uiState.value.onPhotosAdd(listOf("content://a", "content://b", "content://c"))
+
+        sut.uiState.value.onPhotoMakeMain(sut.uiState.value.photos.last().id)
+
+        assertEquals(listOf("content://c", "content://a", "content://b"), sut.uiState.value.photos.map { it.uri })
+    }
+
+    @Test
+    fun `a photo label change reaches only its own photo`() {
+        tags.queue()
+        val sut = createSut()
+        sut.uiState.value.onPhotosAdd(listOf("content://a", "content://b", "content://c"))
+        val ids = sut.uiState.value.photos.map { it.id }
+
+        sut.uiState.value.onPhotoLabelChange(ids[1], "Title page")
+
+        assertEquals(listOf("", "Title page", ""), sut.uiState.value.photos.map { it.label })
+    }
+
+    @Test
+    fun `an image field label that a text row uses is a duplicate`() {
+        tags.queue()
+        val sut = createSut()
+        sut.uiState.value.onAddField()
+        sut.uiState.value.onLabelChange(sut.uiState.value.fields.single().id, "Spine")
+        sut.uiState.value.onPhotosAdd(listOf("content://a", "content://b"))
+
+        sut.uiState.value.onPhotoLabelChange(sut.uiState.value.photos[1].id, "Spine")
+
+        assertEquals(setOf("Spine"), sut.uiState.value.duplicateLabels)
+    }
+
+    @Test
+    fun `the main image label does not count as a duplicate`() {
+        tags.queue()
+        val sut = createSut()
+        sut.uiState.value.onAddField()
+        sut.uiState.value.onLabelChange(sut.uiState.value.fields.single().id, "Spine")
+        sut.uiState.value.onPhotosAdd(listOf("content://a", "content://b"))
+        val (first, second) = sut.uiState.value.photos.map { it.id }
+        sut.uiState.value.onPhotoLabelChange(first, "Spine")
+        sut.uiState.value.onPhotoLabelChange(second, "Cover")
+
+        sut.uiState.value.onPhotoMakeMain(first)
+
+        assertTrue(sut.uiState.value.duplicateLabels.isEmpty())
+    }
+
+    @Test
+    fun `a new ViewModel on the same saved state gets the form back`() {
+        tags.queue()
+        val first = createSut()
+        first.uiState.value.onNameChange("Jörn Uhl")
+        first.uiState.value.onAddField()
+        first.uiState.value.onLabelChange(first.uiState.value.fields.single().id, "Author")
+        first.uiState.value.onValueChange(first.uiState.value.fields.single().id, "Gustav Frenssen")
+        first.uiState.value.onPhotosAdd(listOf("content://a", "content://b"))
+        first.uiState.value.onPhotoRotate(first.uiState.value.photos[0].id)
+        first.uiState.value.onPhotoLabelChange(first.uiState.value.photos[1].id, "Title page")
+        first.uiState.value.onTagToggle(NOVEL.id)
+        val before = first.uiState.value
+
+        val second = createSut()
+
+        val after = second.uiState.value
+        assertEquals("Jörn Uhl", after.name)
+        assertEquals(before.fields, after.fields)
+        assertEquals(before.photos, after.photos)
+        assertEquals(Rotation.CW_90, after.photos[0].rotation)
+        assertEquals(setOf(NOVEL.id), after.selectedTagIds)
+        assertTrue(after.isLoadingTags)
+    }
+
+    @Test
+    fun `rows added after a restore get ids the restored rows do not use`() {
+        tags.queue()
+        val first = createSut()
+        repeat(2) { first.uiState.value.onAddField() }
+        first.uiState.value.onPhotosAdd(listOf("content://a", "content://b"))
+
+        val second = createSut()
+        second.uiState.value.onAddField()
+        second.uiState.value.onPhotosAdd(listOf("content://c"))
+
+        val state = second.uiState.value
+        assertEquals(3, state.fields.map { it.id }.toSet().size)
+        assertEquals(3, state.photos.map { it.id }.toSet().size)
+    }
+
     private class FakeTagsRepository : TagsRepository {
         val tags = ArrayDeque<CompletableDeferred<Result<List<Tag>>>>()
         val categories = ArrayDeque<CompletableDeferred<Result<List<TagCategory>>>>()

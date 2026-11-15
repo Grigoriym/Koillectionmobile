@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <!-- `CAMERA_DIR` in `PhotoSources.android.kt`. -->
+    <cache-path name="camera" path="camera/" />
+</paths>

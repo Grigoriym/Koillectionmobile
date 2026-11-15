@@ -1,9 +1,11 @@
 package com.grappim.koillectionmobile.feature.items.ui
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.grappim.kit.uikit.NativeText
 import com.grappim.koillectionmobile.core.domain.KoillectionError
+import com.grappim.koillectionmobile.core.image.Rotation
 import com.grappim.koillectionmobile.feature.tags.domain.Tag
 import com.grappim.koillectionmobile.feature.tags.domain.TagCategory
 import com.grappim.koillectionmobile.feature.tags.domain.TagsRepository
@@ -15,35 +17,87 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 import org.koin.core.annotation.KoinViewModel
 
 /**
- * The text part of the add-item form: name, free label/value rows, and a pick from the server's
- * existing tags. The form cannot create a tag (plan §5 decision 7). The save, and with it the
- * collection id, comes in M3.6.
+ * The add-item form: name, free label/value rows, photos, and a pick from the server's existing
+ * tags. The form cannot create a tag (plan §5 decision 7). The save, and with it the collection
+ * id, comes in M3.6.
+ *
+ * What the user typed and picked is kept in [savedStateHandle], so it survives process death. The
+ * tags are loaded again.
  */
 @KoinViewModel
-class AddItemViewModel(private val tagsRepository: TagsRepository) : ViewModel() {
+class AddItemViewModel(private val tagsRepository: TagsRepository, private val savedStateHandle: SavedStateHandle) :
+    ViewModel() {
 
-    private var nextFieldId = 0
+    private val draft: AddItemDraft =
+        savedStateHandle.get<String>(DRAFT_KEY)?.let { json.decodeFromString<AddItemDraft>(it) } ?: AddItemDraft()
+
+    private var nextFieldId = (draft.fields.maxOfOrNull { it.id } ?: -1) + 1
+    private var nextPhotoId = (draft.photos.maxOfOrNull { it.id } ?: -1) + 1
 
     private val _uiState = MutableStateFlow(
         AddItemUiState(
+            name = draft.name,
+            fields = draft.fields,
+            photos = draft.photos,
+            selectedTagIds = draft.selectedTagIds,
             onNameChange = ::changeName,
             onAddField = ::addField,
             onRemoveField = ::removeField,
             onLabelChange = ::changeLabel,
             onValueChange = ::changeValue,
             onTagToggle = ::toggleTag,
-            onRetryTags = ::retryTags
+            onRetryTags = ::retryTags,
+            onPhotosAdd = ::addPhotos,
+            onPhotoRotate = ::rotatePhoto,
+            onPhotoRemove = ::removePhoto,
+            onPhotoMakeMain = ::makeMain,
+            onPhotoLabelChange = ::changePhotoLabel
         )
     )
     val uiState: StateFlow<AddItemUiState> = _uiState.asStateFlow()
 
     init {
+        viewModelScope.launch {
+            _uiState
+                .map { AddItemDraft(it.name, it.fields, it.photos, it.selectedTagIds) }
+                .distinctUntilChanged()
+                .collect { savedStateHandle[DRAFT_KEY] = json.encodeToString(it) }
+        }
         loadTags()
+    }
+
+    private fun addPhotos(uris: List<String>) {
+        val rows = uris.map { PhotoRow(id = nextPhotoId++, uri = it) }
+        _uiState.update { it.copy(photos = it.photos + rows) }
+    }
+
+    private fun rotatePhoto(id: Int) = updatePhoto(id) { it.copy(rotation = it.rotation.next()) }
+
+    private fun removePhoto(id: Int) {
+        _uiState.update { s -> s.copy(photos = s.photos.filterNot { it.id == id }) }
+    }
+
+    /** Moves photo [id] to the front: the first photo is the main image. */
+    private fun makeMain(id: Int) {
+        _uiState.update { s ->
+            val (main, rest) = s.photos.partition { it.id == id }
+            s.copy(photos = main + rest)
+        }
+    }
+
+    private fun changePhotoLabel(id: Int, label: String) = updatePhoto(id) { it.copy(label = label) }
+
+    private fun updatePhoto(id: Int, change: (PhotoRow) -> PhotoRow) {
+        _uiState.update { s -> s.copy(photos = s.photos.map { if (it.id == id) change(it) else it }) }
     }
 
     private fun changeName(name: String) {
@@ -101,6 +155,22 @@ class AddItemViewModel(private val tagsRepository: TagsRepository) : ViewModel()
         }
     }
 }
+
+/** What [AddItemViewModel] keeps across process death. */
+@Serializable
+private data class AddItemDraft(
+    val name: String = "",
+    val fields: List<FieldRow> = emptyList(),
+    val photos: List<PhotoRow> = emptyList(),
+    val selectedTagIds: Set<String> = emptySet()
+)
+
+private const val DRAFT_KEY = "add_item_draft"
+
+private val json = Json { ignoreUnknownKeys = true }
+
+/** The next clockwise quarter turn: 0, 90, 180, 270, then 0 again. */
+private fun Rotation.next(): Rotation = Rotation.entries[(ordinal + 1) % Rotation.entries.size]
 
 /**
  * One group per category that has tags, sorted by category label; tags without a category (or

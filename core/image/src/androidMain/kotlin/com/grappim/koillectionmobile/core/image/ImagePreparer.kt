@@ -16,6 +16,19 @@ import java.io.InputStream
  */
 class ImagePreparer(private val contentResolver: ContentResolver) {
     fun prepare(uri: Uri, extra: Rotation): ByteArray {
+        val upright = bitmap(uri, extra)
+        return ByteArrayOutputStream().use { out ->
+            upright.compress(Bitmap.CompressFormat.JPEG, JPEG_QUALITY, out)
+            upright.recycle()
+            out.toByteArray()
+        }
+    }
+
+    /**
+     * The upright bitmap that [prepare] encodes, with the long side at most [maxLongSide]. The
+     * add-item preview calls it with a small [maxLongSide], so it shows what the upload gets.
+     */
+    fun bitmap(uri: Uri, extra: Rotation, maxLongSide: Int = MAX_LONG_SIDE_PX): Bitmap {
         val exifTag =
             open(uri).use {
                 ExifInterface(it).getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
@@ -27,23 +40,18 @@ class ImagePreparer(private val contentResolver: ContentResolver) {
         val source = Size(bounds.outWidth, bounds.outHeight)
         if (source.width <= 0 || source.height <= 0) throw IOException("Not an image: $uri")
 
-        val options = BitmapFactory.Options().apply { inSampleSize = source.sampleSize() }
+        val options = BitmapFactory.Options().apply { inSampleSize = source.sampleSize(maxLongSide) }
         val decoded =
             open(uri).use { BitmapFactory.decodeStream(it, null, options) }
                 ?: throw IOException("Cannot decode $uri")
 
-        val target = Size(decoded.width, decoded.height).fitInside()
+        val target = Size(decoded.width, decoded.height).fitInside(maxLongSide)
         val scaled = Bitmap.createScaledBitmap(decoded, target.width, target.height, true)
         if (scaled !== decoded) decoded.recycle()
 
         val upright = scaled.transformed(orientation)
         if (upright !== scaled) scaled.recycle()
-
-        return ByteArrayOutputStream().use { out ->
-            upright.compress(Bitmap.CompressFormat.JPEG, JPEG_QUALITY, out)
-            upright.recycle()
-            out.toByteArray()
-        }
+        return upright
     }
 
     private fun open(uri: Uri): InputStream =

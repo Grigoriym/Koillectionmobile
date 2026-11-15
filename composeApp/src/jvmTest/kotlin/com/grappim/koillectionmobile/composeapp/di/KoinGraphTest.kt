@@ -1,5 +1,6 @@
 package com.grappim.koillectionmobile.composeapp.di
 
+import androidx.lifecycle.SavedStateHandle
 import com.grappim.koillectionmobile.feature.auth.domain.AuthRepository
 import com.grappim.koillectionmobile.feature.collections.domain.CollectionsRepository
 import com.grappim.koillectionmobile.feature.items.domain.ItemsRepository
@@ -59,7 +60,9 @@ class KoinGraphTest {
          *   `provideHttpClient` through the `HttpClient(engine)` constructor, not through the
          *   function's own parameters. The function builds the client on Ktor's default engine,
          *   so Koin is never asked for one (wallosmobile has the same entry).
+         * - `SavedStateHandle` (M3.5, `AddItemViewModel`): Koin takes it from the ViewModel's
+         *   creation extras when `koinViewModel()` creates it, not from a module.
          */
-        val EXTERNALLY_SUPPLIED = listOf(HttpClientEngine::class)
+        val EXTERNALLY_SUPPLIED = listOf(HttpClientEngine::class, SavedStateHandle::class)
     }
 }

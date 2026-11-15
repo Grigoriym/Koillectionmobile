@@ -47,6 +47,14 @@
     <string name="add_item_add_field">Add field</string>
     <string name="add_item_remove_field">Remove field</string>
     <string name="add_item_label_duplicate">Another field has this label. Each label must be unique within the item.</string>
+    <string name="add_item_section_photos">Photos</string>
+    <string name="add_item_take_photo">Take photo</string>
+    <string name="add_item_pick_photos">Pick photos</string>
+    <string name="add_item_main_image">Main image</string>
+    <string name="add_item_photo_label">Image label</string>
+    <string name="add_item_rotate_photo">Rotate</string>
+    <string name="add_item_make_main">Make main image</string>
+    <string name="add_item_remove_photo">Remove photo</string>
     <string name="add_item_section_tags">Tags</string>
     <string name="add_item_no_category">No category</string>
     <string name="add_item_no_tags">The server has no tags.</string>

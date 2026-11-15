@@ -1,6 +1,6 @@
 # koillectionmobile checklist
 
-**Current step:** M3.5. M3.4 done 2026-11-15, M3.3 done 2026-11-15, M3.2 done 2026-11-15, M3.1 done 2026-11-15; M3 broken into steps 2026-11-15. M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6 and 7 are settled.
+**Current step:** M3.6. M3.5 done 2026-11-15, M3.4 done 2026-11-15, M3.3 done 2026-11-15, M3.2 done 2026-11-15, M3.1 done 2026-11-15; M3 broken into steps 2026-11-15. M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6 and 7 are settled.
 
 ## How to use this
 
@@ -87,12 +87,20 @@ in order, and a failure halfway must not lead to a second item on retry.
   flagged (the server's `NotBlank` is M3.6's concern). Tags: one group per category, sorted by
   label, tags without a known category last. No save button and no process-death state yet
   (M3.5, M3.6). Emulator: 30 tags in 4 categories, the same as `GET /api/tags`.
-- [ ] **M3.5** — Photos in the form: camera (system camera intent, `FileProvider`) and the photo
+- [x] **M3.5** — Photos in the form: camera (system camera intent, `FileProvider`) and the photo
   picker (several at once). One photo is the main image; the rest are image fields with a label
   each, in order. Each photo has a rotate button and a preview that shows the result of M3.2.
   The form survives rotation and process death (photo URIs and labels kept).
   **Verify:** ViewModel tests; on the emulator a camera shot and two picked images show in the
   form, a rotate turns the preview, and `am kill` keeps them.
+  Note: `PhotoSources.kt` (`expect`) in `feature:items:ui`, with the Android `actual` (camera
+  intent, picker, preview) and empty JVM/iOS ones. The first photo is the main image; a "make
+  main" button moves another to the front. Image-field labels join the duplicate-label check, as
+  the server checks all data of an item. The preview runs `ImagePreparer.bitmap` (new, split out
+  of `prepare`) at 512px, so it shows the upload's orientation. The whole form (name, rows,
+  photos, picked tags) is a JSON draft in `SavedStateHandle`. Picked URIs take a persisted read
+  grant, or they die with the process. `KoinGraphTest` now lists `SavedStateHandle` as externally
+  supplied. Releasing grants and camera files is open (`docs/revisit.md`, for M3.6).
 - [ ] **M3.6** — Save: run M3.3 from the form with a progress view, a retry on failure, and on
   success open the new item (the add screen leaves the back stack) and refresh the collection.
   An upload 500 names the disk quota as a likely cause (plan §2).

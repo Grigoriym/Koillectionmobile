@@ -63,3 +63,8 @@ this app.
   target from a fresh dump. To compare the tag picker with the server, count `GET /api/tags`
   (`totalItems`) and `/api/tag_categories` with a bearer token from
   `POST /api/authentication_token` (30 tags in 4 categories on the test instance, 2026-11-15).
+- Photos (M3.5): the system camera is `com.android.camera2`; tap `content-desc` "Shutter", then
+  "Done". Its shot is the emulator's virtual scene. For the picker, push JPEGs to
+  `/sdcard/Pictures/` and media-scan them; tap the thumbnails (`content-desc` "Photo taken on ..."),
+  then "Done". A filled "Image label" field shows its value as `text`, so `ui.py`'s index for
+  "Image label" shifts after each fill: tap the next one from a fresh `list`.
