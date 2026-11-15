@@ -35,3 +35,8 @@ entries get deleted — see /finalize.
 - 2026-11-15 — `git rm` of a module's only source file removed its empty directories again
   (M2.1), and five heredoc writes failed "No such file or directory". Second time; a third
   makes it a `CLAUDE.md` line.
+- 2026-11-15 — Emulator login form (M2.2): tapped each field by its pre-keyboard coordinate,
+  though the skill says to use `KEYCODE_TAB`; the keyboard moved the fields and all three values
+  went into the URL field.
+- 2026-11-15 — `grep -o 'text="•*"[^>]*bounds=...'` on a `uiautomator` dump matched every node
+  (M2.2), so the tap math got a list of numbers. Filter on `password="true"` instead.
