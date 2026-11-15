@@ -22,3 +22,6 @@ entries get deleted — see /finalize.
   so the next heredoc writes failed "No such file or directory". Run `mkdir -p` after it.
 - 2026-11-15 — `../../koillection` has no `vendor/` (M1.7), so API Platform internals (default
   list order) cannot be read from source; the plan records that claim as unchecked.
+- 2026-11-15 — Mutation restore with `git checkout -- <file>` (M1.8) failed ("pathspec did not match") on new,
+  untracked files, so four mutations stacked up. Undid them by hand; copy the file to the
+  scratchpad first and restore from the copy.

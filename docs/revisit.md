@@ -25,6 +25,7 @@ cold session can act on it. Delete an entry when it's fixed.
   will add two more. Fix: one copy in a shared test module (or `core:storage` test fixtures) that
   the `data` modules take as a test dependency. M1.7 added the fourth:
   `feature/items/data/src/jvmTest/.../items/data/FakeSessionStorage.kt`.
+  M1.8 added the fifth: `feature/tags/data/src/jvmTest/.../tags/data/FakeSessionStorage.kt`.
 - 2026-11-15 (M1.7) — Image paths are resolved in one feature and not in the other.
   `feature:items` gives full URLs (`ItemMapper.toDomain(dto, serverUrl)`), but
   `feature:collections` keeps `Collection.imagePath` relative (`CollectionMapper.kt`). M2's

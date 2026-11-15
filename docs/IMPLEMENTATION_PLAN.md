@@ -77,6 +77,10 @@ start of any step that touches the API. Facts that shape the design:
   `OrderBy` on `Item::$data` is a Doctrine collection setting, and API Platform reads the Datum
   rows with its own query (`Datum.php` sets no `order`). So `feature:items` sorts by `position`.
   Not checked against a server with reordered fields: the fixture is already in `position` order.
+- Tags (checked 2026-11-15, M1.8): `GET /api/tags`, `/api/tag_categories` and
+  `/api/items/{id}/tags` are Hydra lists. A tag's `category` is an IRI or null. A tag has
+  `image` and `imageSmallThumbnail` only (no large thumbnail); `feature:tags` does not read them.
+  `TagCategory.label` is nullable in the entity, and `color` is hex without `#`.
 - Feature repositories return `Result` (`resultOf` from grappim-kit `domain`, as in
   wallosmobile); the failure is the `KoillectionError` that `core:api` threw. `feature:auth` is
   the exception: its `LoginResult` names each login outcome.
