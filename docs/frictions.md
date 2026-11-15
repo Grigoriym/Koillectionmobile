@@ -41,3 +41,7 @@ entries get deleted — see /finalize.
   it is an extension, as the `CLAUDE.md` gotcha says. Used `header("Content-Type", ...)`.
 - 2026-11-15 — `./gradlew :core:image:jvmTest --rerun -q | grep PASSED` (M3.2) printed nothing: `-q` hides the
   test-logging events, so the run looked empty. Drop `-q` when the PASSED lines are the proof.
+- 2026-11-15 — A Python `str.replace` on `KoinGraphTest.kt` (M3.5) matched nothing and changed nothing, with no
+  error; only `git diff --stat` (1 line, not 3) showed it. Assert the old text is in the file before replacing.
+- 2026-11-15 — Python-inserted `material.icons` and `lazy` imports in `AddItemScreen.kt` (M3.5) broke ktlint's
+  import order again. Second time (first M2.8); `ktlintFormat` fixed it.
