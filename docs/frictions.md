@@ -34,9 +34,5 @@ entries get deleted — see /finalize.
 - 2026-11-15 — Emulator login form (M2.2): tapped each field by its pre-keyboard coordinate,
   though the skill says to use `KEYCODE_TAB`; the keyboard moved the fields and all three values
   went into the URL field.
-- 2026-11-15 — `grep -o 'text="•*"[^>]*bounds=...'` on a `uiautomator` dump matched every node
-  (M2.2), so the tap math got a list of numbers. Filter on `password="true"` instead.
-- 2026-11-15 — `grep -o 'text="[^"]\+"'` on a `uiautomator` dump (M2.5) skipped a field value that
-  holds `"`: the dump does not escape it. It looked like a missing field until a screenshot showed it.
 - 2026-11-15 — A Python heredoc with Kotlin raw strings (`"""`) in a `"""`-delimited Python string failed with a
   SyntaxError again (M2.6). Second time; `'''` delimiters in the Python fixed it.

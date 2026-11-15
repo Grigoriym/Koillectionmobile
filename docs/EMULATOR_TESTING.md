@@ -50,3 +50,7 @@ this app.
 - Two different items in a row (`Books` → "Jörn Uhl", back, "Die Pappenheimer") must show
   different authors (Gustav Frenssen, Julius Wolff). The same author twice means the entries
   share one ViewModel (the M2.6 bug).
+- Full browse pass (M2.7): taps by text with the skill's `ui.py tap "<text>"`, not by hand-parsed
+  dumps. In landscape the item's main image fills the width, so the fields are below the fold and
+  not in the dump: check the title, or scroll first. Process death: open `Books` → an item, then
+  HOME, `am kill`, `am start -n`; the item comes back, and back goes to `Books`, then Collections.
