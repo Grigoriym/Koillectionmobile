@@ -32,3 +32,6 @@ entries get deleted — see /finalize.
 - 2026-11-15 — `../../koillection` resolved from the wrong directory again (M1.10): typed
   `/home/gregory/proj/grappim/koillection`. Second time; a third makes the absolute path a
   `CLAUDE.md` line.
+- 2026-11-15 — `git rm` of a module's only source file removed its empty directories again
+  (M2.1), and five heredoc writes failed "No such file or directory". Second time; a third
+  makes it a `CLAUDE.md` line.
