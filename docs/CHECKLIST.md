@@ -98,12 +98,15 @@ in order, and a failure halfway must not lead to a second item on retry.
   main" button moves another to the front. Image-field labels join the duplicate-label check, as
   the server checks all data of an item. The preview runs `ImagePreparer.bitmap` (new, split out
   of `prepare`) at 512px, so it shows the upload's orientation. The whole form (name, rows,
-  photos, picked tags) is a JSON draft in `SavedStateHandle`. Picked URIs take a persisted read
-  grant, or they die with the process. `KoinGraphTest` now lists `SavedStateHandle` as externally
-  supplied. Releasing grants and camera files is open (`docs/revisit.md`, for M3.6).
+  photos, picked tags) is a JSON draft in `SavedStateHandle`. A picked photo is copied to
+  `cacheDir/photos/`, as camera shots are: the picker's URI dies with the process, and a persisted
+  grant has a per-app limit (512), so the user chose the copy. `KoinGraphTest` now lists
+  `SavedStateHandle` as externally supplied.
 - [ ] **M3.6** — Save: run M3.3 from the form with a progress view, a retry on failure, and on
   success open the new item (the add screen leaves the back stack) and refresh the collection.
-  An upload 500 names the disk quota as a likely cause (plan §2).
+  An upload 500 names the disk quota as a likely cause (plan §2). Delete the photo files in
+  `cacheDir/photos/` (M3.5) after a successful save, and when a photo is removed or the form is
+  left (`docs/revisit.md`).
   **Verify:** ViewModel tests; on the emulator an item with two text fields, a main image, two
   page images and two tags is created on the local test instance, and the web UI shows the same
   item, upright and in order. A save with the server stopped halfway, then retried, gives one

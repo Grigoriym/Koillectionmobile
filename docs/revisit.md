@@ -44,10 +44,7 @@ cold session can act on it. Delete an entry when it's fixed.
 - 2026-11-15 — `docs/IMPLEMENTATION_PLAN.md:15` points to `~/claude/books/00service/` (`koi.py`,
   `add_book.py`) as the worked example of the API calls. That folder does not exist on the current
   machine. Ask the user where the scripts live now, then fix the path or drop the pointer.
-- 2026-11-15 (M3.5) — The add-item photos leave two things behind that nothing cleans up yet.
-  (1) Each picked photo takes a persisted read grant (`keepReadAccess` in
-  `feature/items/ui/src/androidMain/.../PhotoSources.android.kt`). Android keeps at most 512 per
-  app (128 below API 30); past that `takePersistableUriPermission` fails and the photo is lost on
-  process death. (2) Each camera shot stays in `cacheDir/camera/`. Fix in M3.6: after a successful
-  save (and when a photo is removed or the form is left), call `releasePersistableUriPermission`
-  for picked URIs and delete camera files.
+- 2026-11-15 (M3.5) — Every add-item photo is a file in `cacheDir/photos/` (camera shots, and
+  copies of picked photos: `PhotoSources.android.kt` in `feature/items/ui/src/androidMain`). Nothing
+  deletes them yet. Planned in the M3.6 step: delete after a successful save, and when a photo is
+  removed or the form is left.

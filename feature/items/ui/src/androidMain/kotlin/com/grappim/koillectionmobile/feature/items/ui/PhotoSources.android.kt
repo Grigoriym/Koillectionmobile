@@ -1,7 +1,6 @@
 package com.grappim.koillectionmobile.feature.items.ui
 
 import android.content.Context
-import android.content.Intent
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -14,6 +13,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -27,18 +27,22 @@ import com.grappim.kit.logger.logcat
 import com.grappim.koillectionmobile.core.image.ImagePreparer
 import com.grappim.koillectionmobile.core.image.Rotation
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 
 /**
- * The camera writes to a file in the cache (`photo_paths.xml`), shared through the `FileProvider`
- * in this module's manifest. The camera URI waits in saved state: the camera app often pushes this
- * process out of memory before it returns.
+ * Every photo ends up as a file in the cache (`photo_paths.xml`), shared through the `FileProvider`
+ * in this module's manifest. The camera writes there itself. A picked photo is copied there: the
+ * picker's URI is readable only until the process ends, and a copy needs no persisted grant
+ * (Android keeps at most 512 per app). The camera URI waits in saved state: the camera app often
+ * pushes this process out of memory before it returns.
  */
 @Composable
 internal actual fun rememberPhotoSources(onPhotos: (List<String>) -> Unit): PhotoSources? {
     val context = LocalContext.current
     val currentOnPhotos by rememberUpdatedState(onPhotos)
+    val scope = rememberCoroutineScope()
     var pendingCameraUri by rememberSaveable { mutableStateOf<String?>(null) }
 
     val camera = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { saved ->
@@ -51,14 +55,17 @@ internal actual fun rememberPhotoSources(onPhotos: (List<String>) -> Unit): Phot
         }
     }
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.PickMultipleVisualMedia()) { uris ->
-        uris.forEach { context.keepReadAccess(it) }
-        if (uris.isNotEmpty()) currentOnPhotos(uris.map(Uri::toString))
+        if (uris.isEmpty()) return@rememberLauncherForActivityResult
+        scope.launch {
+            val copies = withContext(Dispatchers.IO) { uris.mapNotNull { context.copyToCache(it) } }
+            if (copies.isNotEmpty()) currentOnPhotos(copies.map(Uri::toString))
+        }
     }
 
     return remember(camera, picker) {
         PhotoSources(
             takePhoto = {
-                val uri = context.newCameraUri()
+                val uri = context.newPhotoUri()
                 pendingCameraUri = uri.toString()
                 camera.launch(uri)
             },
@@ -98,24 +105,33 @@ internal actual fun PhotoPreview(uri: String, rotation: Rotation, modifier: Modi
     }
 }
 
-private fun Context.newCameraUri(): Uri {
-    val dir = File(cacheDir, CAMERA_DIR).apply { mkdirs() }
-    val file = File(dir, "${System.currentTimeMillis()}.jpg")
-    return FileProvider.getUriForFile(this, "$packageName$AUTHORITY_SUFFIX", file)
+private fun Context.newPhotoFile(): File {
+    val dir = File(cacheDir, PHOTO_DIR).apply { mkdirs() }
+    return File.createTempFile("photo", ".jpg", dir)
 }
 
+private fun Context.newPhotoUri(): Uri = uriFor(newPhotoFile())
+
+private fun Context.uriFor(file: File): Uri = FileProvider.getUriForFile(this, "$packageName$AUTHORITY_SUFFIX", file)
+
 /**
- * A picker URI is readable only until the process ends. A persisted grant keeps it readable after
- * process death. The picker's fallback on old devices (`ACTION_GET_CONTENT`) may not offer one:
- * then the photo is readable only in this process.
+ * Copies the picked photo's bytes unchanged (the EXIF orientation stays) and returns the copy's
+ * URI, or null when the photo cannot be read. Blocking: call it off the main thread.
  */
-private fun Context.keepReadAccess(uri: Uri) {
-    runCatching { contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION) }
-        .onFailure { logcat(tag = TAG) { "No persistable read grant for $uri: $it" } }
+private fun Context.copyToCache(source: Uri): Uri? {
+    val file = newPhotoFile()
+    return runCatching {
+        val input = contentResolver.openInputStream(source) ?: error("No stream")
+        input.use { from -> file.outputStream().use { to -> from.copyTo(to) } }
+        uriFor(file)
+    }.onFailure {
+        file.delete()
+        logcat(tag = TAG) { "Copy of $source failed: $it" }
+    }.getOrNull()
 }
 
 private const val PREVIEW_LONG_SIDE_PX = 512
-private const val CAMERA_DIR = "camera"
+private const val PHOTO_DIR = "photos"
 
 /** Must match the provider authority in this module's `AndroidManifest.xml`. */
 private const val AUTHORITY_SUFFIX = ".photos"
