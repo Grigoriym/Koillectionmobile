@@ -34,6 +34,8 @@ cold session can act on it. Delete an entry when it's fixed.
   the source has no `vendor/`, and the local test instance runs at the root. `add_book.py` uses
   unprefixed IRIs against the user's server, but whether that server has a subpath is not
   recorded here. Check once against a subpath instance (or the user's setup) before M3 ships.
+  User, 2026-11-15: their server is reached through Tailscale, with no subpath ("I presume").
+  M3.7 still confirms it from the server URL itself, read only.
 - 2026-11-15 (M2.5) — The error mapping and the error view exist twice, copied by hand:
   `Throwable.toMessage()` in `feature/collections/ui/.../CollectionListViewModel.kt:74` and
   `feature/items/ui/.../ItemViewModel.kt` (bottom), and `EmptyOrError` in
