@@ -1,6 +1,6 @@
 # koillectionmobile checklist
 
-**Current step:** M1.8 (M1.7 done 2026-11-15). M0 done 2026-11-14 (archived). Plan §5 decisions 1, 2, 4 and 6 are settled.
+**Current step:** M1.9 (M1.8 done 2026-11-15). M0 done 2026-11-14 (archived). Plan §5 decisions 1, 2, 4 and 6 are settled.
 
 ## How to use this
 
@@ -114,9 +114,14 @@ Model for every step: `../wallosmobile/core/api` and its `feature:*:data` module
   `normalizeBaseUrl` (`core:api`, now public). `getData` sorts by `position`: the server does not promise
   that order (plan §2). `Datum.type` stays the server's string. Mutation-checked: no `@Single`, no
   sort, no server URL in the image URL and an unnormalised server URL each fail a test.
-- [ ] **M1.8** — `feature:tags` dto/domain/mapper/data: list tags (paged), tag categories,
+- [x] **M1.8** — `feature:tags` dto/domain/mapper/data: list tags (paged), tag categories,
   an item's tags.
   **Verify:** mapper and repository tests against the M1.1 fixtures.
+  Note: `TagsRepository` returns `Result`, as in M1.6. `Tag.categoryId` comes from the
+  `category` IRI. The tag image fields are not read: no fixture has one and no step needs them
+  yet. The tags fixture is one full page (30 of 30), so paging is tested with an inline body.
+  Mutation-checked: no `@Single`, a wrong item-tags path, an unparsed category IRI and a
+  dropped second page each fail a test.
 - [ ] **M1.9** — Write side: create item, create Datum (text and image type), set an item's
   tags (full list, `merge-patch+json`, plan §2). Request shapes follow `add_book.py`, checked
   against the entity `write` groups in the Koillection source.

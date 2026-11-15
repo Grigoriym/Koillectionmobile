@@ -10,5 +10,11 @@ kotlin {
             api(projects.feature.tags.dto)
             api(projects.feature.tags.domain)
         }
+        // `jvmTest`: the tests read the M1.1 fixture files.
+        jvmTest.dependencies {
+            implementation(kotlin("test"))
+            // Decodes the fixtures. `dto` takes it as `implementation` only.
+            implementation(libs.kotlinx.serialization.json)
+        }
     }
 }
