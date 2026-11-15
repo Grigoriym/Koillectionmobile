@@ -1,6 +1,6 @@
 # koillectionmobile checklist
 
-**Current step:** M1 (not broken into steps yet). M0 done 2026-11-14 (archived). Plan §5 decisions 1, 2 and 4 are settled.
+**Current step:** M1.1 (M1 broken into steps 2026-11-15). M0 done 2026-11-14 (archived). Plan §5 decisions 1, 2 and 4 are settled.
 
 ## How to use this
 
@@ -29,11 +29,66 @@ Ground rules:
 
 M0 (repo and module scaffolding) is done; its steps and notes are in `docs/CHECKLIST_ARCHIVE.md`.
 
-## M1 — `core:api` (rough scope)
+## M1 — API layer
 
 Ktor client, server URL + login (JWT), token storage (grappim-kit `storage`), Hydra list
 paging, DTOs for Collection / Item / Datum / Tag, multipart image upload. Fixture-tested
-against real JSON captured from the user's server.
+against real JSON captured from the user's server. No screens: those are M2.
+
+Layout is plan §5 decision 4: shared plumbing in `core:api`, each resource in its
+`feature:<x>:{dto,domain,mapper,data}`. Datum (an item's field) lives in `feature:items`.
+Model for every step: `../wallosmobile/core/api` and its `feature:*:data` modules.
+
+- [ ] **M1.1** — Capture fixtures and settle two open questions. Fetch the server's OpenAPI
+  doc and real responses for: one page of `/api/collections`, one collection, one page of
+  `/api/collections/{id}/items`, one item, `/api/items/{id}/data`, one page of `/api/tags`,
+  `/api/tag_categories`, and the login error bodies (wrong password → 401). Use `koi.py`
+  (`~/claude/books/00service/`), GET only. Decide hand-written vs generated DTOs (plan §2) and
+  answer plan §5 decision 3 (does the Tailscale cert validate without `koi.py`'s check-off?).
+  **The GitHub repo is public:** ask the user how to trim or anonymise their data before any
+  fixture is committed. Never commit a token.
+  **Verify:** fixtures are in the repo, `grep` finds no JWT (`eyJ`) in them, and plan §2 / §5.3
+  record both answers.
+- [ ] **M1.2** — `core:api` client: Ktor `HttpClient` factory (wallosmobile `NetworkModule`),
+  base-URL provider, `Json` (`ignoreUnknownKeys`, `application/ld+json` and
+  `application/merge-patch+json`), redacting logger, custom headers (grappim-kit
+  `customheaders`), and one error type that maps HTTP status and network failure. Koin module.
+  **Verify:** `ktor-client-mock` tests pass (`jvmTest --rerun`), `KoinGraphTest` passes,
+  `build ktlintCheck` green.
+- [ ] **M1.3** — Session storage and bearer auth. Store server URL, username, password and JWT
+  with grappim-kit `storage`; decide `core:api` vs a new `core:storage` module (M0.3 note) and
+  write the answer in plan §5. Add `Authorization: Bearer`; on 401 log in again once with the
+  stored password, then fail.
+  **Verify:** tests prove the header is sent, one re-login on 401, and no loop on a second
+  401. Hand-written fakes for storage.
+- [ ] **M1.4** — Hydra paging in `core:api`: a generic list DTO that reads `member` and
+  `hydra:member`, `totalItems`, and the next-page link; a helper that follows pages.
+  **Verify:** tests against the M1.1 list fixtures, including the last page (no next link).
+- [ ] **M1.5** — `feature:auth` dto/domain/mapper/data: `POST /api/authentication_token`,
+  server-URL check, and distinct results for wrong credentials (401), server JWT failure (500,
+  plan §2 trap) and unreachable server.
+  **Verify:** mock-engine tests for each result; `KoinGraphTest` passes.
+- [ ] **M1.6** — `feature:collections` dto/domain/mapper/data: list (paged), get one,
+  children.
+  **Verify:** mapper and repository tests against the M1.1 fixtures.
+- [ ] **M1.7** — `feature:items` read side: items of a collection (paged), get one item, the
+  item's data (Datum) list, image URLs resolved against the server URL.
+  **Verify:** mapper and repository tests against the M1.1 fixtures.
+- [ ] **M1.8** — `feature:tags` dto/domain/mapper/data: list tags (paged), tag categories,
+  an item's tags.
+  **Verify:** mapper and repository tests against the M1.1 fixtures.
+- [ ] **M1.9** — Write side: create item, create Datum (text and image type), set an item's
+  tags (full list, `merge-patch+json`, plan §2). Request shapes follow `add_book.py`, checked
+  against the entity `write` groups in the Koillection source.
+  **Verify:** mock-engine tests assert method, path, content type and body for each call.
+- [ ] **M1.10** — Multipart upload: `POST /api/items/{id}/image` (field `file`) and
+  `POST /api/data/{id}/image` (field `fileImage`). Bytes in, no platform file APIs in
+  `commonMain`.
+  **Verify:** mock-engine tests assert the multipart parts, field names and content type.
+- [ ] **M1.11** — Live read-only smoke against the user's server: a JVM run (not part of
+  `build` or CI) that logs in and reads one collection, its items and one item's data through
+  the real repositories. No writes; writes get checked on device in M3.
+  **Verify:** the run prints real names from the server; the user confirms them.
 
 ## M2 — browse (rough scope)
 
