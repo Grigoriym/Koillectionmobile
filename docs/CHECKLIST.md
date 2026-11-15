@@ -1,6 +1,6 @@
 # koillectionmobile checklist
 
-**Current step:** M1.10 (M1.9 done 2026-11-15). M0 done 2026-11-14 (archived). Plan §5 decisions 1, 2, 4 and 6 are settled.
+**Current step:** M1.11 (M1.10 done 2026-11-15). M0 done 2026-11-14 (archived). Plan §5 decisions 1, 2, 4 and 6 are settled.
 
 ## How to use this
 
@@ -132,12 +132,18 @@ Model for every step: `../wallosmobile/core/api` and its `feature:*:data` module
   is sent without a `value` key. Not sent to a server: writes are checked on device in M3.
   Mutation-checked: a bare collection id, ld+json on the PATCH, `"value":null` on an image field
   and a wrong datum path each fail a test.
-- [ ] **M1.10** — Multipart upload: `POST /api/items/{id}/image` (field `file`) and
+- [x] **M1.10** — Multipart upload: `POST /api/items/{id}/image` (field `file`) and
   `POST /api/data/{id}/image` (field `fileImage`). Bytes in, no platform file APIs in
   `commonMain`.
   **Verify:** mock-engine tests assert the multipart parts, field names and content type.
   M1.3 note: `bearerAuth` sends a request again after a 401 and a new login. Check that a
   multipart body is still complete on that second send.
+  Note: `ItemsRepository` gains `uploadItemImage` and `uploadDatumImage` (bytes, file name, MIME
+  type; `Result` of the updated `Item` / `Datum`). Ktor `submitFormWithBinaryData` with a
+  `ByteArray` part reads the bytes again on each send, so the repeat after a 401 is complete.
+  The tests parse the multipart body by hand. Not sent to a server: checked on device in M3.
+  Mutation-checked: a wrong field name, no part `Content-Type` and a one-shot channel body each
+  fail a test; only the 401 test catches the one-shot body.
 - [ ] **M1.11** — Live read-only smoke against the local test instance: a JVM run (not part of
   `build` or CI) that logs in and reads one collection, its items and one item's data through
   the real repositories. No writes; writes get checked on device in M3.

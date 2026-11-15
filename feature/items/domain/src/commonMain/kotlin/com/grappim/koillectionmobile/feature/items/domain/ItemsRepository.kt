@@ -25,4 +25,17 @@ interface ItemsRepository {
      * call, to the returned field's id. [label] must not be in use on that item yet.
      */
     suspend fun createImageDatum(itemId: String, label: String, position: Int): Result<Datum>
+
+    /**
+     * Uploads [bytes] as the main image of item [itemId] and returns the item with its new image.
+     * [mimeType] is one the server takes: `image/png`, `image/jpeg`, `image/webp` or `image/avif`.
+     * The server stores the file under its own name; [fileName] only fills the multipart part.
+     */
+    suspend fun uploadItemImage(itemId: String, bytes: ByteArray, fileName: String, mimeType: String): Result<Item>
+
+    /**
+     * Uploads [bytes] as the image of `image` field [datumId] (from [createImageDatum]) and returns
+     * the field with its new image. [mimeType] and [fileName] as in [uploadItemImage].
+     */
+    suspend fun uploadDatumImage(datumId: String, bytes: ByteArray, fileName: String, mimeType: String): Result<Datum>
 }

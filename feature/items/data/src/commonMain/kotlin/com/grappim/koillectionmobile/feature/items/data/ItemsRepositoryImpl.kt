@@ -15,10 +15,16 @@ import com.grappim.koillectionmobile.feature.items.dto.NewItemDto
 import com.grappim.koillectionmobile.feature.items.mapper.ItemMapper
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.request.forms.formData
+import io.ktor.client.request.forms.submitFormWithBinaryData
 import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
+import io.ktor.client.statement.HttpResponse
+import io.ktor.http.Headers
+import io.ktor.http.HttpHeaders
 import io.ktor.http.contentType
+import io.ktor.http.escapeIfNeeded
 import org.koin.core.annotation.Single
 
 /**
@@ -77,6 +83,51 @@ internal class ItemsRepositoryImpl(
         }.body<DatumDto>()
         mapper.toDomain(dto, serverUrl())
     }
+
+    override suspend fun uploadItemImage(
+        itemId: String,
+        bytes: ByteArray,
+        fileName: String,
+        mimeType: String
+    ): Result<Item> = resultOf {
+        val dto = uploadImage("$ITEMS_PATH/$itemId/image", "file", bytes, fileName, mimeType).body<ItemDto>()
+        mapper.toDomain(dto, serverUrl())
+    }
+
+    override suspend fun uploadDatumImage(
+        datumId: String,
+        bytes: ByteArray,
+        fileName: String,
+        mimeType: String
+    ): Result<Datum> = resultOf {
+        val dto = uploadImage("$DATA_PATH/$datumId/image", "fileImage", bytes, fileName, mimeType).body<DatumDto>()
+        mapper.toDomain(dto, serverUrl())
+    }
+
+    /**
+     * `POST` of one `multipart/form-data` part named [field]. The field name is the entity's file
+     * property (`Item::$file`, `Datum::$fileImage`). The part reads [bytes] again on each send,
+     * so the request is complete when `bearerAuth` repeats it after a 401.
+     */
+    private suspend fun uploadImage(
+        path: String,
+        field: String,
+        bytes: ByteArray,
+        fileName: String,
+        mimeType: String
+    ): HttpResponse = httpClient.submitFormWithBinaryData(
+        url = path,
+        formData = formData {
+            append(
+                key = field,
+                value = bytes,
+                headers = Headers.build {
+                    append(HttpHeaders.ContentType, mimeType)
+                    append(HttpHeaders.ContentDisposition, "filename=${fileName.escapeIfNeeded()}")
+                }
+            )
+        }
+    )
 
     private fun itemIri(itemId: String): String = "/$ITEMS_PATH/$itemId"
 

@@ -4,16 +4,21 @@ import com.grappim.kit.testing.FakeCustomHeadersStorage
 import com.grappim.koillectionmobile.core.api.BaseUrlProvider
 import com.grappim.koillectionmobile.core.api.configureKoillectionClient
 import com.grappim.koillectionmobile.core.domain.KoillectionError
+import com.grappim.koillectionmobile.core.storage.Credentials
 import com.grappim.koillectionmobile.feature.items.mapper.ItemMapper
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.mock.MockEngine
+import io.ktor.client.engine.mock.MockRequestHandleScope
 import io.ktor.client.engine.mock.respond
+import io.ktor.client.engine.mock.toByteArray
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.request.HttpRequestData
+import io.ktor.client.request.HttpResponseData
 import io.ktor.content.TextContent
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
+import io.ktor.http.encodedPath
 import io.ktor.http.fullPath
 import io.ktor.http.headersOf
 import kotlinx.coroutines.test.runTest
@@ -36,16 +41,24 @@ class ItemsRepositoryImplTest {
     /** Path (with query) → status and body. Any other path gets a 404. */
     private fun repository(vararg routes: Pair<String, Pair<HttpStatusCode, String>>): ItemsRepositoryImpl {
         val byPath = routes.toMap()
-        val session = FakeSessionStorage(serverUrl = "https://koi.example/sub", token = "jwt")
+        return repository { request ->
+            val (status, body) = byPath[request.url.fullPath]
+                ?: (HttpStatusCode.NotFound to """{"title":"An error occurred","detail":"Not Found"}""")
+            respond(body, status, headersOf(HttpHeaders.ContentType, "application/ld+json"))
+        }
+    }
+
+    private fun repository(
+        session: FakeSessionStorage = FakeSessionStorage(serverUrl = "https://koi.example/sub", token = "jwt"),
+        handler: suspend MockRequestHandleScope.(HttpRequestData) -> HttpResponseData
+    ): ItemsRepositoryImpl {
         val baseUrlProvider = object : BaseUrlProvider {
             override fun getBaseUrl(): String = session.serverUrl
         }
         val client = HttpClient(
             MockEngine { request ->
                 requests += request
-                val (status, body) = byPath[request.url.fullPath]
-                    ?: (HttpStatusCode.NotFound to """{"title":"An error occurred","detail":"Not Found"}""")
-                respond(body, status, headersOf(HttpHeaders.ContentType, "application/ld+json"))
+                handler(request)
             }
         ) {
             configureKoillectionClient(
@@ -203,6 +216,117 @@ class ItemsRepositoryImplTest {
         assertIs<KoillectionError.Validation>(repository.createTextDatum(ITEM_ID, "", "x", 1).exceptionOrNull())
     }
 
+    @Test
+    fun `uploadItemImage posts the bytes as multipart part file`() = runTest {
+        val repository =
+            repository("/sub/api/items/$ITEM_ID/image" to (HttpStatusCode.Created to fixture("item_one.json")))
+
+        val item = repository.uploadItemImage(ITEM_ID, JPEG, "title.jpg", "image/jpeg").getOrThrow()
+
+        val request = requests.single()
+        assertEquals(HttpMethod.Post, request.method)
+        assertEquals("/sub/api/items/$ITEM_ID/image", request.url.fullPath)
+        assertEquals(
+            listOf(Part(name = "file", fileName = "title.jpg", contentType = "image/jpeg", bytes = JPEG.toList())),
+            parts(request)
+        )
+        assertEquals(ITEM_ID, item.id)
+    }
+
+    @Test
+    fun `uploadDatumImage posts the bytes as multipart part fileImage`() = runTest {
+        val repository = repository("/sub/api/data/datum-2/image" to (HttpStatusCode.Created to DATUM_IMAGE_UPLOADED))
+
+        val datum = repository.uploadDatumImage("datum-2", JPEG, "p2.webp", "image/webp").getOrThrow()
+
+        val request = requests.single()
+        assertEquals(HttpMethod.Post, request.method)
+        assertEquals("/sub/api/data/datum-2/image", request.url.fullPath)
+        assertEquals(
+            listOf(Part(name = "fileImage", fileName = "p2.webp", contentType = "image/webp", bytes = JPEG.toList())),
+            parts(request)
+        )
+        assertEquals("https://koi.example/sub/uploads/u/page.jpg", datum.image?.url)
+    }
+
+    /** M1.3: `bearerAuth` sends the same request object again after a 401 and a new login. */
+    @Test
+    fun `an upload repeated after a 401 sends the complete multipart body again`() = runTest {
+        val session = FakeSessionStorage(
+            serverUrl = "https://koi.example/sub",
+            credentials = Credentials(username = "tester", password = "hunter2"),
+            token = "old-jwt"
+        )
+        val repository = repository(session) { request ->
+            val jsonHeaders = headersOf(HttpHeaders.ContentType, "application/json")
+            when {
+                request.url.encodedPath.endsWith("/api/authentication_token") ->
+                    respond("""{"token":"new-jwt"}""", HttpStatusCode.OK, jsonHeaders)
+
+                request.headers[HttpHeaders.Authorization] == "Bearer new-jwt" ->
+                    respond(fixture("item_one.json"), HttpStatusCode.Created, jsonHeaders)
+
+                else -> respond(
+                    """{"code":401,"message":"Expired JWT Token"}""",
+                    HttpStatusCode.Unauthorized,
+                    jsonHeaders
+                )
+            }
+        }
+
+        repository.uploadItemImage(ITEM_ID, JPEG, "title.jpg", "image/jpeg").getOrThrow()
+
+        val uploads = requests.filter { it.url.encodedPath.endsWith("/image") }
+        assertEquals(listOf("Bearer old-jwt", "Bearer new-jwt"), uploads.map { it.headers[HttpHeaders.Authorization] })
+        val expected =
+            listOf(Part(name = "file", fileName = "title.jpg", contentType = "image/jpeg", bytes = JPEG.toList()))
+        assertEquals(expected, parts(uploads[0]))
+        assertEquals(expected, parts(uploads[1]))
+    }
+
+    @Test
+    fun `a rejected upload is a failed result that holds the KoillectionError`() = runTest {
+        val repository = repository(
+            "/sub/api/items/$ITEM_ID/image" to (
+                HttpStatusCode.UnprocessableEntity to
+                    """{"title":"An error occurred","detail":"file: This file is not a valid image."}"""
+                )
+        )
+
+        assertIs<KoillectionError.Validation>(
+            repository.uploadItemImage(ITEM_ID, JPEG, "title.jpg", "image/jpeg").exceptionOrNull()
+        )
+    }
+
+    /** One `multipart/form-data` part; [bytes] as a list so that `equals` compares the content. */
+    private data class Part(val name: String, val fileName: String, val contentType: String, val bytes: List<Byte>)
+
+    /**
+     * Parses the body as RFC 7578 multipart by hand, so the test does not trust Ktor's own
+     * reader. ISO-8859-1 maps each byte to one char and back, so the binary part survives.
+     */
+    private suspend fun parts(request: HttpRequestData): List<Part> {
+        val contentType = request.body.contentType!!
+        assertEquals("multipart/form-data", contentType.withoutParameters().toString())
+        val boundary = contentType.parameter("boundary")!!
+        val text = String(request.body.toByteArray(), Charsets.ISO_8859_1)
+        val segments = text.split("--$boundary")
+        assertEquals("--\r\n", segments.last())
+        return segments.drop(1).dropLast(1).map { segment ->
+            val (head, content) = segment.removePrefix("\r\n").removeSuffix("\r\n").split("\r\n\r\n", limit = 2)
+            val headers = head.split("\r\n").associate { line ->
+                line.substringBefore(":").lowercase() to line.substringAfter(":").trim()
+            }
+            val disposition = headers.getValue("content-disposition")
+            Part(
+                name = Regex("""\bname=([^;]+)""").find(disposition)!!.groupValues[1].removeSurrounding("\""),
+                fileName = Regex("""\bfilename=([^;]+)""").find(disposition)!!.groupValues[1].removeSurrounding("\""),
+                contentType = headers.getValue("content-type"),
+                bytes = content.toByteArray(Charsets.ISO_8859_1).toList()
+            )
+        }
+    }
+
     private fun body(request: HttpRequestData): JsonElement =
         json.parseToJsonElement((request.body as TextContent).text)
 
@@ -214,6 +338,15 @@ class ItemsRepositoryImplTest {
         const val DATUM_IMAGE =
             """{"id":"datum-2","item":"/api/items/01a1de6f-bff4-7eb7-8d9f-973b4ac86da8","type":"image",""" +
                 """"label":"Preface","value":null,"position":2,"image":null}"""
+
+        /** The server's answer to `POST /api/data/{id}/image`: the field with its stored image. */
+        const val DATUM_IMAGE_UPLOADED =
+            """{"id":"datum-2","item":"/api/items/01a1de6f-bff4-7eb7-8d9f-973b4ac86da8","type":"image",""" +
+                """"label":"Preface","value":null,"position":2,"image":"uploads/u/page.jpg"}"""
+
+        /** A JPEG start marker, a CR LF, a zero and bytes above 0x7F: not valid UTF-8 text. */
+        val JPEG = byteArrayOf(0xFF.toByte(), 0xD8.toByte(), 0xFF.toByte(), 0x0D, 0x0A, 0x00, 0x80.toByte(), 0x7F)
+
         const val BOOKS_ID = "01a1de6f-bfad-78b6-a916-7266d9e3dfff"
         const val ITEM_ID = "01a1de6f-bff4-7eb7-8d9f-973b4ac86da8"
     }
