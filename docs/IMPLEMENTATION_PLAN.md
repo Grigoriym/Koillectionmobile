@@ -166,3 +166,8 @@ code without checking the licence terms are kept.
    the HTTP client. The DataStore path and the cipher are per platform (`expect class
    PlatformStorageModule`, TaigaMobileNova's pattern): Android Keystore on Android,
    `NoopSecretCipher` (plain text) on JVM and iOS, neither of which is shipped.
+7. **Add-item form** — *decided 2026-11-15 (start of M3)*: photos come from the system camera
+   (intent, no CameraX) and the Android photo picker. The app applies EXIF orientation, and each
+   photo has a manual rotate button; uploads are downscaled to 2400px JPEG q85, as `add_book.py`
+   does. Text fields are free label/value rows: nothing book-specific in the app. Tags are picked
+   from the server's existing tags only; the form cannot create one.
