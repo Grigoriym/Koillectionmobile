@@ -30,3 +30,18 @@ kotlin {
         }
     }
 }
+
+// M1.11: live read-only smoke run against the local test instance (`docs/local-info.md`). Not
+// wired into `build` or `check`; run it by name. `user.home` points into `build/`, so the stored
+// session stays out of `~/.koillectionmobile`.
+tasks.register<JavaExec>("smokeRun") {
+    group = "verification"
+    description = "Logs in to the local test instance and prints what the read repositories return."
+    val jvmTestCompilation = kotlin.jvm().compilations.getByName("test")
+    dependsOn(jvmTestCompilation.compileAllTaskName)
+    classpath = files(jvmTestCompilation.output.allOutputs, jvmTestCompilation.runtimeDependencyFiles)
+    mainClass.set("com.grappim.koillectionmobile.composeapp.smoke.LiveSmokeKt")
+    val smokeHome = layout.buildDirectory.dir("smoke-home")
+    systemProperty("user.home", smokeHome.get().asFile.absolutePath)
+    javaLauncher.set(javaToolchains.launcherFor { languageVersion.set(JavaLanguageVersion.of(21)) })
+}
