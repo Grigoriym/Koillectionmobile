@@ -38,3 +38,9 @@ entries get deleted — see /finalize.
   SyntaxError again (M2.6). Second time; `'''` delimiters in the Python fixed it.
 - 2026-11-15 — A Python string-replace that put the `material.icons` imports above `material3.CircularProgressIndicator`
   (M2.8) broke ktlint's import order in `ItemScreen.kt`, which also imports `material3.Button`. Insert by sort order, or run `ktlintFormat`.
+- 2026-11-15 — Piped a hung `./gradlew :composeApp:smokeWriteRun` through `| tail -40` (M3.1): `tail` prints
+  only at the end, so 10 minutes passed with no output. Redirect to a file under `timeout` instead.
+- 2026-11-15 — `pkill -f LiveWriteSmokeKt` (M3.1) also matched the Bash tool's own shell, whose command
+  line held that text, and killed it (exit 144). Kill by PID from `pgrep`.
+- 2026-11-15 — `io.ktor.http.contentType(this, ...)` in a debug edit (M3.1) failed "Unresolved reference":
+  it is an extension, as the `CLAUDE.md` gotcha says. Used `header("Content-Type", ...)`.

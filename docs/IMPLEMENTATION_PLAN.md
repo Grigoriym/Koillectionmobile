@@ -58,7 +58,8 @@ start of any step that touches the API. Facts that shape the design:
   `config/packages/lexik_jwt_authentication.yaml` does not set it). There is no refresh token.
   An expired JWT gives 401 `{"code":401,"message":"Expired JWT Token"}` (checked 2026-11-15
   against the local test instance). So the app stores the password and logs in again on a 401
-  (`core:api` `bearerAuth`, M1.3).
+  (`core:api` `bearerAuth`, M1.3). The login request must go without the bearer header: with
+  an expired JWT the server answers the login itself with 401 (checked 2026-11-15, M3.1).
 - `PATCH` takes `application/merge-patch+json`.
 - Resources with `#[ApiResource]`: Item, Collection, Datum (an item's custom field), Tag,
   TagCategory, Template, ChoiceList, Album, Photo, Wishlist, Wish, Loan, Inventory, Log,
@@ -70,7 +71,7 @@ start of any step that touches the API. Facts that shape the design:
   OpenAPI doc answers 201 with the updated resource. The server checks free space per user
   (`HasEnoughSpaceForUpload`). `feature:items` sends one Ktor `ByteArray` part; Ktor reads the
   bytes again on each send, so the `bearerAuth` repeat after a 401 sends the whole body (tested).
-  Not sent to a real server yet: M3. A full per-user quota (`diskSpaceAllowed`, 512 MiB by
+  Sent to the local test instance in M3.1 (see "Writes checked live" below). A full per-user quota (`diskSpaceAllowed`, 512 MiB by
   default) makes an image upload fail with an empty 500 while text fields still work; the user
   hit it on the real server on 2026-11-01 (`~/claude/books/00service/CLAUDE.md`, API gotchas).
 - Collections nest, and `GET /api/collections` returns every level: `Collection.php` has no
@@ -107,7 +108,7 @@ start of any step that touches the API. Facts that shape the design:
   wallosmobile); the failure is the `KoillectionError` that `core:api` threw. `feature:auth` is
   the exception: its `LoginResult` names each login outcome.
 - Item tags: the API takes only the full list, so changing tags means sending all of them.
-- Writes (checked 2026-11-15 against the 1.8.5 source, M1.9; not yet sent to a server by the app):
+- Writes (checked 2026-11-15 against the 1.8.5 source, M1.9; sent live in M3.1, see the next bullet):
   `POST /api/items` needs `name` and `collection` (`item:write`, both `NotBlank`).
   `POST /api/data` needs `item` (or `collection`), `type` and `label`; a label already used on
   the item is rejected (`DatumLabelNotExistsInParent`). An `image` field's `value` must be null
@@ -115,6 +116,14 @@ start of any step that touches the API. Facts that shape the design:
   replaces the tag set: `Item` has `addTag`/`removeTag`, so the serializer adds and removes to
   match the list. A body names other resources by IRI; the app sends `/api/...` without the
   server's subpath, as `add_book.py` does. Behind a subpath this is unchecked (`docs/revisit.md`).
+- Writes checked live 2026-11-15 (M3.1, `./gradlew :composeApp:smokeWriteRun`, JVM, local test
+  instance at the root path): through the app's repositories, an item in `Books`, two text fields
+  (positions 1 and 2), an image field (position 3), a main image upload and a field image upload
+  (`image/jpeg`), and two existing tags. The read-back matched: fields in `position` order, the
+  image URLs, both tags. An image narrower than the server's thumbnail width gets no thumbnails,
+  so the thumbnail URLs equal the image URL (`ThumbnailGenerator` returns early). `DELETE
+  /api/items/{id}` answered 204; after it the item, its fields and both uploaded files gave 404.
+  Not checked: the upload quota 500, a server behind a subpath.
 - Known server-side trap: Koillection's Docker entrypoint can regenerate `JWT_PASSPHRASE` on
   restart, which breaks API login with a 500 while the website keeps working. Upstream issues
   #1600, #1400, #1410. The app should show a clear message for a 500 at login, not a

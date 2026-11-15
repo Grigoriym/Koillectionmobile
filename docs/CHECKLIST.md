@@ -1,6 +1,6 @@
 # koillectionmobile checklist
 
-**Current step:** M3.1. M3 broken into steps 2026-11-15. M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6 and 7 are settled.
+**Current step:** M3.2. M3.1 done 2026-11-15; M3 broken into steps 2026-11-15. M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6 and 7 are settled.
 
 ## How to use this
 
@@ -39,12 +39,17 @@ goes to the local test instance (`docs/local-info.md`), never the real server. L
 `add_book.py` (`~/claude/books/00service/`): downscale to 2400px JPEG q85, fields get `position`
 in order, and a failure halfway must not lead to a second item on retry.
 
-- [ ] **M3.1** — Live write smoke against the local test instance: extend M1.11's JVM run (or add a
+- [x] **M3.1** — Live write smoke against the local test instance: extend M1.11's JVM run (or add a
   second task) that creates an item in `Books`, two text fields, an image field, uploads a main
   image and a field image, sets two existing tags, reads the item back, then deletes it. This is
   the first time M1.9/M1.10's writes reach a server. Record the answers in plan §2.
   **Verify:** the run prints the created item read back (fields, image URLs, tags) and the delete;
   a `GET` of the item after the delete gives 404.
+  Note: a second task, `./gradlew :composeApp:smokeWriteRun` (`LiveWriteSmoke.kt`); the delete
+  goes through the app's `HttpClient`, as the repositories have no delete. Every write worked as
+  sent; answers in plan §2. First, `smokeRun` hung with M1.11's expired stored JWT: `bearerAuth`
+  sent the bearer on the login at a root-path server, the server answered 401, and the re-login
+  deadlocked on its own mutex. Fixed in a separate commit with a test (`794ffb2`).
 - [ ] **M3.2** — Image preparation (Android): read a content URI, apply its EXIF orientation plus
   an extra rotation (0/90/180/270, clockwise), downscale so the long side is at most 2400px,
   encode JPEG q85 to a `ByteArray`. Pure size and rotation math in `commonMain` with tests; the
