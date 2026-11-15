@@ -1,6 +1,6 @@
 # koillectionmobile checklist
 
-**Current step:** M2.4 (M2.3 done 2026-11-15). M1 done 2026-11-15, M0 done 2026-11-14 (both archived). Plan §5 decisions 1, 2, 4, 5 and 6 are settled.
+**Current step:** M2.5 (M2.4 done 2026-11-15). M1 done 2026-11-15, M0 done 2026-11-14 (both archived). Plan §5 decisions 1, 2, 4, 5 and 6 are settled.
 
 ## How to use this
 
@@ -75,13 +75,19 @@ fake repositories.
   an image shows the title's first letter. Tapping a row opens `CollectionRoute` (needed by M2.4's
   Verify). Coil: `coil-compose` in `feature:collections:ui`, and `coil-network-ktor3` in
   `:composeApp`, found by service loader; uploads are public files, so images need no token.
-- [ ] **M2.4** — Collection screen: its child collections, then its items (name and small
+- [x] **M2.4** — Collection screen: its child collections, then its items (name and small
   thumbnail). Tapping a child opens that collection; tapping an item opens the item placeholder.
   `ItemsRepository.getItems` reads every page before it returns (445 items = 15 requests on the
   test instance). Measure the wait on the emulator; if it is too slow, record it in
   `docs/revisit.md` rather than adding paging UI in this step.
   **Verify:** ViewModel tests (`jvmTest --rerun`); on the emulator `Books` shows all its items,
   and back returns to the collection list.
+  Note: `CollectionViewModel` reads the collection, its children and its items in parallel; a
+  load fills all three or none, with a retry button on error (no pull to refresh). The screen
+  stays in `feature:collections:ui`, which now depends on `feature:items:domain`. Wait for `Books`
+  on the emulator: under 2 s (one `uiautomator dump` poll); the host reads all 15 pages in 0.3 s.
+  Not recorded in `docs/revisit.md`. The list ends with the server's last item (445 in total).
+  Tapping a child collection was not checked on the device: the test instance has none.
 - [ ] **M2.5** — Item detail (`feature:items:ui`): main image (large thumbnail, full image on
   tap), fields in `position` order (text-like types as text, `image` fields as images), and the
   item's tags. A field type the screen does not know shows its label and a "not shown" mark, not

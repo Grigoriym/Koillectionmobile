@@ -25,7 +25,13 @@ internal fun MainNavHost(modifier: Modifier = Modifier) {
             entry<CollectionListRoute> {
                 CollectionListScreen(onCollectionClick = { id -> backStack.add(CollectionRoute(id)) })
             }
-            entry<CollectionRoute> { route -> CollectionScreen(collectionId = route.collectionId) }
+            entry<CollectionRoute> { route ->
+                CollectionScreen(
+                    collectionId = route.collectionId,
+                    onCollectionClick = { id -> backStack.add(CollectionRoute(id)) },
+                    onItemClick = { id -> backStack.add(ItemRoute(id)) }
+                )
+            }
             entry<ItemRoute> { route -> ItemScreen(itemId = route.itemId) }
         }
     )

@@ -10,6 +10,8 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(projects.feature.collections.domain)
+            // The collection screen lists the collection's items too.
+            implementation(projects.feature.items.domain)
             // `KoillectionError`, to pick the error message.
             implementation(projects.core.domain)
             implementation(projects.strings)
