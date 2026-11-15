@@ -51,9 +51,15 @@ this app.
 - Two different items in a row (`Books` → "Jörn Uhl", back, "Die Pappenheimer") must show
   different authors (Gustav Frenssen, Julius Wolff). The same author twice means the entries
   share one ViewModel (the M2.6 bug).
-- Full browse pass (M2.7): taps by text with the skill's `ui.py tap "<text>"`, not by hand-parsed
+- Full browse pass (M2.7): taps by text with the skill's `ui.py tap "<text>"`
+  (`~/.claude/skills/emulator-testing/ui.py`), not by hand-parsed
   dumps. In landscape the item's main image fills the width, so the fields are below the fold and
   not in the dump: check the title, or scroll first. Process death: open `Books` → an item, then
   HOME, `am kill`, `am start -n`; the item comes back, and back goes to `Books`, then Collections.
 - Back arrow (M2.8): the collection and item screens' arrow is a node with `content-desc` "Back"
   (`ui.py tap "Back"`). The collection list has none.
+- Add-item form (M3.4): the collection screen's FAB has `content-desc` "Add item". A duplicate
+  label adds an error line under both rows, which moves every node below them: tap the next
+  target from a fresh dump. To compare the tag picker with the server, count `GET /api/tags`
+  (`totalItems`) and `/api/tag_categories` with a bearer token from
+  `POST /api/authentication_token` (30 tags in 4 categories on the test instance, 2026-11-15).

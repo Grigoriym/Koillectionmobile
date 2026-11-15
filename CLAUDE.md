@@ -9,7 +9,7 @@ item with text fields, a main image and page images, without a PC in between.
 ## API contract
 
 The Koillection source at `../../koillection` (`src/Entity/*.php`, `#[ApiResource]`
-attributes) and the server's own OpenAPI docs describe the API. If this repo's docs and the
+attributes; where a machine has no checkout there, `docs/machine.local.md` says where to read it) and the server's own OpenAPI docs describe the API. If this repo's docs and the
 server disagree, the server wins. Re-read the source at the start of any step that touches
 the API.
 
