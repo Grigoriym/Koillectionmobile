@@ -121,9 +121,9 @@ in order, and a failure halfway must not lead to a second item on retry.
   HTTP 500 and the quota message; after `am kill`, quota back and "Try again", the same item got
   the rest (one item, not two). The web UI showed it upright and in order; test items deleted.
 - [ ] **M3.7** — Device pass of the whole add flow, then the user confirms with screenshots. Fix
-  what breaks, or put it in `docs/revisit.md` with evidence. Check `docs/revisit.md`'s M1.9 entry
-  (IRIs without the server's subpath) against the user's real setup before M3 is called done:
-  ask the user whether their server has a subpath; do not write to it.
+  what breaks, or put it in `docs/revisit.md` with evidence. The subpath check (`docs/revisit.md`,
+  M1.9 entry) is deferred: the user's server likely has none, and they chose to check it later
+  (user, 2026-11-15).
   **Verify:** the flow passes on the emulator; the user confirms.
 
 ## M4 — release (rough scope)
