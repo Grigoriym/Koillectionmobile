@@ -207,6 +207,22 @@ class BearerAuthTest {
         assertNull(requests.single().authorization)
     }
 
+    // Hit live 2026-11-15 (M3.1): at the root path the login request carried the expired JWT, got
+    // a 401, and the re-login waited on the mutex its own request held.
+    @Test
+    fun `a server at the root path gets the login request without a bearer header`() = runTest {
+        session.serverUrl = "https://koi.example"
+        val client = client { jsonResponse("{}") }
+
+        client.post(LOGIN_PATH) {
+            contentType(ContentType.Application.Json)
+            setBody(mapOf("username" to "tester", "password" to "hunter2"))
+        }
+
+        assertEquals(1, requests.size)
+        assertNull(requests.single().authorization)
+    }
+
     @Test
     fun `a request body is sent again on the repeat`() = runTest {
         val client = client { request ->

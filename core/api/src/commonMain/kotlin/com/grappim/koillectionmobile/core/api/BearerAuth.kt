@@ -23,6 +23,8 @@ import kotlinx.serialization.Serializable
  */
 const val LOGIN_PATH = "api/authentication_token"
 
+private val LOGIN_PATH_SEGMENTS = LOGIN_PATH.split('/')
+
 /**
  * Sends `Authorization: Bearer <JWT>` with every request except the login request.
  *
@@ -41,7 +43,10 @@ internal fun bearerAuth(sessionStorage: SessionStorage) = createClientPlugin("Ko
     val mutex = Mutex()
 
     on(Send) { request ->
-        if (request.url.encodedPath.endsWith("/$LOGIN_PATH")) return@on proceed(request)
+        // Compare segments: at a server's root path the merged path has no leading `/` here.
+        if (request.url.encodedPathSegments.takeLast(LOGIN_PATH_SEGMENTS.size) == LOGIN_PATH_SEGMENTS) {
+            return@on proceed(request)
+        }
 
         val sentToken = sessionStorage.getToken()
         sentToken?.let { request.headers[HttpHeaders.Authorization] = bearer(it) }
