@@ -122,6 +122,12 @@ An "Unresolved reference" or a wrong-overload error on a library call often mean
 extension import. Ktor's `url.fullPath` and `url.encodedPath`, and kotlinx-serialization's reified
 `decodeFromJsonElement<T>()`, are extensions (hit in M1.3, M1.6, M1.7). Import them by name.
 
+## Test names
+
+No comma in a backtick test name in `commonTest`. It passes `jvmTest` and fails
+`compileTestKotlinIosArm64` ("Name contains illegal characters"); only `build` catches it
+(hit in M1.4, M1.5, M2.3). `jvmTest` source sets do not compile for iOS, so commas are fine there.
+
 ## Plain technical English
 
 Write for a reader whose first language is not English. The model is ASD-STE100

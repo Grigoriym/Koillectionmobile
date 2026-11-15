@@ -74,10 +74,13 @@ start of any step that touches the API. Facts that shape the design:
 - Collections nest, and `GET /api/collections` returns every level: `Collection.php` has no
   `#[ApiFilter]`, so there is no `parent` filter. A top-level list is a client-side filter on a
   null `parent` (an IRI, not an object). `image` is a path relative to the server root
-  (`uploads/<user>/<file>`), as on items. Checked 2026-11-15 (M1.6).
+  (`uploads/<user>/<file>`), as on items. Checked 2026-11-15 (M1.6). A collection has one image
+  (resized to at most 200x200) and no thumbnails. `feature:collections` resolves the path to a
+  full URL, as `feature:items` does (M2.3).
 - Items (checked 2026-11-15, M1.7): `image`, `imageSmallThumbnail` and `imageLargeThumbnail`
   on an item and on a Datum are paths relative to the server root. The server serves `/uploads/*`
-  as static files (`docker/Caddyfile`), so an image URL needs no JWT. `feature:items` resolves
+  as static files (`docker/Caddyfile`), so an image URL needs no JWT (a `curl` without a token
+  got 200, M2.3). `feature:items` resolves
   the paths to full URLs. `GET /api/items/{id}/data` has no guaranteed `position` order: the
   `OrderBy` on `Item::$data` is a Doctrine collection setting, and API Platform reads the Datum
   rows with its own query (`Datum.php` sets no `order`). So `feature:items` sorts by `position`.

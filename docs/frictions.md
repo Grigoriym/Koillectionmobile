@@ -9,13 +9,9 @@ entries get deleted — see /finalize.
   compiler reported "Unclosed comment" and an unresolved name far below it.
 - 2026-11-15 — `failFast = true` (`Quality.kt`) stopped `jvmTest` at the first failure, so the
   XML report listed 4 of 14 tests and looked like the others were missing.
-- 2026-11-15 — A backtick test name with a comma compiled on JVM but failed
-  `compileTestKotlinIosArm64` ("Name contains illegal characters"); only `build` caught it.
 - 2026-11-15 — `failFast` again (M1.4): two mutations in one `jvmTest` run showed only the first
   failure. Ran one mutation per run with `--tests`, plus a clean-tree run of each filter, since a
   filter that matches nothing also fails.
-- 2026-11-15 — The iOS backtick-name trap again (M1.5): a comma in a test name passed `jvmTest`
-  and failed `compileTestKotlinIosArm64`. Second time; a third makes it a rule in `CLAUDE.md`.
 - 2026-11-15 — Ktor `parseUrl("https:///sub")` returned a `Url` with a non-blank host, so a
   host check on the parsed URL passed a URL with no host. Read the host from the text instead.
 - 2026-11-15 — `git rm` of a module's only source file (M1.7) also removed its empty directories,

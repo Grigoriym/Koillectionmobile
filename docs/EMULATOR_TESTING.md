@@ -26,3 +26,9 @@ this app.
   Tap the server URL field once, then `KEYCODE_TAB` to the next field. A second tap by an
   old coordinate put all three values into the URL field (M2.2). `KEYCODE_ENTER` in the
   password field submits the form.
+- Sleep 1 s after each `KEYCODE_TAB` before `input text`. Without it the username lost its
+  first letter, and a later retype got Gboard's autocorrect ("tester" became "yesterday", M2.3).
+  The fix was `pm clear` and a clean fill with the pauses.
+- The test instance has one collection (`Books`), and it has no image. To check an image or a
+  child collection, add a temporary one through the API on the local instance and delete it
+  after (`DELETE /api/collections/<id>` also deletes its children and the uploaded file, M2.3).
