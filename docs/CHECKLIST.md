@@ -1,6 +1,6 @@
 # koillectionmobile checklist
 
-**Current step:** M2.7 (M2.6 done 2026-11-15). M1 done 2026-11-15, M0 done 2026-11-14 (both archived). Plan §5 decisions 1, 2, 4, 5 and 6 are settled.
+**Current step:** M2.8 (M2.7 done 2026-11-15). M1 done 2026-11-15, M0 done 2026-11-14 (both archived). Plan §5 decisions 1, 2, 4, 5 and 6 are settled.
 
 ## How to use this
 
@@ -32,7 +32,8 @@ M1 (API layer) is done; its steps and notes are in `docs/CHECKLIST_ARCHIVE.md`.
 
 ## M2 — browse
 
-Login screen, collection list, item list, item detail with images and fields, log out. Scope is
+Login screen, collection list, item list, item detail with images and fields, log out, a
+top-bar back arrow (M2.8, user 2026-11-15). Scope is
 plan §5 decision 5 (settled 2026-11-15). Every screen is checked on the emulator against the
 local test instance (`docs/local-info.md`); the emulator reaches it at `http://10.0.2.2:8290`.
 
@@ -121,12 +122,22 @@ fake repositories.
   re-login kept the old collection list. `NavDisplay` now has the saveable-state and ViewModel-store
   decorators. Device: a re-login showed the list without a collection deleted while logged out. The
   401 path was not checked on the device, only in `BearerAuthTest`.
-- [ ] **M2.7** — Device pass of the whole browse flow on the emulator: login, collection, item,
+- [x] **M2.7** — Device pass of the whole browse flow on the emulator: login, collection, item,
   back to the top, rotation and process death (back stack kept), log out. Open two different
   items in a row: before M2.6 the second showed the first one's data, and M2.5's device check
   opened only one. Fix what breaks, or put
   it in `docs/revisit.md` with evidence.
   **Verify:** the flow passes on the emulator; screenshots go to the user, and the user confirms.
+  Note: nothing broke, so no code change and no `docs/revisit.md` entry. "Jörn Uhl" then
+  "Die Pappenheimer" showed their own authors. Landscape on an item kept the item and the back
+  stack. `am kill` on "Ut mine Stromtid" restored the item, then back went to `Books` and
+  Collections. Log out left only the URL; a re-login worked. The user saw the screenshots and
+  asked for a top-bar back arrow: that is M2.8.
+- [ ] **M2.8** — Back arrow. The collection screen and the item screen get a back arrow as the
+  `TopAppBar` navigation icon. A tap does the same as system back (removes the top back stack
+  entry). The collection list is the top screen and gets no arrow.
+  **Verify:** `build ktlintCheck` green; on the emulator the arrow goes item → collection →
+  collection list, and the collection list shows no arrow.
 
 ## M3 — add item with photos (rough scope)
 
