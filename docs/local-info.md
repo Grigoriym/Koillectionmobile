@@ -44,6 +44,13 @@ copy that had died at item 102.
 `fixtures/capture.py` writes the JSON fixtures in `fixtures/koillection-1.8.5/` from this
 instance. It refuses nothing on its own: never change its `BASE` to the real server.
 
+## Smoke run
+
+`./gradlew :composeApp:smokeRun` logs in to this instance and prints collections, items and one
+item's fields through the app's own repositories (M1.11). It only reads. Start the instance first.
+Its URL and credentials are constants in `composeApp/src/jvmTest/.../smoke/LiveSmoke.kt`: never
+point them at the real server.
+
 ## Probes
 
 An expired-JWT response without waiting an hour: send any token whose payload has `exp` 1. The
