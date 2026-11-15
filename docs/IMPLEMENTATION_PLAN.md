@@ -145,8 +145,10 @@ code without checking the licence terms are kept.
    `core:domain`, `core:storage` (decision 6), `strings`, and `feature:<x>:{data,domain,dto,mapper,ui}` for `auth`,
    `collections`, `items`, `tags`. The mapper exposes `dto` + `domain` as `api`; `data`
    reaches both through it. No local `uikit` module: `ui` modules use `grappim-kit-uikit`.
-5. **MVP scope** (start of M2): proposed minimum is login, collection list, item list, item
-   detail, and "add item with photos" into a chosen collection.
+5. **MVP scope** — *decided 2026-11-15 (start of M2)*: login, collection list, item list, item
+   detail, and log out (M2); "add item with photos" into a chosen collection (M3). The user
+   accepted the proposal as it was and added log out, so a user can change server without
+   clearing the app data.
 6. **Session storage module** — *decided 2026-11-15 (M1.3)*: a separate `core:storage`, as in
    wallosmobile and TaigaMobileNova. It holds `SessionStorage` (server URL, username, password,
    JWT) and the `CustomHeadersStorage` binding, in one DataStore file with one `SecretCipher`.
