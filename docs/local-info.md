@@ -35,7 +35,9 @@ copy after about 500 MB of images with a 422 "not enough space left on your acco
       -c "update koi_user set disk_space_allowed = 1000000000000 where username='tester';"
 
 Then run `python3 -I copy_from_real.py` in the data folder. It is resumable: run it again after
-an error.
+an error. A finished copy ends `copy.log` with `done`. Check that line, not the
+exit status of a wrapping shell command: on 2026-11-15 the fixtures were first captured from a
+copy that had died at item 102.
 
 ## Fixtures
 

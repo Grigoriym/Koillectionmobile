@@ -13,6 +13,10 @@ attributes) and the server's own OpenAPI docs describe the API. If this repo's d
 server disagree, the server wins. Re-read the source at the start of any step that touches
 the API.
 
+**Test against the local instance, never the user's real server.** The real one holds the
+working book catalogue. A local Koillection with a copy of it is in `docs/local-info.md`
+(user, 2026-11-15).
+
 ## How work happens here
 
 One checklist step per session: "read `docs/CHECKLIST.md` and do step `<N>`". The workflow
