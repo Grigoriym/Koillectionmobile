@@ -16,8 +16,11 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.Serializable
 
-/** The JWT login endpoint (plan §2). Relative to the base URL. */
-internal const val LOGIN_PATH = "api/authentication_token"
+/**
+ * The JWT login endpoint (plan §2). Relative to the base URL. Public so that `feature:auth` logs in
+ * on the same path that [bearerAuth] leaves without a bearer header.
+ */
+const val LOGIN_PATH = "api/authentication_token"
 
 /**
  * Sends `Authorization: Bearer <JWT>` with every request except the login request.

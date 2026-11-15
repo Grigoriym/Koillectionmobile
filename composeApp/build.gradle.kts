@@ -8,6 +8,7 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(projects.core.api)
+            implementation(projects.feature.auth.data)
         }
         // `KoinGraphTest` uses `verify()`, which koin-test ships for the JVM only.
         jvmTest.dependencies {
@@ -15,6 +16,8 @@ kotlin {
             implementation(libs.koin.test)
             // `HttpClientEngine` in `KoinGraphTest`'s extra types.
             implementation(libs.ktor.core)
+            // `AuthRepository`, resolved in `KoinGraphTest`.
+            implementation(projects.feature.auth.domain)
         }
     }
 }

@@ -13,5 +13,13 @@ kotlin {
             // `dto` and `domain` arrive through the mapper, which exposes both as `api`.
             implementation(projects.feature.auth.mapper)
         }
+        commonTest.dependencies {
+            implementation(kotlin("test"))
+            implementation(libs.ktor.client.mock)
+            // `LogLevel` in `configureKoillectionClient`'s signature.
+            implementation(libs.ktor.client.logging)
+            // `FakeCustomHeadersStorage`, and `runTest` through its kotlinx-coroutines-test.
+            implementation(libs.grappim.kit.testing)
+        }
     }
 }

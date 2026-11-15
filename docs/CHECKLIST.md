@@ -1,6 +1,6 @@
 # koillectionmobile checklist
 
-**Current step:** M1.5 (M1.4 done 2026-11-15). M0 done 2026-11-14 (archived). Plan §5 decisions 1, 2, 4 and 6 are settled.
+**Current step:** M1.6 (M1.5 done 2026-11-15). M0 done 2026-11-14 (archived). Plan §5 decisions 1, 2, 4 and 6 are settled.
 
 ## How to use this
 
@@ -86,10 +86,17 @@ Model for every step: `../wallosmobile/core/api` and its `feature:*:data` module
   `next` link is requested as it is (an absolute path with the server's own prefix). Fixture
   tests are in `jvmTest` and read `../../fixtures/` from the module directory: `commonTest` has
   no file API. Mutation-checked one change at a time (`failFast` stops at the first failure).
-- [ ] **M1.5** — `feature:auth` dto/domain/mapper/data: `POST /api/authentication_token`,
+- [x] **M1.5** — `feature:auth` dto/domain/mapper/data: `POST /api/authentication_token`,
   server-URL check, and distinct results for wrong credentials (401), server JWT failure (500,
   plan §2 trap) and unreachable server.
   **Verify:** mock-engine tests for each result; `KoinGraphTest` passes.
+  Note: `AuthRepository.logIn` returns `LoginResult`. The server-URL check is a text check
+  (`http(s)://` and a host) plus the login answer itself (404, 405 or no `token` →
+  `NotKoillection`); no extra probe request, because it would carry the stored JWT to the typed
+  server. The URL is saved before the request (custom headers go only to the stored origin) and
+  put back on failure. `mapper` stays a placeholder: the token is a string, nothing to map.
+  `LOGIN_PATH` (`core:api`) is now public. Mutation-checked: no URL restore, no 500 mapping and
+  no `@Single` each fail a test.
 - [ ] **M1.6** — `feature:collections` dto/domain/mapper/data: list (paged), get one,
   children.
   **Verify:** mapper and repository tests against the M1.1 fixtures.
