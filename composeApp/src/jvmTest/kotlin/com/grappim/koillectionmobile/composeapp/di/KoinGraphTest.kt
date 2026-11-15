@@ -1,5 +1,6 @@
 package com.grappim.koillectionmobile.composeapp.di
 
+import io.ktor.client.engine.HttpClientEngine
 import org.koin.test.verify.verify
 import kotlin.test.Test
 
@@ -18,6 +19,17 @@ import kotlin.test.Test
 class KoinGraphTest {
     @Test
     fun `every definition in the app graph can be resolved`() {
-        AppModule().module().verify()
+        AppModule().module().verify(extraTypes = EXTERNALLY_SUPPLIED)
+    }
+
+    private companion object {
+        /**
+         * Types nothing in `AppModule` defines, on purpose:
+         * - `HttpClientEngine` is a false positive. `verify()` reads `NetworkModule`'s
+         *   `provideHttpClient` through the `HttpClient(engine)` constructor, not through the
+         *   function's own parameters. The function builds the client on Ktor's default engine,
+         *   so Koin is never asked for one (wallosmobile has the same entry).
+         */
+        val EXTERNALLY_SUPPLIED = listOf(HttpClientEngine::class)
     }
 }

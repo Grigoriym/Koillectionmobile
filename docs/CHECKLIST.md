@@ -1,6 +1,6 @@
 # koillectionmobile checklist
 
-**Current step:** M1.2 (M1.1 done 2026-11-15). M0 done 2026-11-14 (archived). Plan §5 decisions 1, 2 and 4 are settled.
+**Current step:** M1.3 (M1.2 done 2026-11-15). M0 done 2026-11-14 (archived). Plan §5 decisions 1, 2 and 4 are settled.
 
 ## How to use this
 
@@ -53,15 +53,22 @@ Model for every step: `../wallosmobile/core/api` and its `feature:*:data` module
   Koillection 1.8.5 copy of the real catalogue (`docs/local-info.md`) is the source of the
   fixtures (`fixtures/koillection-1.8.5/`, script `fixtures/capture.py`), so no real ID is
   in the repo. Full responses kept, not trimmed.
-- [ ] **M1.2** — `core:api` client: Ktor `HttpClient` factory (wallosmobile `NetworkModule`),
+- [x] **M1.2** — `core:api` client: Ktor `HttpClient` factory (wallosmobile `NetworkModule`),
   base-URL provider, `Json` (`ignoreUnknownKeys`, `application/ld+json` and
   `application/merge-patch+json`), redacting logger, custom headers (grappim-kit
   `customheaders`), and one error type that maps HTTP status and network failure. Koin module.
   **Verify:** `ktor-client-mock` tests pass (`jvmTest --rerun`), `KoinGraphTest` passes,
   `build ktlintCheck` green.
+  Note: `configureKoillectionClient` (`HttpClientConfig` extension) holds the setup; the Koin
+  provider applies it on Ktor's default engine, tests on `MockEngine`. Error type is
+  `KoillectionError` in `core:domain`. `BaseUrlProvider` and `CustomHeadersStorage` have no
+  binding yet: both need M1.3's storage. `KoinGraphTest` cannot see that gap (it reads
+  `HttpClient`'s constructor, so `HttpClientEngine` is in its `extraTypes`, as in wallosmobile).
+  Not run on a device: Ktor's engine autodiscovery on Android is first exercised in M1.11/M2.
 - [ ] **M1.3** — Session storage and bearer auth. Store server URL, username, password and JWT
   with grappim-kit `storage`; decide `core:api` vs a new `core:storage` module (M0.3 note) and
-  write the answer in plan §5. Add `Authorization: Bearer`; on 401 log in again once with the
+  write the answer in plan §5. Bind `core:api`'s `BaseUrlProvider` and grappim-kit
+  `CustomHeadersStorage` (M1.2 left both unbound). Add `Authorization: Bearer`; on 401 log in again once with the
   stored password, then fail.
   **Verify:** tests prove the header is sent, one re-login on 401, and no loop on a second
   401. Hand-written fakes for storage.
