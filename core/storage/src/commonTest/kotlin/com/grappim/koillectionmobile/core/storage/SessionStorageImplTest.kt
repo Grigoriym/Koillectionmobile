@@ -81,6 +81,21 @@ class SessionStorageImplTest {
     }
 
     @Test
+    fun `clearing the session logs out and keeps the server URL`() = runTest {
+        storage.saveServerUrl("https://koi.example/")
+        storage.saveCredentials(Credentials(username = "tester", password = "hunter2"))
+        storage.saveToken("jwt-1")
+
+        storage.clearSession()
+
+        assertFalse(storage.isLoggedIn.first())
+        assertNull(storage.getCredentials())
+        assertNull(storage.getToken())
+        assertEquals("https://koi.example/", storage.serverUrl)
+        assertEquals("https://koi.example/", SessionStorageImpl(dataStore, cipher).serverUrl)
+    }
+
+    @Test
     fun `the password is not in the string form of the credentials`() {
         assertEquals(
             "Credentials(username=tester, password=REDACTED)",

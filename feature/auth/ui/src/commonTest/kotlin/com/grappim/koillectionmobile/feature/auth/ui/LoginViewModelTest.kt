@@ -97,7 +97,7 @@ class LoginViewModelTest {
     }
 
     @Test
-    fun `LoggedIn shows no error and drops the password`() {
+    fun `LoggedIn shows no error and drops the username and the password`() {
         repository.result = CompletableDeferred(LoginResult.LoggedIn)
         val sut = filledViewModel()
 
@@ -105,8 +105,25 @@ class LoginViewModelTest {
 
         assertFalse(sut.uiState.value.isLoading)
         assertTrue(sut.uiState.value.error.isEmpty())
+        assertEquals("", sut.uiState.value.username)
         assertEquals("", sut.uiState.value.password)
         assertEquals(SERVER_URL, sut.uiState.value.serverUrl)
+    }
+
+    @Test
+    fun `the server URL of the last login is filled in`() {
+        repository.storedServerUrl = SERVER_URL
+
+        val sut = LoginViewModel(repository)
+
+        assertEquals(SERVER_URL, sut.uiState.value.serverUrl)
+        assertEquals("", sut.uiState.value.username)
+        assertEquals("", sut.uiState.value.password)
+    }
+
+    @Test
+    fun `the server URL is empty before the first login`() {
+        assertEquals("", LoginViewModel(repository).uiState.value.serverUrl)
     }
 
     @Test
@@ -175,11 +192,16 @@ class LoginViewModelTest {
     private class FakeAuthRepository : AuthRepository {
         var result = CompletableDeferred<LoginResult>()
         var call: Triple<String, String, String>? = null
+        var storedServerUrl = ""
 
         override suspend fun logIn(serverUrl: String, username: String, password: String): LoginResult {
             call = Triple(serverUrl, username, password)
             return result.await()
         }
+
+        override suspend fun logOut() = error("not used")
+
+        override fun storedServerUrl(): String = storedServerUrl
     }
 
     private companion object {

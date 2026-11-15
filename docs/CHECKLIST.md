@@ -1,6 +1,6 @@
 # koillectionmobile checklist
 
-**Current step:** M2.6 (M2.5 done 2026-11-15). M1 done 2026-11-15, M0 done 2026-11-14 (both archived). Plan §5 decisions 1, 2, 4, 5 and 6 are settled.
+**Current step:** M2.7 (M2.6 done 2026-11-15). M1 done 2026-11-15, M0 done 2026-11-14 (both archived). Plan §5 decisions 1, 2, 4, 5 and 6 are settled.
 
 ## How to use this
 
@@ -103,11 +103,24 @@ fake repositories.
   "Ut mine Stromtid": 10 text fields, 2 page images, 3 tags, the same as the web page. The test
   instance has only `text` and `image` fields (4007 and 1577), so the other types were not seen on
   the device.
-- [ ] **M2.6** — Log out. A log-out action clears the session in `SessionStorage`, which returns
+- [x] **M2.6** — Log out. A log-out action clears the session in `SessionStorage`, which returns
   the app to login through M2.1's flow. A failed re-login on a 401 (the stored password no longer
   works) also clears the session, so the user sees login and not an endless error.
   **Verify:** tests for both paths (`jvmTest --rerun`); on the emulator log out returns to login
   with empty fields except the server URL, and logging in again works.
+  Note: "Log out" is a text button in the collection list's top bar. `CollectionListViewModel` calls
+  `AuthRepository.logOut()` (`feature:collections:ui` now depends on `feature:auth:domain`), which
+  calls the new `SessionStorage.clearSession()`: it removes the username, password and JWT and keeps
+  the URL. The server has no API log-out route; the JWT stays valid until it expires. `BearerAuth`
+  clears the session only on a 401 from its re-login; a 500, a network error or a second 401 after
+  a good re-login keep it. The login screen fills in the stored URL, and a successful login clears
+  the username too: the login ViewModel lives as long as the activity and is shown again after a
+  log out. Fixed on the way: `MainNavHost` had no `ViewModelStore` per entry (dropped with
+  `grappim-kit-navigation` in M2.1), and Koin keys a ViewModel by class only. So a second item showed
+  the first item's data (A/B on the emulator: "Die Pappenheimer" showed "Jörn Uhl"'s author), and a
+  re-login kept the old collection list. `NavDisplay` now has the saveable-state and ViewModel-store
+  decorators. Device: a re-login showed the list without a collection deleted while logged out. The
+  401 path was not checked on the device, only in `BearerAuthTest`.
 - [ ] **M2.7** — Device pass of the whole browse flow on the emulator: login, collection, item,
   back to the top, rotation and process death (back stack kept), log out. Fix what breaks, or put
   it in `docs/revisit.md` with evidence.

@@ -32,4 +32,9 @@ internal class FakeSessionStorage(
         savedTokens += token
         this.token = token
     }
+
+    override suspend fun clearSession() {
+        credentials = null
+        token = null
+    }
 }

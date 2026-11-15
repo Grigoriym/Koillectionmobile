@@ -8,4 +8,13 @@ interface AuthRepository {
      * result the stored session stays as it was.
      */
     suspend fun logIn(serverUrl: String, username: String, password: String): LoginResult
+
+    /**
+     * Removes the stored credentials and JWT. The server URL stays. The server has no log-out
+     * request: a JWT stays valid until it expires.
+     */
+    suspend fun logOut()
+
+    /** The URL of the last successful login, or `""` before the first one. */
+    fun storedServerUrl(): String
 }

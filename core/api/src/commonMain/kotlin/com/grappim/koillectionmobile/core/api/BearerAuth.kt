@@ -1,5 +1,6 @@
 package com.grappim.koillectionmobile.core.api
 
+import com.grappim.koillectionmobile.core.domain.KoillectionError
 import com.grappim.koillectionmobile.core.storage.SessionStorage
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -30,6 +31,9 @@ const val LOGIN_PATH = "api/authentication_token"
  * as `KoillectionError.Unauthorized`, so there is no loop. A failed login goes to the caller as
  * its own error: a 500 there is the broken-JWT-keys trap (plan §2), not a session problem.
  *
+ * A 401 at that login means the stored password no longer works. The plugin then clears the
+ * session, so the app shows the login screen and not the same error on every screen.
+ *
  * The mutex lets only one request log in at a time. A request that waited for it uses the JWT
  * that the other request saved.
  */
@@ -53,13 +57,21 @@ internal fun bearerAuth(sessionStorage: SessionStorage) = createClientPlugin("Ko
     }
 }
 
-/** `null` when no credentials are stored. A failed login throws its `KoillectionError`. */
+/**
+ * `null` when no credentials are stored. A failed login throws its `KoillectionError`, and a 401
+ * clears the session first.
+ */
 private suspend fun logIn(client: HttpClient, sessionStorage: SessionStorage): String? {
     val credentials = sessionStorage.getCredentials() ?: return null
-    val token = client.post(LOGIN_PATH) {
-        contentType(ContentType.Application.Json)
-        setBody(LoginRequest(username = credentials.username, password = credentials.password))
-    }.body<LoginResponse>().token
+    val token = try {
+        client.post(LOGIN_PATH) {
+            contentType(ContentType.Application.Json)
+            setBody(LoginRequest(username = credentials.username, password = credentials.password))
+        }.body<LoginResponse>().token
+    } catch (error: KoillectionError.Unauthorized) {
+        sessionStorage.clearSession()
+        throw error
+    }
     sessionStorage.saveToken(token)
     return token
 }

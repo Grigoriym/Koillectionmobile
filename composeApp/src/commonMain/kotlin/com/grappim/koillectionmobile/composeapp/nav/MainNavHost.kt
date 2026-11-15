@@ -2,8 +2,10 @@ package com.grappim.koillectionmobile.composeapp.nav
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
+import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.grappim.koillectionmobile.feature.collections.ui.CollectionListRoute
 import com.grappim.koillectionmobile.feature.collections.ui.CollectionListScreen
@@ -12,7 +14,13 @@ import com.grappim.koillectionmobile.feature.collections.ui.CollectionScreen
 import com.grappim.koillectionmobile.feature.items.ui.ItemRoute
 import com.grappim.koillectionmobile.feature.items.ui.ItemScreen
 
-/** The logged-in side: one back stack that starts at the collection list. */
+/**
+ * The logged-in side: one back stack that starts at the collection list.
+ *
+ * Each entry has its own `ViewModelStore`. Koin keys a ViewModel by its class only, so without the
+ * decorator every entry of one type would share the first one's ViewModel (a second item would
+ * show the first item), and a log out would not clear the logged-in screens' state.
+ */
 @Composable
 internal fun MainNavHost(modifier: Modifier = Modifier) {
     val backStack = rememberNavBackStack(navSavedStateConfiguration, CollectionListRoute)
@@ -21,6 +29,10 @@ internal fun MainNavHost(modifier: Modifier = Modifier) {
         backStack = backStack,
         modifier = modifier,
         onBack = { backStack.removeLastOrNull() },
+        entryDecorators = listOf(
+            rememberSaveableStateHolderNavEntryDecorator(),
+            rememberViewModelStoreNavEntryDecorator()
+        ),
         entryProvider = entryProvider {
             entry<CollectionListRoute> {
                 CollectionListScreen(onCollectionClick = { id -> backStack.add(CollectionRoute(id)) })

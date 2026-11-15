@@ -199,6 +199,18 @@ class AuthRepositoryImplTest {
             .forEach { assertFalse(isServerUrl(it), it) }
     }
 
+    @Test
+    fun `log out clears the session sends no request and keeps the server URL`() = runTest {
+        val repository = repository { error("no request expected") }
+
+        repository.logOut()
+
+        assertNull(session.credentials)
+        assertNull(session.token)
+        assertEquals("https://old.example", repository.storedServerUrl())
+        assertEquals(0, requests.size)
+    }
+
     private fun OutgoingContent.text(): String = when (this) {
         is OutgoingContent.ByteArrayContent -> bytes().decodeToString()
         else -> error("unexpected body type ${this::class}")

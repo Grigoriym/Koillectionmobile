@@ -19,6 +19,7 @@
     <string name="collections_title">Collections</string>
     <string name="collections_empty">There are no collections yet.</string>
     <string name="collections_retry">Try again</string>
+    <string name="collections_log_out">Log out</string>
     <string name="collections_error_network">The server does not answer. Check the network connection.</string>
     <string name="collections_error_http">The server answered with an error (HTTP %1$d).</string>
     <string name="collections_error_unexpected">Loading the collections failed with an unexpected error.</string>

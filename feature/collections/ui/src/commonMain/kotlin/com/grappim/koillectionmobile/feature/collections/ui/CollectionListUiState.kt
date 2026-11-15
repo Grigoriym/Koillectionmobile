@@ -12,5 +12,6 @@ data class CollectionListUiState(
     val isLoading: Boolean = true,
     val isRefreshing: Boolean = false,
     val error: NativeText = NativeText.Empty,
-    val onRefresh: () -> Unit = {}
+    val onRefresh: () -> Unit = {},
+    val onLogOutClick: () -> Unit = {}
 )

@@ -24,12 +24,17 @@ import org.koin.core.annotation.KoinViewModel
 /**
  * The ViewModel does not navigate. On [LoginResult.LoggedIn] the repository has stored the session,
  * so `SessionStorage.isLoggedIn` turns `true` and the app shell swaps to the logged-in side.
+ *
+ * The login screen is outside the back stack, so this ViewModel lives as long as the activity. A
+ * log out shows the same instance again. That is why a login clears the username and the password:
+ * after a log out only the server URL is filled in.
  */
 @KoinViewModel
 class LoginViewModel(private val authRepository: AuthRepository) : ViewModel() {
 
     private val _uiState = MutableStateFlow(
         LoginUiState(
+            serverUrl = authRepository.storedServerUrl(),
             onServerUrlChange = ::onServerUrlChange,
             onUsernameChange = ::onUsernameChange,
             onPasswordChange = ::onPasswordChange,
@@ -63,8 +68,8 @@ class LoginViewModel(private val authRepository: AuthRepository) : ViewModel() {
             )
             _uiState.update {
                 if (result == LoginResult.LoggedIn) {
-                    // The password is stored now; the screen has no reason to keep it.
-                    it.copy(isLoading = false, password = "")
+                    // The credentials are stored now; the screen has no reason to keep them.
+                    it.copy(isLoading = false, username = "", password = "")
                 } else {
                     it.copy(isLoading = false, error = result.toMessage())
                 }

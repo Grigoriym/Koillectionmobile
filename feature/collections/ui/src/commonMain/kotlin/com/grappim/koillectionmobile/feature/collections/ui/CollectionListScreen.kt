@@ -17,6 +17,7 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
@@ -30,6 +31,7 @@ import com.grappim.kit.uikit.NativeText
 import com.grappim.kit.uikit.asString
 import com.grappim.koillectionmobile.strings.RString
 import com.grappim.koillectionmobile.strings.generated.resources.collections_empty
+import com.grappim.koillectionmobile.strings.generated.resources.collections_log_out
 import com.grappim.koillectionmobile.strings.generated.resources.collections_retry
 import com.grappim.koillectionmobile.strings.generated.resources.collections_title
 import org.jetbrains.compose.resources.stringResource
@@ -54,7 +56,16 @@ private fun CollectionListContent(
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
-        topBar = { TopAppBar(title = { Text(stringResource(RString.collections_title)) }) }
+        topBar = {
+            TopAppBar(
+                title = { Text(stringResource(RString.collections_title)) },
+                actions = {
+                    TextButton(onClick = uiState.onLogOutClick) {
+                        Text(stringResource(RString.collections_log_out))
+                    }
+                }
+            )
+        }
     ) { padding ->
         PullToRefreshBox(
             modifier = Modifier

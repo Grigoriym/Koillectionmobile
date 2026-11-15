@@ -124,6 +124,37 @@ class BearerAuthTest {
     }
 
     @Test
+    fun `a rejected login clears the session and keeps the server URL`() = runTest {
+        val client = client(
+            login = { jsonResponse("""{"code":401,"message":"Invalid credentials."}""", HttpStatusCode.Unauthorized) }
+        ) { expired() }
+
+        assertFailsWith<KoillectionError.Unauthorized> { client.get("api/collections") }
+
+        assertNull(session.credentials)
+        assertNull(session.token)
+        assertEquals("https://koi.example/sub", session.serverUrl)
+    }
+
+    @Test
+    fun `a 500 at login keeps the session`() = runTest {
+        val client = client(login = { jsonResponse("{}", HttpStatusCode.InternalServerError) }) { expired() }
+
+        assertFailsWith<KoillectionError.Server> { client.get("api/collections") }
+
+        assertEquals(Credentials(username = "tester", password = "hunter2"), session.credentials)
+        assertEquals("old-jwt", session.token)
+    }
+
+    @Test
+    fun `a second 401 after a new login keeps the session`() = runTest {
+        assertFailsWith<KoillectionError.Unauthorized> { client { expired() }.get("api/collections") }
+
+        assertEquals(Credentials(username = "tester", password = "hunter2"), session.credentials)
+        assertEquals("new-jwt", session.token)
+    }
+
+    @Test
     fun `a 500 at login keeps its status`() = runTest {
         val client = client(login = { jsonResponse("{}", HttpStatusCode.InternalServerError) }) { expired() }
 

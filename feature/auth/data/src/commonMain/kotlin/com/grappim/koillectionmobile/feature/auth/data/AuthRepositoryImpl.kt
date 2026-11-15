@@ -54,6 +54,12 @@ internal class AuthRepositoryImpl(
         return result
     }
 
+    override suspend fun logOut() {
+        sessionStorage.clearSession()
+    }
+
+    override fun storedServerUrl(): String = sessionStorage.serverUrl
+
     /** `null` when a 2xx body has no `token`: something other than Koillection answered. */
     private suspend fun requestToken(username: String, password: String): String? {
         // `application/json`, as `core:api`'s re-login sends it. The server answers plain JSON.

@@ -35,6 +35,12 @@ interface SessionStorage {
     suspend fun getToken(): String?
 
     suspend fun saveToken(token: String)
+
+    /**
+     * Removes the credentials and the JWT, so [isLoggedIn] turns `false`. The server URL stays: the
+     * login screen shows it again.
+     */
+    suspend fun clearSession()
 }
 
 data class Credentials(val username: String, val password: String) {

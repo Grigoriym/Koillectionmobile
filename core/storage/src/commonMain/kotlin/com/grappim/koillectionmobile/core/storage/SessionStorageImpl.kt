@@ -64,6 +64,14 @@ class SessionStorageImpl(private val dataStore: DataStore<Preferences>, private 
         dataStore.edit { it[KEY_TOKEN] = encrypted }
     }
 
+    override suspend fun clearSession() {
+        dataStore.edit {
+            it -= KEY_USERNAME
+            it -= KEY_PASSWORD
+            it -= KEY_TOKEN
+        }
+    }
+
     private suspend fun read(key: Preferences.Key<String>): String? = dataStore.data.first()[key]
 
     private companion object {
