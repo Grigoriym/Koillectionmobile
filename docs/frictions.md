@@ -36,3 +36,5 @@ entries get deleted — see /finalize.
   went into the URL field.
 - 2026-11-15 — `grep -o 'text="•*"[^>]*bounds=...'` on a `uiautomator` dump matched every node
   (M2.2), so the tap math got a list of numbers. Filter on `password="true"` instead.
+- 2026-11-15 — `grep -o 'text="[^"]\+"'` on a `uiautomator` dump (M2.5) skipped a field value that
+  holds `"`: the dump does not escape it. It looked like a missing field until a screenshot showed it.

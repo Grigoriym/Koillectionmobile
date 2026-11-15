@@ -33,3 +33,10 @@ cold session can act on it. Delete an entry when it's fixed.
   the source has no `vendor/`, and the local test instance runs at the root. `add_book.py` uses
   unprefixed IRIs against the user's server, but whether that server has a subpath is not
   recorded here. Check once against a subpath instance (or the user's setup) before M3 ships.
+- 2026-11-15 (M2.5) — The error mapping and the error view exist twice, copied by hand:
+  `Throwable.toMessage()` in `feature/collections/ui/.../CollectionListViewModel.kt:59` and
+  `feature/items/ui/.../ItemViewModel.kt` (bottom), and `EmptyOrError` in
+  `feature/collections/ui/.../CollectionListScreen.kt:86` against the inline error `Column` in
+  `feature/items/ui/.../ItemScreen.kt`. Only the string resources differ. A third `ui` screen makes
+  it worth one shared copy (a `core:ui` module, or a `KoillectionError` → message function that
+  takes the strings).

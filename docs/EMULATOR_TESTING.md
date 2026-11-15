@@ -39,3 +39,7 @@ this app.
 - `Books` has 445 items. To check that every page arrived, fling to the bottom (40 fast
   `input swipe 540 2000 540 300 60`) and compare the last rows with the last `member`s of
   `GET /api/collections/<id>/items?page=15` (M2.4).
+- Item check (M2.5): `Books` → "Ut mine Stromtid" has a main image, 10 `text` fields, two `image`
+  fields (Title page, Spine) and 3 tags. To compare with the web UI from the host, log in with
+  `curl` (a cookie jar, `GET /` for `_csrf_token`, then `POST /` with `_login`, `_password` and the
+  token) and read `/items/<id>`.

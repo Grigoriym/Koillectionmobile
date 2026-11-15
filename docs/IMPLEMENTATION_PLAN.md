@@ -98,6 +98,9 @@ start of any step that touches the API. Facts that shape the design:
   `/api/items/{id}/tags` are Hydra lists. A tag's `category` is an IRI or null. A tag has
   `image` and `imageSmallThumbnail` only (no large thumbnail); `feature:tags` does not read them.
   `TagCategory.label` is nullable in the entity, and `color` is hex without `#`.
+  `GET /api/items/{id}/tags` is not sorted by label, though `Item::$tags` has `OrderBy(label)` and
+  the web UI shows that order (same cause as `position` on Datum). The item screen sorts by label,
+  ignoring case (M2.5). Whether Postgres sorts case-insensitively for the web UI is not checked.
 - Feature repositories return `Result` (`resultOf` from grappim-kit `domain`, as in
   wallosmobile); the failure is the `KoillectionError` that `core:api` threw. `feature:auth` is
   the exception: its `LoginResult` names each login outcome.

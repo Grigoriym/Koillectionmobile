@@ -120,7 +120,8 @@ first — it is often for a problem this toolchain doesn't have.
 
 An "Unresolved reference" or a wrong-overload error on a library call often means a missing
 extension import. Ktor's `url.fullPath` and `url.encodedPath`, and kotlinx-serialization's reified
-`decodeFromJsonElement<T>()`, are extensions (hit in M1.3, M1.6, M1.7). Import them by name.
+`decodeFromJsonElement<T>()`, are extensions (hit in M1.3, M1.6, M1.7), and so is grappim-kit's
+`NativeText.asString()` (M2.5). Import them by name.
 
 ## Test names
 
