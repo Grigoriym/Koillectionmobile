@@ -79,3 +79,7 @@ this app.
   the item shows even without the refresh signal. The photo cache is
   `run-as com.grappim.koillectionmobile.debug ls /data/data/com.grappim.koillectionmobile.debug/cache/photos`
   (a relative `cache/photos` fails under `run-as sh -c`).
+- Field rows (M3.7): the "Value" field is multi-line, so `KEYCODE_TAB` types a tab into it instead
+  of moving on. Tap each Label and Value field by its fresh bounds. Back (arrow or system) on a
+  form with any input opens "Discard this item?": tap "Discard" to leave, "Keep editing" to stay.
+  An empty form leaves at once.
