@@ -1,6 +1,9 @@
 package com.grappim.koillectionmobile.composeapp.di
 
+import io.ktor.client.HttpClient
 import io.ktor.client.engine.HttpClientEngine
+import org.koin.core.context.stopKoin
+import org.koin.plugin.module.dsl.startKoin
 import org.koin.test.verify.verify
 import kotlin.test.Test
 
@@ -20,6 +23,21 @@ class KoinGraphTest {
     @Test
     fun `every definition in the app graph can be resolved`() {
         AppModule().module().verify(extraTypes = EXTERNALLY_SUPPLIED)
+    }
+
+    /**
+     * Covers the limit above for the provider chain `verify()` cannot see: `HttpClient` needs
+     * `BaseUrlProvider`, `SessionStorage` and `CustomHeadersStorage`, all from provider functions.
+     * Resolving them creates no file: DataStore writes only on the first save.
+     */
+    @Test
+    fun `the HTTP client resolves from the JVM app graph`() {
+        val koin = startKoin<KoinApp> { }.koin
+        try {
+            koin.get<HttpClient>().close()
+        } finally {
+            stopKoin()
+        }
     }
 
     private companion object {

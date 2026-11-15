@@ -2,6 +2,7 @@ package com.grappim.koillectionmobile.core.api
 
 import com.grappim.kit.customheaders.CustomHeadersStorage
 import com.grappim.kit.logger.KitLogger
+import com.grappim.koillectionmobile.core.storage.SessionStorage
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.logging.LogLevel
 import kotlinx.serialization.json.Json
@@ -11,8 +12,7 @@ import org.koin.core.annotation.Module
 import org.koin.core.annotation.Single
 
 /**
- * [BaseUrlProvider] and [CustomHeadersStorage] have no binding yet: both read stored values,
- * and storage arrives in M1.3. Nothing resolves the `HttpClient` before then.
+ * `SessionStorage` and `CustomHeadersStorage` come from core:storage's `PlatformStorageModule`.
  */
 @Module
 @Configuration
@@ -23,6 +23,11 @@ class NetworkModule {
      * `ignoreUnknownKeys`: the DTOs read a small subset of each resource (plan §2), and a
      * newer server can add fields.
      */
+    @Single
+    fun provideBaseUrlProvider(sessionStorage: SessionStorage): BaseUrlProvider = object : BaseUrlProvider {
+        override fun getBaseUrl(): String = sessionStorage.serverUrl
+    }
+
     @Single
     fun provideJson(): Json = Json { ignoreUnknownKeys = true }
 
@@ -37,11 +42,13 @@ class NetworkModule {
     fun provideHttpClient(
         json: Json,
         baseUrlProvider: BaseUrlProvider,
+        sessionStorage: SessionStorage,
         customHeadersStorage: CustomHeadersStorage
     ): HttpClient = HttpClient {
         configureKoillectionClient(
             json = json,
             baseUrlProvider = baseUrlProvider,
+            sessionStorage = sessionStorage,
             customHeadersStorage = customHeadersStorage,
             logLevel = if (KitLogger.isInstalled) LogLevel.ALL else LogLevel.NONE
         )

@@ -11,10 +11,11 @@ kotlin {
             // `api`: `KoillectionError` is what every caller of the client catches.
             api(projects.core.domain)
 
-            // Wired now so the build proves they resolve; used from M1.3 on: dispatchers, and
-            // `SecretCipher` for the JWT.
+            // `api`: `SessionStorage` is in `configureKoillectionClient`'s signature.
+            api(projects.core.storage)
+
+            // Wired now so the build proves it resolves; for dispatchers.
             implementation(libs.grappim.kit.coroutines)
-            implementation(libs.grappim.kit.storage)
             // `api`: `CustomHeadersStorage` is in `configureKoillectionClient`'s signature.
             api(libs.grappim.kit.customheaders)
 

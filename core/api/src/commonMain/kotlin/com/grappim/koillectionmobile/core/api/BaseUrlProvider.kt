@@ -4,8 +4,8 @@ package com.grappim.koillectionmobile.core.api
  * The server URL the user entered: the instance root, for example `https://host/` or
  * `https://host/koillection/`. Request paths are relative to it (`api/collections`).
  *
- * Read per request, so a change of server applies at once. The implementation reads the stored
- * URL and arrives with session storage (M1.3).
+ * Read per request, so a change of server applies at once. `NetworkModule` binds it to
+ * `SessionStorage.serverUrl`.
  */
 interface BaseUrlProvider {
     fun getBaseUrl(): String

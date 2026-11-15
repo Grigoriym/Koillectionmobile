@@ -48,6 +48,11 @@ start of any step that touches the API. Facts that shape the design:
   reference instead.
 - Login: `POST /api/authentication_token` with `{"username","password"}` → `{"token": JWT}`.
   Then `Authorization: Bearer <token>`.
+- The JWT lives 1 hour (lexik's default `token_ttl`; Koillection's
+  `config/packages/lexik_jwt_authentication.yaml` does not set it). There is no refresh token.
+  An expired JWT gives 401 `{"code":401,"message":"Expired JWT Token"}` (checked 2026-11-15
+  against the local test instance). So the app stores the password and logs in again on a 401
+  (`core:api` `bearerAuth`, M1.3).
 - `PATCH` takes `application/merge-patch+json`.
 - Resources with `#[ApiResource]`: Item, Collection, Datum (an item's custom field), Tag,
   TagCategory, Template, ChoiceList, Album, Photo, Wishlist, Wish, Loan, Inventory, Log,
@@ -94,8 +99,15 @@ code without checking the licence terms are kept.
    Python's default certificate checks, so `koi.py`'s check-off was not needed. The app uses
    normal platform TLS. No custom or self-signed certificate support until a user needs it.
 4. **Module layout** — *decided 2026-11-14*: wallosmobile-style full split. `core:api`,
-   `core:domain`, `strings`, and `feature:<x>:{data,domain,dto,mapper,ui}` for `auth`,
+   `core:domain`, `core:storage` (decision 6), `strings`, and `feature:<x>:{data,domain,dto,mapper,ui}` for `auth`,
    `collections`, `items`, `tags`. The mapper exposes `dto` + `domain` as `api`; `data`
    reaches both through it. No local `uikit` module: `ui` modules use `grappim-kit-uikit`.
 5. **MVP scope** (start of M2): proposed minimum is login, collection list, item list, item
    detail, and "add item with photos" into a chosen collection.
+6. **Session storage module** — *decided 2026-11-15 (M1.3)*: a separate `core:storage`, as in
+   wallosmobile and TaigaMobileNova. It holds `SessionStorage` (server URL, username, password,
+   JWT) and the `CustomHeadersStorage` binding, in one DataStore file with one `SecretCipher`.
+   `core:api` depends on it, and M2's login and settings screens can read the session without
+   the HTTP client. The DataStore path and the cipher are per platform (`expect class
+   PlatformStorageModule`, TaigaMobileNova's pattern): Android Keystore on Android,
+   `NoopSecretCipher` (plain text) on JVM and iOS, neither of which is shipped.

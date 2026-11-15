@@ -65,6 +65,7 @@ class KoillectionHttpClientTest {
             baseUrlProvider = object : BaseUrlProvider {
                 override fun getBaseUrl(): String = baseUrl
             },
+            sessionStorage = FakeSessionStorage(),
             customHeadersStorage = FakeCustomHeadersStorage(headers),
             logLevel = logLevel
         )

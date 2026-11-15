@@ -1,6 +1,6 @@
 # koillectionmobile checklist
 
-**Current step:** M1.3 (M1.2 done 2026-11-15). M0 done 2026-11-14 (archived). Plan §5 decisions 1, 2 and 4 are settled.
+**Current step:** M1.4 (M1.3 done 2026-11-15). M0 done 2026-11-14 (archived). Plan §5 decisions 1, 2, 4 and 6 are settled.
 
 ## How to use this
 
@@ -65,13 +65,20 @@ Model for every step: `../wallosmobile/core/api` and its `feature:*:data` module
   binding yet: both need M1.3's storage. `KoinGraphTest` cannot see that gap (it reads
   `HttpClient`'s constructor, so `HttpClientEngine` is in its `extraTypes`, as in wallosmobile).
   Not run on a device: Ktor's engine autodiscovery on Android is first exercised in M1.11/M2.
-- [ ] **M1.3** — Session storage and bearer auth. Store server URL, username, password and JWT
+- [x] **M1.3** — Session storage and bearer auth. Store server URL, username, password and JWT
   with grappim-kit `storage`; decide `core:api` vs a new `core:storage` module (M0.3 note) and
   write the answer in plan §5. Bind `core:api`'s `BaseUrlProvider` and grappim-kit
   `CustomHeadersStorage` (M1.2 left both unbound). Add `Authorization: Bearer`; on 401 log in again once with the
   stored password, then fail.
   **Verify:** tests prove the header is sent, one re-login on 401, and no loop on a second
   401. Hand-written fakes for storage.
+  Note: new module `core:storage` (plan §5.6). `bearerAuth` (`core:api`) skips the login path;
+  a failed re-login throws its own error, so a 500 there stays `Server` (plan §2 trap).
+  Mutation-checked: a dropped header and a re-login loop each fail a `BearerAuthTest` case.
+  `KoinGraphTest`'s `verify()` passed with `CustomHeadersStorage` unbound, so a second test
+  now starts the JVM `KoinApp` and resolves `HttpClient`; it fails on that gap. Removing
+  `PlatformStorageModule` from `AppModule.includes` did not fail it: the module's own
+  `@Configuration` is found anyway on JVM. Android graph not checked (no device run).
 - [ ] **M1.4** — Hydra paging in `core:api`: a generic list DTO that reads `member` and
   `hydra:member`, `totalItems`, and the next-page link; a helper that follows pages.
   **Verify:** tests against the M1.1 list fixtures, including the last page (no next link).
@@ -96,6 +103,8 @@ Model for every step: `../wallosmobile/core/api` and its `feature:*:data` module
   `POST /api/data/{id}/image` (field `fileImage`). Bytes in, no platform file APIs in
   `commonMain`.
   **Verify:** mock-engine tests assert the multipart parts, field names and content type.
+  M1.3 note: `bearerAuth` sends a request again after a 401 and a new login. Check that a
+  multipart body is still complete on that second send.
 - [ ] **M1.11** — Live read-only smoke against the local test instance: a JVM run (not part of
   `build` or CI) that logs in and reads one collection, its items and one item's data through
   the real repositories. No writes; writes get checked on device in M3.

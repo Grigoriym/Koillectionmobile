@@ -4,6 +4,7 @@ import com.grappim.kit.customheaders.CustomHeaders
 import com.grappim.kit.customheaders.CustomHeadersStorage
 import com.grappim.kit.customheaders.sanitizeCustomHeaders
 import com.grappim.koillectionmobile.core.domain.KoillectionError
+import com.grappim.koillectionmobile.core.storage.SessionStorage
 import io.ktor.client.HttpClientConfig
 import io.ktor.client.plugins.HttpResponseValidator
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -34,11 +35,13 @@ val ContentTypeMergePatchJson = ContentType("application", "merge-patch+json")
  *   lose the Hydra paging keys. Ktor serializes a request body only when the request sets its
  *   content type, so callers set one: [ContentTypeLdJson], or [ContentTypeMergePatchJson] for
  *   `PATCH`.
+ * - `Authorization: Bearer` from [sessionStorage], and one new login on a 401 ([bearerAuth]).
  * - Every non-2xx status and every network failure becomes a [KoillectionError].
  */
 fun HttpClientConfig<*>.configureKoillectionClient(
     json: Json,
     baseUrlProvider: BaseUrlProvider,
+    sessionStorage: SessionStorage,
     customHeadersStorage: CustomHeadersStorage,
     logLevel: LogLevel
 ) {
@@ -52,6 +55,7 @@ fun HttpClientConfig<*>.configureKoillectionClient(
         storage = customHeadersStorage
         serverUrl = { normalizeBaseUrl(baseUrlProvider.getBaseUrl()) }
     }
+    install(bearerAuth(sessionStorage))
     install(Logging) {
         logger = RedactingLogger(tag = "Ktor")
         level = logLevel

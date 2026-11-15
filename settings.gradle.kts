@@ -35,7 +35,7 @@ plugins {
 }
 
 include(":androidApp", ":composeApp")
-include(":core:api", ":core:domain")
+include(":core:api", ":core:domain", ":core:storage")
 include(":strings")
 
 include(
