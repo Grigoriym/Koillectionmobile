@@ -31,8 +31,15 @@ start of any step that touches the API. Facts that shape the design:
   prefix: `member`, `totalItems`, and `view` with `first`/`last`/`previous`/`next` links.
   The last page has no `next`; a list that fits on one page has no `view` at all (checked
   2026-11-15 against the M1.1 fixtures). Older servers may still send `hydra:member`.
-- Error bodies are `{"code": <status>, "message": "..."}`. A wrong password and an unknown
-  user both give 401 `Invalid credentials.`; a missing token gives 401 `JWT Token not found`.
+- Error bodies come in two shapes. The JWT layer sends `{"code": <status>, "message": "..."}`:
+  a wrong password and an unknown user both give 401 `Invalid credentials.`, a missing token
+  gives 401 `JWT Token not found`. API Platform sends `application/problem+json` with
+  `title`, `detail` and `description` (404 `Not Found`; 422 adds `violations`). Checked
+  2026-11-15 against the local test instance; `core:api` reads `message`, then `detail`.
+- Send `Accept: application/ld+json`. A plain `application/json` list is a bare array, without
+  the Hydra paging keys. Ktor's client serializes a request body only when the request sets
+  its content type, so every call with a body sets one (`core:api`'s `ContentTypeLdJson`, or
+  `ContentTypeMergePatchJson` for `PATCH`).
 - The server publishes OpenAPI 3.1 at `GET /api/docs` with `Accept:
   application/vnd.openapi+json` (copy in `fixtures/koillection-1.8.5/openapi.json`).
 - **DTOs are hand-written** (decided M1.1, 2026-11-15). The OpenAPI doc is 3.1 (`type:
