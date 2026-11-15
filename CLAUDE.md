@@ -17,6 +17,9 @@ the API.
 working book catalogue. A local Koillection with a copy of it is in `docs/local-info.md`
 (user, 2026-11-15).
 
+For an on-device check, use the `emulator-testing` skill. This app's facts for it are in
+`docs/EMULATOR_TESTING.md`.
+
 ## How work happens here
 
 One checklist step per session: "read `docs/CHECKLIST.md` and do step `<N>`". The workflow
