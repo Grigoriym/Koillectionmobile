@@ -31,6 +31,8 @@ start of any step that touches the API. Facts that shape the design:
   prefix: `member`, `totalItems`, and `view` with `first`/`last`/`previous`/`next` links.
   The last page has no `next`; a list that fits on one page has no `view` at all (checked
   2026-11-15 against the M1.1 fixtures). Older servers may still send `hydra:member`.
+  `core:api`'s `HydraCollectionDto` reads both key sets; `getAllHydraPages` requests each `next`
+  link as it is, because it is an absolute path that already holds the server's prefix.
 - Error bodies come in two shapes. The JWT layer sends `{"code": <status>, "message": "..."}`:
   a wrong password and an unknown user both give 401 `Invalid credentials.`, a missing token
   gives 401 `JWT Token not found`. API Platform sends `application/problem+json` with

@@ -13,3 +13,6 @@ entries get deleted — see /finalize.
   `compileTestKotlinIosArm64` ("Name contains illegal characters"); only `build` caught it.
 - 2026-11-15 — `request.url.encodedPath` on a `URLBuilder` failed "Unresolved reference": it is
   an extension and needs `import io.ktor.http.encodedPath`; the IDE-free compile gave no hint.
+- 2026-11-15 — `failFast` again (M1.4): two mutations in one `jvmTest` run showed only the first
+  failure. Ran one mutation per run with `--tests`, plus a clean-tree run of each filter, since a
+  filter that matches nothing also fails.
