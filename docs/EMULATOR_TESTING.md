@@ -66,4 +66,4 @@ this app.
 - Photos (M3.5): "Take photo" and "Pick photos" sit under the photo rows (camera and picker steps
   are in the skill). A filled "Image label" field shows its value as `text`, so `ui.py`'s index for
   "Image label" shifts after each fill: tap the next one from a fresh `list`. A picked photo still
-  previews after `am kill` (persisted grant); a white top band on a test JPEG shows the rotation.
+  previews after `am kill` (a copy in `cache/photos/`, readable with `run-as`); a white top band on a test JPEG shows the rotation.
