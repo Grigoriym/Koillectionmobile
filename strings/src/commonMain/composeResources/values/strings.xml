@@ -28,6 +28,7 @@
     <string name="collection_section_children">Collections</string>
     <string name="collection_section_items">Items</string>
     <string name="collection_back">Back</string>
+    <string name="collection_add_item">Add item</string>
 
     <string name="item_back">Back</string>
     <string name="item_retry">Try again</string>
@@ -37,4 +38,20 @@
     <string name="item_section_tags">Tags</string>
     <string name="item_field_not_shown">Not shown (field type: %1$s)</string>
     <string name="item_image_full">Full image. Tap to close.</string>
+
+    <string name="add_item_title">New item</string>
+    <string name="add_item_back">Back</string>
+    <string name="add_item_name_label">Name</string>
+    <string name="add_item_field_label">Label</string>
+    <string name="add_item_field_value">Value</string>
+    <string name="add_item_add_field">Add field</string>
+    <string name="add_item_remove_field">Remove field</string>
+    <string name="add_item_label_duplicate">Another field has this label. Each label must be unique within the item.</string>
+    <string name="add_item_section_tags">Tags</string>
+    <string name="add_item_no_category">No category</string>
+    <string name="add_item_no_tags">The server has no tags.</string>
+    <string name="add_item_retry">Try again</string>
+    <string name="add_item_error_network">Loading the tags failed: the server does not answer. Check the network connection.</string>
+    <string name="add_item_error_http">Loading the tags failed: the server answered with an error (HTTP %1$d).</string>
+    <string name="add_item_error_unexpected">Loading the tags failed with an unexpected error.</string>
 </resources>

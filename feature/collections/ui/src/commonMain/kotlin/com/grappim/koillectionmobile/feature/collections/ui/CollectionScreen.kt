@@ -8,8 +8,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
@@ -23,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.grappim.koillectionmobile.strings.RString
+import com.grappim.koillectionmobile.strings.generated.resources.collection_add_item
 import com.grappim.koillectionmobile.strings.generated.resources.collection_back
 import com.grappim.koillectionmobile.strings.generated.resources.collection_empty
 import com.grappim.koillectionmobile.strings.generated.resources.collection_section_children
@@ -36,6 +39,7 @@ fun CollectionScreen(
     collectionId: String,
     onCollectionClick: (String) -> Unit,
     onItemClick: (String) -> Unit,
+    onAddItemClick: () -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: CollectionViewModel = koinViewModel { parametersOf(collectionId) }
@@ -45,6 +49,7 @@ fun CollectionScreen(
         uiState = uiState,
         onCollectionClick = onCollectionClick,
         onItemClick = onItemClick,
+        onAddItemClick = onAddItemClick,
         onBack = onBack,
         modifier = modifier
     )
@@ -56,6 +61,7 @@ private fun CollectionContent(
     uiState: CollectionUiState,
     onCollectionClick: (String) -> Unit,
     onItemClick: (String) -> Unit,
+    onAddItemClick: () -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -73,6 +79,11 @@ private fun CollectionContent(
                     }
                 }
             )
+        },
+        floatingActionButton = {
+            FloatingActionButton(onClick = onAddItemClick) {
+                Icon(imageVector = Icons.Filled.Add, contentDescription = stringResource(RString.collection_add_item))
+            }
         }
     ) { padding ->
         val contentModifier = Modifier

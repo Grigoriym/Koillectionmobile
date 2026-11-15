@@ -11,6 +11,8 @@ import com.grappim.koillectionmobile.feature.collections.ui.CollectionListRoute
 import com.grappim.koillectionmobile.feature.collections.ui.CollectionListScreen
 import com.grappim.koillectionmobile.feature.collections.ui.CollectionRoute
 import com.grappim.koillectionmobile.feature.collections.ui.CollectionScreen
+import com.grappim.koillectionmobile.feature.items.ui.AddItemRoute
+import com.grappim.koillectionmobile.feature.items.ui.AddItemScreen
 import com.grappim.koillectionmobile.feature.items.ui.ItemRoute
 import com.grappim.koillectionmobile.feature.items.ui.ItemScreen
 
@@ -42,11 +44,15 @@ internal fun MainNavHost(modifier: Modifier = Modifier) {
                     collectionId = route.collectionId,
                     onCollectionClick = { id -> backStack.add(CollectionRoute(id)) },
                     onItemClick = { id -> backStack.add(ItemRoute(id)) },
+                    onAddItemClick = { backStack.add(AddItemRoute(route.collectionId)) },
                     onBack = { backStack.removeLastOrNull() }
                 )
             }
             entry<ItemRoute> { route ->
                 ItemScreen(itemId = route.itemId, onBack = { backStack.removeLastOrNull() })
+            }
+            entry<AddItemRoute> {
+                AddItemScreen(onBack = { backStack.removeLastOrNull() })
             }
         }
     )

@@ -1,6 +1,6 @@
 # koillectionmobile checklist
 
-**Current step:** M3.4. M3.3 done 2026-11-15, M3.2 done 2026-11-15, M3.1 done 2026-11-15; M3 broken into steps 2026-11-15. M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6 and 7 are settled.
+**Current step:** M3.5. M3.4 done 2026-11-15, M3.3 done 2026-11-15, M3.2 done 2026-11-15, M3.1 done 2026-11-15; M3 broken into steps 2026-11-15. M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6 and 7 are settled.
 
 ## How to use this
 
@@ -74,12 +74,19 @@ in order, and a failure halfway must not lead to a second item on retry.
   binding yet: M3.6 adds it with its first caller. The build-logic stability plugin now adds
   compose-runtime to `commonTest` too: without it the iOS test compile failed ("requires the
   Compose Runtime to be on the class path").
-- [ ] **M3.4** — Add-item screen, text part: a nav key with the collection id, an "add" action on
+- [x] **M3.4** — Add-item screen, text part: a nav key with the collection id, an "add" action on
   the collection screen, a form with the name, free label/value rows (add, remove) and a tag
   picker (existing tags only, grouped by category). Labels must be unique within the item
   (server rule, plan §2): the form says so before save.
   **Verify:** ViewModel tests (`jvmTest --rerun`); on the emulator the form opens from `Books`
   and shows the server's tags.
+  Note: `AddItemRoute` + `AddItemScreen`/`AddItemViewModel` in `feature:items:ui`; a FAB "Add item"
+  on the collection screen. The ViewModel does not take the collection id yet (only the route
+  has it): M3.6's save adds it. Duplicate labels compare exactly, as the server does (`===` in
+  `DatumLabelNotExistsInParentValidator`), so "Author" and "author" pass; blank labels are not
+  flagged (the server's `NotBlank` is M3.6's concern). Tags: one group per category, sorted by
+  label, tags without a known category last. No save button and no process-death state yet
+  (M3.5, M3.6). Emulator: 30 tags in 4 categories, the same as `GET /api/tags`.
 - [ ] **M3.5** — Photos in the form: camera (system camera intent, `FileProvider`) and the photo
   picker (several at once). One photo is the main image; the rest are image fields with a label
   each, in order. Each photo has a rotate button and a preview that shows the result of M3.2.
