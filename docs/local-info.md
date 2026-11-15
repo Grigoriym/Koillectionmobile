@@ -57,6 +57,10 @@ and checks the 404. If it fails halfway, it still tries the delete; look for a l
 `M3.1 smoke <millis>` item in `Books` if the cleanup line reports an error. Its constants are in
 `LiveWriteSmoke.kt`, next to `LiveSmoke.kt`: the same rule applies.
 
+Both runs keep their session in `composeApp/build/smoke-home`. A run more than an hour after the
+last one starts with an expired JWT. That is the path that hung in M3.1, so do not delete the
+directory to make a hang go away: find out why first.
+
 ## Probes
 
 An expired-JWT response without waiting an hour: send any token whose payload has `exp` 1. The

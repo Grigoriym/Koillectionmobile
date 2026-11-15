@@ -106,6 +106,9 @@ first — it is often for a problem this toolchain doesn't have.
   only by `ktlintCheck` (M0.4).
 - **Force Gradle tests with `--rerun`** when the test is the proof. An `UP-TO-DATE` test task
   prints "BUILD SUCCESSFUL" without running anything.
+- **A URL check needs a root-path case.** `core:api`'s mock-engine tests use a `/sub` base URL.
+  At a root-path server Ktor's merged path has no leading `/` inside a plugin, which hid the M3.1
+  login deadlock until a live run.
 - **A check that looks the same whether the thing worked or not is not a check.**
   Before trusting one, name what it would show if the change had done nothing.
 - **Before/after comparisons need equally fresh runs.** A baseline taken from a
