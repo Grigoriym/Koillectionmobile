@@ -165,6 +165,9 @@ code without checking the licence terms are kept.
    `core:domain`, `core:storage` (decision 6), `strings`, and `feature:<x>:{data,domain,dto,mapper,ui}` for `auth`,
    `collections`, `items`, `tags`. The mapper exposes `dto` + `domain` as `api`; `data`
    reaches both through it. No local `uikit` module: `ui` modules use `grappim-kit-uikit`.
+   M3.2 (2026-11-15) added `core:image`: photo preparation for upload. It is not in
+   `feature:items:data` because M3.5's preview in `feature:items:ui` needs it too, and a `ui`
+   module does not depend on a `data` module.
 5. **MVP scope** — *decided 2026-11-15 (start of M2)*: login, collection list, item list, item
    detail, and log out (M2); "add item with photos" into a chosen collection (M3). The user
    accepted the proposal as it was and added log out, so a user can change server without

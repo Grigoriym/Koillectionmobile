@@ -1,6 +1,6 @@
 # koillectionmobile checklist
 
-**Current step:** M3.2. M3.1 done 2026-11-15; M3 broken into steps 2026-11-15. M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6 and 7 are settled.
+**Current step:** M3.3. M3.2 done 2026-11-15, M3.1 done 2026-11-15; M3 broken into steps 2026-11-15. M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6 and 7 are settled.
 
 ## How to use this
 
@@ -50,13 +50,17 @@ in order, and a failure halfway must not lead to a second item on retry.
   sent; answers in plan §2. First, `smokeRun` hung with M1.11's expired stored JWT: `bearerAuth`
   sent the bearer on the login at a root-path server, the server answered 401, and the re-login
   deadlocked on its own mutex. Fixed in a separate commit with a test (`794ffb2`).
-- [ ] **M3.2** — Image preparation (Android): read a content URI, apply its EXIF orientation plus
+- [x] **M3.2** — Image preparation (Android): read a content URI, apply its EXIF orientation plus
   an extra rotation (0/90/180/270, clockwise), downscale so the long side is at most 2400px,
   encode JPEG q85 to a `ByteArray`. Pure size and rotation math in `commonMain` with tests; the
   `Bitmap` part in `androidMain`. Pick the module in the step (a new `core:image`, or
   `feature:items:data`) and say why.
   **Verify:** `jvmTest --rerun` for the math; `build ktlintCheck` green. Device output is checked
   in M3.5.
+  Note: a new `core:image` (`ImageMath.kt` in `commonMain`, `ImagePreparer` in `androidMain`), not
+  `feature:items:data`: M3.5's preview in `feature:items:ui` needs it too. EXIF tags 2, 4, 5 and
+  7 mirror as well as rotate. The platform `android.media.ExifInterface` reads a stream from API
+  24 (= minSdk), so there is no new dependency. No DI binding yet: M3.3 or M3.5 adds it.
 - [ ] **M3.3** — Add-item use case (`feature:items`): create the item, then text fields in order,
   the main image, image fields (each created, then uploaded), then tags. It reports progress, and
   on a failure it keeps what exists on the server (item id, finished fields), so a retry continues
