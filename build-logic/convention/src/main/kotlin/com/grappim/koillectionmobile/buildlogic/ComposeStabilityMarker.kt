@@ -13,6 +13,10 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 // compose-runtime is `compileOnly`: it's needed only for the compiler to reference the
 // `@StabilityInferred` annotation type at compile time, not at runtime, and consuming UI modules
 // already carry compose-runtime themselves.
+//
+// `commonTest` needs it as `implementation`: a native test compilation (`compileTestKotlinIosArm64`)
+// does not see `commonMain`'s `compileOnly`, and the Compose compiler then fails with "requires the
+// Compose Runtime to be on the class path" (M3.3, the first stability module with tests).
 fun Project.configureComposeStabilityMarker() {
     pluginManager.apply("org.jetbrains.kotlin.plugin.compose")
 
@@ -20,6 +24,9 @@ fun Project.configureComposeStabilityMarker() {
         sourceSets.apply {
             commonMain.dependencies {
                 compileOnly(libs.findLibrary("jetbrains.compose.runtime").get())
+            }
+            commonTest.dependencies {
+                implementation(libs.findLibrary("jetbrains.compose.runtime").get())
             }
         }
     }

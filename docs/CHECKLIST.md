@@ -1,6 +1,6 @@
 # koillectionmobile checklist
 
-**Current step:** M3.3. M3.2 done 2026-11-15, M3.1 done 2026-11-15; M3 broken into steps 2026-11-15. M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6 and 7 are settled.
+**Current step:** M3.4. M3.3 done 2026-11-15, M3.2 done 2026-11-15, M3.1 done 2026-11-15; M3 broken into steps 2026-11-15. M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6 and 7 are settled.
 
 ## How to use this
 
@@ -61,12 +61,19 @@ in order, and a failure halfway must not lead to a second item on retry.
   `feature:items:data`: M3.5's preview in `feature:items:ui` needs it too. EXIF tags 2, 4, 5 and
   7 mirror as well as rotate. The platform `android.media.ExifInterface` reads a stream from API
   24 (= minSdk), so there is no new dependency. No DI binding yet: M3.3 or M3.5 adds it.
-- [ ] **M3.3** — Add-item use case (`feature:items`): create the item, then text fields in order,
+- [x] **M3.3** — Add-item use case (`feature:items`): create the item, then text fields in order,
   the main image, image fields (each created, then uploaded), then tags. It reports progress, and
   on a failure it keeps what exists on the server (item id, finished fields), so a retry continues
   from the failed part and never creates a second item.
   **Verify:** tests with hand-written fake repositories: the call order and positions, a failure
   at each stage, and a retry that sends only the remaining parts (`jvmTest --rerun`).
+  Note: `AddItemUseCase` in `feature:items:domain`, which now depends on `feature:tags:domain`
+  (`setItemTags`). It is stateless: a `Failure` returns an `AddItemState` (item id, fields done,
+  image field ids), and M3.6's ViewModel passes it back on the retry. Positions: text fields from
+  1, then the image fields. An empty tag list sends no call. Images come in as `ByteArray`. No DI
+  binding yet: M3.6 adds it with its first caller. The build-logic stability plugin now adds
+  compose-runtime to `commonTest` too: without it the iOS test compile failed ("requires the
+  Compose Runtime to be on the class path").
 - [ ] **M3.4** — Add-item screen, text part: a nav key with the collection id, an "add" action on
   the collection screen, a form with the name, free label/value rows (add, remove) and a tag
   picker (existing tags only, grouped by category). Labels must be unique within the item
