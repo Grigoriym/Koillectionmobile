@@ -45,3 +45,5 @@ entries get deleted — see /finalize.
   error; only `git diff --stat` (1 line, not 3) showed it. Assert the old text is in the file before replacing.
 - 2026-11-15 — Python-inserted `material.icons` and `lazy` imports in `AddItemScreen.kt` (M3.5) broke ktlint's
   import order again. Second time (first M2.8); `ktlintFormat` fixed it.
+- 2026-11-15 — `grep -rl <name> feature strings | xargs sed -i` (M3.6) also rewrote generated files under `build/`.
+  Harmless, but exclude `build/` from such a grep.

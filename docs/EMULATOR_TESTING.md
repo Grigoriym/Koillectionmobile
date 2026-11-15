@@ -67,3 +67,15 @@ this app.
   are in the skill). A filled "Image label" field shows its value as `text`, so `ui.py`'s index for
   "Image label" shifts after each fill: tap the next one from a fresh `list`. A picked photo still
   previews after `am kill` (a copy in `cache/photos/`, readable with `run-as`); a white top band on a test JPEG shows the rotation.
+- Save (M3.6): "Save" is a text button in the top bar (`ui.py tap Save`), off while a label is
+  blank ("A label is required." under it). A filled text field's "Label" node stays in the dump, as
+  "Image label" does, so `ui.py tap Label 0` hits the filled row: tap the empty one by its fresh
+  bounds. To fail a save halfway on purpose, set the test user's quota to 1 byte
+  (`update koi_user set disk_space_allowed=1 where username='tester'` in `koillection-test-db`):
+  the item and text fields go through, the first image upload gets HTTP 500. Put it back to
+  `1000000000000` after. The collection list is in server (creation) order, so a new item is
+  last; a refresh check reads the last rows after a fling to the bottom. Run it with no process
+  death since the collection screen opened: a restore creates its ViewModel after the save, so
+  the item shows even without the refresh signal. The photo cache is
+  `run-as com.grappim.koillectionmobile.debug ls /data/data/com.grappim.koillectionmobile.debug/cache/photos`
+  (a relative `cache/photos` fails under `run-as sh -c`).
