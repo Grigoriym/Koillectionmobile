@@ -20,6 +20,10 @@ working book catalogue. A local Koillection with a copy of it is in `docs/local-
 For an on-device check, use the `emulator-testing` skill. This app's facts for it are in
 `docs/EMULATOR_TESTING.md`.
 
+**Machine specifics stay off the repo.** The project works from more than one machine. Committed
+docs say which services and values the project needs. Paths, AVD names and container names on
+one machine go in `docs/machine.local.md` (gitignored, `*.local.md`).
+
 ## How work happens here
 
 One checklist step per session: "read `docs/CHECKLIST.md` and do step `<N>`". The workflow
