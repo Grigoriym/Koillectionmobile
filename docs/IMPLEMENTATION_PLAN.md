@@ -70,7 +70,9 @@ start of any step that touches the API. Facts that shape the design:
   OpenAPI doc answers 201 with the updated resource. The server checks free space per user
   (`HasEnoughSpaceForUpload`). `feature:items` sends one Ktor `ByteArray` part; Ktor reads the
   bytes again on each send, so the `bearerAuth` repeat after a 401 sends the whole body (tested).
-  Not sent to a real server yet: M3.
+  Not sent to a real server yet: M3. A full per-user quota (`diskSpaceAllowed`, 512 MiB by
+  default) makes an image upload fail with an empty 500 while text fields still work; the user
+  hit it on the real server on 2026-11-01 (`~/claude/books/00service/CLAUDE.md`, API gotchas).
 - Collections nest, and `GET /api/collections` returns every level: `Collection.php` has no
   `#[ApiFilter]`, so there is no `parent` filter. A top-level list is a client-side filter on a
   null `parent` (an IRI, not an object). `image` is a path relative to the server root

@@ -72,6 +72,7 @@ in order, and a failure halfway must not lead to a second item on retry.
   form, a rotate turns the preview, and `am kill` keeps them.
 - [ ] **M3.6** — Save: run M3.3 from the form with a progress view, a retry on failure, and on
   success open the new item (the add screen leaves the back stack) and refresh the collection.
+  An upload 500 names the disk quota as a likely cause (plan §2).
   **Verify:** ViewModel tests; on the emulator an item with two text fields, a main image, two
   page images and two tags is created on the local test instance, and the web UI shows the same
   item, upright and in order. A save with the server stopped halfway, then retried, gives one
