@@ -44,3 +44,5 @@ entries get deleted — see /finalize.
   line held that text, and killed it (exit 144). Kill by PID from `pgrep`.
 - 2026-11-15 — `io.ktor.http.contentType(this, ...)` in a debug edit (M3.1) failed "Unresolved reference":
   it is an extension, as the `CLAUDE.md` gotcha says. Used `header("Content-Type", ...)`.
+- 2026-11-15 — `./gradlew :core:image:jvmTest --rerun -q | grep PASSED` (M3.2) printed nothing: `-q` hides the
+  test-logging events, so the run looked empty. Drop `-q` when the PASSED lines are the proof.
