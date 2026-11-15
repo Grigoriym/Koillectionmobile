@@ -116,6 +116,12 @@ first — it is often for a problem this toolchain doesn't have.
   back showing nothing changed anywhere — which reads like a plausible result rather
   than a mistake.
 
+## Kotlin compile gotcha
+
+An "Unresolved reference" or a wrong-overload error on a library call often means a missing
+extension import. Ktor's `url.fullPath` and `url.encodedPath`, and kotlinx-serialization's reified
+`decodeFromJsonElement<T>()`, are extensions (hit in M1.3, M1.6, M1.7). Import them by name.
+
 ## Plain technical English
 
 Write for a reader whose first language is not English. The model is ASD-STE100
