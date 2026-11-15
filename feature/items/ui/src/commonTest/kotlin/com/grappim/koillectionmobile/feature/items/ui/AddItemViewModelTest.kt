@@ -36,8 +36,8 @@ class AddItemViewModelTest {
 
     private val savedStateHandle = SavedStateHandle()
 
-    private fun createSut() =
-        AddItemViewModel("books", tags, FakeAddItemUseCase(), FakePhotoFiles(), ItemListChanges(), savedStateHandle)
+    private fun createSut(handle: SavedStateHandle = savedStateHandle) =
+        AddItemViewModel("books", tags, FakeAddItemUseCase(), FakePhotoFiles(), ItemListChanges(), handle)
 
     private fun answer(
         tagList: Result<List<Tag>> = Result.success(listOf(NOVEL, GERMAN, FRAKTUR, LOOSE)),
@@ -429,6 +429,41 @@ class AddItemViewModelTest {
         val state = second.uiState.value
         assertEquals(3, state.fields.map { it.id }.toSet().size)
         assertEquals(3, state.photos.map { it.id }.toSet().size)
+    }
+
+    @Test
+    fun `an empty form has no input so back leaves without asking`() {
+        tags.queue()
+
+        assertFalse(createSut().uiState.value.hasInput)
+    }
+
+    @Test
+    fun `a blank name counts as no input`() {
+        tags.queue()
+        val sut = createSut()
+
+        sut.uiState.value.onNameChange("  ")
+
+        assertFalse(sut.uiState.value.hasInput)
+    }
+
+    @Test
+    fun `a name a field row a photo or a tag each count as input`() {
+        tags.queue()
+        val inputs = listOf<(AddItemUiState) -> Unit>(
+            { it.onNameChange("Immensee") },
+            { it.onAddField() },
+            { it.onPhotosAdd(listOf("content://a")) },
+            { it.onTagToggle(NOVEL.id) }
+        )
+        inputs.forEach { input ->
+            val sut = createSut(SavedStateHandle())
+
+            input(sut.uiState.value)
+
+            assertTrue(sut.uiState.value.hasInput)
+        }
     }
 
     private companion object {

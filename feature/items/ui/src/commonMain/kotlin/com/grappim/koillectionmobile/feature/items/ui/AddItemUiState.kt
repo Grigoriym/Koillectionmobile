@@ -85,6 +85,10 @@ data class AddItemUiState(
     val hasBlankLabel: Boolean
         get() = fields.any { it.label.isBlank() } || photos.drop(1).any { it.label.isBlank() }
 
+    /** The user entered something, so leaving the form asks first. */
+    val hasInput: Boolean
+        get() = name.isNotBlank() || fields.isNotEmpty() || photos.isNotEmpty() || selectedTagIds.isNotEmpty()
+
     /** The server needs a name (`NotBlank`) and unique, non-blank labels. */
     val canSave: Boolean
         get() = name.isNotBlank() && duplicateLabels.isEmpty() && !hasBlankLabel

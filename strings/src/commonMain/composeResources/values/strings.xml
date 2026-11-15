@@ -75,4 +75,8 @@
     <string name="add_item_save_error_validation">Saving failed: the server rejected a value.</string>
     <string name="add_item_save_error_photo">Saving failed: a photo could not be read.</string>
     <string name="add_item_save_error_unexpected">Saving failed with an unexpected error.</string>
+    <string name="add_item_discard_title">Discard this item?</string>
+    <string name="add_item_discard_text">The name, fields, photos and tags on this form are lost.</string>
+    <string name="add_item_discard">Discard</string>
+    <string name="add_item_keep_editing">Keep editing</string>
 </resources>
