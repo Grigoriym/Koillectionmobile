@@ -6,8 +6,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -19,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.grappim.koillectionmobile.strings.RString
+import com.grappim.koillectionmobile.strings.generated.resources.collection_back
 import com.grappim.koillectionmobile.strings.generated.resources.collection_empty
 import com.grappim.koillectionmobile.strings.generated.resources.collection_section_children
 import com.grappim.koillectionmobile.strings.generated.resources.collection_section_items
@@ -31,6 +36,7 @@ fun CollectionScreen(
     collectionId: String,
     onCollectionClick: (String) -> Unit,
     onItemClick: (String) -> Unit,
+    onBack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: CollectionViewModel = koinViewModel { parametersOf(collectionId) }
 ) {
@@ -39,6 +45,7 @@ fun CollectionScreen(
         uiState = uiState,
         onCollectionClick = onCollectionClick,
         onItemClick = onItemClick,
+        onBack = onBack,
         modifier = modifier
     )
 }
@@ -49,11 +56,24 @@ private fun CollectionContent(
     uiState: CollectionUiState,
     onCollectionClick: (String) -> Unit,
     onItemClick: (String) -> Unit,
+    onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
-        topBar = { TopAppBar(title = { Text(uiState.title) }) }
+        topBar = {
+            TopAppBar(
+                title = { Text(uiState.title) },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(RString.collection_back)
+                        )
+                    }
+                }
+            )
+        }
     ) { padding ->
         val contentModifier = Modifier
             .fillMaxSize()

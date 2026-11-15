@@ -27,7 +27,9 @@
     <string name="collection_empty">This collection has no collections and no items.</string>
     <string name="collection_section_children">Collections</string>
     <string name="collection_section_items">Items</string>
+    <string name="collection_back">Back</string>
 
+    <string name="item_back">Back</string>
     <string name="item_retry">Try again</string>
     <string name="item_error_network">The server does not answer. Check the network connection.</string>
     <string name="item_error_http">The server answered with an error (HTTP %1$d).</string>

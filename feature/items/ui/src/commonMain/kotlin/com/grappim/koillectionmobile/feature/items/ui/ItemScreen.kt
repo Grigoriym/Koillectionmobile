@@ -11,9 +11,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SuggestionChip
@@ -37,6 +41,7 @@ import coil3.compose.AsyncImage
 import com.grappim.kit.uikit.asString
 import com.grappim.koillectionmobile.feature.items.domain.Image
 import com.grappim.koillectionmobile.strings.RString
+import com.grappim.koillectionmobile.strings.generated.resources.item_back
 import com.grappim.koillectionmobile.strings.generated.resources.item_field_not_shown
 import com.grappim.koillectionmobile.strings.generated.resources.item_image_full
 import com.grappim.koillectionmobile.strings.generated.resources.item_retry
@@ -48,22 +53,35 @@ import org.koin.core.parameter.parametersOf
 @Composable
 fun ItemScreen(
     itemId: String,
+    onBack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ItemViewModel = koinViewModel { parametersOf(itemId) }
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    ItemContent(uiState = uiState, modifier = modifier)
+    ItemContent(uiState = uiState, onBack = onBack, modifier = modifier)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ItemContent(uiState: ItemUiState, modifier: Modifier = Modifier) {
+private fun ItemContent(uiState: ItemUiState, onBack: () -> Unit, modifier: Modifier = Modifier) {
     // The full image on screen, or null. Kept across rotation.
     var fullImageUrl by rememberSaveable { mutableStateOf<String?>(null) }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
-        topBar = { TopAppBar(title = { Text(uiState.name) }) }
+        topBar = {
+            TopAppBar(
+                title = { Text(uiState.name) },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(RString.item_back)
+                        )
+                    }
+                }
+            )
+        }
     ) { padding ->
         val contentModifier = Modifier
             .fillMaxSize()

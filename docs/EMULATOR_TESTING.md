@@ -54,3 +54,5 @@ this app.
   dumps. In landscape the item's main image fills the width, so the fields are below the fold and
   not in the dump: check the title, or scroll first. Process death: open `Books` → an item, then
   HOME, `am kill`, `am start -n`; the item comes back, and back goes to `Books`, then Collections.
+- Back arrow (M2.8): the collection and item screens' arrow is a node with `content-desc` "Back"
+  (`ui.py tap "Back"`). The collection list has none.
