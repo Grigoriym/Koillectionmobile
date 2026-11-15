@@ -36,3 +36,5 @@ entries get deleted — see /finalize.
   went into the URL field.
 - 2026-11-15 — A Python heredoc with Kotlin raw strings (`"""`) in a `"""`-delimited Python string failed with a
   SyntaxError again (M2.6). Second time; `'''` delimiters in the Python fixed it.
+- 2026-11-15 — A Python string-replace that put the `material.icons` imports above `material3.CircularProgressIndicator`
+  (M2.8) broke ktlint's import order in `ItemScreen.kt`, which also imports `material3.Button`. Insert by sort order, or run `ktlintFormat`.
