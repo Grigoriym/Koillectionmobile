@@ -1,6 +1,7 @@
 package com.grappim.koillectionmobile.composeapp.di
 
 import com.grappim.koillectionmobile.feature.auth.domain.AuthRepository
+import com.grappim.koillectionmobile.feature.collections.domain.CollectionsRepository
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.HttpClientEngine
 import org.koin.core.context.stopKoin
@@ -30,8 +31,9 @@ class KoinGraphTest {
     /**
      * Covers the limit above for the provider chain `verify()` cannot see: `HttpClient` needs
      * `BaseUrlProvider`, `SessionStorage` and `CustomHeadersStorage`, all from provider functions.
-     * `AuthRepository` is resolved too: `verify()` checks only what the graph defines, so a
-     * repository without its `@Single` would not fail it (mutation-checked in M1.5). A missing
+     * `AuthRepository` and `CollectionsRepository` are resolved too: `verify()` checks only what
+     * the graph defines, so a repository without its `@Single` would not fail it (mutation-checked
+     * in M1.5). A missing
      * `includes` line still passes here, as in M1.3. Resolving them creates no file: DataStore
      * writes only on the first save.
      */
@@ -40,6 +42,7 @@ class KoinGraphTest {
         val koin = startKoin<KoinApp> { }.koin
         try {
             koin.get<AuthRepository>()
+            koin.get<CollectionsRepository>()
             koin.get<HttpClient>().close()
         } finally {
             stopKoin()

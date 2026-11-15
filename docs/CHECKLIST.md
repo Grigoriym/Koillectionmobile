@@ -1,6 +1,6 @@
 # koillectionmobile checklist
 
-**Current step:** M1.6 (M1.5 done 2026-11-15). M0 done 2026-11-14 (archived). Plan §5 decisions 1, 2, 4 and 6 are settled.
+**Current step:** M1.7 (M1.6 done 2026-11-15). M0 done 2026-11-14 (archived). Plan §5 decisions 1, 2, 4 and 6 are settled.
 
 ## How to use this
 
@@ -97,9 +97,15 @@ Model for every step: `../wallosmobile/core/api` and its `feature:*:data` module
   put back on failure. `mapper` stays a placeholder: the token is a string, nothing to map.
   `LOGIN_PATH` (`core:api`) is now public. Mutation-checked: no URL restore, no 500 mapping and
   no `@Single` each fail a test.
-- [ ] **M1.6** — `feature:collections` dto/domain/mapper/data: list (paged), get one,
+- [x] **M1.6** — `feature:collections` dto/domain/mapper/data: list (paged), get one,
   children.
   **Verify:** mapper and repository tests against the M1.1 fixtures.
+  Note: `CollectionsRepository` returns `Result` (`resultOf`, as in wallosmobile); the failure
+  is the `KoillectionError`. `getCollections` returns every level: the server has no `parent`
+  filter, so the caller keeps the ones without `parentId`. `imagePath` stays relative
+  (`uploads/...`), not resolved. The fixtures hold one collection with no children, so paging
+  and a set `parent` are tested with inline bodies. Mutation-checked: no `@Single`, a wrong
+  children path and an unparsed parent IRI each fail a test.
 - [ ] **M1.7** — `feature:items` read side: items of a collection (paged), get one item, the
   item's data (Datum) list, image URLs resolved against the server URL.
   **Verify:** mapper and repository tests against the M1.1 fixtures.

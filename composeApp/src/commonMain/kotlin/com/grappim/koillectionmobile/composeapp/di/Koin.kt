@@ -3,6 +3,8 @@ package com.grappim.koillectionmobile.composeapp.di
 import com.grappim.koillectionmobile.core.api.NetworkModule
 import com.grappim.koillectionmobile.core.storage.PlatformStorageModule
 import com.grappim.koillectionmobile.feature.auth.data.AuthDataModule
+import com.grappim.koillectionmobile.feature.collections.data.CollectionsDataModule
+import com.grappim.koillectionmobile.feature.collections.mapper.CollectionsMapperModule
 import org.koin.core.annotation.ComponentScan
 import org.koin.core.annotation.Configuration
 import org.koin.core.annotation.KoinApplication
@@ -16,7 +18,15 @@ import org.koin.core.annotation.Module
  *
  * The `@ComponentScan` picks up this module's own definitions.
  */
-@Module(includes = [NetworkModule::class, PlatformStorageModule::class, AuthDataModule::class])
+@Module(
+    includes = [
+        NetworkModule::class,
+        PlatformStorageModule::class,
+        AuthDataModule::class,
+        CollectionsMapperModule::class,
+        CollectionsDataModule::class
+    ]
+)
 @Configuration
 @ComponentScan("com.grappim.koillectionmobile.composeapp")
 class AppModule
