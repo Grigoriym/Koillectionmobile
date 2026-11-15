@@ -32,3 +32,10 @@ this app.
 - The test instance has one collection (`Books`), and it has no image. To check an image or a
   child collection, add a temporary one through the API on the local instance and delete it
   after (`DELETE /api/collections/<id>` also deletes its children and the uploaded file, M2.3).
+- The app logs no HTTP requests to logcat, and the Koillection container logs no requests
+  either. To time a screen load, poll `uiautomator dump` for a text the loaded screen shows
+  (about 1 s per poll, M2.4). For a host-side baseline, page through the same endpoint with
+  `curl` (`Books`' 15 item pages took 0.3 s from the host).
+- `Books` has 445 items. To check that every page arrived, fling to the bottom (40 fast
+  `input swipe 540 2000 540 300 60`) and compare the last rows with the last `member`s of
+  `GET /api/collections/<id>/items?page=15` (M2.4).
