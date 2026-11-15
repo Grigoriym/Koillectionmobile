@@ -16,3 +16,7 @@ entries get deleted — see /finalize.
 - 2026-11-15 — `failFast` again (M1.4): two mutations in one `jvmTest` run showed only the first
   failure. Ran one mutation per run with `--tests`, plus a clean-tree run of each filter, since a
   filter that matches nothing also fails.
+- 2026-11-15 — The iOS backtick-name trap again (M1.5): a comma in a test name passed `jvmTest`
+  and failed `compileTestKotlinIosArm64`. Second time; a third makes it a rule in `CLAUDE.md`.
+- 2026-11-15 — Ktor `parseUrl("https:///sub")` returned a `Url` with a non-blank host, so a
+  host check on the parsed URL passed a URL with no host. Read the host from the text instead.

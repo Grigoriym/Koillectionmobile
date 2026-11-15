@@ -49,7 +49,11 @@ start of any step that touches the API. Facts that shape the design:
   app reads a small subset of about six resources. Use the OpenAPI doc as the field
   reference instead.
 - Login: `POST /api/authentication_token` with `{"username","password"}` → `{"token": JWT}`.
-  Then `Authorization: Bearer <token>`.
+  Then `Authorization: Bearer <token>`. The body may be `application/json` or
+  `application/ld+json`; the answer is plain `application/json`. A wrong subpath gets
+  Koillection's own 404 (`problem+json`, `detail: Not Found`), and a `GET` gets 405 (checked
+  2026-11-15 against the local test instance). `feature:auth` reads 404, 405 and a 2xx without
+  `token` as "not a Koillection server".
 - The JWT lives 1 hour (lexik's default `token_ttl`; Koillection's
   `config/packages/lexik_jwt_authentication.yaml` does not set it). There is no refresh token.
   An expired JWT gives 401 `{"code":401,"message":"Expired JWT Token"}` (checked 2026-11-15

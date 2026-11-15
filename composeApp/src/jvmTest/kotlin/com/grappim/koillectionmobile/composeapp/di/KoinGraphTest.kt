@@ -31,7 +31,8 @@ class KoinGraphTest {
      * Covers the limit above for the provider chain `verify()` cannot see: `HttpClient` needs
      * `BaseUrlProvider`, `SessionStorage` and `CustomHeadersStorage`, all from provider functions.
      * `AuthRepository` is resolved too: `verify()` checks only what the graph defines, so a
-     * missing `AuthDataModule` would not fail it. Resolving them creates no file: DataStore
+     * repository without its `@Single` would not fail it (mutation-checked in M1.5). A missing
+     * `includes` line still passes here, as in M1.3. Resolving them creates no file: DataStore
      * writes only on the first save.
      */
     @Test
