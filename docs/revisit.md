@@ -31,3 +31,10 @@ cold session can act on it. Delete an entry when it's fixed.
   `feature:collections` keeps `Collection.imagePath` relative (`CollectionMapper.kt`). M2's
   collection list needs full URLs too. Fix: resolve in `CollectionMapper` the same way, or move
   the resolve helper into `core:api` next to `normalizeBaseUrl` and use it in both.
+- 2026-11-15 (M1.9) — Write bodies send IRIs without the server's subpath (`/api/collections/<id>`,
+  `/api/items/<id>`, `/api/tags/<id>`): `ItemsRepositoryImpl.createItem`/`itemIri` and
+  `TagsRepositoryImpl.setItemTags`. The server's own IRIs carry its prefix (M1.4: `next` links).
+  Whether API Platform accepts an unprefixed IRI on a server behind a subpath is not checked:
+  the source has no `vendor/`, and the local test instance runs at the root. `add_book.py` uses
+  unprefixed IRIs against the user's server, but whether that server has a subpath is not
+  recorded here. Check once against a subpath instance (or the user's setup) before M3 ships.

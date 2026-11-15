@@ -25,3 +25,7 @@ entries get deleted — see /finalize.
 - 2026-11-15 — Mutation restore with `git checkout -- <file>` (M1.8) failed ("pathspec did not match") on new,
   untracked files, so four mutations stacked up. Undid them by hand; copy the file to the
   scratchpad first and restore from the copy.
+- 2026-11-15 — Resolved `../../koillection` from the wrong directory (M1.9) and got "No such file or
+  directory"; from the repo root it is `/home/gregory/proj/koillection`.
+- 2026-11-15 — A Python heredoc that spliced Kotlin raw strings (`"""`) into a test file failed with
+  a SyntaxError (M1.9). Write the Kotlin to a scratchpad file and have Python read it.

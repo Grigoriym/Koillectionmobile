@@ -85,6 +85,14 @@ start of any step that touches the API. Facts that shape the design:
   wallosmobile); the failure is the `KoillectionError` that `core:api` threw. `feature:auth` is
   the exception: its `LoginResult` names each login outcome.
 - Item tags: the API takes only the full list, so changing tags means sending all of them.
+- Writes (checked 2026-11-15 against the 1.8.5 source, M1.9; not yet sent to a server by the app):
+  `POST /api/items` needs `name` and `collection` (`item:write`, both `NotBlank`).
+  `POST /api/data` needs `item` (or `collection`), `type` and `label`; a label already used on
+  the item is rejected (`DatumLabelNotExistsInParent`). An `image` field's `value` must be null
+  (`Assert\IsNull`), so the app leaves the key out. `PATCH /api/items/{id}` with `{"tags": [...]}`
+  replaces the tag set: `Item` has `addTag`/`removeTag`, so the serializer adds and removes to
+  match the list. A body names other resources by IRI; the app sends `/api/...` without the
+  server's subpath, as `add_book.py` does. Behind a subpath this is unchecked (`docs/revisit.md`).
 - Known server-side trap: Koillection's Docker entrypoint can regenerate `JWT_PASSPHRASE` on
   restart, which breaks API login with a 500 while the website keeps working. Upstream issues
   #1600, #1400, #1410. The app should show a clear message for a 500 at login, not a
