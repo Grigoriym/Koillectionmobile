@@ -1,6 +1,6 @@
 # koillectionmobile checklist
 
-**Current step:** M1.4 (M1.3 done 2026-11-15). M0 done 2026-11-14 (archived). Plan §5 decisions 1, 2, 4 and 6 are settled.
+**Current step:** M1.5 (M1.4 done 2026-11-15). M0 done 2026-11-14 (archived). Plan §5 decisions 1, 2, 4 and 6 are settled.
 
 ## How to use this
 
@@ -79,9 +79,13 @@ Model for every step: `../wallosmobile/core/api` and its `feature:*:data` module
   now starts the JVM `KoinApp` and resolves `HttpClient`; it fails on that gap. Removing
   `PlatformStorageModule` from `AppModule.includes` did not fail it: the module's own
   `@Configuration` is found anyway on JVM. Android graph not checked (no device run).
-- [ ] **M1.4** — Hydra paging in `core:api`: a generic list DTO that reads `member` and
+- [x] **M1.4** — Hydra paging in `core:api`: a generic list DTO that reads `member` and
   `hydra:member`, `totalItems`, and the next-page link; a helper that follows pages.
   **Verify:** tests against the M1.1 list fixtures, including the last page (no next link).
+  Note: `HydraCollectionDto<T>` and `HttpClient.getAllHydraPages` (`HydraCollection.kt`). The
+  `next` link is requested as it is (an absolute path with the server's own prefix). Fixture
+  tests are in `jvmTest` and read `../../fixtures/` from the module directory: `commonTest` has
+  no file API. Mutation-checked one change at a time (`failFast` stops at the first failure).
 - [ ] **M1.5** — `feature:auth` dto/domain/mapper/data: `POST /api/authentication_token`,
   server-URL check, and distinct results for wrong credentials (401), server JWT failure (500,
   plan §2 trap) and unreachable server.
