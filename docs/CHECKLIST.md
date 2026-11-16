@@ -1,6 +1,6 @@
 # koillectionmobile checklist
 
-**Current step:** M4 (not broken into steps yet). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6 and 7 are settled.
+**Current step:** M4.1. M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6 and 7 are settled.
 
 ## How to use this
 
@@ -32,6 +32,48 @@ M1 (API layer) is done; its steps and notes are in `docs/CHECKLIST_ARCHIVE.md`.
 M2 (browse) is done; its steps and notes are in `docs/CHECKLIST_ARCHIVE.md`.
 M3 (add item with photos) is done; its steps and notes are in `docs/CHECKLIST_ARCHIVE.md`.
 
-## M4 — release (rough scope)
+## M4 — release
 
-Signing, F-Droid/IzzyOnDroid and/or Play per plan §5 decision 2.
+Both store flavors ship, as in the user's other apps (user, 2026-11-16): `fdroid` to
+IzzyOnDroid first, `gplay` to Google Play. Model: `../Wallosmobile` (`build-logic`
+`configureAppSigningConfigs`, `androidApp/build.gradle.kts` dependency-info block,
+`.github/workflows/release*.yml`, `fastlane/metadata/`). No Firebase: wallosmobile's
+`google-services.json` steps are not ported. Two inputs come from the user later: the launcher
+icon (M4.4) and the release keystores (M4.5). Those steps wait for them; the others do not.
+
+- [ ] **M4.1** — Release blockers. Check the subpath question read only, from the user's server
+  URL (`docs/revisit.md`, M1.9 entry). Go through every `docs/revisit.md` entry with the user;
+  each one is "fix before release" (gets a step here) or "after release".
+  **Verify:** the M1.9 entry is closed or has a recorded answer; each revisit entry has the
+  user's verdict, written in the entry.
+- [ ] **M4.2** — R8 release build. `assembleFdroidRelease` and `assembleGplayRelease` build with
+  minify and resource shrinking on (never run so far; `androidApp/proguard-rules.pro` is empty).
+  Sign the `fdroidRelease` APK by hand with the debug key (`apksigner`, no build change) and run
+  login, browse and add item on the emulator against the local test instance. Add a keep rule
+  only for what R8 breaks.
+  **Verify:** both release tasks pass; the hand-signed APK passes the flow on the emulator.
+- [ ] **M4.3** — Store texts. `README.md` (what the app does, unofficial and not affiliated with
+  Koillection, the Koillection version it was tested against, where to install it), a privacy
+  policy (Play needs one; the app talks only to the user's own server), and
+  `fastlane/metadata/android/en-US/` (title, short and full description, `changelogs/1.txt`,
+  phone screenshots). Screenshots come from the local test instance, which is a copy of the
+  user's real catalogue: the user approves what they show before they are committed.
+  **Verify:** the user approves the texts and the screenshots.
+- [ ] **M4.4** — Launcher icon, from the image the user provides (waits for it). Adaptive icon
+  with a monochrome layer, plus the 512px `fastlane/.../images/icon.png`.
+  **Verify:** the icon shows on the emulator launcher, light and dark.
+- [ ] **M4.5** — Release signing (waits for the user's keystores). Port wallosmobile's
+  per-flavor signing configs: keystore files at the repo root (gitignored), passwords from env
+  vars. Turn off the APK dependency-info block, which F-Droid's scanner rejects. Confirm with the
+  user whether wallosmobile's signed `fdroidDebug` channel is wanted here too.
+  **Verify:** `apksigner verify --print-certs` shows the right certificate for each flavor; the
+  `fdroid` APK has no extra signing block.
+- [ ] **M4.6** — Release workflow. Port wallosmobile's `release.yml`: a `v*` tag builds the signed
+  APKs and the `gplay` AAB and attaches them to a GitHub release. Ask the user before this step
+  whether the branch flow switches now (ground rules: `dev`/`main` + PRs near release), because
+  wallosmobile's `release-prepare`/`release-finalize` need it.
+  **Verify:** a manual run on a pre-release tag attaches signed artifacts that pass `apksigner`.
+- [ ] **M4.7** — First release `0.1.0` (version code 1). Tag it, then the IzzyOnDroid inclusion
+  request and the Play upload (internal testing first). Each outward step needs the user's go.
+  **Verify:** the GitHub release exists; the IzzyOnDroid request and the Play upload are done or
+  handed to the user with what they need.

@@ -162,6 +162,8 @@ code without checking the licence terms are kept.
    fast test/coverage target. No `iosApp` / desktop app until the user asks for one.
 2. **Distribution** — *decided 2026-11-14*: both. Keep the `store` flavor dimension
    (`gplay`, `fdroid` with `.fdroid` suffix) from wallosmobile/Taiga; IzzyOnDroid first.
+   Confirmed at the start of M4 (user, 2026-11-16): both, as in the user's other apps.
+   The launcher icon and the release keystores come from the user.
 3. **TLS** — *answered 2026-11-15 (M1.1)*: the user's Tailscale `ts.net` server passes
    Python's default certificate checks, so `koi.py`'s check-off was not needed. The app uses
    normal platform TLS. No custom or self-signed certificate support until a user needs it.
