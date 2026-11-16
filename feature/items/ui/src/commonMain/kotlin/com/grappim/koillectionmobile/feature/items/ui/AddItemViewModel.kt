@@ -29,6 +29,7 @@ import com.grappim.koillectionmobile.strings.generated.resources.add_item_save_e
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_save_error_unexpected
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_save_error_validation
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_save_unfinished
+import com.grappim.koillectionmobile.strings.generated.resources.error_proxy_rejected
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -350,6 +351,8 @@ private fun Throwable.toSaveMessage(uploadFailed: Boolean): NativeText = when (t
         NativeText.Arguments(RString.add_item_save_error_http, listOf(status))
     }
 
+    is KoillectionError.ProxyRejection -> NativeText.Arguments(RString.error_proxy_rejected, listOf(status))
+
     is KoillectionError.Http -> NativeText.Arguments(RString.add_item_save_error_http, listOf(status))
 
     is KoillectionError.Unauthorized -> NativeText.Arguments(
@@ -391,6 +394,7 @@ private fun List<Tag>.sortedByLabel(): List<Tag> = sortedWith(compareBy(String.C
 
 private fun Throwable.toMessage(): NativeText = when (this) {
     is KoillectionError.Network -> NativeText.Resource(RString.add_item_error_network)
+    is KoillectionError.ProxyRejection -> NativeText.Arguments(RString.error_proxy_rejected, listOf(status))
     is KoillectionError.Server -> NativeText.Arguments(RString.add_item_error_http, listOf(status))
     is KoillectionError.Http -> NativeText.Arguments(RString.add_item_error_http, listOf(status))
     else -> NativeText.Resource(RString.add_item_error_unexpected)

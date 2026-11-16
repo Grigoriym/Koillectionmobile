@@ -1,6 +1,6 @@
 # koillectionmobile checklist
 
-**Current step:** M4.3. M4.2 done 2026-11-16. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6 and 7 are settled.
+**Current step:** M4.4. M4.3 done 2026-11-16. M4.2 done 2026-11-16. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6 and 7 are settled.
 
 ## How to use this
 
@@ -77,7 +77,7 @@ warning (plan §1.1, "Warn on non-HTTPS base URLs"). Not in scope: self-signed c
   header saved at login on `POST /api/authentication_token` and `GET /api/collections`, the value
   changed in the app on the next refresh, and the value after `force-stop` and after `am kill` on
   Settings (the route came back, and Back went to the list).
-- [ ] **M4.3** — Proxy rejection message. Port the idea of wallosmobile's `ProxyRejection.kt`, not
+- [x] **M4.3** — Proxy rejection message. Port the idea of wallosmobile's `ProxyRejection.kt`, not
   its rule. Koillection itself answers 401 to a missing or expired JWT (`bearerAuth` re-logs in
   on it), so "every 401 is a proxy" does not hold here. Settle the rule from evidence: the body
   and content type of Koillection's own 401 against an nginx `auth_basic` 401, plus 407 and an
@@ -94,6 +94,20 @@ warning (plan §1.1, "Warn on non-HTTPS base URLs"). Not in scope: self-signed c
   some other custom header"). Closed (user, 2026-11-16): an `auth_basic` front over the whole
   server breaks Koillection's own API for every client (its JWT also travels in
   `Authorization`), so the app does not try to support it.
+  Note (2026-11-16): the rule, from evidence (plan §2, "Proxy rejection"): a 401 is Koillection's
+  only with the JWT layer's JSON body `{"code":401,...}`; any other 401, any 407 and a 3xx to
+  another host are a proxy (`isProxyRejection`, `KoillectionError.ProxyRejection`, one string
+  `error_proxy_rejected` for login and the app screens). `bearerAuth` does not log in again on a
+  proxy 401. **Behaviour change:** the client no longer follows redirects (`followRedirects =
+  false`), so a same-host 3xx is now `KoillectionError.Http`, not a followed `GET`. Tests:
+  `ProxyRejectionTest` (15, each case at `/sub` and at the root path; mutation-checked for the
+  `bearerAuth` guard and `followRedirects`), plus one each in `AuthRepositoryImplTest`,
+  `LoginViewModelTest`, `CollectionListViewModelTest`. `build` and `ktlintCheck` passed. On
+  `koil36` through the front (`docs/local-info.md`, "Proxy front"): no header gave the proxy
+  message at login; `X-Proxy-Token` saved from login Settings logged in (front log: 200 on the
+  login and `GET /api/collections`). In the app the "no header" case was a wrong value, which
+  the front treats the same: the refresh got one 401, no re-login `POST`, the proxy message, and
+  the session stayed.
 - [ ] **M4.4** — Cleartext warning at login. When the server URL starts with `http://`, show that
   the password and the token travel unencrypted. Advisory only: it never disables Log in,
   because the test instance is plain HTTP. Only a literal `http://` prefix counts.

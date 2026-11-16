@@ -60,6 +60,15 @@ start of any step that touches the API. Facts that shape the design:
   against the local test instance). So the app stores the password and logs in again on a 401
   (`core:api` `bearerAuth`, M1.3). The login request must go without the bearer header: with
   an expired JWT the server answers the login itself with 401 (checked 2026-11-15, M3.1).
+- Proxy rejection (M4.3, checked 2026-11-16 against 1.8.5 and an nginx front). Every Koillection
+  401 comes from the JWT layer (lexik `JWTAuthenticationFailureResponse`): `application/json`,
+  `WWW-Authenticate: Bearer`, body `{"code":401,"message":...}`. nginx's `return 401` and its
+  `auth_basic` 401 send an HTML page. The API does not redirect. So `core:api`
+  (`isProxyRejection`) reads as a proxy: a 401 without that JSON body, any 407, and a 3xx to
+  another host. It throws `KoillectionError.ProxyRejection`, and `bearerAuth` does not log in
+  again on it. The client follows no redirects (`followRedirects = false`); a 3xx on the same
+  host is a plain `KoillectionError.Http`. An `auth_basic` front over the whole server is not
+  supported: the JWT also travels in `Authorization` (user, 2026-11-16).
 - `PATCH` takes `application/merge-patch+json`.
 - Resources with `#[ApiResource]`: Item, Collection, Datum (an item's custom field), Tag,
   TagCategory, Template, ChoiceList, Album, Photo, Wishlist, Wish, Loan, Inventory, Log,

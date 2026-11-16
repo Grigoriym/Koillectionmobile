@@ -7,6 +7,7 @@ import com.grappim.koillectionmobile.core.domain.KoillectionError
 import com.grappim.koillectionmobile.feature.auth.domain.AuthRepository
 import com.grappim.koillectionmobile.feature.auth.domain.LoginResult
 import com.grappim.koillectionmobile.strings.RString
+import com.grappim.koillectionmobile.strings.generated.resources.error_proxy_rejected
 import com.grappim.koillectionmobile.strings.generated.resources.login_error_http
 import com.grappim.koillectionmobile.strings.generated.resources.login_error_invalid_credentials
 import com.grappim.koillectionmobile.strings.generated.resources.login_error_invalid_server_url
@@ -101,6 +102,7 @@ internal fun LoginResult.toMessage(): NativeText = when (this) {
     LoginResult.ServerJwtFailure -> NativeText.Resource(RString.login_error_server_jwt)
 
     is LoginResult.Failed -> when (val error = error) {
+        is KoillectionError.ProxyRejection -> NativeText.Arguments(RString.error_proxy_rejected, listOf(error.status))
         is KoillectionError.Server -> NativeText.Arguments(RString.login_error_http, listOf(error.status))
         is KoillectionError.Http -> NativeText.Arguments(RString.login_error_http, listOf(error.status))
         else -> NativeText.Resource(RString.login_error_unexpected)

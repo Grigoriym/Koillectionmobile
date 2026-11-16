@@ -24,6 +24,13 @@ sealed class KoillectionError(message: String?, cause: Throwable? = null) : Exce
      */
     class Server(val status: Int, message: String?) : KoillectionError(message)
 
+    /**
+     * A proxy in front of the server rejected the request, so it did not reach Koillection: a 401
+     * that is not the JWT layer's, a 407, or a redirect to another host. Usually the proxy wants a
+     * custom header that the app does not send.
+     */
+    class ProxyRejection(val status: Int) : KoillectionError("Rejected by a proxy (HTTP $status)")
+
     /** Any other non-2xx status, for example 403, 405 or 413. */
     class Http(val status: Int, message: String?) : KoillectionError(message)
 

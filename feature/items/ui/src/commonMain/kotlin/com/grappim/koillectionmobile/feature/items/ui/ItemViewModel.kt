@@ -7,6 +7,7 @@ import com.grappim.koillectionmobile.core.domain.KoillectionError
 import com.grappim.koillectionmobile.feature.items.domain.ItemsRepository
 import com.grappim.koillectionmobile.feature.tags.domain.TagsRepository
 import com.grappim.koillectionmobile.strings.RString
+import com.grappim.koillectionmobile.strings.generated.resources.error_proxy_rejected
 import com.grappim.koillectionmobile.strings.generated.resources.item_error_http
 import com.grappim.koillectionmobile.strings.generated.resources.item_error_network
 import com.grappim.koillectionmobile.strings.generated.resources.item_error_unexpected
@@ -84,6 +85,7 @@ class ItemViewModel(
 
 private fun Throwable.toMessage(): NativeText = when (this) {
     is KoillectionError.Network -> NativeText.Resource(RString.item_error_network)
+    is KoillectionError.ProxyRejection -> NativeText.Arguments(RString.error_proxy_rejected, listOf(status))
     is KoillectionError.Server -> NativeText.Arguments(RString.item_error_http, listOf(status))
     is KoillectionError.Http -> NativeText.Arguments(RString.item_error_http, listOf(status))
     else -> NativeText.Resource(RString.item_error_unexpected)

@@ -70,3 +70,42 @@ server checks expiry before the signature (checked 2026-11-15):
       -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJleHAiOjF9.c2ln' \
       http://127.0.0.1:8290/api/collections
     # {"code":401,"message":"Expired JWT Token"}
+
+## Proxy front
+
+A throwaway nginx in front of this instance, for the proxy rejection (M4.3). Each port shows
+one case. Run it on the instance's Docker network and remove it after. The network and the
+container names on a given machine are in `docs/machine.local.md`.
+
+    printf 'proxy:%s\n' "$(openssl passwd -apr1 secret)" > htpasswd
+    cat > nginx.conf <<'EOF'
+    server {  # header check: the app's custom header passes it
+        listen 8295;
+        client_max_body_size 20m;
+        location / {
+            if ($http_x_proxy_token != "secret") { return 401; }
+            proxy_set_header Host $http_host;
+            proxy_pass http://<instance container>:80;
+        }
+    }
+    server {  # auth_basic: evidence only, the app does not support it
+        listen 8296;
+        location / {
+            auth_basic "test";
+            auth_basic_user_file /etc/nginx/htpasswd;
+            proxy_set_header Host $http_host;
+            proxy_pass http://<instance container>:80;
+        }
+    }
+    server { listen 8297; location / { return 407; } }
+    server { listen 8298; location / { return 302 https://auth.example.com/login?rd=$request_uri; } }
+    EOF
+    docker run -d --name koillection-proxyfront --network <instance network> \
+      -p 127.0.0.1:8295-8298:8295-8298 \
+      -v $PWD/nginx.conf:/etc/nginx/conf.d/default.conf:ro \
+      -v $PWD/htpasswd:/etc/nginx/htpasswd:ro nginx:alpine
+
+From the emulator: `http://10.0.2.2:8295`, custom header `X-Proxy-Token: secret`. Without
+the header the front answers 401 HTML; with it, Koillection answers. `docker logs
+koillection-proxyfront` shows each request's status, also the app's (user agent
+`ktor-client`). Remove it with `docker rm -f koillection-proxyfront`.

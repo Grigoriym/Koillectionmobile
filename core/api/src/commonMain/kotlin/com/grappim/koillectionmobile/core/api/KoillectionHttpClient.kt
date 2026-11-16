@@ -12,6 +12,7 @@ import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.statement.bodyAsText
+import io.ktor.client.statement.request
 import io.ktor.http.ContentType
 import io.ktor.http.ContentTypeMatcher
 import io.ktor.http.HttpHeaders
@@ -36,7 +37,8 @@ val ContentTypeMergePatchJson = ContentType("application", "merge-patch+json")
  *   content type, so callers set one: [ContentTypeLdJson], or [ContentTypeMergePatchJson] for
  *   `PATCH`.
  * - `Authorization: Bearer` from [sessionStorage], and one new login on a 401 ([bearerAuth]).
- * - Every non-2xx status and every network failure becomes a [KoillectionError].
+ * - Every non-2xx status and every network failure becomes a [KoillectionError]. A proxy's
+ *   answer ([isProxyRejection]) becomes [KoillectionError.ProxyRejection].
  */
 fun HttpClientConfig<*>.configureKoillectionClient(
     json: Json,
@@ -45,6 +47,9 @@ fun HttpClientConfig<*>.configureKoillectionClient(
     customHeadersStorage: CustomHeadersStorage,
     logLevel: LogLevel
 ) {
+    // The API does not redirect. A redirect is a proxy or a wrong URL, and `isProxyRejection`
+    // must see it: Ktor would follow a GET to a proxy's login page.
+    followRedirects = false
     defaultRequest {
         url(normalizeBaseUrl(baseUrlProvider.getBaseUrl()))
     }
@@ -64,8 +69,14 @@ fun HttpClientConfig<*>.configureKoillectionClient(
     }
     HttpResponseValidator {
         validateResponse { response ->
+            val status = response.status.value
             if (!response.status.isSuccess()) {
-                throw mapHttpError(response.status.value, response.bodyAsText(), json)
+                val body = response.bodyAsText()
+                val location = response.headers[HttpHeaders.Location]
+                if (isProxyRejection(status, body, location, response.request.url.host)) {
+                    throw KoillectionError.ProxyRejection(status)
+                }
+                throw mapHttpError(status, body, json)
             }
         }
         handleResponseExceptionWithRequest { cause, _ ->

@@ -115,6 +115,24 @@ class AuthRepositoryImplTest {
     }
 
     @Test
+    fun `a proxy 401 is Failed with ProxyRejection and not InvalidCredentials`() = runTest {
+        // nginx `return 401` in front of the 1.8.5 test instance (2026-11-16).
+        val repository = repository {
+            respondWith(
+                body = "<html><head><title>401 Authorization Required</title></head></html>",
+                status = HttpStatusCode.Unauthorized,
+                contentType = "text/html"
+            )
+        }
+
+        val result = repository.logIn()
+
+        val error = assertIs<LoginResult.Failed>(result).error
+        assertEquals(401, assertIs<KoillectionError.ProxyRejection>(error).status)
+        assertSessionUnchanged()
+    }
+
+    @Test
     fun `a 500 is ServerJwtFailure`() = runTest {
         val repository = repository {
             respondWith("""{"code":500,"message":"Internal Server Error"}""", HttpStatusCode.InternalServerError)

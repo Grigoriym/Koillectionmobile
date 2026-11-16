@@ -8,6 +8,7 @@ import io.ktor.client.plugins.api.Send
 import io.ktor.client.plugins.api.createClientPlugin
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
@@ -27,7 +28,8 @@ private val LOGIN_PATH_SEGMENTS = LOGIN_PATH.split('/')
 /**
  * Sends `Authorization: Bearer <JWT>` with every request except the login request.
  *
- * Koillection has no refresh token. On a 401 the plugin logs in again once with the stored
+ * Koillection has no refresh token. On a 401 from the JWT layer (not from a proxy,
+ * [isKoillectionUnauthorized]) the plugin logs in again once with the stored
  * credentials, saves the new JWT and repeats the request once. A second 401 goes to the caller
  * as `KoillectionError.Unauthorized`, so there is no loop. A failed login goes to the caller as
  * its own error: a 500 there is the broken-JWT-keys trap (plan §2), not a session problem.
@@ -51,6 +53,8 @@ internal fun bearerAuth(sessionStorage: SessionStorage) = createClientPlugin("Ko
         sentToken?.let { request.headers[HttpHeaders.Authorization] = bearer(it) }
         val call = proceed(request)
         if (call.response.status != HttpStatusCode.Unauthorized) return@on call
+        // A proxy's 401 is not about the JWT: a new login would only meet the same proxy.
+        if (!isKoillectionUnauthorized(call.response.bodyAsText())) return@on call
 
         val newToken = mutex.withLock {
             sessionStorage.getToken().takeIf { it != sentToken } ?: logIn(client, sessionStorage)

@@ -94,3 +94,8 @@ this app.
   device: to see the headers a request carries, point the server URL at a forwarder on the host
   that prints them (M4.2 used a small Python asyncio forwarder, `127.0.0.1:8291` → `8290`, which
   the emulator reaches as `http://10.0.2.2:8291`).
+- Proxy rejection (M4.3): run the proxy front (`docs/local-info.md`, "Proxy front") and log in to
+  `http://10.0.2.2:8295`. Its access log is the request proof, as the app logs none. Back on the
+  login form with the keyboard already closed leaves the app; the relaunch shows an empty form.
+  To make the header wrong while logged in, edit its value in Settings (tap the value field,
+  `KEYCODE_MOVE_END`, a run of `KEYCODE_DEL`), save, and pull the list down to refresh.

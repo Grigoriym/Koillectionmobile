@@ -6,6 +6,7 @@ import com.grappim.koillectionmobile.core.domain.KoillectionError
 import com.grappim.koillectionmobile.feature.auth.domain.AuthRepository
 import com.grappim.koillectionmobile.feature.auth.domain.LoginResult
 import com.grappim.koillectionmobile.strings.RString
+import com.grappim.koillectionmobile.strings.generated.resources.error_proxy_rejected
 import com.grappim.koillectionmobile.strings.generated.resources.login_error_http
 import com.grappim.koillectionmobile.strings.generated.resources.login_error_invalid_credentials
 import com.grappim.koillectionmobile.strings.generated.resources.login_error_invalid_server_url
@@ -167,6 +168,14 @@ class LoginViewModelTest {
         assertEquals(
             NativeText.Arguments(RString.login_error_http, listOf(403)),
             messageFor(LoginResult.Failed(KoillectionError.Http(status = 403, message = null)))
+        )
+    }
+
+    @Test
+    fun `Failed with ProxyRejection has the proxy message`() {
+        assertEquals(
+            NativeText.Arguments(RString.error_proxy_rejected, listOf(407)),
+            messageFor(LoginResult.Failed(KoillectionError.ProxyRejection(status = 407)))
         )
     }
 

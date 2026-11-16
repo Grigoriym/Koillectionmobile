@@ -10,6 +10,7 @@ import com.grappim.koillectionmobile.strings.RString
 import com.grappim.koillectionmobile.strings.generated.resources.collections_error_http
 import com.grappim.koillectionmobile.strings.generated.resources.collections_error_network
 import com.grappim.koillectionmobile.strings.generated.resources.collections_error_unexpected
+import com.grappim.koillectionmobile.strings.generated.resources.error_proxy_rejected
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -73,6 +74,7 @@ class CollectionListViewModel(
 
 internal fun Throwable.toMessage(): NativeText = when (this) {
     is KoillectionError.Network -> NativeText.Resource(RString.collections_error_network)
+    is KoillectionError.ProxyRejection -> NativeText.Arguments(RString.error_proxy_rejected, listOf(status))
     is KoillectionError.Server -> NativeText.Arguments(RString.collections_error_http, listOf(status))
     is KoillectionError.Http -> NativeText.Arguments(RString.collections_error_http, listOf(status))
     else -> NativeText.Resource(RString.collections_error_unexpected)

@@ -15,6 +15,7 @@
     <string name="login_error_server_jwt">The server failed to make a login token (HTTP 500). Usually its JWT keys do not match JWT_PASSPHRASE, for example after a container restart made a new passphrase. The website can still work in this state. Check JWT_PASSPHRASE and the JWT keys on the server.</string>
     <string name="login_error_http">The server answered with an error (HTTP %1$d).</string>
     <string name="login_error_unexpected">The login failed with an unexpected error.</string>
+    <string name="error_proxy_rejected">A proxy in front of the server rejected the request (HTTP %1$d), so it did not reach Koillection. The proxy may want a header: add it in Settings, custom headers.</string>
     <string name="login_error_local_network_denied">Not sent: this server is on your local network, and the app may not reach it. Turn on local network access for this app in the Android settings.</string>
 
     <string name="login_settings">Settings</string>

@@ -11,6 +11,7 @@ import com.grappim.koillectionmobile.strings.RString
 import com.grappim.koillectionmobile.strings.generated.resources.collections_error_http
 import com.grappim.koillectionmobile.strings.generated.resources.collections_error_network
 import com.grappim.koillectionmobile.strings.generated.resources.collections_error_unexpected
+import com.grappim.koillectionmobile.strings.generated.resources.error_proxy_rejected
 import kotlinx.coroutines.CompletableDeferred
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
@@ -90,6 +91,14 @@ class CollectionListViewModelTest {
         assertEquals(
             NativeText.Arguments(RString.collections_error_http, listOf(403)),
             errorFor(KoillectionError.Http(status = 403, message = null))
+        )
+    }
+
+    @Test
+    fun `a proxy rejection has the proxy message`() {
+        assertEquals(
+            NativeText.Arguments(RString.error_proxy_rejected, listOf(401)),
+            errorFor(KoillectionError.ProxyRejection(status = 401))
         )
     }
 
