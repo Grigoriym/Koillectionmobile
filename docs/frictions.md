@@ -23,8 +23,6 @@ entries get deleted — see /finalize.
   went into the URL field.
 - 2026-11-15 — A Python heredoc with Kotlin raw strings (`"""`) in a `"""`-delimited Python string failed with a
   SyntaxError again (M2.6). Second time; `'''` delimiters in the Python fixed it.
-- 2026-11-15 — A Python string-replace that put the `material.icons` imports above `material3.CircularProgressIndicator`
-  (M2.8) broke ktlint's import order in `ItemScreen.kt`, which also imports `material3.Button`. Insert by sort order, or run `ktlintFormat`.
 - 2026-11-15 — Piped a hung `./gradlew :composeApp:smokeWriteRun` through `| tail -40` (M3.1): `tail` prints
   only at the end, so 10 minutes passed with no output. Redirect to a file under `timeout` instead.
 - 2026-11-15 — `pkill -f LiveWriteSmokeKt` (M3.1) also matched the Bash tool's own shell, whose command
@@ -35,8 +33,6 @@ entries get deleted — see /finalize.
   test-logging events, so the run looked empty. Drop `-q` when the PASSED lines are the proof.
 - 2026-11-15 — A Python `str.replace` on `KoinGraphTest.kt` (M3.5) matched nothing and changed nothing, with no
   error; only `git diff --stat` (1 line, not 3) showed it. Assert the old text is in the file before replacing.
-- 2026-11-15 — Python-inserted `material.icons` and `lazy` imports in `AddItemScreen.kt` (M3.5) broke ktlint's
-  import order again. Second time (first M2.8); `ktlintFormat` fixed it.
 - 2026-11-15 — `grep -rl <name> feature strings | xargs sed -i` (M3.6) also rewrote generated files under `build/`.
   Harmless, but exclude `build/` from such a grep.
 - 2026-11-16 — `adb exec-out screencap -p > s.png` on the API 37 AVD (M4.1) wrote the abort text
@@ -60,9 +56,5 @@ entries get deleted — see /finalize.
   auto-mode classifier ("Unauthorized Access"), as a package download. The user chose to skip it.
 - 2026-11-16 — `./gradlew build` (M5.3) failed "SDK location not found" again: ran it before reading
   `docs/machine.local.md`. Second time (first M4.4); a third makes it a fix (`local.properties` or a `CLAUDE.md` line).
-- 2026-11-16 — `./gradlew ... jvmTest --rerun -q` (M6.1 mutation check) hid the failing test names
-  and assertion text, so a `grep FAILED` came back empty although the task failed. Drop `-q` and check the exit code.
-- 2026-11-16 — `jvmTest --rerun -q` (M6.3 mutation checks) printed only "BUILD FAILED in 2s", which also fits
-  a compile error; a rerun without `-q` showed the test names. Second time (first M6.1).
 - 2026-11-16 — `uiautomator dump` (M6.3) had the delete dialog's title and buttons but not its body text,
   which the screenshot showed. Read dialog body text from a screenshot.
