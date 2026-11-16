@@ -4,10 +4,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.grappim.kit.uikit.NativeText
 import com.grappim.koillectionmobile.core.domain.KoillectionError
+import com.grappim.koillectionmobile.feature.items.domain.ItemListChanges
 import com.grappim.koillectionmobile.feature.items.domain.ItemsRepository
 import com.grappim.koillectionmobile.feature.tags.domain.TagsRepository
 import com.grappim.koillectionmobile.strings.RString
 import com.grappim.koillectionmobile.strings.generated.resources.error_proxy_rejected
+import com.grappim.koillectionmobile.strings.generated.resources.item_delete_error_unexpected
 import com.grappim.koillectionmobile.strings.generated.resources.item_error_http
 import com.grappim.koillectionmobile.strings.generated.resources.item_error_network
 import com.grappim.koillectionmobile.strings.generated.resources.item_error_unexpected
@@ -17,12 +19,15 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.StringResource
 import org.koin.core.annotation.InjectedParam
 import org.koin.core.annotation.KoinViewModel
 
 /**
  * Reads the item, its fields and its tags in parallel. The tags are sorted by label, as the web UI
  * shows them: `Item::$tags` has `OrderBy(label)`, but the API list does not apply it.
+ *
+ * A delete tells the item's collection to read its list again ([ItemListChanges]).
  *
  * [itemId] arrives through `parametersOf` at the call site. [InjectedParam] tells the Koin
  * compiler plugin not to look for a `String` definition in the graph.
@@ -31,14 +36,41 @@ import org.koin.core.annotation.KoinViewModel
 class ItemViewModel(
     @InjectedParam private val itemId: String,
     private val itemsRepository: ItemsRepository,
-    private val tagsRepository: TagsRepository
+    private val tagsRepository: TagsRepository,
+    private val itemListChanges: ItemListChanges
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(ItemUiState(onRetry = ::retry))
+    private val _uiState = MutableStateFlow(
+        ItemUiState(onRetry = ::retry, onDelete = ::delete, onDeleteErrorShown = ::clearDeleteError)
+    )
     val uiState: StateFlow<ItemUiState> = _uiState.asStateFlow()
+
+    /** The collection of the loaded item, for the change signal after a delete. */
+    private var collectionId: String? = null
 
     init {
         load()
+    }
+
+    private fun delete() {
+        if (!_uiState.value.canDelete) return
+        _uiState.update { it.copy(isDeleting = true, deleteError = NativeText.Empty) }
+        viewModelScope.launch {
+            val result = itemsRepository.deleteItem(itemId)
+            result.onSuccess { collectionId?.let(itemListChanges::notifyChanged) }
+            _uiState.update { state ->
+                state.copy(
+                    isDeleting = false,
+                    isDeleted = result.isSuccess,
+                    deleteError = result.exceptionOrNull()?.toMessage(RString.item_delete_error_unexpected)
+                        ?: NativeText.Empty
+                )
+            }
+        }
+    }
+
+    private fun clearDeleteError() {
+        _uiState.update { it.copy(deleteError = NativeText.Empty) }
     }
 
     private fun retry() {
@@ -58,6 +90,7 @@ class ItemViewModel(
             val failure = itemResult.exceptionOrNull()
                 ?: dataResult.exceptionOrNull()
                 ?: tagsResult.exceptionOrNull()
+            if (failure == null) collectionId = itemResult.getOrThrow().collectionId
             _uiState.update { state ->
                 if (failure != null) {
                     state.copy(
@@ -66,7 +99,7 @@ class ItemViewModel(
                         fields = emptyList(),
                         tags = emptyList(),
                         isLoading = false,
-                        error = failure.toMessage()
+                        error = failure.toMessage(RString.item_error_unexpected)
                     )
                 } else {
                     state.copy(
@@ -83,10 +116,10 @@ class ItemViewModel(
     }
 }
 
-private fun Throwable.toMessage(): NativeText = when (this) {
+private fun Throwable.toMessage(unexpected: StringResource): NativeText = when (this) {
     is KoillectionError.Network -> NativeText.Resource(RString.item_error_network)
     is KoillectionError.ProxyRejection -> NativeText.Arguments(RString.error_proxy_rejected, listOf(status))
     is KoillectionError.Server -> NativeText.Arguments(RString.item_error_http, listOf(status))
     is KoillectionError.Http -> NativeText.Arguments(RString.item_error_http, listOf(status))
-    else -> NativeText.Resource(RString.item_error_unexpected)
+    else -> NativeText.Resource(unexpected)
 }

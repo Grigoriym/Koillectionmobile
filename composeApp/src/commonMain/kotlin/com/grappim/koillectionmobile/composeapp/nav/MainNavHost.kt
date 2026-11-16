@@ -54,7 +54,12 @@ internal fun MainNavHost(modifier: Modifier = Modifier) {
                 )
             }
             entry<ItemRoute> { route ->
-                ItemScreen(itemId = route.itemId, onBack = { backStack.removeLastOrNull() })
+                ItemScreen(
+                    itemId = route.itemId,
+                    onBack = { backStack.removeLastOrNull() },
+                    // The item is gone; its collection reads its list again (ItemListChanges).
+                    onClose = { backStack.remove(route) }
+                )
             }
             entry<SettingsRoute> {
                 SettingsScreen(onBack = { backStack.removeLastOrNull() })

@@ -6,15 +6,21 @@ import com.grappim.koillectionmobile.core.domain.KoillectionError
 import com.grappim.koillectionmobile.feature.items.domain.Datum
 import com.grappim.koillectionmobile.feature.items.domain.Image
 import com.grappim.koillectionmobile.feature.items.domain.Item
+import com.grappim.koillectionmobile.feature.items.domain.ItemListChanges
 import com.grappim.koillectionmobile.feature.items.domain.ItemsRepository
 import com.grappim.koillectionmobile.feature.tags.domain.Tag
 import com.grappim.koillectionmobile.feature.tags.domain.TagCategory
 import com.grappim.koillectionmobile.feature.tags.domain.TagsRepository
 import com.grappim.koillectionmobile.strings.RString
+import com.grappim.koillectionmobile.strings.generated.resources.item_delete_error_unexpected
 import com.grappim.koillectionmobile.strings.generated.resources.item_error_http
 import com.grappim.koillectionmobile.strings.generated.resources.item_error_network
 import com.grappim.koillectionmobile.strings.generated.resources.item_error_unexpected
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -27,6 +33,7 @@ class ItemViewModelTest {
 
     private val items = FakeItemsRepository()
     private val tags = FakeTagsRepository()
+    private val itemListChanges = ItemListChanges()
     private val mainDispatcherRule = MainDispatcherRule()
 
     @BeforeTest
@@ -39,7 +46,7 @@ class ItemViewModelTest {
         mainDispatcherRule.tearDown()
     }
 
-    private fun createSut() = ItemViewModel(DUNE.id, items, tags)
+    private fun createSut() = ItemViewModel(DUNE.id, items, tags, itemListChanges)
 
     private fun queueAll() {
         items.queue()
@@ -240,12 +247,134 @@ class ItemViewModelTest {
         assertEquals(1, tags.calls.size)
     }
 
+    /** A loaded item; the delete waits until the test completes [FakeItemsRepository.delete]. */
+    private fun loadedSut(): ItemViewModel {
+        queueAll()
+        val sut = createSut()
+        answerAll()
+        return sut
+    }
+
+    /** The collection ids sent on [itemListChanges] while [block] runs. */
+    private fun changesDuring(block: () -> Unit): List<String> {
+        val changed = mutableListOf<String>()
+        val scope = CoroutineScope(Dispatchers.Main)
+        scope.launch { itemListChanges.changedCollections.collect { changed += it } }
+        block()
+        scope.cancel()
+        return changed
+    }
+
+    @Test
+    fun `a loaded item can be deleted`() {
+        val sut = loadedSut()
+
+        assertTrue(sut.uiState.value.canDelete)
+    }
+
+    @Test
+    fun `the delete is not offered while the item loads or after a failed load`() {
+        queueAll()
+        val sut = createSut()
+        assertFalse(sut.uiState.value.canDelete)
+
+        sut.uiState.value.onDelete()
+        answerAll(item = Result.failure(KoillectionError.Http(status = 404, message = null)))
+        assertFalse(sut.uiState.value.canDelete)
+        sut.uiState.value.onDelete()
+
+        assertTrue(items.deleteCalls.isEmpty())
+    }
+
+    @Test
+    fun `a delete sends the item id and the screen waits for the answer`() {
+        val sut = loadedSut()
+
+        sut.uiState.value.onDelete()
+
+        assertEquals(listOf(DUNE.id), items.deleteCalls)
+        assertTrue(sut.uiState.value.isDeleting)
+        assertFalse(sut.uiState.value.canDelete)
+        assertFalse(sut.uiState.value.isDeleted)
+    }
+
+    @Test
+    fun `a second delete while one runs sends no second request`() {
+        val sut = loadedSut()
+
+        sut.uiState.value.onDelete()
+        sut.uiState.value.onDelete()
+
+        assertEquals(1, items.deleteCalls.size)
+    }
+
+    @Test
+    fun `a successful delete marks the item deleted and tells its collection`() {
+        val sut = loadedSut()
+
+        val changed = changesDuring {
+            sut.uiState.value.onDelete()
+            items.delete.complete(Result.success(Unit))
+        }
+
+        assertTrue(sut.uiState.value.isDeleted)
+        assertFalse(sut.uiState.value.isDeleting)
+        assertTrue(sut.uiState.value.deleteError.isEmpty())
+        assertEquals(listOf("books"), changed)
+    }
+
+    @Test
+    fun `a failed delete shows the error keeps the item and tells no collection`() {
+        val sut = loadedSut()
+
+        val changed = changesDuring {
+            sut.uiState.value.onDelete()
+            items.delete.complete(Result.failure(KoillectionError.Server(status = 500, message = null)))
+        }
+
+        val state = sut.uiState.value
+        assertEquals(NativeText.Arguments(RString.item_error_http, listOf(500)), state.deleteError)
+        assertFalse(state.isDeleted)
+        assertFalse(state.isDeleting)
+        assertEquals("Dune", state.name)
+        assertTrue(changed.isEmpty())
+    }
+
+    @Test
+    fun `an unexpected delete failure names the delete`() {
+        val sut = loadedSut()
+
+        sut.uiState.value.onDelete()
+        items.delete.complete(Result.failure(IllegalStateException("bad json")))
+
+        assertEquals(NativeText.Resource(RString.item_delete_error_unexpected), sut.uiState.value.deleteError)
+    }
+
+    @Test
+    fun `after a failed delete the error can be closed and the delete tried again`() {
+        val sut = loadedSut()
+        sut.uiState.value.onDelete()
+        items.delete.complete(Result.failure(KoillectionError.Network(IllegalStateException("offline"))))
+
+        sut.uiState.value.onDeleteErrorShown()
+        assertTrue(sut.uiState.value.deleteError.isEmpty())
+        assertTrue(sut.uiState.value.canDelete)
+
+        items.delete = CompletableDeferred(Result.success(Unit))
+        sut.uiState.value.onDelete()
+
+        assertEquals(2, items.deleteCalls.size)
+        assertTrue(sut.uiState.value.isDeleted)
+    }
+
     /** Each call takes the next queued response. Queue one with [queue] before the call. */
     private class FakeItemsRepository : ItemsRepository {
         val item = ArrayDeque<CompletableDeferred<Result<Item>>>()
         val data = ArrayDeque<CompletableDeferred<Result<List<Datum>>>>()
         val itemCalls = mutableListOf<String>()
         val dataCalls = mutableListOf<String>()
+        var delete = CompletableDeferred<Result<Unit>>()
+        val deleteCalls = mutableListOf<String>()
 
         fun queue() {
             item.addLast(CompletableDeferred())
@@ -296,7 +425,10 @@ class ItemViewModelTest {
 
         override suspend fun deleteDatum(id: String): Result<Unit> = error("not used")
 
-        override suspend fun deleteItem(id: String): Result<Unit> = error("not used")
+        override suspend fun deleteItem(id: String): Result<Unit> {
+            deleteCalls += id
+            return delete.await()
+        }
     }
 
     private class FakeTagsRepository : TagsRepository {

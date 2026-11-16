@@ -1,6 +1,6 @@
 # koillectionmobile checklist
 
-**Current step:** M5.3. M5.2 done 2026-11-16. M5.1 done 2026-11-16. M5 broken into steps 2026-11-16. M4 done 2026-11-16. M4.4 done 2026-11-16. M4.3 done 2026-11-16. M4.2 done 2026-11-16. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6, 7 and 8 are settled.
+**Current step:** M5.4. M5.3 done 2026-11-16. M5.2 done 2026-11-16. M5.1 done 2026-11-16. M5 broken into steps 2026-11-16. M4 done 2026-11-16. M4.4 done 2026-11-16. M4.3 done 2026-11-16. M4.2 done 2026-11-16. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6, 7 and 8 are settled.
 
 ## How to use this
 
@@ -58,11 +58,13 @@ never removed; no field reordering. Every write goes to the local test instance 
   **Verify:** the run prints each step and passes; plan §2 has the results.
   Note: the duplicate-label `PATCH` got an empty HTTP 500, not the expected 422 (server bug,
   plan §2); the run now expects the 500. A `POST` with a duplicate label still gets 422.
-- [ ] **M5.3** — Delete item: a delete action on the item screen with a confirm dialog. On
+- [x] **M5.3** — Delete item: a delete action on the item screen with a confirm dialog. On
   success the item screen leaves the back stack and the collection reads its list again
   (`ItemListChanges`). A failure shows the error and keeps the item screen.
   **Verify:** ViewModel tests; on the emulator a test item is deleted, the collection list no
   longer shows it, and the web UI agrees.
+  Note: the error shows in a dialog ("The item was not deleted"); the screen keeps the item.
+  The device check used a temporary collection (deleted after) and airplane mode for the failure.
 - [ ] **M5.4** — Edit use case (`feature:items:domain`): from the item as loaded (name, fields,
   main image, tags) and the edited form, work out the calls and run them. Deletes first (a freed
   label can be reused), then changes, then new fields (positions after the current last), then a

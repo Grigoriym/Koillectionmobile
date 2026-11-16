@@ -9,10 +9,13 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -22,10 +25,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -42,6 +48,13 @@ import com.grappim.kit.uikit.asString
 import com.grappim.koillectionmobile.feature.items.domain.Image
 import com.grappim.koillectionmobile.strings.RString
 import com.grappim.koillectionmobile.strings.generated.resources.item_back
+import com.grappim.koillectionmobile.strings.generated.resources.item_delete
+import com.grappim.koillectionmobile.strings.generated.resources.item_delete_cancel
+import com.grappim.koillectionmobile.strings.generated.resources.item_delete_confirm
+import com.grappim.koillectionmobile.strings.generated.resources.item_delete_failed_ok
+import com.grappim.koillectionmobile.strings.generated.resources.item_delete_failed_title
+import com.grappim.koillectionmobile.strings.generated.resources.item_delete_text
+import com.grappim.koillectionmobile.strings.generated.resources.item_delete_title
 import com.grappim.koillectionmobile.strings.generated.resources.item_field_not_shown
 import com.grappim.koillectionmobile.strings.generated.resources.item_image_full
 import com.grappim.koillectionmobile.strings.generated.resources.item_retry
@@ -50,14 +63,20 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
+/** [onClose] runs once the server deleted the item, to take the screen off the back stack. */
 @Composable
 fun ItemScreen(
     itemId: String,
     onBack: () -> Unit,
+    onClose: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ItemViewModel = koinViewModel { parametersOf(itemId) }
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val currentOnClose by rememberUpdatedState(onClose)
+    LaunchedEffect(uiState.isDeleted) {
+        if (uiState.isDeleted) currentOnClose()
+    }
     ItemContent(uiState = uiState, onBack = onBack, modifier = modifier)
 }
 
@@ -66,6 +85,7 @@ fun ItemScreen(
 private fun ItemContent(uiState: ItemUiState, onBack: () -> Unit, modifier: Modifier = Modifier) {
     // The full image on screen, or null. Kept across rotation.
     var fullImageUrl by rememberSaveable { mutableStateOf<String?>(null) }
+    var isDeleteConfirmShown by rememberSaveable { mutableStateOf(false) }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -78,6 +98,18 @@ private fun ItemContent(uiState: ItemUiState, onBack: () -> Unit, modifier: Modi
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(RString.item_back)
                         )
+                    }
+                },
+                actions = {
+                    if (uiState.isDeleting) {
+                        CircularProgressIndicator(modifier = Modifier.padding(PADDING / 2).size(PROGRESS_SIZE))
+                    } else if (uiState.canDelete) {
+                        IconButton(onClick = { isDeleteConfirmShown = true }) {
+                            Icon(
+                                imageVector = Icons.Filled.Delete,
+                                contentDescription = stringResource(RString.item_delete)
+                            )
+                        }
                     }
                 }
             )
@@ -113,6 +145,39 @@ private fun ItemContent(uiState: ItemUiState, onBack: () -> Unit, modifier: Modi
     }
 
     fullImageUrl?.let { url -> FullImage(url = url, onDismiss = { fullImageUrl = null }) }
+    if (isDeleteConfirmShown) {
+        DeleteDialog(
+            name = uiState.name,
+            onDelete = {
+                isDeleteConfirmShown = false
+                uiState.onDelete()
+            },
+            onDismiss = { isDeleteConfirmShown = false }
+        )
+    }
+    if (uiState.deleteError.isNotEmpty()) {
+        AlertDialog(
+            onDismissRequest = uiState.onDeleteErrorShown,
+            title = { Text(stringResource(RString.item_delete_failed_title)) },
+            text = { Text(uiState.deleteError.asString()) },
+            confirmButton = {
+                TextButton(onClick = uiState.onDeleteErrorShown) {
+                    Text(stringResource(RString.item_delete_failed_ok))
+                }
+            }
+        )
+    }
+}
+
+@Composable
+private fun DeleteDialog(name: String, onDelete: () -> Unit, onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(RString.item_delete_title)) },
+        text = { Text(stringResource(RString.item_delete_text, name)) },
+        confirmButton = { TextButton(onClick = onDelete) { Text(stringResource(RString.item_delete_confirm)) } },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(RString.item_delete_cancel)) } }
+    )
 }
 
 @Composable
@@ -200,3 +265,4 @@ private fun FullImage(url: String, onDismiss: () -> Unit) {
 
 private val PADDING = 16.dp
 private val TAG_SPACING = 8.dp
+private val PROGRESS_SIZE = 24.dp
