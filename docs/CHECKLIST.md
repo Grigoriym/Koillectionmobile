@@ -1,6 +1,6 @@
 # koillectionmobile checklist
 
-**Current step:** M6.2. M6.1 done 2026-11-16. M6 broken into steps 2026-11-16. M5 done 2026-11-16. M5.7 done 2026-11-16. M5.6 done 2026-11-16. M5.5 done 2026-11-16. M5.4 done 2026-11-16. M5.3 done 2026-11-16. M5.2 done 2026-11-16. M5.1 done 2026-11-16. M5 broken into steps 2026-11-16. M4 done 2026-11-16. M4.4 done 2026-11-16. M4.3 done 2026-11-16. M4.2 done 2026-11-16. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6, 7 and 8 are settled.
+**Current step:** M6.3. M6.2 done 2026-11-16. M6.1 done 2026-11-16. M6 broken into steps 2026-11-16. M5 done 2026-11-16. M5.7 done 2026-11-16. M5.6 done 2026-11-16. M5.5 done 2026-11-16. M5.4 done 2026-11-16. M5.3 done 2026-11-16. M5.2 done 2026-11-16. M5.1 done 2026-11-16. M5 broken into steps 2026-11-16. M4 done 2026-11-16. M4.4 done 2026-11-16. M4.3 done 2026-11-16. M4.2 done 2026-11-16. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6, 7 and 8 are settled.
 
 ## How to use this
 
@@ -48,12 +48,15 @@ Create a collection (top level or child), rename it, set, replace or remove its 
   contract). A `PATCH` sends `application/merge-patch+json` and only the changed keys.
   **Verify:** mock-engine tests for each call (method, path, content type, body keys), with a
   root-path base URL case; mutation-check one body key and one method.
-- [ ] **M6.2** — Live collection smoke against the local test instance: extend `smokeWriteRun`
+- [x] **M6.2** — Live collection smoke against the local test instance: extend `smokeWriteRun`
   (or add a task) to create a top-level collection and a child, rename the child, upload an
   image, replace it (the old file gives 404), remove it (the file gives 404 and `image` is null),
   add an item to the child, then delete the parent. After the delete, the child and the item give
   404. Also send a create with an empty title (expect 422). Record the answers in plan §2.
   **Verify:** the run prints each step and passes; plan §2 has the results.
+  Note: a separate task, `./gradlew :composeApp:smokeCollectionRun` (`LiveCollectionSmoke.kt`),
+  so the item run stays as it was. The empty-title 422 was also confirmed with `curl`, since
+  `KoillectionError.Validation` covers 400 and 422.
 - [ ] **M6.3** — Delete collection: a delete action on the collection screen. The confirm dialog
   names the collection and counts the child collections (every level) and the items they hold;
   decide in the step how to count the items (for example `totalItems` of each

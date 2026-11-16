@@ -130,7 +130,16 @@ start of any step that touches the API. Facts that shape the design:
   to `POST /api/collections/{id}/image`; `PATCH` with `{"deleteImage": true}` removes it
   (`UploadListener`). The `Assert\Image` MIME check on `Collection::$file` sits in group
   `colletion:image` (a typo in 1.8.5), so the server may not run it: an unchecked type can pass.
-  Read from the 1.8.5 source in M6.1; M6.2 sends them live.
+  Read from the 1.8.5 source in M6.1; sent live in M6.2, see the next bullet.
+- Collection writes checked live 2026-11-16 (M6.2, `./gradlew :composeApp:smokeCollectionRun`,
+  JVM, local test instance at the root path), through the M6.1 repository calls: a top-level
+  collection and a child (`parent` IRI) were created; the server picked a `color` for each. The
+  parent's `/children` listed the child. A rename was read back and kept the parent. A `jpeg`
+  image upload got a file; a second upload got a new file name, and the old file gave 404.
+  `PATCH` with `deleteImage` answered `image: null`, and the file gave 404. A `DELETE` of the
+  parent took the child and an item in the child with it: all three gave 404. A create with an
+  empty title got 422 (`title: This value should not be blank.`). Not checked: a server behind a
+  subpath, and whether a non-image file passes the upload (the `colletion:image` group typo).
 - Writes checked live 2026-11-15 (M3.1, `./gradlew :composeApp:smokeWriteRun`, JVM, local test
   instance at the root path): through the app's repositories, an item in `Books`, two text fields
   (positions 1 and 2), an image field (position 3), a main image upload and a field image upload

@@ -58,7 +58,14 @@ each old file for 404. Last it deletes the item and checks the 404. If it fails 
 `M3.1 smoke <millis>` item in `Books` if the cleanup line reports an error. Its constants are in
 `LiveWriteSmoke.kt`, next to `LiveSmoke.kt`: the same rule applies.
 
-Both runs keep their session in `composeApp/build/smoke-home`. A run more than an hour after the
+`./gradlew :composeApp:smokeCollectionRun` writes (M6.2): it creates a top-level collection and a
+child, renames the child, uploads, replaces and removes the child's image, adds an item to the child
+and deletes the parent. Last it sends a create with an empty title (422). If it fails halfway, it
+still tries to delete the parent; look for a leftover `M6.2 smoke parent <millis>` collection if
+the cleanup line reports an error. Its constants are in `LiveCollectionSmoke.kt`: the same rule
+applies.
+
+All three runs keep their session in `composeApp/build/smoke-home`. A run more than an hour after the
 last one starts with an expired JWT. That is the path that hung in M3.1, so do not delete the
 directory to make a hang go away: find out why first.
 

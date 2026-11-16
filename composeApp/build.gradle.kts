@@ -72,3 +72,18 @@ tasks.register<JavaExec>("smokeWriteRun") {
     systemProperty("user.home", smokeHome.get().asFile.absolutePath)
     javaLauncher.set(javaToolchains.launcherFor { languageVersion.set(JavaLanguageVersion.of(21)) })
 }
+
+// M6.2: live collection smoke run against the local test instance. It creates a collection and a
+// child, edits the child and deletes the parent. Same setup as `smokeRun`; never point it at the
+// real server.
+tasks.register<JavaExec>("smokeCollectionRun") {
+    group = "verification"
+    description = "Creates, edits and deletes collections on the local test instance."
+    val jvmTestCompilation = kotlin.jvm().compilations.getByName("test")
+    dependsOn(jvmTestCompilation.compileAllTaskName)
+    classpath = files(jvmTestCompilation.output.allOutputs, jvmTestCompilation.runtimeDependencyFiles)
+    mainClass.set("com.grappim.koillectionmobile.composeapp.smoke.LiveCollectionSmokeKt")
+    val smokeHome = layout.buildDirectory.dir("smoke-home")
+    systemProperty("user.home", smokeHome.get().asFile.absolutePath)
+    javaLauncher.set(javaToolchains.launcherFor { languageVersion.set(JavaLanguageVersion.of(21)) })
+}
