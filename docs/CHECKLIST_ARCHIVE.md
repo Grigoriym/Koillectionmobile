@@ -527,3 +527,84 @@ warning (plan §1.1, "Warn on non-HTTPS base URLs"). Not in scope: self-signed c
   `java-jdk` rules (no `detekt-rules` here). **Deviation in the Verify:** `renovate-config-validator`
   did not run; the user chose to let the bot check the config on its first run. Only a JSON parse
   ran. **The user must install the Renovate GitHub app** for it to run at all.
+
+## M5 — edit and delete items
+
+Change an existing item's name, text fields, main image, image fields and tags; delete an item
+(with a confirm). Uses `PATCH`/`DELETE` on `Item` and `Datum` (Koillection source). Form choices
+are plan §5 decision 8 (user, 2026-11-16): the add form, prefilled; the main image is replaced,
+never removed; no field reordering. Every write goes to the local test instance only
+(`docs/local-info.md`).
+
+- [x] **M5.1** — Repository writes (`feature:items`): rename an item (`PATCH /api/items/{id}`,
+  `{"name"}`), change a field (`PATCH /api/data/{id}`, `label` and/or `value`), delete a field
+  (`DELETE /api/data/{id}`), delete an item (`DELETE /api/items/{id}`). Re-read `Item.php` and
+  `Datum.php` first. A `PATCH` sends `application/merge-patch+json` and only the changed keys.
+  **Verify:** mock-engine tests for each call (method, path, content type, body keys), with a
+  root-path base URL case (`CLAUDE.md`, Verification); mutation-check one body key and one method.
+  Note: `updateDatum(id, label, value)` leaves a null argument out of the body. Mutations caught:
+  a `value` key always sent (the label-only test), `deleteItem` sent as `POST` (the method test).
+- [x] **M5.2** — Live edit smoke against the local test instance: extend `smokeWriteRun` (or add a
+  task) to create an item with a text field, an image field and a main image, then rename it,
+  change the field's label and value, replace the main image and the field image, delete the
+  image field, and delete the item. After each replace, the old file gives 404; after the field
+  delete, its file gives 404. Also try a `PATCH` that gives a field the label of another field
+  of the item (expect 422). Record the answers in plan §2.
+  **Verify:** the run prints each step and passes; plan §2 has the results.
+  Note: the duplicate-label `PATCH` got an empty HTTP 500, not the expected 422 (server bug,
+  plan §2); the run now expects the 500. A `POST` with a duplicate label still gets 422.
+- [x] **M5.3** — Delete item: a delete action on the item screen with a confirm dialog. On
+  success the item screen leaves the back stack and the collection reads its list again
+  (`ItemListChanges`). A failure shows the error and keeps the item screen.
+  **Verify:** ViewModel tests; on the emulator a test item is deleted, the collection list no
+  longer shows it, and the web UI agrees.
+  Note: the error shows in a dialog ("The item was not deleted"); the screen keeps the item.
+  The device check used a temporary collection (deleted after) and airplane mode for the failure.
+- [x] **M5.4** — Edit use case (`feature:items:domain`): from the item as loaded (name, fields,
+  main image, tags) and the edited form, work out the calls and run them. Deletes first (a freed
+  label can be reused), then changes, then new fields (positions after the current last), then a
+  new main image, then the tags (only if the set changed). Fields the form cannot edit (types
+  other than `text` and `image`) are never touched. A retry reloads the item and works out the
+  calls again, so a call that already went through is not sent twice. A label swap between two
+  fields needs a temporary label (server rule, plan §2): handle it, or reject it in the form
+  with a message; decide in the step. A duplicate label in a `PATCH` gets an empty 500, not a
+  422 (M5.2, plan §2), so a conflict must be caught before the calls are sent.
+  **Verify:** use case tests with hand-written fakes: each kind of change alone, a mix, no change
+  (no calls), a failure in the middle and the retry, a label swap, an untouched non-text field.
+  Note: a label swap is handled: the use case moves one field to a temporary label
+  (`<label> (moving 1)`), visible on the server only if the save stops there. A duplicate final
+  label returns `EditItemResult.DuplicateLabel` before any call. The retry is `retry(original, edit)`;
+  it reads the item again and matches a new field already created by its label. `EditItemUseCase`
+  is bound in `ItemsDataModule`.
+- [x] **M5.5** — Edit screen: an "edit" action on the item screen opens the M3 add form,
+  prefilled from the server (name, text fields, the main image and image fields shown from their
+  URLs, the item's tags). An existing photo can be replaced (camera or picker) or, for an image
+  field, removed; its label can change. The main image has replace only. New text rows and new
+  photos are added as in M3. Fields of other types show read only. The form survives rotation and
+  process death (edits kept, not reloaded over).
+  **Verify:** ViewModel tests; on the emulator the form opens with the item's values, and
+  `am kill` keeps an edit.
+  Note: a separate `EditItemViewModel`/`EditItemRoute` with the add form's parts (`ItemFormParts.kt`);
+  the item screen's pencil opens it. The form has no Save yet (M5.6). "Replace" (camera or picker)
+  is per image; the picker can return several photos, and only the first is used. The draft and
+  the loaded values are in saved state as `EditItemDraft`; M5.6 can build the `ItemSnapshot`
+  diff base from `original`, or read the item again.
+- [x] **M5.6** — Save the edit: run M5.4 from the form with the M3 progress view and retry. On
+  success return to the item screen, which reads the item again, and refresh the collection (a
+  new name shows in the list). An upload 500 names the disk quota, as in M3.6. Delete the photo
+  files in `cacheDir/photos/` as M3.6 does.
+  **Verify:** ViewModel tests; on the emulator one edit renames the item, changes a text field,
+  adds one, removes an image field, replaces the main image and changes the tags; the web UI on
+  the local test instance shows the same.
+  Note: the item screen reads the item again through a new `ItemChanges` signal (bound in
+  `ItemsDataModule`). `EditItemResult.Failure` got `isUpload` for the quota message. The loaded
+  `ItemSnapshot` is kept in saved state; the first save is `editItem`, every later one `retry`. A
+  failure after a call went through offers only the retry; before that, "Back to the form" too.
+  `SaveView` moved to `ItemFormParts.kt`. The device check used a temporary collection (deleted after).
+- [x] **M5.7** — Device pass of edit and delete, then the user confirms with screenshots. Fix what
+  breaks, or put it in `docs/revisit.md` with evidence.
+  **Verify:** the user confirms.
+  Note: nothing broke. One save renamed the item, changed a text value, added a field, removed an
+  image field, replaced the main image (picker) and changed the tags; the API agreed and both old
+  files gave 404. The edits survived `am kill` before Save. Temporary collection, deleted after.
+  The user confirmed from the screenshots.
