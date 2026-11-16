@@ -10,6 +10,8 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(projects.core.api)
+            // The local network banner's text.
+            implementation(projects.strings)
             implementation(libs.grappim.kit.uikit)
             implementation(projects.feature.auth.ui)
             implementation(projects.feature.collections.ui)

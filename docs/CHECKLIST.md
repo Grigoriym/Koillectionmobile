@@ -1,6 +1,6 @@
 # koillectionmobile checklist
 
-**Current step:** M4.1. The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6 and 7 are settled.
+**Current step:** M4.2. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6 and 7 are settled.
 
 ## How to use this
 
@@ -39,7 +39,7 @@ plan §4.5b (custom headers, proxy rejection), §4.5c (local network permission)
 warning (plan §1.1, "Warn on non-HTTPS base URLs"). Not in scope: self-signed certificate trust
 (TOFU). Plan §5 decision 3 still holds.
 
-- [ ] **M4.1** — Local network permission. Port wallosmobile 28.10: `ACCESS_LOCAL_NETWORK` in the
+- [x] **M4.1** — Local network permission. Port wallosmobile 28.10: `ACCESS_LOCAL_NETWORK` in the
   manifest, `rememberLocalNetworkPermissionRequest` (`expect`/`actual`, from wallosmobile `uikit`
   `permission/`), asked at Log in only for a private, link-local or `fc00::/7` address on API 37+,
   a "denied" login message, and `LocalNetworkBanner` above `MainNavHost`. There is no local
@@ -51,6 +51,13 @@ warning (plan §1.1, "Warn on non-HTTPS base URLs"). Not in scope: self-signed c
   the host's LAN address (not `10.0.2.2`): denied gives the message and sends no request, allowed
   logs in, and a revoke while logged in shows the banner, which leaves after a grant. The API 36
   AVD logs in with no prompt.
+  Note (2026-11-16): unit tests (`LocalNetworkAddressTest`, `jvmTest`, on the JVM's parsed bytes;
+  the address check is common code over `ByteArray`), `build` and `ktlintCheck` passed. **The
+  device checks did not run.** The `koil37` AVD crashes in `surfaceflinger` on emulator 37.2.13
+  (`docs/machine.local.md`); the user chose to skip the API 37 pass. The API 36 "no prompt" check
+  was then blocked by a tooling outage, and the user chose to skip it too and check later. Both are
+  open in `docs/revisit.md`. The banner wraps `MainNavHost` and takes the top inset (this app has no
+  shell `Scaffold`, unlike wallosmobile).
 - [ ] **M4.2** — Settings screen with custom headers. A new `feature:settings:ui` module; port
   wallosmobile's `customheaders/` screen and ViewModel (`feature/settings/ui`). The storage,
   validator and Ktor plugin come from `grappim-kit-customheaders` and are already wired

@@ -3,6 +3,8 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <!-- Android 17: a server on a LAN address needs it (feature:auth:ui permission/). -->
+    <uses-permission android:name="android.permission.ACCESS_LOCAL_NETWORK" />
 
     <!-- Cleartext for any host: a self-hosted Koillection server is often plain HTTP on a LAN. -->
     <application

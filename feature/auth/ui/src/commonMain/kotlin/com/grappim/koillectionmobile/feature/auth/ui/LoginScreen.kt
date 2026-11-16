@@ -32,6 +32,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.grappim.kit.uikit.asString
+import com.grappim.koillectionmobile.feature.auth.ui.permission.rememberLocalNetworkPermissionRequest
 import com.grappim.koillectionmobile.strings.RString
 import com.grappim.koillectionmobile.strings.generated.resources.login_button
 import com.grappim.koillectionmobile.strings.generated.resources.login_password_label
@@ -45,7 +46,23 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun LoginScreen(modifier: Modifier = Modifier, viewModel: LoginViewModel = koinViewModel()) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    LoginContent(uiState = uiState, modifier = modifier)
+    val localNetworkPermission = rememberLocalNetworkPermissionRequest()
+
+    // Here and not in the Button, so the keyboard's Done goes through it as well.
+    LoginContent(
+        uiState = uiState.copy(
+            onLogInClick = {
+                if (uiState.canLogIn) {
+                    localNetworkPermission.request(
+                        serverUrl = uiState.serverUrl,
+                        onAllowed = uiState.onLogInClick,
+                        onDenied = uiState.onLocalNetworkDenied
+                    )
+                }
+            }
+        ),
+        modifier = modifier
+    )
 }
 
 @Composable

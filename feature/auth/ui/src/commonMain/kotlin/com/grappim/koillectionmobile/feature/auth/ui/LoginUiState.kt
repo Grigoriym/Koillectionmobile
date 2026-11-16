@@ -11,7 +11,8 @@ data class LoginUiState(
     val onServerUrlChange: (String) -> Unit = {},
     val onUsernameChange: (String) -> Unit = {},
     val onPasswordChange: (String) -> Unit = {},
-    val onLogInClick: () -> Unit = {}
+    val onLogInClick: () -> Unit = {},
+    val onLocalNetworkDenied: () -> Unit = {}
 ) {
     val canLogIn: Boolean
         get() = !isLoading && serverUrl.isNotBlank() && username.isNotBlank() && password.isNotBlank()

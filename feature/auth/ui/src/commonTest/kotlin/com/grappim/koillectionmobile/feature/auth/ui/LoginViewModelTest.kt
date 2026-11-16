@@ -9,6 +9,7 @@ import com.grappim.koillectionmobile.strings.RString
 import com.grappim.koillectionmobile.strings.generated.resources.login_error_http
 import com.grappim.koillectionmobile.strings.generated.resources.login_error_invalid_credentials
 import com.grappim.koillectionmobile.strings.generated.resources.login_error_invalid_server_url
+import com.grappim.koillectionmobile.strings.generated.resources.login_error_local_network_denied
 import com.grappim.koillectionmobile.strings.generated.resources.login_error_not_koillection
 import com.grappim.koillectionmobile.strings.generated.resources.login_error_server_jwt
 import com.grappim.koillectionmobile.strings.generated.resources.login_error_unexpected
@@ -187,6 +188,20 @@ class LoginViewModelTest {
         sut.uiState.value.onPasswordChange("another")
 
         assertTrue(sut.uiState.value.error.isEmpty())
+    }
+
+    @Test
+    fun `a denied local network says so and sends nothing`() {
+        val sut = filledViewModel()
+
+        sut.uiState.value.onLocalNetworkDenied()
+
+        assertEquals(NativeText.Resource(RString.login_error_local_network_denied), sut.uiState.value.error)
+        assertFalse(sut.uiState.value.isLoading)
+        assertNull(repository.call)
+        // The form keeps its values, so a retry after a grant needs no retyping.
+        assertEquals(USERNAME, sut.uiState.value.username)
+        assertEquals(PASSWORD, sut.uiState.value.password)
     }
 
     private class FakeAuthRepository : AuthRepository {

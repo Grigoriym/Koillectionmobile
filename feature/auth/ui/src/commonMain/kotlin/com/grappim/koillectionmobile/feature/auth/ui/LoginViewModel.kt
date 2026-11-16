@@ -10,6 +10,7 @@ import com.grappim.koillectionmobile.strings.RString
 import com.grappim.koillectionmobile.strings.generated.resources.login_error_http
 import com.grappim.koillectionmobile.strings.generated.resources.login_error_invalid_credentials
 import com.grappim.koillectionmobile.strings.generated.resources.login_error_invalid_server_url
+import com.grappim.koillectionmobile.strings.generated.resources.login_error_local_network_denied
 import com.grappim.koillectionmobile.strings.generated.resources.login_error_not_koillection
 import com.grappim.koillectionmobile.strings.generated.resources.login_error_server_jwt
 import com.grappim.koillectionmobile.strings.generated.resources.login_error_unexpected
@@ -38,7 +39,8 @@ class LoginViewModel(private val authRepository: AuthRepository) : ViewModel() {
             onServerUrlChange = ::onServerUrlChange,
             onUsernameChange = ::onUsernameChange,
             onPasswordChange = ::onPasswordChange,
-            onLogInClick = ::onLogInClick
+            onLogInClick = ::onLogInClick,
+            onLocalNetworkDenied = ::onLocalNetworkDenied
         )
     )
     val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
@@ -53,6 +55,13 @@ class LoginViewModel(private val authRepository: AuthRepository) : ViewModel() {
 
     private fun onPasswordChange(password: String) {
         _uiState.update { it.copy(password = password, error = NativeText.Empty) }
+    }
+
+    /** The login never ran: the request could only time out and blame the URL. */
+    private fun onLocalNetworkDenied() {
+        _uiState.update {
+            it.copy(isLoading = false, error = NativeText.Resource(RString.login_error_local_network_denied))
+        }
     }
 
     private fun onLogInClick() {

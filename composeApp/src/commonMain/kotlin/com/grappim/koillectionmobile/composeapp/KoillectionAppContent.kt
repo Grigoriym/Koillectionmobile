@@ -50,7 +50,7 @@ fun KoillectionAppContent(modifier: Modifier = Modifier, sessionStorage: Session
             // a frame, so it is blank and not a progress indicator.
             null -> Box(modifier = modifier.fillMaxSize())
 
-            true -> MainNavHost(modifier = modifier)
+            true -> LocalNetworkBanner(modifier = modifier) { MainNavHost() }
 
             false -> LoginScreen(modifier = modifier)
         }
