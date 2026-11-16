@@ -47,3 +47,12 @@ entries get deleted — see /finalize.
   import order again. Second time (first M2.8); `ktlintFormat` fixed it.
 - 2026-11-15 — `grep -rl <name> feature strings | xargs sed -i` (M3.6) also rewrote generated files under `build/`.
   Harmless, but exclude `build/` from such a grep.
+- 2026-11-16 — `adb exec-out screencap -p > s.png` on the API 37 AVD (M4.1) wrote the abort text
+  ("Assertion failed: ...hasReadColorBufferDma") into the `.png` with exit 0; only `file` showed it.
+- 2026-11-16 — On the crashing API 37 AVD, `nc` and `ping` from `adb shell` said "Network is
+  unreachable" even for `1.1.1.1`, and an `adb install` printed "Success" but the app was gone after
+  the next boot. Both were the crash loop, not a network block or an install bug.
+- 2026-11-16 — `sdkmanager` installing the API 37 system image also updated the shared emulator
+  binary (to 37.2.13) without asking. The already-running `koil36` kept the old binary in memory.
+- 2026-11-16 — The auto-mode classifier gave "no verdict (error)" on several Bash calls in a row
+  (M4.1), plain greps too; Read and Edit kept working.

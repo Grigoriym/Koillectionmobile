@@ -83,3 +83,8 @@ this app.
   of moving on. Tap each Label and Value field by its fresh bounds. Back (arrow or system) on a
   form with any input opens "Discard this item?": tap "Discard" to leave, "Keep editing" to stay.
   An empty form leaves at once.
+- Local network permission (M4.1): `10.0.2.2` is the emulator's own gateway, so a check of
+  `ACCESS_LOCAL_NETWORK` needs another private host address. The test instance listens on
+  `127.0.0.1` only: forward a host-only private address to it for the check, not the Wi-Fi LAN
+  address (the address and the forwarder on a given machine are in `docs/machine.local.md`). The
+  permission matters only on API 37+, and no API 37 AVD has worked here yet (`docs/revisit.md`).

@@ -57,3 +57,12 @@ cold session can act on it. Delete an entry when it's fixed.
   `AddItemUseCaseImpl.addItem` in `feature/items/domain/.../AddItemUseCase.kt`. The server has
   no idempotency key. Fix option: before a retry with no item id, look for a new item of the same
   name in the collection, or ask the user.
+- 2026-11-16 (M4.1) — The local network permission is not checked on an API 37 device. The
+  `koil37` AVD crashes (`docs/machine.local.md`), and the user chose to skip that pass. Open:
+  denied at Log in gives `login_error_local_network_denied` and sends no request; allowed logs in;
+  a revoke while logged in shows `LocalNetworkBanner` (`composeApp/.../LocalNetworkBanner.kt`),
+  which leaves after a grant; the banner takes the status bar inset and the screen below does not
+  add a second gap. Run it on a working API 37 AVD or an Android 17 phone.
+- 2026-11-16 (M4.1) — Known limits carried over from wallosmobile (its `docs/revisit.md` §6):
+  screens do not reload after a grant (the collection list needs Try again); the denied message at
+  Log in has no "Open settings" action. `feature/auth/ui/.../permission/`.
