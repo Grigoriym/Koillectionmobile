@@ -51,9 +51,10 @@ item's fields through the app's own repositories (M1.11). It only reads. Start t
 Its URL and credentials are constants in `composeApp/src/jvmTest/.../smoke/LiveSmoke.kt`: never
 point them at the real server.
 
-`./gradlew :composeApp:smokeWriteRun` writes (M3.1): it creates one item in `Books` with two text
-fields, an image field, a main image and two existing tags, prints it read back, then deletes it
-and checks the 404. If it fails halfway, it still tries the delete; look for a leftover
+`./gradlew :composeApp:smokeWriteRun` writes (M3.1, M5.2): it creates one item in `Books` with two
+text fields, an image field, a main image and two existing tags, and prints it read back. Then it
+edits the item (rename, field changes, both images replaced, the image field deleted) and checks
+each old file for 404. Last it deletes the item and checks the 404. If it fails halfway, it still tries the delete; look for a leftover
 `M3.1 smoke <millis>` item in `Books` if the cleanup line reports an error. Its constants are in
 `LiveWriteSmoke.kt`, next to `LiveSmoke.kt`: the same rule applies.
 

@@ -59,11 +59,11 @@ tasks.register<JavaExec>("smokeRun") {
     javaLauncher.set(javaToolchains.launcherFor { languageVersion.set(JavaLanguageVersion.of(21)) })
 }
 
-// M3.1: live write smoke run against the local test instance. It creates an item in `Books` and
-// deletes it again. Same setup as `smokeRun`; never point it at the real server.
+// M3.1, M5.2: live write smoke run against the local test instance. It creates an item in `Books`,
+// edits it and deletes it again. Same setup as `smokeRun`; never point it at the real server.
 tasks.register<JavaExec>("smokeWriteRun") {
     group = "verification"
-    description = "Creates, reads back and deletes one item on the local test instance."
+    description = "Creates, edits and deletes one item on the local test instance."
     val jvmTestCompilation = kotlin.jvm().compilations.getByName("test")
     dependsOn(jvmTestCompilation.compileAllTaskName)
     classpath = files(jvmTestCompilation.output.allOutputs, jvmTestCompilation.runtimeDependencyFiles)

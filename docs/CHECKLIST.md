@@ -1,6 +1,6 @@
 # koillectionmobile checklist
 
-**Current step:** M5.2. M5.1 done 2026-11-16. M5 broken into steps 2026-11-16. M4 done 2026-11-16. M4.4 done 2026-11-16. M4.3 done 2026-11-16. M4.2 done 2026-11-16. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6, 7 and 8 are settled.
+**Current step:** M5.3. M5.2 done 2026-11-16. M5.1 done 2026-11-16. M5 broken into steps 2026-11-16. M4 done 2026-11-16. M4.4 done 2026-11-16. M4.3 done 2026-11-16. M4.2 done 2026-11-16. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6, 7 and 8 are settled.
 
 ## How to use this
 
@@ -49,13 +49,15 @@ never removed; no field reordering. Every write goes to the local test instance 
   root-path base URL case (`CLAUDE.md`, Verification); mutation-check one body key and one method.
   Note: `updateDatum(id, label, value)` leaves a null argument out of the body. Mutations caught:
   a `value` key always sent (the label-only test), `deleteItem` sent as `POST` (the method test).
-- [ ] **M5.2** — Live edit smoke against the local test instance: extend `smokeWriteRun` (or add a
+- [x] **M5.2** — Live edit smoke against the local test instance: extend `smokeWriteRun` (or add a
   task) to create an item with a text field, an image field and a main image, then rename it,
   change the field's label and value, replace the main image and the field image, delete the
   image field, and delete the item. After each replace, the old file gives 404; after the field
   delete, its file gives 404. Also try a `PATCH` that gives a field the label of another field
   of the item (expect 422). Record the answers in plan §2.
   **Verify:** the run prints each step and passes; plan §2 has the results.
+  Note: the duplicate-label `PATCH` got an empty HTTP 500, not the expected 422 (server bug,
+  plan §2); the run now expects the 500. A `POST` with a duplicate label still gets 422.
 - [ ] **M5.3** — Delete item: a delete action on the item screen with a confirm dialog. On
   success the item screen leaves the back stack and the collection reads its list again
   (`ItemListChanges`). A failure shows the error and keeps the item screen.
@@ -68,7 +70,8 @@ never removed; no field reordering. Every write goes to the local test instance 
   other than `text` and `image`) are never touched. A retry reloads the item and works out the
   calls again, so a call that already went through is not sent twice. A label swap between two
   fields needs a temporary label (server rule, plan §2): handle it, or reject it in the form
-  with a message; decide in the step.
+  with a message; decide in the step. A duplicate label in a `PATCH` gets an empty 500, not a
+  422 (M5.2, plan §2), so a conflict must be caught before the calls are sent.
   **Verify:** use case tests with hand-written fakes: each kind of change alone, a mix, no change
   (no calls), a failure in the middle and the retry, a label swap, an untouched non-text field.
 - [ ] **M5.5** — Edit screen: an "edit" action on the item screen opens the M3 add form,

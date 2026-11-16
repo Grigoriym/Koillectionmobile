@@ -137,7 +137,8 @@ start of any step that touches the API. Facts that shape the design:
   `disk_space_allowed` at 1 byte, `POST /api/items` and the text fields worked and the main-image
   upload got HTTP 500 (the `HasEnoughSpaceForUpload` violation, not a 422). The add-item form names
   the quota for a 500 at an image upload only.
-- Edit and delete (read in the 1.8.5 source 2026-11-16, start of M5; not sent live yet, M5.2):
+- Edit and delete (read in the 1.8.5 source 2026-11-16, start of M5; sent live in M5.2, see the
+  next bullet):
   `Item` and `Datum` both have `Patch` and `Delete`. A new upload to `/api/items/{id}/image` or
   `/api/data/{id}/image` deletes the old file (`ImageHandler::upload` calls `removeOldFile`). A
   deleted item or field takes its files with it (`UploadListener::postRemove`); `Item::$data` has
@@ -145,6 +146,19 @@ start of any step that touches the API. Facts that shape the design:
   image. `DatumLabelNotExistsInParentValidator` skips the field itself, so a `PATCH` that keeps
   a label passes; a label used by another field of the item fails. The test instance's items
   hold only `text` and `image` fields (4007 and 1577).
+- Edits checked live 2026-11-16 (M5.2, `./gradlew :composeApp:smokeWriteRun`, JVM, local test
+  instance at the root path), through the M5.1 repository calls: a rename, a field `label` and
+  `value` change, and a `value`-only change were read back as sent. A new main image and a new
+  field image each got a new file name; the old file gave 404 and the new one 200 (no JWT). After
+  `DELETE /api/data/{id}` the field's file gave 404. `DELETE /api/items/{id}` answered 204 and the
+  item then gave 404.
+- Duplicate label (checked live 2026-11-16, M5.2): a `PATCH /api/data/{id}` that gives a field the
+  label of another field of the item gets **HTTP 500 with an empty body**, not a 422. The server
+  log shows the validator's `ValidationException` ("label is used multiple times"), then a
+  `UniqueConstraintViolationException` on `koi_datum_pkey` while it handles that exception. The
+  field keeps its old label. A `POST /api/data` with a duplicate label gets the normal 422 with
+  `violations`. So the app cannot tell a label conflict on an edit from any other server failure:
+  the edit form must catch duplicate labels before it sends.
 - Known server-side trap: Koillection's Docker entrypoint can regenerate `JWT_PASSPHRASE` on
   restart, which breaks API login with a 500 while the website keeps working. Upstream issues
   #1600, #1400, #1410. The app should show a clear message for a 500 at login, not a

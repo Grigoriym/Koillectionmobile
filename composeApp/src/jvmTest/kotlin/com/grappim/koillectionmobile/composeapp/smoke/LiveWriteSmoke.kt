@@ -8,7 +8,8 @@ import com.grappim.koillectionmobile.feature.collections.domain.CollectionsRepos
 import com.grappim.koillectionmobile.feature.items.domain.ItemsRepository
 import com.grappim.koillectionmobile.feature.tags.domain.TagsRepository
 import io.ktor.client.HttpClient
-import io.ktor.client.request.delete
+import io.ktor.client.request.get
+import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.runBlocking
 import org.koin.core.context.stopKoin
 import org.koin.plugin.module.dsl.startKoin
@@ -28,13 +29,15 @@ private const val PASSWORD = "koillection-test"
 private const val COLLECTION_TITLE = "Books"
 
 /**
- * Live write smoke run (M3.1): in collection `Books` on the local test instance it creates an item,
- * two text fields, an image field, uploads a main image and the field image, sets two existing
- * tags, reads the item back, deletes it, and reads it once more to see the 404. Run it with
+ * Live write smoke run (M3.1, M5.2): in collection `Books` on the local test instance it creates an
+ * item, two text fields, an image field, uploads a main image and the field image, sets two
+ * existing tags and reads the item back. Then it edits (M5.2): it renames the item, changes a text
+ * field's label and value, replaces the main image and the field image, tries a duplicate label
+ * (rejected, see the comment there) and deletes the image field. Last it deletes the item and reads it
+ * once more to see the 404. After each replace or delete, the old file must give 404. Run it with
  * `./gradlew :composeApp:smokeWriteRun`.
  *
- * The repositories have no delete (the app does not need one yet), so the delete goes through the
- * app's authenticated `HttpClient`. If the run fails after the create, it still tries the delete.
+ * If the run fails after the create, it still tries the delete.
  */
 fun main() {
     val koin = startKoin<KoinApp> { }.koin
@@ -73,7 +76,10 @@ fun main() {
             }
             println("  tags: ${tagsRepository.getItemTags(item.id).getOrThrow().map { it.label }}")
 
-            deleteItem(koin.get(), item.id)
+            HttpClient().use { files -> edit(items, item.id, files) }
+
+            items.deleteItem(item.id).getOrThrow()
+            println("DELETE item ${item.id}: ok")
             createdItemId = null
             val afterDelete = items.getItem(item.id).exceptionOrNull()
             println("GET after delete: $afterDelete")
@@ -85,7 +91,7 @@ fun main() {
         1
     } finally {
         createdItemId?.let { id ->
-            runCatching { runBlocking { deleteItem(koin.get(), id) } }
+            runCatching { runBlocking { koin.get<ItemsRepository>().deleteItem(id).getOrThrow() } }
                 .onFailure { System.err.println("cleanup delete of $id failed: $it") }
         }
         stopKoin()
@@ -93,9 +99,66 @@ fun main() {
     exitProcess(exitCode)
 }
 
-private suspend fun deleteItem(client: HttpClient, id: String) {
-    val response = client.delete("api/items/$id")
-    println("DELETE api/items/$id: ${response.status}")
+/** The M5.2 edits on item [itemId] as created above. [files] is a client without the JWT. */
+private suspend fun edit(items: ItemsRepository, itemId: String, files: HttpClient) {
+    println("edit:")
+    val renamed = items.renameItem(itemId, "M5.2 smoke renamed ${System.currentTimeMillis()}").getOrThrow()
+    println("  rename: ${renamed.name}")
+    check(items.getItem(itemId).getOrThrow().name == renamed.name) { "rename not read back" }
+
+    val data = items.getData(itemId).getOrThrow()
+    val author = data.single { it.label == "Author" }
+    val year = data.single { it.label == "Year" }
+    val page = data.single { it.label == "Page 1" }
+
+    val changed = items.updateDatum(author.id, label = "Writer", value = "Changed Author").getOrThrow()
+    println("  field label and value: ${changed.label} = ${changed.value}")
+    check(changed.label == "Writer" && changed.value == "Changed Author") { "field change not applied" }
+    val valueOnly = items.updateDatum(year.id, value = "2027").getOrThrow()
+    println("  field value only: ${valueOnly.label} = ${valueOnly.value}")
+    check(valueOnly.label == "Year" && valueOnly.value == "2027") { "value-only change not applied" }
+
+    val duplicate = items.updateDatum(year.id, label = "Writer").exceptionOrNull()
+    println("  duplicate label: $duplicate")
+    // Koillection 1.8.5 answers this PATCH with an empty 500, not a 422: the validator rejects it,
+    // then the error handler fails on a duplicate key (server log, M5.2). A POST gets the 422.
+    check(duplicate is KoillectionError.Server && duplicate.status == 500) { "a duplicate label was not rejected" }
+    check(items.getData(itemId).getOrThrow().single { it.id == year.id }.label == "Year") { "duplicate label stored" }
+
+    val oldMain = checkNotNull(items.getItem(itemId).getOrThrow().image).url
+    expectStatus(files, oldMain, HttpStatusCode.OK)
+    val replacedItem = items.uploadItemImage(itemId, jpeg(Color.GREEN), "main2.jpg", JPEG).getOrThrow()
+    val newMain = checkNotNull(replacedItem.image).url
+    println("  main image replaced: $newMain")
+    check(newMain != oldMain) { "main image URL did not change" }
+    expectStatus(files, newMain, HttpStatusCode.OK)
+    expectStatus(files, oldMain, HttpStatusCode.NotFound)
+
+    val oldPage = checkNotNull(page.image).url
+    expectStatus(files, oldPage, HttpStatusCode.OK)
+    val replacedPage = items.uploadDatumImage(page.id, jpeg(Color.MAGENTA), "page1b.jpg", JPEG).getOrThrow()
+    val newPage = checkNotNull(replacedPage.image).url
+    println("  field image replaced: $newPage")
+    check(newPage != oldPage) { "field image URL did not change" }
+    expectStatus(files, newPage, HttpStatusCode.OK)
+    expectStatus(files, oldPage, HttpStatusCode.NotFound)
+
+    items.deleteDatum(page.id).getOrThrow()
+    println("  image field deleted")
+    expectStatus(files, newPage, HttpStatusCode.NotFound)
+    check(items.getData(itemId).getOrThrow().none { it.id == page.id }) { "deleted field still listed" }
+
+    println("read back after edit:")
+    println("  item: ${items.getItem(itemId).getOrThrow()}")
+    items.getData(itemId).getOrThrow().forEach {
+        println("  [${it.position}] ${it.type} ${it.label}: ${it.value ?: it.image ?: "-"}")
+    }
+}
+
+private suspend fun expectStatus(files: HttpClient, url: String, expected: HttpStatusCode) {
+    val status = files.get(url).status
+    println("    GET $url: $status")
+    check(status == expected) { "expected $expected for $url, got $status" }
 }
 
 /** A small solid JPEG, enough for the server's `Assert\Image`. */
