@@ -95,3 +95,8 @@ cold session can act on it. Delete an entry when it's fixed.
   (`docs/local-info.md`, "Proxy front") the thumbnails and item images will fail. Not checked on
   device. Fix option: a singleton `ImageLoader` whose fetcher uses a client with the
   `CustomHeaders` plugin (server origin only).
+- 2026-11-16 (M5.3) — A delete that gets HTTP 404 shows "The item was not deleted" and keeps the
+  item screen. `ItemViewModel.delete` (`feature/items/ui/.../ItemViewModel.kt`) treats every
+  failure the same. A 404 means the item is already gone: a retry after a lost answer, or a delete
+  from the web UI. The user then sees a deleted item and has to go back by hand; the collection is
+  not told to reload. Fix option: treat `KoillectionError.Http(404)` on delete as success.
