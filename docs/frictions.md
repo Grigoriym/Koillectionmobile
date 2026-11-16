@@ -56,3 +56,5 @@ entries get deleted — see /finalize.
   binary (to 37.2.13) without asking. The already-running `koil36` kept the old binary in memory.
 - 2026-11-16 — The auto-mode classifier gave "no verdict (error)" on several Bash calls in a row
   (M4.1), plain greps too; Read and Edit kept working.
+- 2026-11-16 — `pkill -f "fwd.py ..."` killed the Bash tool's own shell again (exit 144), as in M3.1.
+  Second time; kill by PID from `pgrep` (a pattern like `fwd\.py` does not match its own command line).
