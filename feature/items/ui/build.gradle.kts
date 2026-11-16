@@ -14,16 +14,14 @@ kotlin {
             implementation(projects.feature.tags.domain)
             // `KoillectionError`, to pick the error message.
             implementation(projects.core.domain)
-            // `Rotation` in the form state; `ImagePreparer` for the photo preview on Android.
+            // `Rotation` in the form state.
             implementation(projects.core.image)
+            // The camera, the picker, the photo preview and `PhotoFiles`.
+            implementation(projects.core.photos)
             implementation(projects.strings)
             implementation(libs.grappim.kit.uikit)
             // `AsyncImage`. The network fetcher is wired in `:composeApp`.
             implementation(libs.coil.compose)
-        }
-        androidMain.dependencies {
-            // The camera and photo picker launchers.
-            implementation(libs.androidx.activity.compose)
         }
         commonTest.dependencies {
             implementation(kotlin("test"))

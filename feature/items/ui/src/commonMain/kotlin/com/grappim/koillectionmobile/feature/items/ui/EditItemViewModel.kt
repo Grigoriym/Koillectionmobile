@@ -6,6 +6,9 @@ import androidx.lifecycle.viewModelScope
 import com.grappim.kit.logger.logcat
 import com.grappim.kit.uikit.NativeText
 import com.grappim.koillectionmobile.core.image.Rotation
+import com.grappim.koillectionmobile.core.photos.JPEG_MIME_TYPE
+import com.grappim.koillectionmobile.core.photos.PhotoFiles
+import com.grappim.koillectionmobile.core.photos.next
 import com.grappim.koillectionmobile.feature.items.domain.Datum
 import com.grappim.koillectionmobile.feature.items.domain.EditItemProgress
 import com.grappim.koillectionmobile.feature.items.domain.EditItemResult

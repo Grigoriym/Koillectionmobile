@@ -1,6 +1,7 @@
 package com.grappim.koillectionmobile.feature.items.ui
 
 import com.grappim.koillectionmobile.core.image.Rotation
+import com.grappim.koillectionmobile.core.photos.PhotoFiles
 import com.grappim.koillectionmobile.feature.items.domain.AddItemProgress
 import com.grappim.koillectionmobile.feature.items.domain.AddItemResult
 import com.grappim.koillectionmobile.feature.items.domain.AddItemState

@@ -1,6 +1,6 @@
 # koillectionmobile checklist
 
-**Current step:** M6.4. M6.3 done 2026-11-16. M6.2 done 2026-11-16. M6.1 done 2026-11-16. M6 broken into steps 2026-11-16. M5 done 2026-11-16. M5.7 done 2026-11-16. M5.6 done 2026-11-16. M5.5 done 2026-11-16. M5.4 done 2026-11-16. M5.3 done 2026-11-16. M5.2 done 2026-11-16. M5.1 done 2026-11-16. M5 broken into steps 2026-11-16. M4 done 2026-11-16. M4.4 done 2026-11-16. M4.3 done 2026-11-16. M4.2 done 2026-11-16. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6, 7 and 8 are settled.
+**Current step:** M6.5. M6.4 done 2026-11-16. M6.3 done 2026-11-16. M6.2 done 2026-11-16. M6.1 done 2026-11-16. M6 broken into steps 2026-11-16. M5 done 2026-11-16. M5.7 done 2026-11-16. M5.6 done 2026-11-16. M5.5 done 2026-11-16. M5.4 done 2026-11-16. M5.3 done 2026-11-16. M5.2 done 2026-11-16. M5.1 done 2026-11-16. M5 broken into steps 2026-11-16. M4 done 2026-11-16. M4.4 done 2026-11-16. M4.3 done 2026-11-16. M4.2 done 2026-11-16. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6, 7 and 8 are settled.
 
 ## How to use this
 
@@ -68,13 +68,17 @@ Create a collection (top level or child), rename it, set, replace or remove its 
   `CollectionsRepository.countItems` per collection (`totalItems` of the first item page); the API
   has no counters (plan §2). A new `CollectionListChanges` signal makes the list or the parent read
   again. On the device a child (1 collection, 2 items) and then its parent (0, 0) were deleted.
-- [ ] **M6.4** — Create collection: a "new collection" action on the collection list (top level)
+- [x] **M6.4** — Create collection: a "new collection" action on the collection list (top level)
   and on the collection screen (child). A form with the title and an optional image (camera or
   picker, M3's photo preparation), saved with the M3 progress view and retry. On success the new
   collection opens, and the list or the parent shows it. The form survives rotation and process
   death. Delete the photo files in `cacheDir/photos/` as M3.6 does.
   **Verify:** ViewModel tests; on the emulator a top-level and a child collection are created,
   one with an image, and the web UI shows them.
+  Note: the photo code moved to a new `core:photos` (plan §5 decision 4). The form has its own
+  save view and messages in `feature:collections:ui`, a small copy of M3's. The list has a FAB;
+  the collection screen has a "More actions" menu with "New collection". "Pick photo" opens the
+  multi-select picker and keeps the first photo, as the edit form's "Replace" does.
 - [ ] **M6.5** — Edit collection: an "edit" action on the collection screen opens the M6.4 form,
   prefilled (title, image from its URL). The image can be replaced or removed. The save sends only
   what changed. On success the collection screen and the list read the collection again.

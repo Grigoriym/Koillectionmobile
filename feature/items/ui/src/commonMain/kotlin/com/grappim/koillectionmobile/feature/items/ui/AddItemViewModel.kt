@@ -6,7 +6,9 @@ import androidx.lifecycle.viewModelScope
 import com.grappim.kit.logger.logcat
 import com.grappim.kit.uikit.NativeText
 import com.grappim.koillectionmobile.core.domain.KoillectionError
-import com.grappim.koillectionmobile.core.image.Rotation
+import com.grappim.koillectionmobile.core.photos.JPEG_MIME_TYPE
+import com.grappim.koillectionmobile.core.photos.PhotoFiles
+import com.grappim.koillectionmobile.core.photos.next
 import com.grappim.koillectionmobile.feature.items.domain.AddItemResult
 import com.grappim.koillectionmobile.feature.items.domain.AddItemState
 import com.grappim.koillectionmobile.feature.items.domain.AddItemUseCase
@@ -365,9 +367,6 @@ private const val HTTP_UNAUTHORIZED = 401
 private const val HTTP_NOT_FOUND = 404
 
 private val json = Json { ignoreUnknownKeys = true }
-
-/** The next clockwise quarter turn: 0, 90, 180, 270, then 0 again. */
-internal fun Rotation.next(): Rotation = Rotation.entries[(ordinal + 1) % Rotation.entries.size]
 
 /** The server's tags and categories, read in parallel and grouped by [groupTags]. */
 internal suspend fun TagsRepository.loadTagGroups(): Result<List<TagGroup>> = coroutineScope {

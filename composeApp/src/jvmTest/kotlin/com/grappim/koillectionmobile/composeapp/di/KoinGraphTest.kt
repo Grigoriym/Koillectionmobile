@@ -2,12 +2,12 @@ package com.grappim.koillectionmobile.composeapp.di
 
 import androidx.lifecycle.SavedStateHandle
 import com.grappim.kit.customheaders.CustomHeaderValidator
+import com.grappim.koillectionmobile.core.photos.PhotoFiles
 import com.grappim.koillectionmobile.feature.auth.domain.AuthRepository
 import com.grappim.koillectionmobile.feature.collections.domain.CollectionsRepository
 import com.grappim.koillectionmobile.feature.items.domain.AddItemUseCase
 import com.grappim.koillectionmobile.feature.items.domain.ItemListChanges
 import com.grappim.koillectionmobile.feature.items.domain.ItemsRepository
-import com.grappim.koillectionmobile.feature.items.ui.PhotoFiles
 import com.grappim.koillectionmobile.feature.tags.domain.TagsRepository
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.HttpClientEngine

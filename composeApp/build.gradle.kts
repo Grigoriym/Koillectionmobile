@@ -10,6 +10,8 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(projects.core.api)
+            // `PlatformPhotoModule` in `AppModule`.
+            implementation(projects.core.photos)
             // The local network banner's text.
             implementation(projects.strings)
             implementation(libs.grappim.kit.uikit)

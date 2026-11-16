@@ -226,6 +226,9 @@ code without checking the licence terms are kept.
    M3.2 (2026-11-15) added `core:image`: photo preparation for upload. It is not in
    `feature:items:data` because M3.5's preview in `feature:items:ui` needs it too, and a `ui`
    module does not depend on a `data` module.
+   M6.4 (2026-11-16) added `core:photos` (user's choice): the camera and picker launchers, the
+   photo preview, `PhotoFiles` and the `FileProvider`, moved out of `feature:items:ui`, so the
+   collection form uses them too. `core:image` stays free of Compose.
    M3.3 (2026-11-15): `feature:items:domain` depends on `feature:tags:domain`, because
    `AddItemUseCase` sets the new item's tags.
 5. **MVP scope** — *decided 2026-11-15 (start of M2)*: login, collection list, item list, item

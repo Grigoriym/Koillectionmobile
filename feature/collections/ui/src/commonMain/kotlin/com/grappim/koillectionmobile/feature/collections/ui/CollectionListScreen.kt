@@ -10,9 +10,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -30,6 +34,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.grappim.kit.uikit.NativeText
 import com.grappim.kit.uikit.asString
 import com.grappim.koillectionmobile.strings.RString
+import com.grappim.koillectionmobile.strings.generated.resources.collection_new
 import com.grappim.koillectionmobile.strings.generated.resources.collections_empty
 import com.grappim.koillectionmobile.strings.generated.resources.collections_log_out
 import com.grappim.koillectionmobile.strings.generated.resources.collections_retry
@@ -42,6 +47,7 @@ import org.koin.compose.viewmodel.koinViewModel
 fun CollectionListScreen(
     onCollectionClick: (String) -> Unit,
     onSettingsClick: () -> Unit,
+    onNewCollectionClick: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: CollectionListViewModel = koinViewModel()
 ) {
@@ -50,6 +56,7 @@ fun CollectionListScreen(
         uiState = uiState,
         onCollectionClick = onCollectionClick,
         onSettingsClick = onSettingsClick,
+        onNewCollectionClick = onNewCollectionClick,
         modifier = modifier
     )
 }
@@ -60,6 +67,7 @@ private fun CollectionListContent(
     uiState: CollectionListUiState,
     onCollectionClick: (String) -> Unit,
     onSettingsClick: () -> Unit,
+    onNewCollectionClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Scaffold(
@@ -76,6 +84,11 @@ private fun CollectionListContent(
                     }
                 }
             )
+        },
+        floatingActionButton = {
+            FloatingActionButton(onClick = onNewCollectionClick) {
+                Icon(imageVector = Icons.Filled.Add, contentDescription = stringResource(RString.collection_new))
+            }
         }
     ) { padding ->
         PullToRefreshBox(

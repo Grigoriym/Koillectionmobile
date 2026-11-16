@@ -11,6 +11,8 @@ import com.grappim.koillectionmobile.feature.collections.ui.CollectionListRoute
 import com.grappim.koillectionmobile.feature.collections.ui.CollectionListScreen
 import com.grappim.koillectionmobile.feature.collections.ui.CollectionRoute
 import com.grappim.koillectionmobile.feature.collections.ui.CollectionScreen
+import com.grappim.koillectionmobile.feature.collections.ui.NewCollectionRoute
+import com.grappim.koillectionmobile.feature.collections.ui.NewCollectionScreen
 import com.grappim.koillectionmobile.feature.items.ui.AddItemRoute
 import com.grappim.koillectionmobile.feature.items.ui.AddItemScreen
 import com.grappim.koillectionmobile.feature.items.ui.EditItemRoute
@@ -43,7 +45,8 @@ internal fun MainNavHost(modifier: Modifier = Modifier) {
             entry<CollectionListRoute> {
                 CollectionListScreen(
                     onCollectionClick = { id -> backStack.add(CollectionRoute(id)) },
-                    onSettingsClick = { backStack.add(SettingsRoute) }
+                    onSettingsClick = { backStack.add(SettingsRoute) },
+                    onNewCollectionClick = { backStack.add(NewCollectionRoute()) }
                 )
             }
             entry<CollectionRoute> { route ->
@@ -52,6 +55,7 @@ internal fun MainNavHost(modifier: Modifier = Modifier) {
                     onCollectionClick = { id -> backStack.add(CollectionRoute(id)) },
                     onItemClick = { id -> backStack.add(ItemRoute(id)) },
                     onAddItemClick = { backStack.add(AddItemRoute(route.collectionId)) },
+                    onNewCollectionClick = { backStack.add(NewCollectionRoute(route.collectionId)) },
                     onBack = { backStack.removeLastOrNull() },
                     // The collection is gone; the list or the parent reads it again (CollectionListChanges).
                     onClose = { backStack.remove(route) }
@@ -68,6 +72,17 @@ internal fun MainNavHost(modifier: Modifier = Modifier) {
             }
             entry<EditItemRoute> { route ->
                 EditItemScreen(itemId = route.itemId, onBack = { backStack.removeLastOrNull() })
+            }
+            entry<NewCollectionRoute> { route ->
+                NewCollectionScreen(
+                    parentId = route.parentId,
+                    onBack = { backStack.removeLastOrNull() },
+                    // The new collection replaces the form, so back goes to the list or the parent.
+                    onOpenCollection = { id ->
+                        backStack.remove(route)
+                        backStack.add(CollectionRoute(id))
+                    }
+                )
             }
             entry<SettingsRoute> {
                 SettingsScreen(onBack = { backStack.removeLastOrNull() })

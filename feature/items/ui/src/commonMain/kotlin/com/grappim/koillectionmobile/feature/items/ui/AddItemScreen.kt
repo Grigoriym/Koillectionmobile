@@ -40,6 +40,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigationevent.NavigationEventInfo
 import androidx.navigationevent.compose.NavigationBackHandler
 import androidx.navigationevent.compose.rememberNavigationEventState
+import com.grappim.koillectionmobile.core.photos.PhotoPreview
+import com.grappim.koillectionmobile.core.photos.rememberPhotoSources
 import com.grappim.koillectionmobile.strings.RString
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_add_field
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_back
