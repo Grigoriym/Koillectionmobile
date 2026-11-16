@@ -33,6 +33,7 @@ import com.grappim.koillectionmobile.strings.RString
 import com.grappim.koillectionmobile.strings.generated.resources.collections_empty
 import com.grappim.koillectionmobile.strings.generated.resources.collections_log_out
 import com.grappim.koillectionmobile.strings.generated.resources.collections_retry
+import com.grappim.koillectionmobile.strings.generated.resources.collections_settings
 import com.grappim.koillectionmobile.strings.generated.resources.collections_title
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -40,11 +41,17 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun CollectionListScreen(
     onCollectionClick: (String) -> Unit,
+    onSettingsClick: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: CollectionListViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    CollectionListContent(uiState = uiState, onCollectionClick = onCollectionClick, modifier = modifier)
+    CollectionListContent(
+        uiState = uiState,
+        onCollectionClick = onCollectionClick,
+        onSettingsClick = onSettingsClick,
+        modifier = modifier
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -52,6 +59,7 @@ fun CollectionListScreen(
 private fun CollectionListContent(
     uiState: CollectionListUiState,
     onCollectionClick: (String) -> Unit,
+    onSettingsClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Scaffold(
@@ -60,6 +68,9 @@ private fun CollectionListContent(
             TopAppBar(
                 title = { Text(stringResource(RString.collections_title)) },
                 actions = {
+                    TextButton(onClick = onSettingsClick) {
+                        Text(stringResource(RString.collections_settings))
+                    }
                     TextButton(onClick = uiState.onLogOutClick) {
                         Text(stringResource(RString.collections_log_out))
                     }

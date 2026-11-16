@@ -16,6 +16,7 @@ kotlin {
             implementation(projects.feature.auth.ui)
             implementation(projects.feature.collections.ui)
             implementation(projects.feature.items.ui)
+            implementation(projects.feature.settings.ui)
             implementation(projects.feature.auth.data)
             implementation(projects.feature.collections.data)
             implementation(projects.feature.collections.mapper)

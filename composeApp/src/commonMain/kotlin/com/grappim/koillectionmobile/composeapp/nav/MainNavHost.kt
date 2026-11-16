@@ -15,6 +15,8 @@ import com.grappim.koillectionmobile.feature.items.ui.AddItemRoute
 import com.grappim.koillectionmobile.feature.items.ui.AddItemScreen
 import com.grappim.koillectionmobile.feature.items.ui.ItemRoute
 import com.grappim.koillectionmobile.feature.items.ui.ItemScreen
+import com.grappim.koillectionmobile.feature.settings.ui.SettingsRoute
+import com.grappim.koillectionmobile.feature.settings.ui.SettingsScreen
 
 /**
  * The logged-in side: one back stack that starts at the collection list.
@@ -37,7 +39,10 @@ internal fun MainNavHost(modifier: Modifier = Modifier) {
         ),
         entryProvider = entryProvider {
             entry<CollectionListRoute> {
-                CollectionListScreen(onCollectionClick = { id -> backStack.add(CollectionRoute(id)) })
+                CollectionListScreen(
+                    onCollectionClick = { id -> backStack.add(CollectionRoute(id)) },
+                    onSettingsClick = { backStack.add(SettingsRoute) }
+                )
             }
             entry<CollectionRoute> { route ->
                 CollectionScreen(
@@ -50,6 +55,9 @@ internal fun MainNavHost(modifier: Modifier = Modifier) {
             }
             entry<ItemRoute> { route ->
                 ItemScreen(itemId = route.itemId, onBack = { backStack.removeLastOrNull() })
+            }
+            entry<SettingsRoute> {
+                SettingsScreen(onBack = { backStack.removeLastOrNull() })
             }
             entry<AddItemRoute> { route ->
                 AddItemScreen(

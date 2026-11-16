@@ -1,6 +1,7 @@
 package com.grappim.koillectionmobile.composeapp.di
 
 import androidx.lifecycle.SavedStateHandle
+import com.grappim.kit.customheaders.CustomHeaderValidator
 import com.grappim.koillectionmobile.feature.auth.domain.AuthRepository
 import com.grappim.koillectionmobile.feature.collections.domain.CollectionsRepository
 import com.grappim.koillectionmobile.feature.items.domain.AddItemUseCase
@@ -39,7 +40,7 @@ class KoinGraphTest {
      * `BaseUrlProvider`, `SessionStorage` and `CustomHeadersStorage`, all from provider functions.
      * `AuthRepository`, `CollectionsRepository`, `ItemsRepository` and `TagsRepository` are resolved
      * too, and the M3.6 add-item bindings (`AddItemUseCase`, `ItemListChanges`, `PhotoFiles`), which
-     * come from provider functions: `verify()` checks only what the graph defines, so a repository without its `@Single`
+     * come from provider functions, and the M4.2 `CustomHeaderValidator`: `verify()` checks only what the graph defines, so a repository without its `@Single`
      * would not fail it (mutation-checked in M1.5). A missing `includes` line still passes here, as in M1.3.
      * Resolving them creates no file: DataStore writes only on the first save.
      */
@@ -54,6 +55,7 @@ class KoinGraphTest {
             koin.get<AddItemUseCase>()
             koin.get<ItemListChanges>()
             koin.get<PhotoFiles>()
+            koin.get<CustomHeaderValidator>()
             koin.get<HttpClient>().close()
         } finally {
             stopKoin()

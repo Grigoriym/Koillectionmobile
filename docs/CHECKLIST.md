@@ -1,6 +1,6 @@
 # koillectionmobile checklist
 
-**Current step:** M4.2. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6 and 7 are settled.
+**Current step:** M4.3. M4.2 done 2026-11-16. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6 and 7 are settled.
 
 ## How to use this
 
@@ -58,7 +58,7 @@ warning (plan §1.1, "Warn on non-HTTPS base URLs"). Not in scope: self-signed c
   was then blocked by a tooling outage, and the user chose to skip it too and check later. Both are
   open in `docs/revisit.md`. The banner wraps `MainNavHost` and takes the top inset (this app has no
   shell `Scaffold`, unlike wallosmobile).
-- [ ] **M4.2** — Settings screen with custom headers. A new `feature:settings:ui` module; port
+- [x] **M4.2** — Settings screen with custom headers. A new `feature:settings:ui` module; port
   wallosmobile's `customheaders/` screen and ViewModel (`feature/settings/ui`). The storage,
   validator and Ktor plugin come from `grappim-kit-customheaders` and are already wired
   (`core/api/.../KoillectionHttpClient.kt`). The app opens Settings as a route from the
@@ -66,6 +66,17 @@ warning (plan §1.1, "Warn on non-HTTPS base URLs"). Not in scope: self-signed c
   stack), as wallosmobile's `LoginBranch`. Keep Log out where it is unless the user asks.
   **Verify:** ViewModel tests; on the emulator, a header saved from login and from the app
   reaches the test instance (Ktor log shows the name, the value redacted), and survives `am kill`.
+  Note (2026-11-16): ViewModel tests (`CustomHeadersViewModelTest`), `build` and `ktlintCheck`
+  passed. Settings is one screen (`SettingsRoute`) whose only section is the custom headers; a
+  "Settings" text button opens it from the collection list top bar and from login (`LoginBranch`).
+  `Authorization` is a reserved name (`NetworkModule.provideCustomHeaderValidator`): the
+  `CustomHeaders` plugin runs after `bearerAuth` and would replace the token. **Deviation in the
+  Verify:** the debug app installs no `KitLogger`, so there is no Ktor log on the device. The
+  redaction is a unit test (`KoillectionHttpClientTest`, "the log names a custom header but hides
+  its value"). On `koil36`, a header-printing TCP forwarder (`127.0.0.1:8291` → `8290`) showed the
+  header saved at login on `POST /api/authentication_token` and `GET /api/collections`, the value
+  changed in the app on the next refresh, and the value after `force-stop` and after `am kill` on
+  Settings (the route came back, and Back went to the list).
 - [ ] **M4.3** — Proxy rejection message. Port the idea of wallosmobile's `ProxyRejection.kt`, not
   its rule. Koillection itself answers 401 to a missing or expired JWT (`bearerAuth` re-logs in
   on it), so "every 401 is a proxy" does not hold here. Settle the rule from evidence: the body
@@ -76,6 +87,11 @@ warning (plan §1.1, "Warn on non-HTTPS base URLs"). Not in scope: self-signed c
   **Verify:** `MockEngine` tests for each case, with a root-path base URL as well; on the emulator
   through the front, no header gives the proxy message at login and in the app, and the M4.2
   header gets through.
+  Note from M4.2 (2026-11-16): the app may not send a custom `Authorization` (reserved: it holds
+  the bearer token). A plain `auth_basic` front reads `Authorization`, so the M4.2 header cannot
+  pass it. For the "header gets through" case, make the front check another header (for example
+  nginx `if ($http_x_proxy_token != ...)`), and decide with the user whether `auth_basic` users
+  need `Proxy-Authorization` or another answer.
 - [ ] **M4.4** — Cleartext warning at login. When the server URL starts with `http://`, show that
   the password and the token travel unencrypted. Advisory only: it never disables Log in,
   because the test instance is plain HTTP. Only a literal `http://` prefix counts.

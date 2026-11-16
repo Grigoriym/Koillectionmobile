@@ -66,3 +66,4 @@ include(
     ":feature:tags:mapper",
     ":feature:tags:ui"
 )
+include(":feature:settings:ui")

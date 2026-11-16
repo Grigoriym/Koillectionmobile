@@ -16,7 +16,6 @@ import androidx.compose.ui.Modifier
 import com.grappim.kit.uikit.KitTheme
 import com.grappim.koillectionmobile.composeapp.nav.MainNavHost
 import com.grappim.koillectionmobile.core.storage.SessionStorage
-import com.grappim.koillectionmobile.feature.auth.ui.LoginScreen
 import org.koin.compose.koinInject
 
 /**
@@ -52,7 +51,7 @@ fun KoillectionAppContent(modifier: Modifier = Modifier, sessionStorage: Session
 
             true -> LocalNetworkBanner(modifier = modifier) { MainNavHost() }
 
-            false -> LoginScreen(modifier = modifier)
+            false -> LoginBranch(modifier = modifier)
         }
     }
 }

@@ -17,6 +17,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -38,13 +39,18 @@ import com.grappim.koillectionmobile.strings.generated.resources.login_button
 import com.grappim.koillectionmobile.strings.generated.resources.login_password_label
 import com.grappim.koillectionmobile.strings.generated.resources.login_server_url_label
 import com.grappim.koillectionmobile.strings.generated.resources.login_server_url_placeholder
+import com.grappim.koillectionmobile.strings.generated.resources.login_settings
 import com.grappim.koillectionmobile.strings.generated.resources.login_title
 import com.grappim.koillectionmobile.strings.generated.resources.login_username_label
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun LoginScreen(modifier: Modifier = Modifier, viewModel: LoginViewModel = koinViewModel()) {
+fun LoginScreen(
+    onSettingsClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: LoginViewModel = koinViewModel()
+) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val localNetworkPermission = rememberLocalNetworkPermissionRequest()
 
@@ -61,12 +67,13 @@ fun LoginScreen(modifier: Modifier = Modifier, viewModel: LoginViewModel = koinV
                 }
             }
         ),
+        onSettingsClick = onSettingsClick,
         modifier = modifier
     )
 }
 
 @Composable
-private fun LoginContent(uiState: LoginUiState, modifier: Modifier = Modifier) {
+private fun LoginContent(uiState: LoginUiState, onSettingsClick: () -> Unit, modifier: Modifier = Modifier) {
     val focusManager = LocalFocusManager.current
     val isEnabled = !uiState.isLoading
 
@@ -139,6 +146,10 @@ private fun LoginContent(uiState: LoginUiState, modifier: Modifier = Modifier) {
                 ) {
                     Text(stringResource(RString.login_button))
                 }
+            }
+
+            TextButton(onClick = onSettingsClick, enabled = isEnabled) {
+                Text(stringResource(RString.login_settings))
             }
         }
     }

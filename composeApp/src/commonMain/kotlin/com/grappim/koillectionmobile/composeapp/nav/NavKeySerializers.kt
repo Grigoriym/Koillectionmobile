@@ -6,6 +6,7 @@ import com.grappim.koillectionmobile.feature.collections.ui.CollectionListRoute
 import com.grappim.koillectionmobile.feature.collections.ui.CollectionRoute
 import com.grappim.koillectionmobile.feature.items.ui.AddItemRoute
 import com.grappim.koillectionmobile.feature.items.ui.ItemRoute
+import com.grappim.koillectionmobile.feature.settings.ui.SettingsRoute
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 import kotlinx.serialization.modules.subclass
@@ -21,6 +22,7 @@ private val navKeySerializersModule = SerializersModule {
         subclass(CollectionRoute::class)
         subclass(ItemRoute::class)
         subclass(AddItemRoute::class)
+        subclass(SettingsRoute::class)
     }
 }
 

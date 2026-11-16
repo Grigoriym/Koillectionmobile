@@ -1,10 +1,12 @@
 package com.grappim.koillectionmobile.core.api
 
+import com.grappim.kit.customheaders.CustomHeaderValidator
 import com.grappim.kit.customheaders.CustomHeadersStorage
 import com.grappim.kit.logger.KitLogger
 import com.grappim.koillectionmobile.core.storage.SessionStorage
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.logging.LogLevel
+import io.ktor.http.HttpHeaders
 import kotlinx.serialization.json.Json
 import org.koin.core.annotation.ComponentScan
 import org.koin.core.annotation.Configuration
@@ -27,6 +29,14 @@ class NetworkModule {
     fun provideBaseUrlProvider(sessionStorage: SessionStorage): BaseUrlProvider = object : BaseUrlProvider {
         override fun getBaseUrl(): String = sessionStorage.serverUrl
     }
+
+    /**
+     * The client sets `Authorization: Bearer` itself ([bearerAuth]). The `CustomHeaders` plugin
+     * runs after it and would replace the token, so a custom header may not use that name.
+     */
+    @Single
+    fun provideCustomHeaderValidator(): CustomHeaderValidator =
+        CustomHeaderValidator(CustomHeaderValidator.DEFAULT_RESERVED_NAMES + HttpHeaders.Authorization)
 
     @Single
     fun provideJson(): Json = Json { ignoreUnknownKeys = true }

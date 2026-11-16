@@ -246,6 +246,26 @@ class KoillectionHttpClientTest {
         assertFalse(log.contains("eyJ"), log)
     }
 
+    @Test
+    fun `the log names a custom header but hides its value`() = runTest {
+        val lines = mutableListOf<String>()
+        KitLogger.install(
+            object : KitLogger {
+                override fun log(priority: LogPriority, tag: String?, throwable: Throwable?, message: () -> String) {
+                    lines += message()
+                }
+            }
+        )
+
+        client(headers = listOf(CustomHeader("X-Proxy-Token", "pr0xy-s3cret")), logLevel = LogLevel.ALL)
+            .get("api/collections")
+
+        val log = lines.joinToString("\n")
+        assertEquals("pr0xy-s3cret", requests.single().headers["X-Proxy-Token"])
+        assertTrue(log.contains("X-Proxy-Token"), log)
+        assertFalse(log.contains("pr0xy-s3cret"), log)
+    }
+
     private fun OutgoingContent.text(): String = when (this) {
         is OutgoingContent.ByteArrayContent -> bytes().decodeToString()
         else -> error("unexpected body type ${this::class}")
