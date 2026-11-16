@@ -1,6 +1,6 @@
 # koillectionmobile checklist
 
-**Current step:** M6.3. M6.2 done 2026-11-16. M6.1 done 2026-11-16. M6 broken into steps 2026-11-16. M5 done 2026-11-16. M5.7 done 2026-11-16. M5.6 done 2026-11-16. M5.5 done 2026-11-16. M5.4 done 2026-11-16. M5.3 done 2026-11-16. M5.2 done 2026-11-16. M5.1 done 2026-11-16. M5 broken into steps 2026-11-16. M4 done 2026-11-16. M4.4 done 2026-11-16. M4.3 done 2026-11-16. M4.2 done 2026-11-16. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6, 7 and 8 are settled.
+**Current step:** M6.4. M6.3 done 2026-11-16. M6.2 done 2026-11-16. M6.1 done 2026-11-16. M6 broken into steps 2026-11-16. M5 done 2026-11-16. M5.7 done 2026-11-16. M5.6 done 2026-11-16. M5.5 done 2026-11-16. M5.4 done 2026-11-16. M5.3 done 2026-11-16. M5.2 done 2026-11-16. M5.1 done 2026-11-16. M5 broken into steps 2026-11-16. M4 done 2026-11-16. M4.4 done 2026-11-16. M4.3 done 2026-11-16. M4.2 done 2026-11-16. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6, 7 and 8 are settled.
 
 ## How to use this
 
@@ -57,13 +57,17 @@ Create a collection (top level or child), rename it, set, replace or remove its 
   Note: a separate task, `./gradlew :composeApp:smokeCollectionRun` (`LiveCollectionSmoke.kt`),
   so the item run stays as it was. The empty-title 422 was also confirmed with `curl`, since
   `KoillectionError.Validation` covers 400 and 422.
-- [ ] **M6.3** — Delete collection: a delete action on the collection screen. The confirm dialog
+- [x] **M6.3** — Delete collection: a delete action on the collection screen. The confirm dialog
   names the collection and counts the child collections (every level) and the items they hold;
   decide in the step how to count the items (for example `totalItems` of each
   `/api/collections/{id}/items`). On success the screen leaves the back stack, and the list or
   the parent collection reads its children again. A failure shows the error and keeps the screen.
   **Verify:** ViewModel tests (counts, success, failure); on the emulator a temporary collection
   with a child and an item is deleted, the list no longer shows it, and the web UI agrees.
+  Note: the count is one `getCollections()` (descendants by `parentId`) plus a new
+  `CollectionsRepository.countItems` per collection (`totalItems` of the first item page); the API
+  has no counters (plan §2). A new `CollectionListChanges` signal makes the list or the parent read
+  again. On the device a child (1 collection, 2 items) and then its parent (0, 0) were deleted.
 - [ ] **M6.4** — Create collection: a "new collection" action on the collection list (top level)
   and on the collection screen (child). A form with the title and an optional image (camera or
   picker, M3's photo preparation), saved with the M3 progress view and retry. On success the new

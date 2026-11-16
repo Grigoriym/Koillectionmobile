@@ -18,6 +18,12 @@ interface CollectionsRepository {
     suspend fun getChildren(id: String): Result<List<Collection>>
 
     /**
+     * The number of items directly in collection [id], not in its children. One request: the
+     * server's `totalItems` of the first item page.
+     */
+    suspend fun countItems(id: String): Result<Int>
+
+    /**
      * Creates a collection titled [title] and returns it as the server sent it. A null [parentId]
      * makes a top-level collection; otherwise the new one is a child of [parentId].
      */

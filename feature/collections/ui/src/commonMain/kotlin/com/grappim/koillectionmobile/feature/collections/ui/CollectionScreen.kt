@@ -4,11 +4,14 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -18,22 +21,39 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.grappim.kit.uikit.asString
+import com.grappim.koillectionmobile.strings.RPlurals
 import com.grappim.koillectionmobile.strings.RString
 import com.grappim.koillectionmobile.strings.generated.resources.collection_add_item
 import com.grappim.koillectionmobile.strings.generated.resources.collection_back
+import com.grappim.koillectionmobile.strings.generated.resources.collection_delete
+import com.grappim.koillectionmobile.strings.generated.resources.collection_delete_cancel
+import com.grappim.koillectionmobile.strings.generated.resources.collection_delete_children
+import com.grappim.koillectionmobile.strings.generated.resources.collection_delete_confirm
+import com.grappim.koillectionmobile.strings.generated.resources.collection_delete_failed_ok
+import com.grappim.koillectionmobile.strings.generated.resources.collection_delete_failed_title
+import com.grappim.koillectionmobile.strings.generated.resources.collection_delete_items
+import com.grappim.koillectionmobile.strings.generated.resources.collection_delete_text
+import com.grappim.koillectionmobile.strings.generated.resources.collection_delete_title
 import com.grappim.koillectionmobile.strings.generated.resources.collection_empty
 import com.grappim.koillectionmobile.strings.generated.resources.collection_section_children
 import com.grappim.koillectionmobile.strings.generated.resources.collection_section_items
+import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
+/** [onClose] runs once the server deleted the collection, to take the screen off the back stack. */
 @Composable
 fun CollectionScreen(
     collectionId: String,
@@ -41,10 +61,15 @@ fun CollectionScreen(
     onItemClick: (String) -> Unit,
     onAddItemClick: () -> Unit,
     onBack: () -> Unit,
+    onClose: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: CollectionViewModel = koinViewModel { parametersOf(collectionId) }
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val currentOnClose by rememberUpdatedState(onClose)
+    LaunchedEffect(uiState.isDeleted) {
+        if (uiState.isDeleted) currentOnClose()
+    }
     CollectionContent(
         uiState = uiState,
         onCollectionClick = onCollectionClick,
@@ -76,6 +101,18 @@ private fun CollectionContent(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(RString.collection_back)
                         )
+                    }
+                },
+                actions = {
+                    if (uiState.isCountingDelete || uiState.isDeleting) {
+                        CircularProgressIndicator(modifier = Modifier.padding(PADDING / 2).size(PROGRESS_SIZE))
+                    } else if (uiState.canDelete) {
+                        IconButton(onClick = uiState.onDeleteClick) {
+                            Icon(
+                                imageVector = Icons.Filled.Delete,
+                                contentDescription = stringResource(RString.collection_delete)
+                            )
+                        }
                     }
                 }
             )
@@ -131,6 +168,45 @@ private fun CollectionContent(
             }
         }
     }
+    DeleteDialogs(uiState)
+}
+
+@Composable
+private fun DeleteDialogs(uiState: CollectionUiState) {
+    uiState.deleteSummary?.let { summary ->
+        AlertDialog(
+            onDismissRequest = uiState.onDeleteDismiss,
+            title = { Text(stringResource(RString.collection_delete_title)) },
+            text = {
+                val children =
+                    pluralStringResource(RPlurals.collection_delete_children, summary.childCount, summary.childCount)
+                val items = pluralStringResource(RPlurals.collection_delete_items, summary.itemCount, summary.itemCount)
+                Text(stringResource(RString.collection_delete_text, uiState.title, children, items))
+            },
+            confirmButton = {
+                TextButton(onClick = uiState.onDeleteConfirm) {
+                    Text(stringResource(RString.collection_delete_confirm))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = uiState.onDeleteDismiss) {
+                    Text(stringResource(RString.collection_delete_cancel))
+                }
+            }
+        )
+    }
+    if (uiState.deleteError.isNotEmpty()) {
+        AlertDialog(
+            onDismissRequest = uiState.onDeleteErrorShown,
+            title = { Text(stringResource(RString.collection_delete_failed_title)) },
+            text = { Text(uiState.deleteError.asString()) },
+            confirmButton = {
+                TextButton(onClick = uiState.onDeleteErrorShown) {
+                    Text(stringResource(RString.collection_delete_failed_ok))
+                }
+            }
+        )
+    }
 }
 
 @Composable
@@ -142,3 +218,5 @@ private fun SectionHeader(text: String, modifier: Modifier = Modifier) {
         color = MaterialTheme.colorScheme.primary
     )
 }
+
+private val PROGRESS_SIZE = 24.dp

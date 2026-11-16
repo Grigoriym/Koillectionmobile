@@ -38,6 +38,23 @@
     <string name="collection_section_items">Items</string>
     <string name="collection_back">Back</string>
     <string name="collection_add_item">Add item</string>
+    <string name="collection_delete">Delete collection</string>
+    <string name="collection_delete_title">Delete this collection?</string>
+    <string name="collection_delete_text">The server deletes "%1$s" and everything in it: %2$s and %3$s. You cannot undo this.</string>
+    <plurals name="collection_delete_children">
+        <item quantity="one">%1$d collection</item>
+        <item quantity="other">%1$d collections</item>
+    </plurals>
+    <plurals name="collection_delete_items">
+        <item quantity="one">%1$d item</item>
+        <item quantity="other">%1$d items</item>
+    </plurals>
+    <string name="collection_delete_confirm">Delete</string>
+    <string name="collection_delete_cancel">Cancel</string>
+    <string name="collection_delete_failed_title">The collection was not deleted</string>
+    <string name="collection_delete_count_error_unexpected">Counting the collections and items to delete failed with an unexpected error.</string>
+    <string name="collection_delete_error_unexpected">Deleting the collection failed with an unexpected error.</string>
+    <string name="collection_delete_failed_ok">OK</string>
 
     <string name="item_back">Back</string>
     <string name="item_retry">Try again</string>

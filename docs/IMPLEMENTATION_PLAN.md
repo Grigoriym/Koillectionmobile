@@ -140,6 +140,11 @@ start of any step that touches the API. Facts that shape the design:
   parent took the child and an item in the child with it: all three gave 404. A create with an
   empty title got 422 (`title: This value should not be blank.`). Not checked: a server behind a
   subpath, and whether a non-image file passes the upload (the `colletion:image` group typo).
+- Counting what a collection delete takes (M6.3, 1.8.5 source): the API has no counters.
+  `Collection::$cachedValues` holds them but has no `Groups`, and `Item.php` has no `#[ApiFilter]`,
+  so items cannot be counted for several collections in one call. The app reads all collections
+  once, finds the descendants by `parentId`, and reads `totalItems` of the first page of
+  `/api/collections/{id}/items` for each one. Checked on the device against the local test instance.
 - Writes checked live 2026-11-15 (M3.1, `./gradlew :composeApp:smokeWriteRun`, JVM, local test
   instance at the root path): through the app's repositories, an item in `Books`, two text fields
   (positions 1 and 2), an image field (position 3), a main image upload and a field image upload

@@ -4,6 +4,7 @@ import com.grappim.kit.domain.resultOf
 import com.grappim.koillectionmobile.core.api.BaseUrlProvider
 import com.grappim.koillectionmobile.core.api.ContentTypeLdJson
 import com.grappim.koillectionmobile.core.api.ContentTypeMergePatchJson
+import com.grappim.koillectionmobile.core.api.HydraCollectionDto
 import com.grappim.koillectionmobile.core.api.getAllHydraPages
 import com.grappim.koillectionmobile.core.api.normalizeBaseUrl
 import com.grappim.koillectionmobile.feature.collections.domain.Collection
@@ -25,6 +26,7 @@ import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
 import io.ktor.http.contentType
 import io.ktor.http.escapeIfNeeded
+import kotlinx.serialization.json.JsonObject
 import org.koin.core.annotation.Single
 
 /**
@@ -52,6 +54,15 @@ internal class CollectionsRepositoryImpl(
         val serverUrl = serverUrl()
         httpClient.getAllHydraPages<CollectionDto>("$COLLECTIONS_PATH/$id/children")
             .map { mapper.toDomain(it, serverUrl) }
+    }
+
+    /**
+     * Reads only the first page. `Item.php` has no `#[ApiFilter]`, so there is no cheaper count. A
+     * page without `totalItems` is a list that fits on one page: its members are the count.
+     */
+    override suspend fun countItems(id: String): Result<Int> = resultOf {
+        val page = httpClient.get("$COLLECTIONS_PATH/$id/items").body<HydraCollectionDto<JsonObject>>()
+        page.totalItems ?: page.member.size
     }
 
     override suspend fun createCollection(title: String, parentId: String?): Result<Collection> = resultOf {

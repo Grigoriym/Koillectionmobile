@@ -52,7 +52,9 @@ internal fun MainNavHost(modifier: Modifier = Modifier) {
                     onCollectionClick = { id -> backStack.add(CollectionRoute(id)) },
                     onItemClick = { id -> backStack.add(ItemRoute(id)) },
                     onAddItemClick = { backStack.add(AddItemRoute(route.collectionId)) },
-                    onBack = { backStack.removeLastOrNull() }
+                    onBack = { backStack.removeLastOrNull() },
+                    // The collection is gone; the list or the parent reads it again (CollectionListChanges).
+                    onClose = { backStack.remove(route) }
                 )
             }
             entry<ItemRoute> { route ->

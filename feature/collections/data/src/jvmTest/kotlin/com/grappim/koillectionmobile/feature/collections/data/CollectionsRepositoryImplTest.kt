@@ -246,6 +246,34 @@ class CollectionsRepositoryImplTest {
     }
 
     @Test
+    fun `countItems reads only the first item page and returns its totalItems`() = runTest {
+        val repository = repository(
+            "/sub/api/collections/$BOOKS_ID/items" to (HttpStatusCode.OK to fixture("collection_items_page_1.json"))
+        )
+
+        assertEquals(445, repository.countItems(BOOKS_ID).getOrThrow())
+        val request = requests.single()
+        assertEquals(HttpMethod.Get, request.method)
+        assertEquals("/sub/api/collections/$BOOKS_ID/items", request.url.fullPath)
+    }
+
+    @Test
+    fun `countItems without totalItems counts the members of the page`() = runTest {
+        val repository = repository(
+            "/sub/api/collections/a/items" to (HttpStatusCode.OK to """{"member":[{"id":"x"},{"id":"y"}]}""")
+        )
+
+        assertEquals(2, repository.countItems("a").getOrThrow())
+    }
+
+    @Test
+    fun `a failed count is a failed result that holds the KoillectionError`() = runTest {
+        val repository = repository()
+
+        assertIs<KoillectionError.NotFound>(repository.countItems("missing").exceptionOrNull())
+    }
+
+    @Test
     fun `deleteCollection sends DELETE to the collection's path`() = runTest {
         val repository = repository("/sub/api/collections/new" to (HttpStatusCode.NoContent to ""))
 
@@ -265,18 +293,20 @@ class CollectionsRepositoryImplTest {
 
     /** `CLAUDE.md`, Verification: at a root-path server Ktor's merged path differs from `/sub`. */
     @Test
-    fun `the write calls keep their paths at a root-path server`() = runTest {
+    fun `the write calls and the count keep their paths at a root-path server`() = runTest {
         val repository = repository(
             "https://koi.example",
             "/api/collections" to (HttpStatusCode.Created to NEW_TOP),
             "/api/collections/new" to (HttpStatusCode.OK to NEW_TOP),
-            "/api/collections/new/image" to (HttpStatusCode.Created to NEW_WITH_IMAGE)
+            "/api/collections/new/image" to (HttpStatusCode.Created to NEW_WITH_IMAGE),
+            "/api/collections/new/items" to (HttpStatusCode.OK to """{"member":[],"totalItems":0}""")
         )
 
         repository.createCollection("Comics").getOrThrow()
         repository.renameCollection("new", "Comics").getOrThrow()
         repository.uploadCollectionImage("new", JPEG, "cover.jpg", "image/jpeg").getOrThrow()
         repository.deleteCollectionImage("new").getOrThrow()
+        repository.countItems("new").getOrThrow()
         repository.deleteCollection("new").getOrThrow()
 
         assertEquals(
@@ -285,6 +315,7 @@ class CollectionsRepositoryImplTest {
                 "PATCH /api/collections/new",
                 "POST /api/collections/new/image",
                 "PATCH /api/collections/new",
+                "GET /api/collections/new/items",
                 "DELETE /api/collections/new"
             ),
             requests.map { "${it.method.value} ${it.url.fullPath}" }
