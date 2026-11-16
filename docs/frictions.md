@@ -64,3 +64,5 @@ entries get deleted — see /finalize.
   step and the rest ran anyway. Validate JSON with `python3 -c "import json; ..."`.
 - 2026-11-16 — `./gradlew build` (M4.4) failed "SDK location not found": ran it before reading
   `docs/machine.local.md`, which says to prefix `ANDROID_HOME=$HOME/Android/Sdk`.
+- 2026-11-16 — `npx --yes --package renovate -- renovate-config-validator` (M4.5) was denied by the
+  auto-mode classifier ("Unauthorized Access"), as a package download. The user chose to skip it.
