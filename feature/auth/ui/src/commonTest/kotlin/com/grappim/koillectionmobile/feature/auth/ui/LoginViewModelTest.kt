@@ -213,6 +213,55 @@ class LoginViewModelTest {
         assertEquals(PASSWORD, sut.uiState.value.password)
     }
 
+    @Test
+    fun `an http server URL shows the cleartext warning`() {
+        val sut = LoginViewModel(repository)
+
+        sut.uiState.value.onServerUrlChange(SERVER_URL)
+
+        assertTrue(sut.uiState.value.isCleartextWarningVisible)
+    }
+
+    @Test
+    fun `an http server URL in capitals with spaces around it warns too`() {
+        val sut = LoginViewModel(repository)
+
+        sut.uiState.value.onServerUrlChange("  HTTP://koillection.lan ")
+
+        assertTrue(sut.uiState.value.isCleartextWarningVisible)
+    }
+
+    @Test
+    fun `an https server URL shows no cleartext warning`() {
+        val sut = LoginViewModel(repository)
+
+        sut.uiState.value.onServerUrlChange(HTTPS_SERVER_URL)
+
+        assertFalse(sut.uiState.value.isCleartextWarningVisible)
+    }
+
+    @Test
+    fun `a server URL without a scheme shows no cleartext warning`() {
+        val sut = LoginViewModel(repository)
+        assertFalse(sut.uiState.value.isCleartextWarningVisible)
+
+        sut.uiState.value.onServerUrlChange("koillection.lan")
+
+        assertFalse(sut.uiState.value.isCleartextWarningVisible)
+    }
+
+    @Test
+    fun `the cleartext warning does not block log in`() {
+        repository.result = CompletableDeferred(LoginResult.LoggedIn)
+        val sut = filledViewModel()
+        assertTrue(sut.uiState.value.isCleartextWarningVisible)
+        assertTrue(sut.uiState.value.canLogIn)
+
+        sut.uiState.value.onLogInClick()
+
+        assertEquals(SERVER_URL, repository.call?.first)
+    }
+
     private class FakeAuthRepository : AuthRepository {
         var result = CompletableDeferred<LoginResult>()
         var call: Triple<String, String, String>? = null
@@ -230,6 +279,7 @@ class LoginViewModelTest {
 
     private companion object {
         const val SERVER_URL = "http://10.0.2.2:8290"
+        const val HTTPS_SERVER_URL = "https://koillection.example.com"
         const val USERNAME = "tester"
         const val PASSWORD = "hunter2"
     }

@@ -1,6 +1,6 @@
 # koillectionmobile checklist
 
-**Current step:** M4.4. M4.3 done 2026-11-16. M4.2 done 2026-11-16. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6 and 7 are settled.
+**Current step:** M4.5. M4.4 done 2026-11-16. M4.3 done 2026-11-16. M4.2 done 2026-11-16. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6 and 7 are settled.
 
 ## How to use this
 
@@ -108,11 +108,16 @@ warning (plan §1.1, "Warn on non-HTTPS base URLs"). Not in scope: self-signed c
   login and `GET /api/collections`). In the app the "no header" case was a wrong value, which
   the front treats the same: the refresh got one 401, no re-login `POST`, the proxy message, and
   the session stayed.
-- [ ] **M4.4** — Cleartext warning at login. When the server URL starts with `http://`, show that
+- [x] **M4.4** — Cleartext warning at login. When the server URL starts with `http://`, show that
   the password and the token travel unencrypted. Advisory only: it never disables Log in,
   because the test instance is plain HTTP. Only a literal `http://` prefix counts.
   **Verify:** ViewModel tests; on the emulator the warning shows for `http://` and not for
   `https://`.
+  Note (2026-11-16): `LoginUiState.isCleartextWarningVisible` (the trimmed URL starts with
+  `http://`, any case, as wallosmobile's); the line sits under the server URL field. Tests: five in
+  `LoginViewModelTest` (http, capitals with spaces, https, no scheme, Log in stays on and sends);
+  the `ignoreCase` mutation fails one. `build` and `ktlintCheck` passed. On `koil36`:
+  `http://10.0.2.2:8290` shows the warning, `https://10.0.2.2:8290` does not.
 - [ ] **M4.5** — Security register and dependency alerts. Run `/masvs-review` to create
   `docs/security/masvs.md` (after M4.1–M4.4, so it reviews them). Add `renovate.json` with
   `osvVulnerabilityAlerts`, as wallosmobile's; keep only the package rules this build needs.

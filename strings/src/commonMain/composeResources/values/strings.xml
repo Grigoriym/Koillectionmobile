@@ -7,6 +7,7 @@
     <string name="login_username_label">Username</string>
     <string name="login_password_label">Password</string>
     <string name="login_button">Log in</string>
+    <string name="login_cleartext_warning">This address is not encrypted (http://). Your password and the login token travel over the network in plain text.</string>
 
     <string name="login_error_invalid_server_url">Enter the full server address. It must start with http:// or https://.</string>
     <string name="login_error_unreachable">The server does not answer. Check the address and the network connection.</string>

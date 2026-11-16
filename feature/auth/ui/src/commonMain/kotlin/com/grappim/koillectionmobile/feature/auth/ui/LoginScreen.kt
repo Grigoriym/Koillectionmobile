@@ -36,6 +36,7 @@ import com.grappim.kit.uikit.asString
 import com.grappim.koillectionmobile.feature.auth.ui.permission.rememberLocalNetworkPermissionRequest
 import com.grappim.koillectionmobile.strings.RString
 import com.grappim.koillectionmobile.strings.generated.resources.login_button
+import com.grappim.koillectionmobile.strings.generated.resources.login_cleartext_warning
 import com.grappim.koillectionmobile.strings.generated.resources.login_password_label
 import com.grappim.koillectionmobile.strings.generated.resources.login_server_url_label
 import com.grappim.koillectionmobile.strings.generated.resources.login_server_url_placeholder
@@ -100,6 +101,14 @@ private fun LoginContent(uiState: LoginUiState, onSettingsClick: () -> Unit, mod
                 keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) }),
                 enabled = isEnabled
             )
+
+            if (uiState.isCleartextWarningVisible) {
+                Text(
+                    text = stringResource(RString.login_cleartext_warning),
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
 
             OutlinedTextField(
                 modifier = Modifier
