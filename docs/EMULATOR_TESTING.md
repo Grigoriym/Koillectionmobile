@@ -106,6 +106,11 @@ this app.
   read-only row in the edit form, and a new text row goes below it. The tag chips sit below "Add
   field": the first dump of the form has none of them, so scroll before you read `checked`. The
   main image's Replace → "Pick photos" needs the photo media-scanned first (skill, Step 5).
+- Delete collection (M6.3): a trash icon in the collection screen's top bar (`content-desc` "Delete
+  collection") counts first, then opens "Delete this collection?" with "Cancel" and "Delete". The
+  dialog's body (the counts) was not in `ui.py list` or a dump grep, though the screenshot showed it:
+  read the counts from a screenshot. Build the test tree through the API (`POST /api/collections`
+  with a `parent` IRI, `POST /api/items` with a `collection` IRI); the delete cleans it up.
 - Local network permission (M4.1): `10.0.2.2` is the emulator's own gateway, so a check of
   `ACCESS_LOCAL_NETWORK` needs another private host address. The test instance listens on
   `127.0.0.1` only: forward a host-only private address to it for the check, not the Wi-Fi LAN

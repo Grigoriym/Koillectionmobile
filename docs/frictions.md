@@ -64,3 +64,7 @@ entries get deleted — see /finalize.
   from the auto-mode classifier ("reviewed this call without its leading cd"); the identical retry passed.
 - 2026-11-16 — `./gradlew ... jvmTest --rerun -q` (M6.1 mutation check) hid the failing test names
   and assertion text, so a `grep FAILED` came back empty although the task failed. Drop `-q` and check the exit code.
+- 2026-11-16 — `jvmTest --rerun -q` (M6.3 mutation checks) printed only "BUILD FAILED in 2s", which also fits
+  a compile error; a rerun without `-q` showed the test names. Second time (first M6.1).
+- 2026-11-16 — `uiautomator dump` (M6.3) had the delete dialog's title and buttons but not its body text,
+  which the screenshot showed. Read dialog body text from a screenshot.
