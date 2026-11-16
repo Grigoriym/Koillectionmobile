@@ -1,6 +1,6 @@
 # koillectionmobile checklist
 
-**Current step:** M6.1. M6 broken into steps 2026-11-16. M5 done 2026-11-16. M5.7 done 2026-11-16. M5.6 done 2026-11-16. M5.5 done 2026-11-16. M5.4 done 2026-11-16. M5.3 done 2026-11-16. M5.2 done 2026-11-16. M5.1 done 2026-11-16. M5 broken into steps 2026-11-16. M4 done 2026-11-16. M4.4 done 2026-11-16. M4.3 done 2026-11-16. M4.2 done 2026-11-16. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6, 7 and 8 are settled.
+**Current step:** M6.2. M6.1 done 2026-11-16. M6 broken into steps 2026-11-16. M5 done 2026-11-16. M5.7 done 2026-11-16. M5.6 done 2026-11-16. M5.5 done 2026-11-16. M5.4 done 2026-11-16. M5.3 done 2026-11-16. M5.2 done 2026-11-16. M5.1 done 2026-11-16. M5 broken into steps 2026-11-16. M4 done 2026-11-16. M4.4 done 2026-11-16. M4.3 done 2026-11-16. M4.2 done 2026-11-16. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6, 7 and 8 are settled.
 
 ## How to use this
 
@@ -40,7 +40,7 @@ Create a collection (top level or child), rename it, set, replace or remove its 
 (with a confirm that counts what goes with it). Form choices are plan §5 decision 9 (user,
 2026-11-16). Every write goes to the local test instance only (`docs/local-info.md`).
 
-- [ ] **M6.1** — Repository writes (`feature:collections`): create (`POST /api/collections`,
+- [x] **M6.1** — Repository writes (`feature:collections`): create (`POST /api/collections`,
   `title` and an optional `parent` IRI), rename (`PATCH /api/collections/{id}`, `{"title"}`),
   upload the image (`POST /api/collections/{id}/image`, multipart), remove the image (`PATCH`
   with `deleteImage`), delete (`DELETE /api/collections/{id}`). Re-read `Collection.php` first,

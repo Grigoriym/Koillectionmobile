@@ -201,6 +201,21 @@ class CollectionListViewModelTest {
         override suspend fun getCollection(id: String): Result<Collection> = error("not used")
 
         override suspend fun getChildren(id: String): Result<List<Collection>> = error("not used")
+
+        override suspend fun createCollection(title: String, parentId: String?): Result<Collection> = error("not used")
+
+        override suspend fun renameCollection(id: String, title: String): Result<Collection> = error("not used")
+
+        override suspend fun uploadCollectionImage(
+            id: String,
+            bytes: ByteArray,
+            fileName: String,
+            mimeType: String
+        ): Result<Collection> = error("not used")
+
+        override suspend fun deleteCollectionImage(id: String): Result<Collection> = error("not used")
+
+        override suspend fun deleteCollection(id: String): Result<Unit> = error("not used")
     }
 
     private companion object {

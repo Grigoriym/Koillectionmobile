@@ -125,6 +125,10 @@ start of any step that touches the API. Facts that shape the design:
   replaces the tag set: `Item` has `addTag`/`removeTag`, so the serializer adds and removes to
   match the list. A body names other resources by IRI; the app sends `/api/...` without the
   server's subpath, as `add_book.py` does. Behind a subpath this is unchecked (`docs/revisit.md`).
+  `POST /api/collections` needs only `title` (`collection:write`, `NotBlank`); `parent` is an
+  optional IRI, and `ColorListener` picks the colour. The image goes up as multipart part `file`
+  to `POST /api/collections/{id}/image`; `PATCH` with `{"deleteImage": true}` removes it
+  (`UploadListener`). Read from the 1.8.5 source in M6.1; M6.2 sends them live.
 - Writes checked live 2026-11-15 (M3.1, `./gradlew :composeApp:smokeWriteRun`, JVM, local test
   instance at the root path): through the app's repositories, an item in `Books`, two text fields
   (positions 1 and 2), an image field (position 3), a main image upload and a field image upload
