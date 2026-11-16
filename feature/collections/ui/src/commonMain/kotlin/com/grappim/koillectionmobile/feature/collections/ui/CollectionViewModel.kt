@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.grappim.kit.uikit.NativeText
 import com.grappim.koillectionmobile.feature.collections.domain.Collection
+import com.grappim.koillectionmobile.feature.collections.domain.CollectionChanges
 import com.grappim.koillectionmobile.feature.collections.domain.CollectionListChanges
 import com.grappim.koillectionmobile.feature.collections.domain.CollectionsRepository
 import com.grappim.koillectionmobile.feature.items.domain.ItemListChanges
@@ -31,8 +32,9 @@ import org.koin.core.annotation.KoinViewModel
  * compiler plugin not to look for a `String` definition in the graph.
  *
  * A change to this collection's items ([ItemListChanges]: a new item, a saved edit, a delete) or
- * to its children ([CollectionListChanges]: a child deleted) reads everything again, while the
- * screen waits lower on the back stack.
+ * to its children ([CollectionListChanges]: a child created or deleted) or to the collection itself
+ * ([CollectionChanges]: a saved edit) reads everything again, while the screen waits lower on the
+ * back stack.
  *
  * Before the delete confirm, the screen counts what goes with the collection: the server deletes
  * the child collections at every level and their items (`cascade: all` in `Collection.php`).
@@ -44,7 +46,8 @@ class CollectionViewModel(
     private val collectionsRepository: CollectionsRepository,
     private val itemsRepository: ItemsRepository,
     private val itemListChanges: ItemListChanges,
-    private val collectionListChanges: CollectionListChanges
+    private val collectionListChanges: CollectionListChanges,
+    private val collectionChanges: CollectionChanges
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(
@@ -70,6 +73,11 @@ class CollectionViewModel(
         }
         viewModelScope.launch {
             collectionListChanges.changedParents
+                .filter { it == collectionId }
+                .collect { load() }
+        }
+        viewModelScope.launch {
+            collectionChanges.changedCollections
                 .filter { it == collectionId }
                 .collect { load() }
         }

@@ -11,6 +11,8 @@ import com.grappim.koillectionmobile.feature.collections.ui.CollectionListRoute
 import com.grappim.koillectionmobile.feature.collections.ui.CollectionListScreen
 import com.grappim.koillectionmobile.feature.collections.ui.CollectionRoute
 import com.grappim.koillectionmobile.feature.collections.ui.CollectionScreen
+import com.grappim.koillectionmobile.feature.collections.ui.EditCollectionRoute
+import com.grappim.koillectionmobile.feature.collections.ui.EditCollectionScreen
 import com.grappim.koillectionmobile.feature.collections.ui.NewCollectionRoute
 import com.grappim.koillectionmobile.feature.collections.ui.NewCollectionScreen
 import com.grappim.koillectionmobile.feature.items.ui.AddItemRoute
@@ -56,6 +58,7 @@ internal fun MainNavHost(modifier: Modifier = Modifier) {
                     onItemClick = { id -> backStack.add(ItemRoute(id)) },
                     onAddItemClick = { backStack.add(AddItemRoute(route.collectionId)) },
                     onNewCollectionClick = { backStack.add(NewCollectionRoute(route.collectionId)) },
+                    onEditClick = { backStack.add(EditCollectionRoute(route.collectionId)) },
                     onBack = { backStack.removeLastOrNull() },
                     // The collection is gone; the list or the parent reads it again (CollectionListChanges).
                     onClose = { backStack.remove(route) }
@@ -82,6 +85,14 @@ internal fun MainNavHost(modifier: Modifier = Modifier) {
                         backStack.remove(route)
                         backStack.add(CollectionRoute(id))
                     }
+                )
+            }
+            entry<EditCollectionRoute> { route ->
+                EditCollectionScreen(
+                    collectionId = route.collectionId,
+                    onBack = { backStack.removeLastOrNull() },
+                    // The collection screen and the list read the collection again (CollectionChanges).
+                    onClose = { backStack.remove(route) }
                 )
             }
             entry<SettingsRoute> {

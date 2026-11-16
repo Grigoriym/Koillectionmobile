@@ -4,6 +4,7 @@ import com.grappim.kit.testing.MainDispatcherRule
 import com.grappim.kit.uikit.NativeText
 import com.grappim.koillectionmobile.core.domain.KoillectionError
 import com.grappim.koillectionmobile.feature.collections.domain.Collection
+import com.grappim.koillectionmobile.feature.collections.domain.CollectionChanges
 import com.grappim.koillectionmobile.feature.collections.domain.CollectionListChanges
 import com.grappim.koillectionmobile.feature.collections.domain.CollectionsRepository
 import com.grappim.koillectionmobile.feature.items.domain.Datum
@@ -47,8 +48,10 @@ class CollectionViewModelTest {
 
     private val itemListChanges = ItemListChanges()
     private val collectionListChanges = CollectionListChanges()
+    private val collectionChanges = CollectionChanges()
 
-    private fun createSut() = CollectionViewModel(BOOKS.id, collections, items, itemListChanges, collectionListChanges)
+    private fun createSut() =
+        CollectionViewModel(BOOKS.id, collections, items, itemListChanges, collectionListChanges, collectionChanges)
 
     /** A view model whose first load has succeeded, so the delete is offered. */
     private fun loadedSut(): CollectionViewModel {
@@ -418,6 +421,27 @@ class CollectionViewModelTest {
         collectionListChanges.notifyChanged(GAMES.id)
 
         assertEquals(1, collections.childrenCalls.size)
+    }
+
+    @Test
+    fun `a saved edit of this collection loads its new title`() {
+        val sut = loadedSut()
+        queueAll()
+
+        collectionChanges.notifyChanged(BOOKS.id)
+        answerAll(collection = Result.success(BOOKS.copy(title = "Old books")))
+
+        assertEquals("Old books", sut.uiState.value.title)
+        assertEquals(2, collections.collectionCalls.size)
+    }
+
+    @Test
+    fun `a saved edit of another collection loads nothing`() {
+        loadedSut()
+
+        collectionChanges.notifyChanged(GAMES.id)
+
+        assertEquals(1, collections.collectionCalls.size)
     }
 
     private class FakeItemsRepository : ItemsRepository {

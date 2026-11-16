@@ -57,6 +57,7 @@
     <string name="collection_delete_failed_ok">OK</string>
     <string name="collection_new">New collection</string>
     <string name="collection_more">More actions</string>
+    <string name="collection_edit">Edit collection</string>
     <string name="collection_form_new_title">New collection</string>
     <string name="collection_form_back">Back</string>
     <string name="collection_form_title_label">Title</string>
@@ -82,6 +83,10 @@
     <string name="collection_form_discard_text">The title and the image on this form are lost.</string>
     <string name="collection_form_discard">Discard</string>
     <string name="collection_form_keep_editing">Keep editing</string>
+    <string name="collection_form_edit_title">Edit collection</string>
+    <string name="collection_form_edit_partial">Some changes are on the server, but not all. Try again to send the rest.</string>
+    <string name="collection_form_edit_discard_title">Discard the changes?</string>
+    <string name="collection_form_edit_discard_text">The changes on this form are lost. The collection stays as it is on the server.</string>
 
     <string name="item_back">Back</string>
     <string name="item_retry">Try again</string>

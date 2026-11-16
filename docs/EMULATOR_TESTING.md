@@ -116,6 +116,10 @@ this app.
   "Pick photo", then "Rotate" and "Remove image" once a photo is set; "Save" in the top bar. On
   success the new collection opens, and back goes to the list or the parent. The server stores
   the image at most 200x200, so a rotation is checked in the form's preview, not on the server.
+- Edit collection (M6.5): "More actions" → "Edit collection". The form is the M6.4 form, filled;
+  the server image shows with "Remove image", and Save is off until something changed. On success
+  the form closes onto the collection screen. To check the image on the server, read `image` from
+  `GET /api/collections/<id>` and a pixel of that file; the replaced or removed file gives 404.
 - Local network permission (M4.1): `10.0.2.2` is the emulator's own gateway, so a check of
   `ACCESS_LOCAL_NETWORK` needs another private host address. The test instance listens on
   `127.0.0.1` only: forward a host-only private address to it for the check, not the Wi-Fi LAN

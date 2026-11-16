@@ -1,5 +1,6 @@
 package com.grappim.koillectionmobile.feature.collections.data
 
+import com.grappim.koillectionmobile.feature.collections.domain.CollectionChanges
 import com.grappim.koillectionmobile.feature.collections.domain.CollectionListChanges
 import org.koin.core.annotation.ComponentScan
 import org.koin.core.annotation.Configuration
@@ -14,4 +15,7 @@ class CollectionsDataModule {
 
     @Single
     fun provideCollectionListChanges(): CollectionListChanges = CollectionListChanges()
+
+    @Single
+    fun provideCollectionChanges(): CollectionChanges = CollectionChanges()
 }

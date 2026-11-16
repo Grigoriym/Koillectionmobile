@@ -4,6 +4,7 @@ import androidx.navigation3.runtime.NavKey
 import androidx.savedstate.serialization.SavedStateConfiguration
 import com.grappim.koillectionmobile.feature.collections.ui.CollectionListRoute
 import com.grappim.koillectionmobile.feature.collections.ui.CollectionRoute
+import com.grappim.koillectionmobile.feature.collections.ui.EditCollectionRoute
 import com.grappim.koillectionmobile.feature.collections.ui.NewCollectionRoute
 import com.grappim.koillectionmobile.feature.items.ui.AddItemRoute
 import com.grappim.koillectionmobile.feature.items.ui.EditItemRoute
@@ -23,6 +24,7 @@ private val navKeySerializersModule = SerializersModule {
         subclass(CollectionListRoute::class)
         subclass(CollectionRoute::class)
         subclass(NewCollectionRoute::class)
+        subclass(EditCollectionRoute::class)
         subclass(ItemRoute::class)
         subclass(AddItemRoute::class)
         subclass(EditItemRoute::class)

@@ -51,6 +51,7 @@ import com.grappim.koillectionmobile.strings.generated.resources.collection_dele
 import com.grappim.koillectionmobile.strings.generated.resources.collection_delete_items
 import com.grappim.koillectionmobile.strings.generated.resources.collection_delete_text
 import com.grappim.koillectionmobile.strings.generated.resources.collection_delete_title
+import com.grappim.koillectionmobile.strings.generated.resources.collection_edit
 import com.grappim.koillectionmobile.strings.generated.resources.collection_empty
 import com.grappim.koillectionmobile.strings.generated.resources.collection_more
 import com.grappim.koillectionmobile.strings.generated.resources.collection_new
@@ -69,6 +70,7 @@ fun CollectionScreen(
     onItemClick: (String) -> Unit,
     onAddItemClick: () -> Unit,
     onNewCollectionClick: () -> Unit,
+    onEditClick: () -> Unit,
     onBack: () -> Unit,
     onClose: () -> Unit,
     modifier: Modifier = Modifier,
@@ -85,6 +87,7 @@ fun CollectionScreen(
         onItemClick = onItemClick,
         onAddItemClick = onAddItemClick,
         onNewCollectionClick = onNewCollectionClick,
+        onEditClick = onEditClick,
         onBack = onBack,
         modifier = modifier
     )
@@ -98,6 +101,7 @@ private fun CollectionContent(
     onItemClick: (String) -> Unit,
     onAddItemClick: () -> Unit,
     onNewCollectionClick: () -> Unit,
+    onEditClick: () -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -126,7 +130,7 @@ private fun CollectionContent(
                         }
                     }
                     if (!uiState.isLoading && uiState.error.isEmpty() && !uiState.isDeleted) {
-                        MoreMenu(onNewCollectionClick = onNewCollectionClick)
+                        MoreMenu(onNewCollectionClick = onNewCollectionClick, onEditClick = onEditClick)
                     }
                 }
             )
@@ -225,7 +229,7 @@ private fun DeleteDialogs(uiState: CollectionUiState) {
 
 /** The top bar's overflow menu. */
 @Composable
-private fun MoreMenu(onNewCollectionClick: () -> Unit) {
+private fun MoreMenu(onNewCollectionClick: () -> Unit, onEditClick: () -> Unit) {
     var isExpanded by remember { mutableStateOf(false) }
     Box {
         IconButton(onClick = { isExpanded = true }) {
@@ -237,6 +241,13 @@ private fun MoreMenu(onNewCollectionClick: () -> Unit) {
                 onClick = {
                     isExpanded = false
                     onNewCollectionClick()
+                }
+            )
+            DropdownMenuItem(
+                text = { Text(stringResource(RString.collection_edit)) },
+                onClick = {
+                    isExpanded = false
+                    onEditClick()
                 }
             )
         }

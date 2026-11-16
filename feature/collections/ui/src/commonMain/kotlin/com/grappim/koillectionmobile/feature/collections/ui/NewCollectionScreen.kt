@@ -34,11 +34,13 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigationevent.NavigationEventInfo
 import androidx.navigationevent.compose.NavigationBackHandler
 import androidx.navigationevent.compose.rememberNavigationEventState
+import coil3.compose.AsyncImage
 import com.grappim.kit.uikit.asString
 import com.grappim.koillectionmobile.core.photos.PhotoPreview
 import com.grappim.koillectionmobile.core.photos.rememberPhotoSources
@@ -85,22 +87,73 @@ fun NewCollectionScreen(
     NewCollectionContent(uiState = uiState, onBack = onBack, modifier = modifier)
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun NewCollectionContent(uiState: NewCollectionUiState, onBack: () -> Unit, modifier: Modifier = Modifier) {
-    // One back tap must not lose a filled form, as on the add-item form: the arrow and the system
-    // back ask first.
+    CollectionFormScaffold(
+        topTitle = stringResource(RString.collection_form_new_title),
+        hasInput = uiState.hasInput,
+        canSave = uiState.canSave,
+        isSaveShown = uiState.save == null,
+        discardTitle = stringResource(RString.collection_form_discard_title),
+        discardText = stringResource(RString.collection_form_discard_text),
+        onSave = uiState.onSave,
+        onBack = onBack,
+        modifier = modifier
+    ) { contentModifier ->
+        val save = uiState.save
+        if (save == null) {
+            CollectionForm(
+                title = uiState.title,
+                onTitleChange = uiState.onTitleChange,
+                photo = uiState.photo,
+                imageUrl = null,
+                onPhotosAdd = uiState.onPhotosAdd,
+                onPhotoRotate = uiState.onPhotoRotate,
+                onPhotoRemove = uiState.onPhotoRemove,
+                modifier = contentModifier
+            )
+        } else {
+            CollectionSaveView(
+                status = save,
+                partialText = stringResource(RString.collection_form_save_partial),
+                onRetry = uiState.onRetrySave,
+                onEditForm = uiState.onEditForm,
+                modifier = contentModifier
+            )
+        }
+    }
+}
+
+/**
+ * The frame of the new and the edit collection form: the top bar with Save, and the discard
+ * confirm. While [hasInput], one back tap must not lose the form, as on the add-item form: the
+ * arrow and the system back ask first. [content] gets the modifier of the area under the top bar.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+internal fun CollectionFormScaffold(
+    topTitle: String,
+    hasInput: Boolean,
+    canSave: Boolean,
+    isSaveShown: Boolean,
+    discardTitle: String,
+    discardText: String,
+    onSave: () -> Unit,
+    onBack: () -> Unit,
+    modifier: Modifier = Modifier,
+    content: @Composable (Modifier) -> Unit
+) {
     var isDiscardShown by rememberSaveable { mutableStateOf(false) }
     NavigationBackHandler(
         state = rememberNavigationEventState(NavigationEventInfo.None),
-        isBackEnabled = uiState.hasInput,
+        isBackEnabled = hasInput,
         onBackCompleted = { isDiscardShown = true }
     )
     if (isDiscardShown) {
         AlertDialog(
             onDismissRequest = { isDiscardShown = false },
-            title = { Text(stringResource(RString.collection_form_discard_title)) },
-            text = { Text(stringResource(RString.collection_form_discard_text)) },
+            title = { Text(discardTitle) },
+            text = { Text(discardText) },
             confirmButton = {
                 TextButton(onClick = {
                     isDiscardShown = false
@@ -118,9 +171,9 @@ private fun NewCollectionContent(uiState: NewCollectionUiState, onBack: () -> Un
         modifier = modifier.fillMaxSize(),
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(RString.collection_form_new_title)) },
+                title = { Text(topTitle) },
                 navigationIcon = {
-                    IconButton(onClick = { if (uiState.hasInput) isDiscardShown = true else onBack() }) {
+                    IconButton(onClick = { if (hasInput) isDiscardShown = true else onBack() }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(RString.collection_form_back)
@@ -128,8 +181,8 @@ private fun NewCollectionContent(uiState: NewCollectionUiState, onBack: () -> Un
                     }
                 },
                 actions = {
-                    if (uiState.save == null) {
-                        TextButton(onClick = uiState.onSave, enabled = uiState.canSave) {
+                    if (isSaveShown) {
+                        TextButton(onClick = onSave, enabled = canSave) {
                             Text(stringResource(RString.collection_form_save))
                         }
                     }
@@ -137,26 +190,30 @@ private fun NewCollectionContent(uiState: NewCollectionUiState, onBack: () -> Un
             )
         }
     ) { padding ->
-        val contentModifier = Modifier
-            .fillMaxSize()
-            .padding(padding)
-        val save = uiState.save
-        if (save == null) {
-            CollectionForm(uiState = uiState, modifier = contentModifier)
-        } else {
-            CollectionSaveView(
-                status = save,
-                onRetry = uiState.onRetrySave,
-                onEditForm = uiState.onEditForm,
-                modifier = contentModifier
-            )
-        }
+        content(
+            Modifier
+                .fillMaxSize()
+                .padding(padding)
+        )
     }
 }
 
+/**
+ * The title and the image. [photo] is a new photo on this device. Without one, [imageUrl] is the
+ * image on the server, if the collection has one (the edit form).
+ */
 @Composable
-private fun CollectionForm(uiState: NewCollectionUiState, modifier: Modifier = Modifier) {
-    val photoSources = rememberPhotoSources(onPhotos = uiState.onPhotosAdd)
+internal fun CollectionForm(
+    title: String,
+    onTitleChange: (String) -> Unit,
+    photo: FormPhoto?,
+    imageUrl: String?,
+    onPhotosAdd: (List<String>) -> Unit,
+    onPhotoRotate: () -> Unit,
+    onPhotoRemove: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val photoSources = rememberPhotoSources(onPhotos = onPhotosAdd)
     Column(
         modifier = modifier
             .verticalScroll(rememberScrollState())
@@ -164,8 +221,8 @@ private fun CollectionForm(uiState: NewCollectionUiState, modifier: Modifier = M
         verticalArrangement = Arrangement.spacedBy(PADDING)
     ) {
         OutlinedTextField(
-            value = uiState.title,
-            onValueChange = uiState.onTitleChange,
+            value = title,
+            onValueChange = onTitleChange,
             label = { Text(stringResource(RString.collection_form_title_label)) },
             singleLine = true,
             modifier = Modifier.fillMaxWidth()
@@ -175,16 +232,25 @@ private fun CollectionForm(uiState: NewCollectionUiState, modifier: Modifier = M
             style = MaterialTheme.typography.titleSmall,
             color = MaterialTheme.colorScheme.primary
         )
-        val photo = uiState.photo
         if (photo != null) {
             PhotoPreview(uri = photo.uri, rotation = photo.rotation, modifier = Modifier.size(PREVIEW_SIZE))
             Row(horizontalArrangement = Arrangement.spacedBy(PADDING / 2)) {
-                OutlinedButton(onClick = uiState.onPhotoRotate) {
+                OutlinedButton(onClick = onPhotoRotate) {
                     Text(stringResource(RString.collection_form_rotate_photo))
                 }
-                OutlinedButton(onClick = uiState.onPhotoRemove) {
+                OutlinedButton(onClick = onPhotoRemove) {
                     Text(stringResource(RString.collection_form_remove_photo))
                 }
+            }
+        } else if (imageUrl != null) {
+            AsyncImage(
+                model = imageUrl,
+                contentDescription = null,
+                modifier = Modifier.size(PREVIEW_SIZE),
+                contentScale = ContentScale.Fit
+            )
+            OutlinedButton(onClick = onPhotoRemove) {
+                Text(stringResource(RString.collection_form_remove_photo))
             }
         }
         if (photoSources != null) {
@@ -202,12 +268,13 @@ private fun CollectionForm(uiState: NewCollectionUiState, modifier: Modifier = M
 
 /**
  * The save instead of the form, as on the add-item form: a progress bar while it runs; on a
- * failure the message and a retry. The way back to the form is offered only while nothing exists
- * on the server.
+ * failure the message and a retry. The way back to the form is offered only while no call went
+ * through; otherwise [partialText] says what is on the server.
  */
 @Composable
-private fun CollectionSaveView(
+internal fun CollectionSaveView(
     status: CollectionSaveStatus,
+    partialText: String,
     onRetry: () -> Unit,
     onEditForm: () -> Unit,
     modifier: Modifier = Modifier
@@ -233,7 +300,7 @@ private fun CollectionSaveView(
 
             is CollectionSaveStatus.Failed -> {
                 Text(text = status.message.asString(), color = MaterialTheme.colorScheme.error)
-                if (status.isPartial) Text(stringResource(RString.collection_form_save_partial))
+                if (status.isPartial) Text(partialText)
                 Button(onClick = onRetry) { Text(stringResource(RString.collection_form_retry)) }
                 if (!status.isPartial) {
                     OutlinedButton(onClick = onEditForm) { Text(stringResource(RString.collection_form_edit_form)) }

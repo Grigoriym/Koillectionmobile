@@ -20,3 +20,7 @@ data class CollectionRoute(val collectionId: String) : NavKey
  */
 @Serializable
 data class NewCollectionRoute(val parentId: String? = null) : NavKey
+
+/** The edit form of collection [collectionId]. */
+@Serializable
+data class EditCollectionRoute(val collectionId: String) : NavKey

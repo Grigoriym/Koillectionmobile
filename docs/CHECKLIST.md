@@ -1,6 +1,6 @@
 # koillectionmobile checklist
 
-**Current step:** M6.5. M6.4 done 2026-11-16. M6.3 done 2026-11-16. M6.2 done 2026-11-16. M6.1 done 2026-11-16. M6 broken into steps 2026-11-16. M5 done 2026-11-16. M5.7 done 2026-11-16. M5.6 done 2026-11-16. M5.5 done 2026-11-16. M5.4 done 2026-11-16. M5.3 done 2026-11-16. M5.2 done 2026-11-16. M5.1 done 2026-11-16. M5 broken into steps 2026-11-16. M4 done 2026-11-16. M4.4 done 2026-11-16. M4.3 done 2026-11-16. M4.2 done 2026-11-16. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6, 7 and 8 are settled.
+**Current step:** M6.6. M6.5 done 2026-11-16. M6.4 done 2026-11-16. M6.3 done 2026-11-16. M6.2 done 2026-11-16. M6.1 done 2026-11-16. M6 broken into steps 2026-11-16. M5 done 2026-11-16. M5.7 done 2026-11-16. M5.6 done 2026-11-16. M5.5 done 2026-11-16. M5.4 done 2026-11-16. M5.3 done 2026-11-16. M5.2 done 2026-11-16. M5.1 done 2026-11-16. M5 broken into steps 2026-11-16. M4 done 2026-11-16. M4.4 done 2026-11-16. M4.3 done 2026-11-16. M4.2 done 2026-11-16. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6, 7 and 8 are settled.
 
 ## How to use this
 
@@ -79,12 +79,18 @@ Create a collection (top level or child), rename it, set, replace or remove its 
   save view and messages in `feature:collections:ui`, a small copy of M3's. The list has a FAB;
   the collection screen has a "More actions" menu with "New collection". "Pick photo" opens the
   multi-select picker and keeps the first photo, as the edit form's "Replace" does.
-- [ ] **M6.5** — Edit collection: an "edit" action on the collection screen opens the M6.4 form,
+- [x] **M6.5** — Edit collection: an "edit" action on the collection screen opens the M6.4 form,
   prefilled (title, image from its URL). The image can be replaced or removed. The save sends only
   what changed. On success the collection screen and the list read the collection again.
   **Verify:** ViewModel tests (each change alone, no change sends no call, a failure and the
   retry); on the emulator a rename, an image replace and an image remove show in the app and in
   the web UI.
+  Note: its own `EditCollectionViewModel`; the screen shares the M6.4 frame, form and save view
+  (`CollectionFormScaffold`, `CollectionForm`, `CollectionSaveView`). One call per change (rename,
+  upload, image delete); the calls that went through are kept in `SavedStateHandle`, so a retry
+  sends only the rest. "Remove image" drops a new photo and the server image both. A new
+  `CollectionChanges` signal makes the collection screen read again; `CollectionListChanges` (the
+  parent) does the list. Process death is covered by ViewModel tests only, not on the device.
 - [ ] **M6.6** — Device pass of create, edit and delete, then the user confirms with screenshots.
   Fix what breaks, or put it in `docs/revisit.md` with evidence.
   **Verify:** the user confirms.
