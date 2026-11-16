@@ -99,3 +99,5 @@ this app.
   login form with the keyboard already closed leaves the app; the relaunch shows an empty form.
   To make the header wrong while logged in, edit its value in Settings (tap the value field,
   `KEYCODE_MOVE_END`, a run of `KEYCODE_DEL`), save, and pull the list down to refresh.
+- Cleartext warning (M4.4): an `http://` server URL adds a red line under the URL field, which
+  moves Username, Password and Log in down. Tap fields from a dump taken after the URL is typed.

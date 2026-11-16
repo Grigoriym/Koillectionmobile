@@ -62,3 +62,5 @@ entries get deleted — see /finalize.
   commands (user, 2026-11-16); delete this entry if it stops recurring.
 - 2026-11-16 — `jq` is not installed on this machine; a `jq -e ... && next` chain skipped the next
   step and the rest ran anyway. Validate JSON with `python3 -c "import json; ..."`.
+- 2026-11-16 — `./gradlew build` (M4.4) failed "SDK location not found": ran it before reading
+  `docs/machine.local.md`, which says to prefix `ANDROID_HOME=$HOME/Android/Sdk`.
