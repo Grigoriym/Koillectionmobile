@@ -75,3 +75,23 @@ cold session can act on it. Delete an entry when it's fixed.
   module class in the build (or every `*UiModule`/`*DataModule` in `settings.gradle.kts` modules)
   and checks each is in `AppModule`'s `includes` (read the annotation by reflection). Effort: one
   test, if the annotation keeps runtime retention; otherwise a source-text check of `Koin.kt`.
+- 2026-11-16 (M4.5) — MASVS-CODE-3: no advisory feed checks the dependencies yet. `renovate.json`
+  sets `osvVulnerabilityAlerts`, but Renovate runs only after the user installs the Renovate
+  GitHub app on `Grigoriym/Koillectionmobile`. GitHub's own vulnerability alerts are off
+  (`gh api repos/Grigoriym/Koillectionmobile/vulnerability-alerts`: 404 "disabled"). The
+  `renovate-config-validator` run was skipped (user, 2026-11-16: the bot checks the config on its
+  first run). Close when the app is installed and its first run reports no config error.
+- 2026-11-16 (M4.5) — MASVS-PRIVACY-4: log out does not clear Coil's image disk cache.
+  `AuthRepositoryImpl.logOut` (`feature/auth/data/.../AuthRepositoryImpl.kt:57`) clears only the
+  session keys; the app uses Coil's default singleton `ImageLoader` (no `diskCache` config). A log
+  in to another server keeps the first server's images on the device. Fix option: clear the
+  `ImageLoader`'s disk and memory cache on log out.
+- 2026-11-16 (M4.5) — MASVS-PRIVACY-1: `ACCESS_NETWORK_STATE`
+  (`androidApp/src/main/AndroidManifest.xml:5`) has no user in app code. Coil's network fetcher
+  may use it. Check the merged release manifest (M9.2) and the libraries before removing it.
+- 2026-11-16 (M4.5) — Images do not get the custom headers (M4.2). Coil loads them with its own
+  Ktor client (`coil-network-ktor3`, `composeApp/build.gradle.kts:30`), not the app's
+  `HttpClient`, so the `CustomHeaders` plugin does not run. Behind a header-checking proxy
+  (`docs/local-info.md`, "Proxy front") the thumbnails and item images will fail. Not checked on
+  device. Fix option: a singleton `ImageLoader` whose fetcher uses a client with the
+  `CustomHeaders` plugin (server origin only).
