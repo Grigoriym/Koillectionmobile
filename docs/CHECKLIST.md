@@ -1,6 +1,6 @@
 # koillectionmobile checklist
 
-**Current step:** M4 (not broken into steps yet). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6 and 7 are settled.
+**Current step:** M4.1. The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6 and 7 are settled.
 
 ## How to use this
 
@@ -32,25 +32,54 @@ M1 (API layer) is done; its steps and notes are in `docs/CHECKLIST_ARCHIVE.md`.
 M2 (browse) is done; its steps and notes are in `docs/CHECKLIST_ARCHIVE.md`.
 M3 (add item with photos) is done; its steps and notes are in `docs/CHECKLIST_ARCHIVE.md`.
 
-## M4 — network and security parity with wallosmobile (rough scope)
+## M4 — network and security parity with wallosmobile
 
-The user chose all four gaps found against `../Wallosmobile` (user, 2026-11-16):
+The user chose all four gaps found against `../Wallosmobile` (user, 2026-11-16). Model: wallosmobile
+plan §4.5b (custom headers, proxy rejection), §4.5c (local network permission) and its cleartext
+warning (plan §1.1, "Warn on non-HTTPS base URLs"). Not in scope: self-signed certificate trust
+(TOFU). Plan §5 decision 3 still holds.
 
-- `ACCESS_LOCAL_NETWORK`: with `targetSdk` 37 on Android 17, a LAN server times out without it.
-  Port wallosmobile 28.10 (its plan §4.5c, `rememberLocalNetworkPermissionRequest`,
-  `LocalNetworkBanner`). An API 36 AVD cannot show the block. Check on an API 37 AVD
-  (`system-images;android-37.0;google_apis;x86_64` is available) against the test instance at
-  the host's LAN address, not `10.0.2.2`. No real phone unless that AVD cannot show the block
-  (user, 2026-11-16: the port is proven in wallosmobile).
-- A Settings screen, opened from the login screen and from the app, to edit custom headers
-  (reverse-proxy auth). The `CustomHeaders` plugin and storage are already wired
-  (`core/api/.../KoillectionHttpClient.kt`); only the UI is missing. Plus a clear message when
-  a proxy, not Koillection, rejects a request (wallosmobile M28, `ProxyRejection.kt`).
-- A warning at login when the server URL is `http://` and a password is sent.
-- `/masvs-review` to create `docs/security/masvs.md`; `renovate.json` with
-  `osvVulnerabilityAlerts`, as wallosmobile.
-
-Not in scope: self-signed certificate trust (TOFU). Plan §5 decision 3 still holds.
+- [ ] **M4.1** — Local network permission. Port wallosmobile 28.10: `ACCESS_LOCAL_NETWORK` in the
+  manifest, `rememberLocalNetworkPermissionRequest` (`expect`/`actual`, from wallosmobile `uikit`
+  `permission/`), asked at Log in only for a private, link-local or `fc00::/7` address on API 37+,
+  a "denied" login message, and `LocalNetworkBanner` above `MainNavHost`. There is no local
+  `uikit` (settled decisions): put the request in `feature:auth:ui` and the banner in `composeApp`,
+  unless the user prefers a `grappim-kit-uikit` release. Ask at the start of the step. Create an
+  API 37 AVD (`system-images;android-37.0;google_apis;x86_64`) and record it in
+  `docs/machine.local.md`.
+  **Verify:** unit tests for the address check; on the API 37 AVD, against the test instance at
+  the host's LAN address (not `10.0.2.2`): denied gives the message and sends no request, allowed
+  logs in, and a revoke while logged in shows the banner, which leaves after a grant. The API 36
+  AVD logs in with no prompt.
+- [ ] **M4.2** — Settings screen with custom headers. A new `feature:settings:ui` module; port
+  wallosmobile's `customheaders/` screen and ViewModel (`feature/settings/ui`). The storage,
+  validator and Ktor plugin come from `grappim-kit-customheaders` and are already wired
+  (`core/api/.../KoillectionHttpClient.kt`). The app opens Settings as a route from the
+  collection list top bar. The login screen opens it as state, not a route (login has no back
+  stack), as wallosmobile's `LoginBranch`. Keep Log out where it is unless the user asks.
+  **Verify:** ViewModel tests; on the emulator, a header saved from login and from the app
+  reaches the test instance (Ktor log shows the name, the value redacted), and survives `am kill`.
+- [ ] **M4.3** — Proxy rejection message. Port the idea of wallosmobile's `ProxyRejection.kt`, not
+  its rule. Koillection itself answers 401 to a missing or expired JWT (`bearerAuth` re-logs in
+  on it), so "every 401 is a proxy" does not hold here. Settle the rule from evidence: the body
+  and content type of Koillection's own 401 against an nginx `auth_basic` 401, plus 407 and an
+  off-host redirect. A proxy 401 must not start a re-login. Repro: a throwaway `auth_basic` front
+  over the test instance (wallosmobile `docs/local-info.txt`, "Reverse-proxy header auth"); write
+  the recipe for this project into `docs/local-info.md`.
+  **Verify:** `MockEngine` tests for each case, with a root-path base URL as well; on the emulator
+  through the front, no header gives the proxy message at login and in the app, and the M4.2
+  header gets through.
+- [ ] **M4.4** — Cleartext warning at login. When the server URL starts with `http://`, show that
+  the password and the token travel unencrypted. Advisory only: it never disables Log in,
+  because the test instance is plain HTTP. Only a literal `http://` prefix counts.
+  **Verify:** ViewModel tests; on the emulator the warning shows for `http://` and not for
+  `https://`.
+- [ ] **M4.5** — Security register and dependency alerts. Run `/masvs-review` to create
+  `docs/security/masvs.md` (after M4.1–M4.4, so it reviews them). Add `renovate.json` with
+  `osvVulnerabilityAlerts`, as wallosmobile's; keep only the package rules this build needs.
+  Renovate runs only after the user installs the GitHub app on the repo: tell them.
+  **Verify:** `masvs.md` covers every MASVS v2 control with a status; each gap is a
+  `docs/revisit.md` entry or has the user's verdict; `renovate-config-validator` passes.
 
 ## M5 — edit and delete items (rough scope)
 
