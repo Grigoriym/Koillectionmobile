@@ -38,7 +38,10 @@ The user chose all four gaps found against `../Wallosmobile` (user, 2026-11-16):
 
 - `ACCESS_LOCAL_NETWORK`: with `targetSdk` 37 on Android 17, a LAN server times out without it.
   Port wallosmobile 28.10 (its plan §4.5c, `rememberLocalNetworkPermissionRequest`,
-  `LocalNetworkBanner`). An API 36 AVD cannot show the block; wallosmobile needed a real phone.
+  `LocalNetworkBanner`). An API 36 AVD cannot show the block. Check on an API 37 AVD
+  (`system-images;android-37.0;google_apis;x86_64` is available) against the test instance at
+  the host's LAN address, not `10.0.2.2`. No real phone unless that AVD cannot show the block
+  (user, 2026-11-16: the port is proven in wallosmobile).
 - A Settings screen, opened from the login screen and from the app, to edit custom headers
   (reverse-proxy auth). The `CustomHeaders` plugin and storage are already wired
   (`core/api/.../KoillectionHttpClient.kt`); only the UI is missing. Plus a clear message when
