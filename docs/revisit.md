@@ -100,3 +100,13 @@ cold session can act on it. Delete an entry when it's fixed.
   failure the same. A 404 means the item is already gone: a retry after a lost answer, or a delete
   from the web UI. The user then sees a deleted item and has to go back by hand; the collection is
   not told to reload. Fix option: treat `KoillectionError.Http(404)` on delete as success.
+- 2026-11-16 (M5.6) — Two edge cases of the edit save, left as they are.
+  (1) "Back to the form" shows after a failure where no call reported success
+  (`EditItemViewModel.fail`, `isPartial = hasSent`). If the failed call was an image upload whose
+  answer was lost, the server has the new image; the next save is `retry`, which sees a changed
+  image URL and skips that upload (`EditItemUseCaseImpl.plan`, "image URL is still the original
+  one"). A second replacement of the same photo on the form is then not sent.
+  (2) `EditItemResult.DuplicateLabel` from a `retry` (someone added a field with that label on
+  the web meanwhile) after a partial save shows only "Try again", which gives the same answer each
+  time; the user can only leave the form. Fix option for both: let `retry` diff against the server
+  as reloaded, with a fresh `original`, once the form changes after a failure.

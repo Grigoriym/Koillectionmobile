@@ -116,6 +116,10 @@ first — it is often for a problem this toolchain doesn't have.
 - **Run `ktlintCheck` alongside `build`.** `build` skips the root project's
   `:ktlintKotlinScriptCheck`, so `settings.gradle.kts` and root `build.gradle.kts` are linted
   only by `ktlintCheck` (M0.4).
+- **A mutation check copies the file to the scratchpad first and restores from the copy.**
+  `git checkout --` fails on an untracked file (M1.8) and drops the step's own uncommitted edits
+  (M5.6). `jvmTest` has `failFast = true` (`Quality.kt`): a run stops at the first failure, so its
+  report lists fewer tests than exist. That is the stop, not missing tests; run one mutation per run.
 - **Force Gradle tests with `--rerun`** when the test is the proof. An `UP-TO-DATE` test task
   prints "BUILD SUCCESSFUL" without running anything.
 - **A new Koin module needs its `includes` line in `AppModule`** (`composeApp/.../di/Koin.kt`).

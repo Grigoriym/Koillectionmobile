@@ -7,20 +7,12 @@ entries get deleted — see /finalize.
   text held a `#` comment. Use `|` as the delimiter when the text may contain `#`.
 - 2026-11-15 — A KDoc holding `` `application/*+json` `` opened a nested `/*` comment; the
   compiler reported "Unclosed comment" and an unresolved name far below it.
-- 2026-11-15 — `failFast = true` (`Quality.kt`) stopped `jvmTest` at the first failure, so the
-  XML report listed 4 of 14 tests and looked like the others were missing.
-- 2026-11-15 — `failFast` again (M1.4): two mutations in one `jvmTest` run showed only the first
-  failure. Ran one mutation per run with `--tests`, plus a clean-tree run of each filter, since a
-  filter that matches nothing also fails.
 - 2026-11-15 — Ktor `parseUrl("https:///sub")` returned a `Url` with a non-blank host, so a
   host check on the parsed URL passed a URL with no host. Read the host from the text instead.
 - 2026-11-15 — `git rm` of a module's only source file (M1.7) also removed its empty directories,
   so the next heredoc writes failed "No such file or directory". Run `mkdir -p` after it.
 - 2026-11-15 — `../../koillection` has no `vendor/` (M1.7), so API Platform internals (default
   list order) cannot be read from source; the plan records that claim as unchecked.
-- 2026-11-15 — Mutation restore with `git checkout -- <file>` (M1.8) failed ("pathspec did not match") on new,
-  untracked files, so four mutations stacked up. Undid them by hand; copy the file to the
-  scratchpad first and restore from the copy.
 - 2026-11-15 — A Python heredoc that spliced Kotlin raw strings (`"""`) into a test file failed with
   a SyntaxError (M1.9). Write the Kotlin to a scratchpad file and have Python read it.
 - 2026-11-15 — `git rm` of a module's only source file removed its empty directories again
@@ -66,9 +58,6 @@ entries get deleted — see /finalize.
   `docs/machine.local.md`, which says to prefix `ANDROID_HOME=$HOME/Android/Sdk`.
 - 2026-11-16 — `npx --yes --package renovate -- renovate-config-validator` (M4.5) was denied by the
   auto-mode classifier ("Unauthorized Access"), as a package download. The user chose to skip it.
-- 2026-11-16 — A mutation run (M5.1) reported "13 tests completed, 2 failed" of 22: the
-  convention plugin sets `failFast = true` (`build-logic/.../Quality.kt`), so a run with a
-  mutation stops early and shows only the first tests that caught it, not all of them.
 - 2026-11-16 — `./gradlew build` (M5.3) failed "SDK location not found" again: ran it before reading
   `docs/machine.local.md`. Second time (first M4.4); a third makes it a fix (`local.properties` or a `CLAUDE.md` line).
 - 2026-11-16 — A Bash call (M5.5) that started with `cd` into a deep source folder got no verdict
