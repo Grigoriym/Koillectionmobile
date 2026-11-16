@@ -235,3 +235,5 @@ code without checking the licence terms are kept.
    cannot clear it (the web form can). Image fields can be removed. No field reordering in M5:
    new fields go after the last one. A label swap between two fields is allowed: the save moves
    one field to a temporary label first (M5.4).
+   Built in M5.5 as its own `EditItemViewModel` and route, with the add form's parts shared
+   (`ItemFormParts.kt`), not as a mode of `AddItemViewModel`: the two saves have nothing in common.

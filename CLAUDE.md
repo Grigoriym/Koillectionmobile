@@ -13,6 +13,11 @@ attributes; where a machine has no checkout there, `docs/machine.local.md` says 
 server disagree, the server wins. Re-read the source at the start of any step that touches
 the API.
 
+**A probe or setup script copies the API details from the app's code, not from memory.** Keys,
+multipart part names and `Accept` headers come from the `feature:*:data` repositories or
+`fixtures/capture.py`. Guessed ones failed three times (M5.2 `member`; M5.5 `fileImage`, and a
+plain-array answer to `Accept: application/json`), and a wrong part name answers 200 and stores nothing.
+
 **Test against the local instance, never the user's real server.** The real one holds the
 working book catalogue. A local Koillection with a copy of it is in `docs/local-info.md`
 (user, 2026-11-15).

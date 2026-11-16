@@ -69,7 +69,7 @@ entries get deleted — see /finalize.
 - 2026-11-16 — A mutation run (M5.1) reported "13 tests completed, 2 failed" of 22: the
   convention plugin sets `failFast = true` (`build-logic/.../Quality.kt`), so a run with a
   mutation stops early and shows only the first tests that caught it, not all of them.
-- 2026-11-16 — A curl probe (M5.2) read `["hydra:member"]` and failed with `KeyError`: 1.8.5 sends
-  `member` (plan §1 says so; `fixtures/capture.py` uses it). Guessed the key instead of reading it.
 - 2026-11-16 — `./gradlew build` (M5.3) failed "SDK location not found" again: ran it before reading
   `docs/machine.local.md`. Second time (first M4.4); a third makes it a fix (`local.properties` or a `CLAUDE.md` line).
+- 2026-11-16 — A Bash call (M5.5) that started with `cd` into a deep source folder got no verdict
+  from the auto-mode classifier ("reviewed this call without its leading cd"); the identical retry passed.
