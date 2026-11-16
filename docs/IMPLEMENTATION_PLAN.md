@@ -128,7 +128,9 @@ start of any step that touches the API. Facts that shape the design:
   `POST /api/collections` needs only `title` (`collection:write`, `NotBlank`); `parent` is an
   optional IRI, and `ColorListener` picks the colour. The image goes up as multipart part `file`
   to `POST /api/collections/{id}/image`; `PATCH` with `{"deleteImage": true}` removes it
-  (`UploadListener`). Read from the 1.8.5 source in M6.1; M6.2 sends them live.
+  (`UploadListener`). The `Assert\Image` MIME check on `Collection::$file` sits in group
+  `colletion:image` (a typo in 1.8.5), so the server may not run it: an unchecked type can pass.
+  Read from the 1.8.5 source in M6.1; M6.2 sends them live.
 - Writes checked live 2026-11-15 (M3.1, `./gradlew :composeApp:smokeWriteRun`, JVM, local test
   instance at the root path): through the app's repositories, an item in `Books`, two text fields
   (positions 1 and 2), an image field (position 3), a main image upload and a field image upload

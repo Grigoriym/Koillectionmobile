@@ -62,3 +62,5 @@ entries get deleted — see /finalize.
   `docs/machine.local.md`. Second time (first M4.4); a third makes it a fix (`local.properties` or a `CLAUDE.md` line).
 - 2026-11-16 — A Bash call (M5.5) that started with `cd` into a deep source folder got no verdict
   from the auto-mode classifier ("reviewed this call without its leading cd"); the identical retry passed.
+- 2026-11-16 — `./gradlew ... jvmTest --rerun -q` (M6.1 mutation check) hid the failing test names
+  and assertion text, so a `grep FAILED` came back empty although the task failed. Drop `-q` and check the exit code.
