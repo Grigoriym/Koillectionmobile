@@ -90,8 +90,9 @@ warning (plan §1.1, "Warn on non-HTTPS base URLs"). Not in scope: self-signed c
   Note from M4.2 (2026-11-16): the app may not send a custom `Authorization` (reserved: it holds
   the bearer token). A plain `auth_basic` front reads `Authorization`, so the M4.2 header cannot
   pass it. For the "header gets through" case, make the front check another header (for example
-  nginx `if ($http_x_proxy_token != ...)`), and decide with the user whether `auth_basic` users
-  need `Proxy-Authorization` or another answer.
+  nginx `if ($http_x_proxy_token != ...)`): the user chose this (2026-11-16, "we can test on
+  some other custom header"). Still open: whether `auth_basic` users need `Proxy-Authorization`
+  or another answer.
 - [ ] **M4.4** — Cleartext warning at login. When the server URL starts with `http://`, show that
   the password and the token travel unencrypted. Advisory only: it never disables Log in,
   because the test instance is plain HTTP. Only a literal `http://` prefix counts.
