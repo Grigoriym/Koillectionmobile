@@ -1,6 +1,6 @@
 # koillectionmobile checklist
 
-**Current step:** M5.4. M5.3 done 2026-11-16. M5.2 done 2026-11-16. M5.1 done 2026-11-16. M5 broken into steps 2026-11-16. M4 done 2026-11-16. M4.4 done 2026-11-16. M4.3 done 2026-11-16. M4.2 done 2026-11-16. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6, 7 and 8 are settled.
+**Current step:** M5.5. M5.4 done 2026-11-16. M5.3 done 2026-11-16. M5.2 done 2026-11-16. M5.1 done 2026-11-16. M5 broken into steps 2026-11-16. M4 done 2026-11-16. M4.4 done 2026-11-16. M4.3 done 2026-11-16. M4.2 done 2026-11-16. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6, 7 and 8 are settled.
 
 ## How to use this
 
@@ -65,7 +65,7 @@ never removed; no field reordering. Every write goes to the local test instance 
   longer shows it, and the web UI agrees.
   Note: the error shows in a dialog ("The item was not deleted"); the screen keeps the item.
   The device check used a temporary collection (deleted after) and airplane mode for the failure.
-- [ ] **M5.4** — Edit use case (`feature:items:domain`): from the item as loaded (name, fields,
+- [x] **M5.4** — Edit use case (`feature:items:domain`): from the item as loaded (name, fields,
   main image, tags) and the edited form, work out the calls and run them. Deletes first (a freed
   label can be reused), then changes, then new fields (positions after the current last), then a
   new main image, then the tags (only if the set changed). Fields the form cannot edit (types
@@ -76,6 +76,11 @@ never removed; no field reordering. Every write goes to the local test instance 
   422 (M5.2, plan §2), so a conflict must be caught before the calls are sent.
   **Verify:** use case tests with hand-written fakes: each kind of change alone, a mix, no change
   (no calls), a failure in the middle and the retry, a label swap, an untouched non-text field.
+  Note: a label swap is handled: the use case moves one field to a temporary label
+  (`<label> (moving 1)`), visible on the server only if the save stops there. A duplicate final
+  label returns `EditItemResult.DuplicateLabel` before any call. The retry is `retry(original, edit)`;
+  it reads the item again and matches a new field already created by its label. `EditItemUseCase`
+  is bound in `ItemsDataModule`.
 - [ ] **M5.5** — Edit screen: an "edit" action on the item screen opens the M3 add form,
   prefilled from the server (name, text fields, the main image and image fields shown from their
   URLs, the item's tags). An existing photo can be replaced (camera or picker) or, for an image

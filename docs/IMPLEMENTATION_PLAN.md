@@ -232,4 +232,5 @@ code without checking the licence terms are kept.
    prefilled from the server, and the save sends only what changed. The main image can be
    replaced but not removed: Koillection 1.8.5's `Item` upload has no delete property, so the API
    cannot clear it (the web form can). Image fields can be removed. No field reordering in M5:
-   new fields go after the last one.
+   new fields go after the last one. A label swap between two fields is allowed: the save moves
+   one field to a temporary label first (M5.4).

@@ -2,6 +2,8 @@ package com.grappim.koillectionmobile.feature.items.data
 
 import com.grappim.koillectionmobile.feature.items.domain.AddItemUseCase
 import com.grappim.koillectionmobile.feature.items.domain.AddItemUseCaseImpl
+import com.grappim.koillectionmobile.feature.items.domain.EditItemUseCase
+import com.grappim.koillectionmobile.feature.items.domain.EditItemUseCaseImpl
 import com.grappim.koillectionmobile.feature.items.domain.ItemListChanges
 import com.grappim.koillectionmobile.feature.items.domain.ItemsRepository
 import com.grappim.koillectionmobile.feature.tags.domain.TagsRepository
@@ -19,6 +21,10 @@ class ItemsDataModule {
     @Single
     fun provideAddItemUseCase(itemsRepository: ItemsRepository, tagsRepository: TagsRepository): AddItemUseCase =
         AddItemUseCaseImpl(itemsRepository, tagsRepository)
+
+    @Single
+    fun provideEditItemUseCase(itemsRepository: ItemsRepository, tagsRepository: TagsRepository): EditItemUseCase =
+        EditItemUseCaseImpl(itemsRepository, tagsRepository)
 
     @Single
     fun provideItemListChanges(): ItemListChanges = ItemListChanges()
