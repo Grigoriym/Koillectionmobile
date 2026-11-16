@@ -30,8 +30,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -54,13 +56,16 @@ import com.grappim.koillectionmobile.strings.generated.resources.add_item_photo_
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_pick_photos
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_remove_photo
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_rotate_photo
+import com.grappim.koillectionmobile.strings.generated.resources.add_item_save
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_section_photos
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_take_photo
 import com.grappim.koillectionmobile.strings.generated.resources.edit_item_discard_text
+import com.grappim.koillectionmobile.strings.generated.resources.edit_item_discard_text_partial
 import com.grappim.koillectionmobile.strings.generated.resources.edit_item_discard_title
 import com.grappim.koillectionmobile.strings.generated.resources.edit_item_no_main_image
 import com.grappim.koillectionmobile.strings.generated.resources.edit_item_read_only
 import com.grappim.koillectionmobile.strings.generated.resources.edit_item_replace_photo
+import com.grappim.koillectionmobile.strings.generated.resources.edit_item_save_partial
 import com.grappim.koillectionmobile.strings.generated.resources.edit_item_title
 import com.grappim.koillectionmobile.strings.generated.resources.item_retry
 import org.jetbrains.compose.resources.StringResource
@@ -68,6 +73,7 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
+/** [onBack] also runs once the save is done: the item screen below reads the item again. */
 @Composable
 fun EditItemScreen(
     itemId: String,
@@ -76,6 +82,10 @@ fun EditItemScreen(
     viewModel: EditItemViewModel = koinViewModel { parametersOf(itemId) }
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val currentOnBack by rememberUpdatedState(onBack)
+    LaunchedEffect(uiState.isSaved) {
+        if (uiState.isSaved) currentOnBack()
+    }
     EditItemContent(uiState = uiState, onBack = onBack, modifier = modifier)
 }
 
@@ -92,7 +102,11 @@ private fun EditItemContent(uiState: EditItemUiState, onBack: () -> Unit, modifi
     if (isDiscardShown) {
         DiscardDialog(
             title = RString.edit_item_discard_title,
-            text = RString.edit_item_discard_text,
+            text = if ((uiState.save as? SaveStatus.Failed)?.isPartial == true) {
+                RString.edit_item_discard_text_partial
+            } else {
+                RString.edit_item_discard_text
+            },
             onDiscard = {
                 isDiscardShown = false
                 onBack()
@@ -112,6 +126,13 @@ private fun EditItemContent(uiState: EditItemUiState, onBack: () -> Unit, modifi
                             contentDescription = stringResource(RString.add_item_back)
                         )
                     }
+                },
+                actions = {
+                    if (uiState.draft != null && uiState.save == null) {
+                        TextButton(onClick = uiState.onSave, enabled = uiState.canSave) {
+                            Text(stringResource(RString.add_item_save))
+                        }
+                    }
                 }
             )
         }
@@ -120,7 +141,16 @@ private fun EditItemContent(uiState: EditItemUiState, onBack: () -> Unit, modifi
             .fillMaxSize()
             .padding(padding)
         val draft = uiState.draft
+        val save = uiState.save
         when {
+            save != null -> SaveView(
+                status = save,
+                partialText = RString.edit_item_save_partial,
+                onRetry = uiState.onRetrySave,
+                onEditForm = uiState.onEditForm,
+                modifier = contentModifier
+            )
+
             draft != null -> EditForm(draft = draft, uiState = uiState, modifier = contentModifier)
 
             uiState.isLoading -> Box(modifier = contentModifier, contentAlignment = Alignment.Center) {

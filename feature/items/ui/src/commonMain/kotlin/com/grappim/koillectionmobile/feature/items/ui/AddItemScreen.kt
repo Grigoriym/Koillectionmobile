@@ -16,12 +16,9 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -43,26 +40,21 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigationevent.NavigationEventInfo
 import androidx.navigationevent.compose.NavigationBackHandler
 import androidx.navigationevent.compose.rememberNavigationEventState
-import com.grappim.kit.uikit.asString
 import com.grappim.koillectionmobile.strings.RString
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_add_field
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_back
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_discard_text
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_discard_title
-import com.grappim.koillectionmobile.strings.generated.resources.add_item_edit_form
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_main_image
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_make_main
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_name_label
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_photo_label
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_pick_photos
-import com.grappim.koillectionmobile.strings.generated.resources.add_item_preparing
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_remove_photo
-import com.grappim.koillectionmobile.strings.generated.resources.add_item_retry
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_rotate_photo
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_save
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_save_partial
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_section_photos
-import com.grappim.koillectionmobile.strings.generated.resources.add_item_sending
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_take_photo
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_title
 import org.jetbrains.compose.resources.StringResource
@@ -135,7 +127,9 @@ private fun AddItemContent(uiState: AddItemUiState, onBack: () -> Unit, modifier
         if (save != null) {
             SaveView(
                 status = save,
-                uiState = uiState,
+                partialText = RString.add_item_save_partial,
+                onRetry = uiState.onRetrySave,
+                onEditForm = uiState.onEditForm,
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(padding)
@@ -280,43 +274,6 @@ private fun PhotoRowEditor(
                         imageVector = Icons.Filled.Delete,
                         contentDescription = stringResource(RString.add_item_remove_photo)
                     )
-                }
-            }
-        }
-    }
-}
-
-/**
- * The save instead of the form: a progress bar while it runs; on a failure the message and a
- * retry, plus a way back to the form while nothing exists on the server.
- */
-@Composable
-private fun SaveView(status: SaveStatus, uiState: AddItemUiState, modifier: Modifier = Modifier) {
-    Column(
-        modifier = modifier.padding(PADDING),
-        verticalArrangement = Arrangement.spacedBy(PADDING, Alignment.CenterVertically),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        when (status) {
-            SaveStatus.Preparing -> {
-                CircularProgressIndicator()
-                Text(stringResource(RString.add_item_preparing))
-            }
-
-            is SaveStatus.Sending -> {
-                LinearProgressIndicator(
-                    progress = { if (status.total == 0) 0f else status.done.toFloat() / status.total },
-                    modifier = Modifier.fillMaxWidth()
-                )
-                Text(stringResource(RString.add_item_sending, status.done, status.total))
-            }
-
-            is SaveStatus.Failed -> {
-                Text(text = status.message.asString(), color = MaterialTheme.colorScheme.error)
-                if (status.isPartial) Text(stringResource(RString.add_item_save_partial))
-                Button(onClick = uiState.onRetrySave) { Text(stringResource(RString.add_item_retry)) }
-                if (!status.isPartial) {
-                    OutlinedButton(onClick = uiState.onEditForm) { Text(stringResource(RString.add_item_edit_form)) }
                 }
             }
         }

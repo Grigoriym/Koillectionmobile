@@ -5,14 +5,18 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -24,6 +28,7 @@ import com.grappim.kit.uikit.NativeText
 import com.grappim.kit.uikit.asString
 import com.grappim.koillectionmobile.strings.RString
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_discard
+import com.grappim.koillectionmobile.strings.generated.resources.add_item_edit_form
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_field_label
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_field_value
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_keep_editing
@@ -31,9 +36,11 @@ import com.grappim.koillectionmobile.strings.generated.resources.add_item_label_
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_label_required
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_no_category
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_no_tags
+import com.grappim.koillectionmobile.strings.generated.resources.add_item_preparing
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_remove_field
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_retry
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_section_tags
+import com.grappim.koillectionmobile.strings.generated.resources.add_item_sending
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 
@@ -136,4 +143,49 @@ internal fun TagPicker(
     }
 }
 
+/**
+ * The save instead of the form: a progress bar while it runs; on a failure the message and a
+ * retry. [partialText] explains a partial save (some calls went through); only then is the way
+ * back to the form ([onEditForm]) not offered.
+ */
+@Composable
+internal fun SaveView(
+    status: SaveStatus,
+    partialText: StringResource,
+    onRetry: () -> Unit,
+    onEditForm: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier.padding(SAVE_PADDING),
+        verticalArrangement = Arrangement.spacedBy(SAVE_PADDING, Alignment.CenterVertically),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        when (status) {
+            SaveStatus.Preparing -> {
+                CircularProgressIndicator()
+                Text(stringResource(RString.add_item_preparing))
+            }
+
+            is SaveStatus.Sending -> {
+                LinearProgressIndicator(
+                    progress = { if (status.total == 0) 0f else status.done.toFloat() / status.total },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Text(stringResource(RString.add_item_sending, status.done, status.total))
+            }
+
+            is SaveStatus.Failed -> {
+                Text(text = status.message.asString(), color = MaterialTheme.colorScheme.error)
+                if (status.isPartial) Text(stringResource(partialText))
+                Button(onClick = onRetry) { Text(stringResource(RString.add_item_retry)) }
+                if (!status.isPartial) {
+                    OutlinedButton(onClick = onEditForm) { Text(stringResource(RString.add_item_edit_form)) }
+                }
+            }
+        }
+    }
+}
+
 private val TAG_SPACING = 8.dp
+private val SAVE_PADDING = 16.dp

@@ -97,6 +97,11 @@ this app.
   `file` the server answers 200 and stores nothing. A `GET` with `Accept: application/json` gives a
   plain array, not a Hydra `member` list. The Name field is at the top, so a tap on a lower field
   while the keyboard is open can miss: close the keyboard (`KEYCODE_BACK`) and dump first.
+- Save the edit (M5.6): "Save" in the edit form's top bar. On success the form closes and the item
+  screen shows the new values at once; back shows the new name in the collection. A tap on the
+  Author value right after typing in Name (keyboard still open) landed in Name again: close the
+  keyboard after every field. To build the test item, `/api/collections` takes `{"title"}`, and the
+  tags go in a merge-patch `{"tags": [IRIs]}` on the item (`TagsRepositoryImpl.setItemTags`).
 - Local network permission (M4.1): `10.0.2.2` is the emulator's own gateway, so a check of
   `ACCESS_LOCAL_NETWORK` needs another private host address. The test instance listens on
   `127.0.0.1` only: forward a host-only private address to it for the check, not the Wi-Fi LAN

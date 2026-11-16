@@ -55,6 +55,9 @@ data class EditItemDraft(
  * The edit form of an item. Until the item is loaded, [draft] is null: [isLoading] is true, or
  * [error] is set. [original] is the item as loaded. Both survive process death.
  *
+ * While [save] is set, the screen shows it instead of the form. [isSaved] is set once the save is
+ * done: the screen then leaves.
+ *
  * [draft] holds the [EditItemDraft.mainImage] (replace only), the image fields in
  * [EditItemDraft.photos] (existing first, then new ones), and the text and read-only fields in
  * [EditItemDraft.fields] (existing in server order, then new ones).
@@ -67,6 +70,8 @@ data class EditItemUiState(
     val tagGroups: List<TagGroup> = emptyList(),
     val isLoadingTags: Boolean = true,
     val tagsError: NativeText = NativeText.Empty,
+    val save: SaveStatus? = null,
+    val isSaved: Boolean = false,
     val onRetry: () -> Unit = {},
     val onNameChange: (String) -> Unit = {},
     val onAddField: () -> Unit = {},
@@ -79,7 +84,10 @@ data class EditItemUiState(
     val onPhotoReplace: (Int, List<String>) -> Unit = { _, _ -> },
     val onPhotoRotate: (Int) -> Unit = {},
     val onPhotoRemove: (Int) -> Unit = {},
-    val onPhotoLabelChange: (Int, String) -> Unit = { _, _ -> }
+    val onPhotoLabelChange: (Int, String) -> Unit = { _, _ -> },
+    val onSave: () -> Unit = {},
+    val onRetrySave: () -> Unit = {},
+    val onEditForm: () -> Unit = {}
 ) {
     /** The user changed something, so leaving the form asks first. */
     val hasChanges: Boolean get() = draft != null && draft != original
@@ -98,4 +106,16 @@ data class EditItemUiState(
                 .filterValues { it > 1 }
                 .keys
         }
+
+    /** The server rejects a blank label (`NotBlank`). A read-only field is not checked: the form does not send it. */
+    val hasBlankLabel: Boolean
+        get() {
+            val draft = draft ?: return false
+            val blankText = draft.fields.any { it is EditRow.Text && it.label.isBlank() }
+            return blankText || draft.photos.any { it.label.isBlank() }
+        }
+
+    /** As on the add form: a name, and unique, non-blank labels. */
+    val canSave: Boolean
+        get() = draft != null && draft.name.isNotBlank() && duplicateLabels.isEmpty() && !hasBlankLabel
 }

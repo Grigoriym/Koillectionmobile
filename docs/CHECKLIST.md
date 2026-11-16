@@ -1,6 +1,6 @@
 # koillectionmobile checklist
 
-**Current step:** M5.6. M5.5 done 2026-11-16. M5.4 done 2026-11-16. M5.3 done 2026-11-16. M5.2 done 2026-11-16. M5.1 done 2026-11-16. M5 broken into steps 2026-11-16. M4 done 2026-11-16. M4.4 done 2026-11-16. M4.3 done 2026-11-16. M4.2 done 2026-11-16. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6, 7 and 8 are settled.
+**Current step:** M5.7. M5.6 done 2026-11-16. M5.5 done 2026-11-16. M5.4 done 2026-11-16. M5.3 done 2026-11-16. M5.2 done 2026-11-16. M5.1 done 2026-11-16. M5 broken into steps 2026-11-16. M4 done 2026-11-16. M4.4 done 2026-11-16. M4.3 done 2026-11-16. M4.2 done 2026-11-16. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6, 7 and 8 are settled.
 
 ## How to use this
 
@@ -94,13 +94,18 @@ never removed; no field reordering. Every write goes to the local test instance 
   is per image; the picker can return several photos, and only the first is used. The draft and
   the loaded values are in saved state as `EditItemDraft`; M5.6 can build the `ItemSnapshot`
   diff base from `original`, or read the item again.
-- [ ] **M5.6** — Save the edit: run M5.4 from the form with the M3 progress view and retry. On
+- [x] **M5.6** — Save the edit: run M5.4 from the form with the M3 progress view and retry. On
   success return to the item screen, which reads the item again, and refresh the collection (a
   new name shows in the list). An upload 500 names the disk quota, as in M3.6. Delete the photo
   files in `cacheDir/photos/` as M3.6 does.
   **Verify:** ViewModel tests; on the emulator one edit renames the item, changes a text field,
   adds one, removes an image field, replaces the main image and changes the tags; the web UI on
   the local test instance shows the same.
+  Note: the item screen reads the item again through a new `ItemChanges` signal (bound in
+  `ItemsDataModule`). `EditItemResult.Failure` got `isUpload` for the quota message. The loaded
+  `ItemSnapshot` is kept in saved state; the first save is `editItem`, every later one `retry`. A
+  failure after a call went through offers only the retry; before that, "Back to the form" too.
+  `SaveView` moved to `ItemFormParts.kt`. The device check used a temporary collection (deleted after).
 - [ ] **M5.7** — Device pass of edit and delete, then the user confirms with screenshots. Fix what
   breaks, or put it in `docs/revisit.md` with evidence.
   **Verify:** the user confirms.

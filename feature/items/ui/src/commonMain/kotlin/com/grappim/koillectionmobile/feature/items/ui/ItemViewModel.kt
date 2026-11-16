@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.grappim.kit.uikit.NativeText
 import com.grappim.koillectionmobile.core.domain.KoillectionError
+import com.grappim.koillectionmobile.feature.items.domain.ItemChanges
 import com.grappim.koillectionmobile.feature.items.domain.ItemListChanges
 import com.grappim.koillectionmobile.feature.items.domain.ItemsRepository
 import com.grappim.koillectionmobile.feature.tags.domain.TagsRepository
@@ -17,6 +18,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.StringResource
@@ -27,7 +29,8 @@ import org.koin.core.annotation.KoinViewModel
  * Reads the item, its fields and its tags in parallel. The tags are sorted by label, as the web UI
  * shows them: `Item::$tags` has `OrderBy(label)`, but the API list does not apply it.
  *
- * A delete tells the item's collection to read its list again ([ItemListChanges]).
+ * A delete tells the item's collection to read its list again ([ItemListChanges]). A save on the
+ * edit form ([ItemChanges]) reads the item again.
  *
  * [itemId] arrives through `parametersOf` at the call site. [InjectedParam] tells the Koin
  * compiler plugin not to look for a `String` definition in the graph.
@@ -37,7 +40,8 @@ class ItemViewModel(
     @InjectedParam private val itemId: String,
     private val itemsRepository: ItemsRepository,
     private val tagsRepository: TagsRepository,
-    private val itemListChanges: ItemListChanges
+    private val itemListChanges: ItemListChanges,
+    private val itemChanges: ItemChanges
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(
@@ -50,6 +54,9 @@ class ItemViewModel(
 
     init {
         load()
+        viewModelScope.launch {
+            itemChanges.changedItems.filter { it == itemId }.collect { load() }
+        }
     }
 
     private fun delete() {

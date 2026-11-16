@@ -23,8 +23,8 @@ import org.koin.core.annotation.KoinViewModel
  * [collectionId] arrives through `parametersOf` at the call site. [InjectedParam] tells the Koin
  * compiler plugin not to look for a `String` definition in the graph.
  *
- * A new item in this collection ([ItemListChanges], from the add-item form) reads everything
- * again, while the screen waits lower on the back stack.
+ * A change to this collection's items ([ItemListChanges]: a new item, a saved edit, a delete)
+ * reads everything again, while the screen waits lower on the back stack.
  */
 @KoinViewModel
 class CollectionViewModel(

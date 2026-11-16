@@ -6,6 +6,7 @@ import com.grappim.koillectionmobile.core.domain.KoillectionError
 import com.grappim.koillectionmobile.feature.items.domain.Datum
 import com.grappim.koillectionmobile.feature.items.domain.Image
 import com.grappim.koillectionmobile.feature.items.domain.Item
+import com.grappim.koillectionmobile.feature.items.domain.ItemChanges
 import com.grappim.koillectionmobile.feature.items.domain.ItemListChanges
 import com.grappim.koillectionmobile.feature.items.domain.ItemsRepository
 import com.grappim.koillectionmobile.feature.tags.domain.Tag
@@ -34,6 +35,7 @@ class ItemViewModelTest {
     private val items = FakeItemsRepository()
     private val tags = FakeTagsRepository()
     private val itemListChanges = ItemListChanges()
+    private val itemChanges = ItemChanges()
     private val mainDispatcherRule = MainDispatcherRule()
 
     @BeforeTest
@@ -46,7 +48,7 @@ class ItemViewModelTest {
         mainDispatcherRule.tearDown()
     }
 
-    private fun createSut() = ItemViewModel(DUNE.id, items, tags, itemListChanges)
+    private fun createSut() = ItemViewModel(DUNE.id, items, tags, itemListChanges, itemChanges)
 
     private fun queueAll() {
         items.queue()
@@ -245,6 +247,21 @@ class ItemViewModelTest {
 
         assertEquals(1, items.itemCalls.size)
         assertEquals(1, tags.calls.size)
+    }
+
+    @Test
+    fun `a saved edit of this item reads it again and one of another item does not`() {
+        val sut = loadedSut()
+
+        itemChanges.notifyChanged("other-item")
+        assertEquals(1, items.itemCalls.size)
+
+        queueAll()
+        itemChanges.notifyChanged(DUNE.id)
+        answerAll(item = Result.success(DUNE.copy(name = "Dune Messiah")))
+
+        assertEquals(2, items.itemCalls.size)
+        assertEquals("Dune Messiah", sut.uiState.value.name)
     }
 
     /** A loaded item; the delete waits until the test completes [FakeItemsRepository.delete]. */

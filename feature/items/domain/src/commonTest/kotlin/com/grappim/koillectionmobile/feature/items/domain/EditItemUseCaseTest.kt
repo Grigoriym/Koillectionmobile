@@ -122,6 +122,7 @@ class EditItemUseCaseTest {
 
                 val failure = assertIs<EditItemResult.Failure>(useCase.editItem(original, MIX), case)
                 assertSame(server.error, failure.error, case)
+                assertEquals(failing.startsWith("upload"), failure.isUpload, case)
                 val failedAt = MIX_CALLS.indexOf(failing)
                 assertEquals(MIX_CALLS.take(failedAt + 1), server.calls, case)
 

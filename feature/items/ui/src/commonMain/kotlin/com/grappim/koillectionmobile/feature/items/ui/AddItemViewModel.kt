@@ -335,7 +335,7 @@ private fun AddItemState.isAtUpload(newItem: NewItem): Boolean = itemId != null 
     ((newItem.mainImage != null && !mainImageDone) || imageFieldIds.size > imageFieldsUploaded)
 
 /** An upload 500 usually means a full upload quota (plan §2), so that one is named. */
-private fun Throwable.toSaveMessage(uploadFailed: Boolean): NativeText = when (this) {
+internal fun Throwable.toSaveMessage(uploadFailed: Boolean): NativeText = when (this) {
     is KoillectionError.Network -> NativeText.Resource(RString.add_item_save_error_network)
 
     is KoillectionError.Server -> if (uploadFailed && status == HTTP_INTERNAL_ERROR) {

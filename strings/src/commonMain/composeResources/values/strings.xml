@@ -104,6 +104,9 @@
     <string name="edit_item_read_only">Read only (field type: %1$s)</string>
     <string name="edit_item_discard_title">Discard your changes?</string>
     <string name="edit_item_discard_text">The changes on this form are lost. The item on the server stays as it is.</string>
+    <string name="edit_item_discard_text_partial">Some of the changes are already on the server. The rest are lost.</string>
+    <string name="edit_item_save_partial">Some of the changes are on the server, not all of them. Try again to send the rest.</string>
+    <string name="edit_item_save_error_duplicate_label">Saving stopped: two fields would have the label "%1$s". Nothing was sent in this try.</string>
 
     <string name="settings_title">Settings</string>
     <string name="settings_back">Back</string>

@@ -41,8 +41,11 @@ sealed interface EditItemResult {
     /** No call was sent: two fields would have [label] (labels are unique within an item, server rule). */
     data class DuplicateLabel(val label: String) : EditItemResult
 
-    /** Some calls may have gone through: retry with [EditItemUseCase.retry]. */
-    data class Failure(val error: Throwable) : EditItemResult
+    /**
+     * Some calls may have gone through: retry with [EditItemUseCase.retry]. [isUpload]: the failed
+     * call was an image upload (the main image or a field image).
+     */
+    data class Failure(val error: Throwable, val isUpload: Boolean = false) : EditItemResult
 }
 
 interface EditItemUseCase {
@@ -113,12 +116,13 @@ class EditItemUseCaseImpl(private val itemsRepository: ItemsRepository, private 
             run(original.item.id, call) {
                 done++
                 onProgress(EditItemProgress(done, total))
-            }.onFailure { return EditItemResult.Failure(it) }
+            }?.let { return it }
         }
         return EditItemResult.Success
     }
 
-    private suspend fun run(itemId: String, call: Call, onCallDone: () -> Unit): Result<Unit> {
+    /** Sends [call]. Returns null on success. */
+    private suspend fun run(itemId: String, call: Call, onCallDone: () -> Unit): EditItemResult.Failure? {
         val result: Result<Any> = when (call) {
             is Call.DeleteField -> itemsRepository.deleteDatum(call.datumId)
 
@@ -133,7 +137,7 @@ class EditItemUseCaseImpl(private val itemsRepository: ItemsRepository, private 
 
             is Call.CreateImageField -> {
                 val datum = itemsRepository.createImageDatum(itemId, call.field.label, call.position)
-                    .getOrElse { return Result.failure(it) }
+                    .getOrElse { return EditItemResult.Failure(it) }
                 onCallDone()
                 upload(datum.id, call.field.image)
             }
@@ -143,7 +147,13 @@ class EditItemUseCaseImpl(private val itemsRepository: ItemsRepository, private 
 
             is Call.SetTags -> tagsRepository.setItemTags(itemId, call.tagIds)
         }
-        return result.map { onCallDone() }
+        return result.fold(
+            onSuccess = {
+                onCallDone()
+                null
+            },
+            onFailure = { EditItemResult.Failure(it, isUpload = call.isUpload) }
+        )
     }
 
     private suspend fun upload(datumId: String, image: NewImage) =
@@ -261,21 +271,29 @@ class EditItemUseCaseImpl(private val itemsRepository: ItemsRepository, private 
         /** The number of server calls, for the progress. */
         val size: Int get() = 1
 
+        /** The call (its last part, for [CreateImageField]) is an image upload. */
+        val isUpload: Boolean get() = false
+
         class DeleteField(val datumId: String) : Call
 
         class Rename(val name: String) : Call
 
         class PatchField(val datumId: String, val label: String?, val value: String?) : Call
 
-        class UploadFieldImage(val datumId: String, val image: NewImage) : Call
+        class UploadFieldImage(val datumId: String, val image: NewImage) : Call {
+            override val isUpload: Boolean get() = true
+        }
 
         class CreateTextField(val field: NewTextField, val position: Int) : Call
 
         class CreateImageField(val field: NewImageField, val position: Int) : Call {
             override val size: Int get() = 2
+            override val isUpload: Boolean get() = true
         }
 
-        class UploadMainImage(val image: NewImage) : Call
+        class UploadMainImage(val image: NewImage) : Call {
+            override val isUpload: Boolean get() = true
+        }
 
         class SetTags(val tagIds: List<String>) : Call
     }

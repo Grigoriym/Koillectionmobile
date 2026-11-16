@@ -7,19 +7,41 @@ import com.grappim.kit.uikit.NativeText
 import com.grappim.koillectionmobile.core.domain.KoillectionError
 import com.grappim.koillectionmobile.core.image.Rotation
 import com.grappim.koillectionmobile.feature.items.domain.Datum
+import com.grappim.koillectionmobile.feature.items.domain.EditItemProgress
+import com.grappim.koillectionmobile.feature.items.domain.EditItemResult
+import com.grappim.koillectionmobile.feature.items.domain.EditItemUseCase
+import com.grappim.koillectionmobile.feature.items.domain.EditedField
 import com.grappim.koillectionmobile.feature.items.domain.Image
 import com.grappim.koillectionmobile.feature.items.domain.Item
+import com.grappim.koillectionmobile.feature.items.domain.ItemChanges
+import com.grappim.koillectionmobile.feature.items.domain.ItemEdit
+import com.grappim.koillectionmobile.feature.items.domain.ItemListChanges
+import com.grappim.koillectionmobile.feature.items.domain.ItemSnapshot
 import com.grappim.koillectionmobile.feature.items.domain.ItemsRepository
+import com.grappim.koillectionmobile.feature.items.domain.NewImage
+import com.grappim.koillectionmobile.feature.items.domain.NewTextField
 import com.grappim.koillectionmobile.feature.tags.domain.Tag
 import com.grappim.koillectionmobile.feature.tags.domain.TagCategory
 import com.grappim.koillectionmobile.strings.RString
+import com.grappim.koillectionmobile.strings.generated.resources.add_item_save_error_http
+import com.grappim.koillectionmobile.strings.generated.resources.add_item_save_error_photo
+import com.grappim.koillectionmobile.strings.generated.resources.add_item_save_error_quota
+import com.grappim.koillectionmobile.strings.generated.resources.add_item_save_unfinished
+import com.grappim.koillectionmobile.strings.generated.resources.edit_item_save_error_duplicate_label
 import com.grappim.koillectionmobile.strings.generated.resources.item_error_network
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertIs
 import kotlin.test.assertNull
+import kotlin.test.assertSame
 import kotlin.test.assertTrue
 
 class EditItemViewModelTest {
@@ -27,6 +49,9 @@ class EditItemViewModelTest {
     private val items = FakeItemsRepository()
     private val tags = FakeTagsRepository()
     private val photoFiles = FakePhotoFiles()
+    private val editUseCase = FakeEditItemUseCase()
+    private val itemListChanges = ItemListChanges()
+    private val itemChanges = ItemChanges()
     private val savedStateHandle = SavedStateHandle()
     private val mainDispatcherRule = MainDispatcherRule()
 
@@ -44,11 +69,18 @@ class EditItemViewModelTest {
     /** Creates the ViewModel and answers the tag list at once. */
     private fun createSut(handle: SavedStateHandle = savedStateHandle): EditItemViewModel {
         tags.queue()
-        val sut = EditItemViewModel(DUNE.id, items, tags, photoFiles, handle)
+        val sut = EditItemViewModel(DUNE.id, items, tags, editUseCase, photoFiles, itemListChanges, itemChanges, handle)
         tags.tags.removeFirst().complete(Result.success(listOf(NOVEL, GERMAN)))
         tags.categories.removeFirst().complete(Result.success(emptyList<TagCategory>()))
         return sut
     }
+
+    /** What a process death keeps: every saved-state value. */
+    private fun restoredHandle() = SavedStateHandle(
+        savedStateHandle.keys().associateWith {
+            savedStateHandle.get<Any>(it)
+        }
+    )
 
     private val draft get(): EditItemDraft = checkNotNull(createdSut.uiState.value.draft)
 
@@ -246,7 +278,7 @@ class EditItemViewModelTest {
         sut.uiState.value.onPhotoReplace(draft.mainImage.id, listOf("content://a"))
 
         val restored =
-            createSut(SavedStateHandle(mapOf("edit_item_form" to savedStateHandle.get<String>("edit_item_form"))))
+            createSut(restoredHandle())
 
         val state = restored.uiState.value
         assertEquals(1, items.itemCalls.size)
@@ -263,7 +295,7 @@ class EditItemViewModelTest {
         sut.uiState.value.onAddField()
 
         val restored =
-            createSut(SavedStateHandle(mapOf("edit_item_form" to savedStateHandle.get<String>("edit_item_form"))))
+            createSut(restoredHandle())
         restored.uiState.value.onAddField()
 
         val ids = checkNotNull(restored.uiState.value.draft).fields.map { it.id }
@@ -281,6 +313,256 @@ class EditItemViewModelTest {
         store.clear()
 
         assertEquals(listOf("content://a", "content://b"), photoFiles.deleted)
+    }
+
+    @Test
+    fun `save is off with a blank name or a blank label`() {
+        val sut = loaded()
+        assertTrue(sut.uiState.value.canSave)
+
+        sut.uiState.value.onNameChange(" ")
+        assertFalse(sut.uiState.value.canSave, "a blank name")
+        sut.uiState.value.onNameChange("Dune")
+
+        sut.uiState.value.onAddField()
+        assertFalse(sut.uiState.value.canSave, "a blank text label")
+        sut.uiState.value.onRemoveField(draft.fields.last().id)
+
+        sut.uiState.value.onPhotoLabelChange(draft.photos.single().id, "")
+        assertFalse(sut.uiState.value.canSave, "a blank image label")
+
+        sut.uiState.value.onSave()
+        assertEquals(emptyList(), editUseCase.calls)
+    }
+
+    @Test
+    fun `save sends the form against the item as loaded`() {
+        val sut = loaded()
+        val s = { sut.uiState.value }
+        s().onNameChange(" Dune Messiah ")
+        s().onValueChange(draft.fields.first().id, "F. Herbert")
+        s().onAddField()
+        s().onLabelChange(draft.fields.last().id, "Pages")
+        s().onValueChange(draft.fields.last().id, "412")
+        s().onPhotoRemove(draft.photos.single().id)
+        s().onPhotoReplace(draft.mainImage.id, listOf("content://a"))
+        s().onPhotoRotate(draft.mainImage.id)
+        s().onPhotosAdd(listOf("content://b"))
+        s().onPhotoLabelChange(draft.photos.single().id, "Spine")
+        s().onTagToggle(GERMAN.id)
+
+        s().onSave()
+
+        val (kind, original, edit) = editUseCase.calls.single()
+        assertEquals("edit", kind)
+        assertEquals(ItemSnapshot(DUNE, listOf(AUTHOR, TITLE_PAGE, PUBLISHED), setOf(NOVEL.id)), original)
+        assertEquals("Dune Messiah", edit.name)
+        assertEquals(listOf<EditedField>(EditedField.Text("author", "Author", "F. Herbert")), edit.fields)
+        assertEquals(listOf(NewTextField("Pages", "412")), edit.newTextFields)
+        assertEquals(listOf("Spine" to "content://b@NONE"), edit.newImageFields.map { it.label to it.image.text() })
+        assertEquals("content://a@${Rotation.entries[1]}", edit.newMainImage?.text())
+        assertEquals(setOf(NOVEL.id, GERMAN.id), edit.tagIds.toSet())
+    }
+
+    @Test
+    fun `a replaced field image is sent with its field and an unchanged image is not`() {
+        val sut = loaded()
+        sut.uiState.value.onPhotoReplace(draft.photos.single().id, listOf("content://c"))
+
+        sut.uiState.value.onSave()
+
+        val edit = editUseCase.calls.single().third
+        val page = assertIs<EditedField.Image>(edit.fields.single { it.datumId == "title-page" })
+        assertEquals("content://c@NONE", page.newImage?.text())
+        assertNull(edit.newMainImage)
+        assertEquals(listOf("content://c"), photoFiles.prepared)
+    }
+
+    @Test
+    fun `a read-only field is not sent`() {
+        loaded().uiState.value.onSave()
+
+        val edit = editUseCase.calls.single().third
+        assertEquals(listOf("author", "title-page"), edit.fields.map { it.datumId })
+    }
+
+    @Test
+    fun `a successful save deletes the photos tells the item and the collection and leaves`() {
+        val sut = loaded()
+        sut.uiState.value.onPhotoReplace(draft.mainImage.id, listOf("content://a"))
+
+        val (items, collections) = signalsDuring { sut.uiState.value.onSave() }
+
+        assertTrue(sut.uiState.value.isSaved)
+        assertEquals(listOf("content://a"), photoFiles.deleted)
+        assertEquals(listOf(DUNE.id), items)
+        assertEquals(listOf("books"), collections)
+    }
+
+    @Test
+    fun `progress shows the finished and the total calls`() {
+        val sut = loaded()
+        val gate = CompletableDeferred<EditItemResult>()
+        editUseCase.answer = { onProgress ->
+            onProgress(EditItemProgress(1, 4))
+            gate.await()
+        }
+
+        sut.uiState.value.onSave()
+
+        assertEquals(SaveStatus.Sending(1, 4), sut.uiState.value.save)
+        assertFalse(sut.uiState.value.isSaved)
+    }
+
+    @Test
+    fun `an upload 500 names the upload quota and another 500 only the status`() {
+        for (isUpload in listOf(true, false)) {
+            editUseCase.calls.clear()
+            editUseCase.answer = { EditItemResult.Failure(KoillectionError.Server(500, null), isUpload) }
+            // A fresh saved state: the first round's started save would come back as unfinished.
+            val sut = createSut(SavedStateHandle())
+
+            sut.uiState.value.onSave()
+
+            val failed = assertIs<SaveStatus.Failed>(sut.uiState.value.save)
+            val expected = if (isUpload) {
+                NativeText.Resource(RString.add_item_save_error_quota)
+            } else {
+                NativeText.Arguments(RString.add_item_save_error_http, listOf(500))
+            }
+            assertEquals(expected, failed.message, "isUpload: $isUpload")
+        }
+    }
+
+    @Test
+    fun `a failure after a call went through offers only the retry and the retry sends the same edit`() {
+        val sut = loaded()
+        sut.uiState.value.onPhotoReplace(draft.mainImage.id, listOf("content://a"))
+        editUseCase.answer = { onProgress ->
+            onProgress(EditItemProgress(0, 3))
+            onProgress(EditItemProgress(1, 3))
+            EditItemResult.Failure(KoillectionError.Network(Exception("offline")))
+        }
+        sut.uiState.value.onSave()
+
+        assertTrue(assertIs<SaveStatus.Failed>(sut.uiState.value.save).isPartial)
+        sut.uiState.value.onEditForm()
+        assertIs<SaveStatus.Failed>(sut.uiState.value.save)
+
+        editUseCase.answer = { EditItemResult.Success }
+        sut.uiState.value.onRetrySave()
+
+        assertEquals(listOf("edit", "retry"), editUseCase.calls.map { it.first })
+        assertSame(editUseCase.calls[0].third, editUseCase.calls[1].third)
+        assertEquals(listOf("content://a"), photoFiles.prepared)
+        assertTrue(sut.uiState.value.isSaved)
+    }
+
+    @Test
+    fun `a failure before any call can go back to the form and the next save is a retry`() {
+        val sut = loaded()
+        editUseCase.answer = { EditItemResult.Failure(KoillectionError.Network(Exception("offline"))) }
+        sut.uiState.value.onSave()
+        assertFalse(assertIs<SaveStatus.Failed>(sut.uiState.value.save).isPartial)
+
+        sut.uiState.value.onEditForm()
+        assertNull(sut.uiState.value.save)
+        sut.uiState.value.onNameChange("Dune Messiah")
+        editUseCase.answer = { EditItemResult.Success }
+        sut.uiState.value.onSave()
+
+        assertEquals(listOf("edit", "retry"), editUseCase.calls.map { it.first })
+        assertEquals("Dune Messiah", editUseCase.calls[1].third.name)
+    }
+
+    @Test
+    fun `a duplicate label found by the use case names the label`() {
+        val sut = loaded()
+        editUseCase.answer = { EditItemResult.DuplicateLabel("Author") }
+
+        sut.uiState.value.onSave()
+
+        val failed = assertIs<SaveStatus.Failed>(sut.uiState.value.save)
+        assertEquals(
+            NativeText.Arguments(RString.edit_item_save_error_duplicate_label, listOf("Author")),
+            failed.message
+        )
+        assertFalse(failed.isPartial)
+    }
+
+    @Test
+    fun `a photo that cannot be read fails the save before any server call`() {
+        val sut = loaded()
+        sut.uiState.value.onPhotosAdd(listOf("content://broken"))
+        sut.uiState.value.onPhotoLabelChange(draft.photos.last().id, "Spine")
+        photoFiles.unreadable += "content://broken"
+
+        sut.uiState.value.onSave()
+
+        val failed = assertIs<SaveStatus.Failed>(sut.uiState.value.save)
+        assertEquals(NativeText.Resource(RString.add_item_save_error_photo), failed.message)
+        assertEquals(emptyList(), editUseCase.calls)
+    }
+
+    @Test
+    fun `a save cut by process death comes back as a retry against the item as loaded`() {
+        val sut = loaded()
+        sut.uiState.value.onNameChange("Dune Messiah")
+        editUseCase.answer = { CompletableDeferred<EditItemResult>().await() }
+        sut.uiState.value.onSave()
+
+        val restored = createSut(restoredHandle())
+        val failed = assertIs<SaveStatus.Failed>(restored.uiState.value.save)
+        assertEquals(NativeText.Resource(RString.add_item_save_unfinished), failed.message)
+        assertTrue(failed.isPartial)
+
+        editUseCase.answer = { EditItemResult.Success }
+        restored.uiState.value.onRetrySave()
+
+        val (kind, original, edit) = editUseCase.calls.last()
+        assertEquals("retry", kind)
+        assertEquals(editUseCase.calls.first().second, original)
+        assertEquals("Dune Messiah", edit.name)
+        assertEquals(1, items.itemCalls.size)
+        assertTrue(restored.uiState.value.isSaved)
+    }
+
+    /** The item ids on [itemChanges] and the collection ids on [itemListChanges] while [block] runs. */
+    private fun signalsDuring(block: () -> Unit): Pair<List<String>, List<String>> {
+        val changedItems = mutableListOf<String>()
+        val changedCollections = mutableListOf<String>()
+        val scope = CoroutineScope(Dispatchers.Main)
+        scope.launch { itemChanges.changedItems.collect { changedItems += it } }
+        scope.launch { itemListChanges.changedCollections.collect { changedCollections += it } }
+        block()
+        scope.cancel()
+        return changedItems to changedCollections
+    }
+
+    private fun NewImage.text() = bytes.decodeToString()
+
+    /** Records each call as ("edit" or "retry", original, edit); [answer] decides the result. */
+    private class FakeEditItemUseCase : EditItemUseCase {
+        val calls = mutableListOf<Triple<String, ItemSnapshot, ItemEdit>>()
+        var answer: suspend ((EditItemProgress) -> Unit) -> EditItemResult = { EditItemResult.Success }
+
+        override suspend fun editItem(
+            original: ItemSnapshot,
+            edit: ItemEdit,
+            onProgress: (EditItemProgress) -> Unit
+        ): EditItemResult {
+            calls += Triple("edit", original, edit)
+            return answer(onProgress)
+        }
+
+        override suspend fun retry(
+            original: ItemSnapshot,
+            edit: ItemEdit,
+            onProgress: (EditItemProgress) -> Unit
+        ): EditItemResult {
+            calls += Triple("retry", original, edit)
+            return answer(onProgress)
+        }
     }
 
     private class FakeItemsRepository : ItemsRepository {
