@@ -137,6 +137,14 @@ start of any step that touches the API. Facts that shape the design:
   `disk_space_allowed` at 1 byte, `POST /api/items` and the text fields worked and the main-image
   upload got HTTP 500 (the `HasEnoughSpaceForUpload` violation, not a 422). The add-item form names
   the quota for a 500 at an image upload only.
+- Edit and delete (read in the 1.8.5 source 2026-11-16, start of M5; not sent live yet, M5.2):
+  `Item` and `Datum` both have `Patch` and `Delete`. A new upload to `/api/items/{id}/image` or
+  `/api/data/{id}/image` deletes the old file (`ImageHandler::upload` calls `removeOldFile`). A
+  deleted item or field takes its files with it (`UploadListener::postRemove`); `Item::$data` has
+  `orphanRemoval`. `Item`'s `#[Upload]` has no `deleteProperty`, so the API cannot remove a main
+  image. `DatumLabelNotExistsInParentValidator` skips the field itself, so a `PATCH` that keeps
+  a label passes; a label used by another field of the item fails. The test instance's items
+  hold only `text` and `image` fields (4007 and 1577).
 - Known server-side trap: Koillection's Docker entrypoint can regenerate `JWT_PASSPHRASE` on
   restart, which breaks API login with a 500 while the website keeps working. Upstream issues
   #1600, #1400, #1410. The app should show a clear message for a 500 at login, not a
@@ -206,3 +214,8 @@ code without checking the licence terms are kept.
    does. Text fields are free label/value rows: nothing book-specific in the app. Tags are picked
    from the server's existing tags only; the form cannot create one.
    Changed 2026-11-16 (user): the form gets tag creation in M7.
+8. **Edit-item form** — *decided 2026-11-16 (start of M5)*: the edit screen is the M3 add form,
+   prefilled from the server, and the save sends only what changed. The main image can be
+   replaced but not removed: Koillection 1.8.5's `Item` upload has no delete property, so the API
+   cannot clear it (the web form can). Image fields can be removed. No field reordering in M5:
+   new fields go after the last one.
