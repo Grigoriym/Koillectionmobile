@@ -289,6 +289,14 @@ class ItemViewModelTest {
             fileName: String,
             mimeType: String
         ): Result<Datum> = error("not used")
+
+        override suspend fun renameItem(id: String, name: String): Result<Item> = error("not used")
+
+        override suspend fun updateDatum(id: String, label: String?, value: String?): Result<Datum> = error("not used")
+
+        override suspend fun deleteDatum(id: String): Result<Unit> = error("not used")
+
+        override suspend fun deleteItem(id: String): Result<Unit> = error("not used")
     }
 
     private class FakeTagsRepository : TagsRepository {

@@ -298,6 +298,125 @@ class ItemsRepositoryImplTest {
         )
     }
 
+    @Test
+    fun `renameItem patches only the name as merge-patch+json`() = runTest {
+        val repository = repository("/sub/api/items/$ITEM_ID" to (HttpStatusCode.OK to fixture("item_one.json")))
+
+        val item = repository.renameItem(ITEM_ID, "Auswahl").getOrThrow()
+
+        val request = requests.single()
+        assertEquals(HttpMethod.Patch, request.method)
+        assertEquals("/sub/api/items/$ITEM_ID", request.url.fullPath)
+        assertEquals("application/merge-patch+json", request.body.contentType.toString())
+        assertEquals(json.parseToJsonElement("""{"name":"Auswahl"}"""), body(request))
+        assertEquals(ITEM_ID, item.id)
+    }
+
+    @Test
+    fun `updateDatum with a label and a value patches both as merge-patch+json`() = runTest {
+        val repository = repository("/sub/api/data/datum-1" to (HttpStatusCode.OK to DATUM_TEXT))
+
+        val datum = repository.updateDatum("datum-1", label = "Author", value = "Theodor Echtermeyer").getOrThrow()
+
+        val request = requests.single()
+        assertEquals(HttpMethod.Patch, request.method)
+        assertEquals("/sub/api/data/datum-1", request.url.fullPath)
+        assertEquals("application/merge-patch+json", request.body.contentType.toString())
+        assertEquals(
+            json.parseToJsonElement("""{"label":"Author","value":"Theodor Echtermeyer"}"""),
+            body(request)
+        )
+        assertEquals("datum-1", datum.id)
+    }
+
+    @Test
+    fun `updateDatum with only a label leaves the value key out`() = runTest {
+        val repository = repository("/sub/api/data/datum-2" to (HttpStatusCode.OK to DATUM_IMAGE))
+
+        repository.updateDatum("datum-2", label = "Preface").getOrThrow()
+
+        assertEquals(json.parseToJsonElement("""{"label":"Preface"}"""), body(requests.single()))
+    }
+
+    @Test
+    fun `updateDatum with only a value leaves the label key out`() = runTest {
+        val repository = repository("/sub/api/data/datum-1" to (HttpStatusCode.OK to DATUM_TEXT))
+
+        repository.updateDatum("datum-1", value = "").getOrThrow()
+
+        assertEquals(json.parseToJsonElement("""{"value":""}"""), body(requests.single()))
+    }
+
+    @Test
+    fun `a rejected updateDatum is a failed result that holds the KoillectionError`() = runTest {
+        val repository = repository(
+            "/sub/api/data/datum-1" to (
+                HttpStatusCode.UnprocessableEntity to
+                    """{"title":"An error occurred","detail":"item: error.datum.label_already_used"}"""
+                )
+        )
+
+        assertIs<KoillectionError.Validation>(repository.updateDatum("datum-1", label = "Title").exceptionOrNull())
+    }
+
+    @Test
+    fun `deleteDatum sends DELETE to the field's path`() = runTest {
+        val repository = repository("/sub/api/data/datum-1" to (HttpStatusCode.NoContent to ""))
+
+        repository.deleteDatum("datum-1").getOrThrow()
+
+        val request = requests.single()
+        assertEquals(HttpMethod.Delete, request.method)
+        assertEquals("/sub/api/data/datum-1", request.url.fullPath)
+    }
+
+    @Test
+    fun `deleteItem sends DELETE to the item's path`() = runTest {
+        val repository = repository("/sub/api/items/$ITEM_ID" to (HttpStatusCode.NoContent to ""))
+
+        repository.deleteItem(ITEM_ID).getOrThrow()
+
+        val request = requests.single()
+        assertEquals(HttpMethod.Delete, request.method)
+        assertEquals("/sub/api/items/$ITEM_ID", request.url.fullPath)
+    }
+
+    @Test
+    fun `a failed delete is a failed result that holds the KoillectionError`() = runTest {
+        val repository = repository()
+
+        assertIs<KoillectionError.NotFound>(repository.deleteItem("missing").exceptionOrNull())
+    }
+
+    /** `CLAUDE.md`, Verification: at a root-path server Ktor's merged path differs from `/sub`. */
+    @Test
+    fun `the edit and delete calls keep their paths at a root-path server`() = runTest {
+        val repository = repository(FakeSessionStorage(serverUrl = "https://koi.example", token = "jwt")) { request ->
+            val body = when (request.url.encodedPath) {
+                "/api/items/$ITEM_ID" -> fixture("item_one.json")
+                "/api/data/datum-1" -> DATUM_TEXT
+                else -> """{"title":"An error occurred","detail":"Not Found"}"""
+            }
+            val status = if (body.startsWith("""{"title"""")) HttpStatusCode.NotFound else HttpStatusCode.OK
+            respond(body, status, headersOf(HttpHeaders.ContentType, "application/ld+json"))
+        }
+
+        repository.renameItem(ITEM_ID, "Auswahl").getOrThrow()
+        repository.updateDatum("datum-1", label = "Author").getOrThrow()
+        repository.deleteDatum("datum-1").getOrThrow()
+        repository.deleteItem(ITEM_ID).getOrThrow()
+
+        assertEquals(
+            listOf(
+                "PATCH /api/items/$ITEM_ID",
+                "PATCH /api/data/datum-1",
+                "DELETE /api/data/datum-1",
+                "DELETE /api/items/$ITEM_ID"
+            ),
+            requests.map { "${it.method.value} ${it.url.fullPath}" }
+        )
+    }
+
     /** One `multipart/form-data` part; [bytes] as a list so that `equals` compares the content. */
     private data class Part(val name: String, val fileName: String, val contentType: String, val bytes: List<Byte>)
 

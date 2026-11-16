@@ -1,6 +1,6 @@
 # koillectionmobile checklist
 
-**Current step:** M5.1. M5 broken into steps 2026-11-16. M4 done 2026-11-16. M4.4 done 2026-11-16. M4.3 done 2026-11-16. M4.2 done 2026-11-16. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6, 7 and 8 are settled.
+**Current step:** M5.2. M5.1 done 2026-11-16. M5 broken into steps 2026-11-16. M4 done 2026-11-16. M4.4 done 2026-11-16. M4.3 done 2026-11-16. M4.2 done 2026-11-16. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6, 7 and 8 are settled.
 
 ## How to use this
 
@@ -41,12 +41,14 @@ are plan §5 decision 8 (user, 2026-11-16): the add form, prefilled; the main im
 never removed; no field reordering. Every write goes to the local test instance only
 (`docs/local-info.md`).
 
-- [ ] **M5.1** — Repository writes (`feature:items`): rename an item (`PATCH /api/items/{id}`,
+- [x] **M5.1** — Repository writes (`feature:items`): rename an item (`PATCH /api/items/{id}`,
   `{"name"}`), change a field (`PATCH /api/data/{id}`, `label` and/or `value`), delete a field
   (`DELETE /api/data/{id}`), delete an item (`DELETE /api/items/{id}`). Re-read `Item.php` and
   `Datum.php` first. A `PATCH` sends `application/merge-patch+json` and only the changed keys.
   **Verify:** mock-engine tests for each call (method, path, content type, body keys), with a
   root-path base URL case (`CLAUDE.md`, Verification); mutation-check one body key and one method.
+  Note: `updateDatum(id, label, value)` leaves a null argument out of the body. Mutations caught:
+  a `value` key always sent (the label-only test), `deleteItem` sent as `POST` (the method test).
 - [ ] **M5.2** — Live edit smoke against the local test instance: extend `smokeWriteRun` (or add a
   task) to create an item with a text field, an image field and a main image, then rename it,
   change the field's label and value, replace the main image and the field image, delete the

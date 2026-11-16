@@ -3,21 +3,26 @@ package com.grappim.koillectionmobile.feature.items.data
 import com.grappim.kit.domain.resultOf
 import com.grappim.koillectionmobile.core.api.BaseUrlProvider
 import com.grappim.koillectionmobile.core.api.ContentTypeLdJson
+import com.grappim.koillectionmobile.core.api.ContentTypeMergePatchJson
 import com.grappim.koillectionmobile.core.api.getAllHydraPages
 import com.grappim.koillectionmobile.core.api.normalizeBaseUrl
 import com.grappim.koillectionmobile.feature.items.domain.Datum
 import com.grappim.koillectionmobile.feature.items.domain.Item
 import com.grappim.koillectionmobile.feature.items.domain.ItemsRepository
 import com.grappim.koillectionmobile.feature.items.dto.DatumDto
+import com.grappim.koillectionmobile.feature.items.dto.DatumPatchDto
 import com.grappim.koillectionmobile.feature.items.dto.ItemDto
+import com.grappim.koillectionmobile.feature.items.dto.ItemNamePatchDto
 import com.grappim.koillectionmobile.feature.items.dto.NewDatumDto
 import com.grappim.koillectionmobile.feature.items.dto.NewItemDto
 import com.grappim.koillectionmobile.feature.items.mapper.ItemMapper
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.request.delete
 import io.ktor.client.request.forms.formData
 import io.ktor.client.request.forms.submitFormWithBinaryData
 import io.ktor.client.request.get
+import io.ktor.client.request.patch
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
@@ -128,6 +133,32 @@ internal class ItemsRepositoryImpl(
             )
         }
     )
+
+    override suspend fun renameItem(id: String, name: String): Result<Item> = resultOf {
+        val dto = httpClient.patch("$ITEMS_PATH/$id") {
+            contentType(ContentTypeMergePatchJson)
+            setBody(ItemNamePatchDto(name = name))
+        }.body<ItemDto>()
+        mapper.toDomain(dto, serverUrl())
+    }
+
+    override suspend fun updateDatum(id: String, label: String?, value: String?): Result<Datum> = resultOf {
+        val dto = httpClient.patch("$DATA_PATH/$id") {
+            contentType(ContentTypeMergePatchJson)
+            setBody(DatumPatchDto(label = label, value = value))
+        }.body<DatumDto>()
+        mapper.toDomain(dto, serverUrl())
+    }
+
+    override suspend fun deleteDatum(id: String): Result<Unit> = resultOf {
+        httpClient.delete("$DATA_PATH/$id")
+        Unit
+    }
+
+    override suspend fun deleteItem(id: String): Result<Unit> = resultOf {
+        httpClient.delete("$ITEMS_PATH/$id")
+        Unit
+    }
 
     private fun itemIri(itemId: String): String = "/$ITEMS_PATH/$itemId"
 
