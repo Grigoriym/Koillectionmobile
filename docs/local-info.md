@@ -72,6 +72,10 @@ server checks expiry before the signature (checked 2026-11-15):
       http://127.0.0.1:8290/api/collections
     # {"code":401,"message":"Expired JWT Token"}
 
+The cause of an empty 500: the app container's log has the PHP exception as one JSON line per
+request (`docker logs --since 5m <instance container> 2>&1 | grep -i exception`). It named the
+duplicate-label bug in M5.2 (plan §2).
+
 ## Proxy front
 
 A throwaway nginx in front of this instance, for the proxy rejection (M4.3). Each port shows
