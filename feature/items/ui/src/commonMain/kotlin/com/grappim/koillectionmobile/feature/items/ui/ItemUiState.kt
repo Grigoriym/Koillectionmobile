@@ -27,4 +27,7 @@ data class ItemUiState(
 ) {
     /** The delete is offered only for an item on screen, and not twice at once. */
     val canDelete: Boolean get() = !isLoading && error.isEmpty() && !isDeleting && !isDeleted
+
+    /** The edit is offered only for an item on screen that is not being deleted. */
+    val canEdit: Boolean get() = canDelete
 }

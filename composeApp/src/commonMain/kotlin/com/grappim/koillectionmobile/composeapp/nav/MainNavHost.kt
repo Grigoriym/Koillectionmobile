@@ -13,6 +13,8 @@ import com.grappim.koillectionmobile.feature.collections.ui.CollectionRoute
 import com.grappim.koillectionmobile.feature.collections.ui.CollectionScreen
 import com.grappim.koillectionmobile.feature.items.ui.AddItemRoute
 import com.grappim.koillectionmobile.feature.items.ui.AddItemScreen
+import com.grappim.koillectionmobile.feature.items.ui.EditItemRoute
+import com.grappim.koillectionmobile.feature.items.ui.EditItemScreen
 import com.grappim.koillectionmobile.feature.items.ui.ItemRoute
 import com.grappim.koillectionmobile.feature.items.ui.ItemScreen
 import com.grappim.koillectionmobile.feature.settings.ui.SettingsRoute
@@ -58,8 +60,12 @@ internal fun MainNavHost(modifier: Modifier = Modifier) {
                     itemId = route.itemId,
                     onBack = { backStack.removeLastOrNull() },
                     // The item is gone; its collection reads its list again (ItemListChanges).
-                    onClose = { backStack.remove(route) }
+                    onClose = { backStack.remove(route) },
+                    onEdit = { backStack.add(EditItemRoute(route.itemId)) }
                 )
+            }
+            entry<EditItemRoute> { route ->
+                EditItemScreen(itemId = route.itemId, onBack = { backStack.removeLastOrNull() })
             }
             entry<SettingsRoute> {
                 SettingsScreen(onBack = { backStack.removeLastOrNull() })

@@ -116,7 +116,7 @@ class ItemViewModel(
     }
 }
 
-private fun Throwable.toMessage(unexpected: StringResource): NativeText = when (this) {
+internal fun Throwable.toMessage(unexpected: StringResource): NativeText = when (this) {
     is KoillectionError.Network -> NativeText.Resource(RString.item_error_network)
     is KoillectionError.ProxyRejection -> NativeText.Arguments(RString.error_proxy_rejected, listOf(status))
     is KoillectionError.Server -> NativeText.Arguments(RString.item_error_http, listOf(status))

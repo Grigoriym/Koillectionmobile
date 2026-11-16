@@ -2,7 +2,6 @@ package com.grappim.koillectionmobile.feature.items.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,15 +13,12 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
@@ -51,31 +47,21 @@ import com.grappim.kit.uikit.asString
 import com.grappim.koillectionmobile.strings.RString
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_add_field
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_back
-import com.grappim.koillectionmobile.strings.generated.resources.add_item_discard
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_discard_text
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_discard_title
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_edit_form
-import com.grappim.koillectionmobile.strings.generated.resources.add_item_field_label
-import com.grappim.koillectionmobile.strings.generated.resources.add_item_field_value
-import com.grappim.koillectionmobile.strings.generated.resources.add_item_keep_editing
-import com.grappim.koillectionmobile.strings.generated.resources.add_item_label_duplicate
-import com.grappim.koillectionmobile.strings.generated.resources.add_item_label_required
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_main_image
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_make_main
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_name_label
-import com.grappim.koillectionmobile.strings.generated.resources.add_item_no_category
-import com.grappim.koillectionmobile.strings.generated.resources.add_item_no_tags
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_photo_label
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_pick_photos
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_preparing
-import com.grappim.koillectionmobile.strings.generated.resources.add_item_remove_field
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_remove_photo
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_retry
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_rotate_photo
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_save
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_save_partial
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_section_photos
-import com.grappim.koillectionmobile.strings.generated.resources.add_item_section_tags
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_sending
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_take_photo
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_title
@@ -113,6 +99,8 @@ private fun AddItemContent(uiState: AddItemUiState, onBack: () -> Unit, modifier
     )
     if (isDiscardShown) {
         DiscardDialog(
+            title = RString.add_item_discard_title,
+            text = RString.add_item_discard_text,
             onDiscard = {
                 isDiscardShown = false
                 onBack()
@@ -208,7 +196,8 @@ private fun AddItemContent(uiState: AddItemUiState, onBack: () -> Unit, modifier
             }
             items(uiState.fields, key = { "field-${it.id}" }) { row ->
                 FieldRowEditor(
-                    row = row,
+                    label = row.label,
+                    value = row.value,
                     labelError = labelError(row.label, duplicates),
                     onLabelChange = { uiState.onLabelChange(row.id, it) },
                     onValueChange = { uiState.onValueChange(row.id, it) },
@@ -224,45 +213,17 @@ private fun AddItemContent(uiState: AddItemUiState, onBack: () -> Unit, modifier
             }
             item(key = "tags") {
                 TagPicker(
-                    uiState = uiState,
+                    tagGroups = uiState.tagGroups,
+                    selectedTagIds = uiState.selectedTagIds,
+                    isLoading = uiState.isLoadingTags,
+                    error = uiState.tagsError,
+                    onTagToggle = uiState.onTagToggle,
+                    onRetry = uiState.onRetryTags,
                     modifier = Modifier
                         .padding(horizontal = PADDING)
                         .padding(bottom = PADDING)
                 )
             }
-        }
-    }
-}
-
-@Composable
-private fun FieldRowEditor(
-    row: FieldRow,
-    labelError: StringResource?,
-    onLabelChange: (String) -> Unit,
-    onValueChange: (String) -> Unit,
-    onRemove: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Row(modifier = modifier.fillMaxWidth(), verticalAlignment = Alignment.Top) {
-        Column(modifier = Modifier.weight(1f)) {
-            OutlinedTextField(
-                value = row.label,
-                onValueChange = onLabelChange,
-                label = { Text(stringResource(RString.add_item_field_label)) },
-                singleLine = true,
-                isError = labelError != null,
-                supportingText = labelError?.let { { Text(stringResource(it)) } },
-                modifier = Modifier.fillMaxWidth()
-            )
-            OutlinedTextField(
-                value = row.value,
-                onValueChange = onValueChange,
-                label = { Text(stringResource(RString.add_item_field_value)) },
-                modifier = Modifier.fillMaxWidth()
-            )
-        }
-        IconButton(onClick = onRemove) {
-            Icon(imageVector = Icons.Filled.Close, contentDescription = stringResource(RString.add_item_remove_field))
         }
     }
 }
@@ -325,24 +286,6 @@ private fun PhotoRowEditor(
     }
 }
 
-@Composable
-private fun DiscardDialog(onDiscard: () -> Unit, onDismiss: () -> Unit) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(stringResource(RString.add_item_discard_title)) },
-        text = { Text(stringResource(RString.add_item_discard_text)) },
-        confirmButton = { TextButton(onClick = onDiscard) { Text(stringResource(RString.add_item_discard)) } },
-        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(RString.add_item_keep_editing)) } }
-    )
-}
-
-/** The message under a label field: a blank label, or one that another field uses. */
-private fun labelError(label: String, duplicates: Set<String>): StringResource? = when {
-    label.isBlank() -> RString.add_item_label_required
-    label in duplicates -> RString.add_item_label_duplicate
-    else -> null
-}
-
 /**
  * The save instead of the form: a progress bar while it runs; on a failure the message and a
  * retry, plus a way back to the form while nothing exists on the server.
@@ -374,43 +317,6 @@ private fun SaveView(status: SaveStatus, uiState: AddItemUiState, modifier: Modi
                 Button(onClick = uiState.onRetrySave) { Text(stringResource(RString.add_item_retry)) }
                 if (!status.isPartial) {
                     OutlinedButton(onClick = uiState.onEditForm) { Text(stringResource(RString.add_item_edit_form)) }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun TagPicker(uiState: AddItemUiState, modifier: Modifier = Modifier) {
-    Column(modifier = modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(TAG_SPACING)) {
-        Text(
-            text = stringResource(RString.add_item_section_tags),
-            style = MaterialTheme.typography.titleSmall,
-            color = MaterialTheme.colorScheme.primary
-        )
-        when {
-            uiState.isLoadingTags -> CircularProgressIndicator()
-
-            uiState.tagsError.isNotEmpty() -> {
-                Text(text = uiState.tagsError.asString(), color = MaterialTheme.colorScheme.error)
-                TextButton(onClick = uiState.onRetryTags) { Text(stringResource(RString.add_item_retry)) }
-            }
-
-            uiState.tagGroups.isEmpty() -> Text(stringResource(RString.add_item_no_tags))
-
-            else -> uiState.tagGroups.forEach { group ->
-                Text(
-                    text = group.label ?: stringResource(RString.add_item_no_category),
-                    style = MaterialTheme.typography.labelLarge
-                )
-                FlowRow(horizontalArrangement = Arrangement.spacedBy(TAG_SPACING)) {
-                    group.tags.forEach { tag ->
-                        FilterChip(
-                            selected = tag.id in uiState.selectedTagIds,
-                            onClick = { uiState.onTagToggle(tag.id) },
-                            label = { Text(tag.label) }
-                        )
-                    }
                 }
             }
         }

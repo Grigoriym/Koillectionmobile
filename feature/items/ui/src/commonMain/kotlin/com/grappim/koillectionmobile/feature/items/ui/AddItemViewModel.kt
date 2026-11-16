@@ -32,6 +32,7 @@ import com.grappim.koillectionmobile.strings.generated.resources.add_item_save_u
 import com.grappim.koillectionmobile.strings.generated.resources.error_proxy_rejected
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -272,21 +273,13 @@ class AddItemViewModel(
 
     private fun loadTags() {
         viewModelScope.launch {
-            val tags = async { tagsRepository.getTags() }
-            val categories = async { tagsRepository.getTagCategories() }
-            val tagsResult = tags.await()
-            val categoriesResult = categories.await()
-            val failure = tagsResult.exceptionOrNull() ?: categoriesResult.exceptionOrNull()
+            val result = tagsRepository.loadTagGroups()
             _uiState.update { state ->
-                if (failure != null) {
-                    state.copy(tagGroups = emptyList(), isLoadingTags = false, tagsError = failure.toMessage())
-                } else {
-                    state.copy(
-                        tagGroups = groupTags(tagsResult.getOrThrow(), categoriesResult.getOrThrow()),
-                        isLoadingTags = false,
-                        tagsError = NativeText.Empty
-                    )
-                }
+                state.copy(
+                    tagGroups = result.getOrElse { emptyList() },
+                    isLoadingTags = false,
+                    tagsError = result.exceptionOrNull()?.toTagsMessage() ?: NativeText.Empty
+                )
             }
         }
     }
@@ -374,7 +367,21 @@ private const val HTTP_NOT_FOUND = 404
 private val json = Json { ignoreUnknownKeys = true }
 
 /** The next clockwise quarter turn: 0, 90, 180, 270, then 0 again. */
-private fun Rotation.next(): Rotation = Rotation.entries[(ordinal + 1) % Rotation.entries.size]
+internal fun Rotation.next(): Rotation = Rotation.entries[(ordinal + 1) % Rotation.entries.size]
+
+/** The server's tags and categories, read in parallel and grouped by [groupTags]. */
+internal suspend fun TagsRepository.loadTagGroups(): Result<List<TagGroup>> = coroutineScope {
+    val tags = async { getTags() }
+    val categories = async { getTagCategories() }
+    val tagsResult = tags.await()
+    val categoriesResult = categories.await()
+    val failure = tagsResult.exceptionOrNull() ?: categoriesResult.exceptionOrNull()
+    if (failure != null) {
+        Result.failure(failure)
+    } else {
+        Result.success(groupTags(tagsResult.getOrThrow(), categoriesResult.getOrThrow()))
+    }
+}
 
 /**
  * One group per category that has tags, sorted by category label; tags without a category (or
@@ -392,7 +399,8 @@ internal fun groupTags(tags: List<Tag>, categories: List<TagCategory>): List<Tag
 
 private fun List<Tag>.sortedByLabel(): List<Tag> = sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER) { it.label })
 
-private fun Throwable.toMessage(): NativeText = when (this) {
+/** The message of a failed [loadTagGroups]. */
+internal fun Throwable.toTagsMessage(): NativeText = when (this) {
     is KoillectionError.Network -> NativeText.Resource(RString.add_item_error_network)
     is KoillectionError.ProxyRejection -> NativeText.Arguments(RString.error_proxy_rejected, listOf(status))
     is KoillectionError.Server -> NativeText.Arguments(RString.add_item_error_http, listOf(status))

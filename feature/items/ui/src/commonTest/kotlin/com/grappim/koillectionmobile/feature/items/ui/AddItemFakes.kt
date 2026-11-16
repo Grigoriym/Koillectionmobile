@@ -32,7 +32,14 @@ internal class FakeTagsRepository : TagsRepository {
         return categories.first().await()
     }
 
-    override suspend fun getItemTags(itemId: String): Result<List<Tag>> = error("not used")
+    /** The answer of [getItemTags], given at once. */
+    var itemTags: Result<List<Tag>> = Result.success(emptyList())
+    val itemTagCalls = mutableListOf<String>()
+
+    override suspend fun getItemTags(itemId: String): Result<List<Tag>> {
+        itemTagCalls += itemId
+        return itemTags
+    }
 
     override suspend fun setItemTags(itemId: String, tagIds: List<String>): Result<Unit> = error("not used")
 }

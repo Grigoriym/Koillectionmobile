@@ -55,6 +55,7 @@
     <string name="item_delete_failed_title">The item was not deleted</string>
     <string name="item_delete_error_unexpected">Deleting the item failed with an unexpected error.</string>
     <string name="item_delete_failed_ok">OK</string>
+    <string name="item_edit">Edit item</string>
 
     <string name="add_item_title">New item</string>
     <string name="add_item_back">Back</string>
@@ -96,6 +97,13 @@
     <string name="add_item_discard_text">The name, fields, photos and tags on this form are lost.</string>
     <string name="add_item_discard">Discard</string>
     <string name="add_item_keep_editing">Keep editing</string>
+
+    <string name="edit_item_title">Edit item</string>
+    <string name="edit_item_replace_photo">Replace</string>
+    <string name="edit_item_no_main_image">The item has no main image.</string>
+    <string name="edit_item_read_only">Read only (field type: %1$s)</string>
+    <string name="edit_item_discard_title">Discard your changes?</string>
+    <string name="edit_item_discard_text">The changes on this form are lost. The item on the server stays as it is.</string>
 
     <string name="settings_title">Settings</string>
     <string name="settings_back">Back</string>

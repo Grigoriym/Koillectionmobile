@@ -15,6 +15,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -55,6 +56,7 @@ import com.grappim.koillectionmobile.strings.generated.resources.item_delete_fai
 import com.grappim.koillectionmobile.strings.generated.resources.item_delete_failed_title
 import com.grappim.koillectionmobile.strings.generated.resources.item_delete_text
 import com.grappim.koillectionmobile.strings.generated.resources.item_delete_title
+import com.grappim.koillectionmobile.strings.generated.resources.item_edit
 import com.grappim.koillectionmobile.strings.generated.resources.item_field_not_shown
 import com.grappim.koillectionmobile.strings.generated.resources.item_image_full
 import com.grappim.koillectionmobile.strings.generated.resources.item_retry
@@ -63,12 +65,16 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
-/** [onClose] runs once the server deleted the item, to take the screen off the back stack. */
+/**
+ * [onClose] runs once the server deleted the item, to take the screen off the back stack.
+ * [onEdit] opens the edit form.
+ */
 @Composable
 fun ItemScreen(
     itemId: String,
     onBack: () -> Unit,
     onClose: () -> Unit,
+    onEdit: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ItemViewModel = koinViewModel { parametersOf(itemId) }
 ) {
@@ -77,12 +83,12 @@ fun ItemScreen(
     LaunchedEffect(uiState.isDeleted) {
         if (uiState.isDeleted) currentOnClose()
     }
-    ItemContent(uiState = uiState, onBack = onBack, modifier = modifier)
+    ItemContent(uiState = uiState, onBack = onBack, onEdit = onEdit, modifier = modifier)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ItemContent(uiState: ItemUiState, onBack: () -> Unit, modifier: Modifier = Modifier) {
+private fun ItemContent(uiState: ItemUiState, onBack: () -> Unit, onEdit: () -> Unit, modifier: Modifier = Modifier) {
     // The full image on screen, or null. Kept across rotation.
     var fullImageUrl by rememberSaveable { mutableStateOf<String?>(null) }
     var isDeleteConfirmShown by rememberSaveable { mutableStateOf(false) }
@@ -101,6 +107,14 @@ private fun ItemContent(uiState: ItemUiState, onBack: () -> Unit, modifier: Modi
                     }
                 },
                 actions = {
+                    if (uiState.canEdit) {
+                        IconButton(onClick = onEdit) {
+                            Icon(
+                                imageVector = Icons.Filled.Edit,
+                                contentDescription = stringResource(RString.item_edit)
+                            )
+                        }
+                    }
                     if (uiState.isDeleting) {
                         CircularProgressIndicator(modifier = Modifier.padding(PADDING / 2).size(PROGRESS_SIZE))
                     } else if (uiState.canDelete) {

@@ -89,6 +89,14 @@ this app.
   and delete the collection after. Airplane mode before "Delete" gives the failure dialog
   ("The item was not deleted", "OK"). After a delete, back from the collection goes to
   Collections: the item screen is off the back stack.
+- Edit item (M5.5): a pencil in the item screen's top bar (`content-desc` "Edit item") opens "Edit
+  item". Each image row has a "Replace" text button with a "Take photo" / "Pick photos" menu; a
+  replaced photo gets a "Rotate" button. A tag chip's `checked` is on the chip's parent node, not
+  its text node. Back with edits opens "Discard your changes?". To build a test item through the
+  API, a field image goes up as the multipart part `fileImage` (the main image is `file`): with
+  `file` the server answers 200 and stores nothing. A `GET` with `Accept: application/json` gives a
+  plain array, not a Hydra `member` list. The Name field is at the top, so a tap on a lower field
+  while the keyboard is open can miss: close the keyboard (`KEYCODE_BACK`) and dump first.
 - Local network permission (M4.1): `10.0.2.2` is the emulator's own gateway, so a check of
   `ACCESS_LOCAL_NETWORK` needs another private host address. The test instance listens on
   `127.0.0.1` only: forward a host-only private address to it for the check, not the Wi-Fi LAN

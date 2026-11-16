@@ -1,6 +1,6 @@
 # koillectionmobile checklist
 
-**Current step:** M5.5. M5.4 done 2026-11-16. M5.3 done 2026-11-16. M5.2 done 2026-11-16. M5.1 done 2026-11-16. M5 broken into steps 2026-11-16. M4 done 2026-11-16. M4.4 done 2026-11-16. M4.3 done 2026-11-16. M4.2 done 2026-11-16. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6, 7 and 8 are settled.
+**Current step:** M5.6. M5.5 done 2026-11-16. M5.4 done 2026-11-16. M5.3 done 2026-11-16. M5.2 done 2026-11-16. M5.1 done 2026-11-16. M5 broken into steps 2026-11-16. M4 done 2026-11-16. M4.4 done 2026-11-16. M4.3 done 2026-11-16. M4.2 done 2026-11-16. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6, 7 and 8 are settled.
 
 ## How to use this
 
@@ -81,7 +81,7 @@ never removed; no field reordering. Every write goes to the local test instance 
   label returns `EditItemResult.DuplicateLabel` before any call. The retry is `retry(original, edit)`;
   it reads the item again and matches a new field already created by its label. `EditItemUseCase`
   is bound in `ItemsDataModule`.
-- [ ] **M5.5** — Edit screen: an "edit" action on the item screen opens the M3 add form,
+- [x] **M5.5** — Edit screen: an "edit" action on the item screen opens the M3 add form,
   prefilled from the server (name, text fields, the main image and image fields shown from their
   URLs, the item's tags). An existing photo can be replaced (camera or picker) or, for an image
   field, removed; its label can change. The main image has replace only. New text rows and new
@@ -89,6 +89,11 @@ never removed; no field reordering. Every write goes to the local test instance 
   process death (edits kept, not reloaded over).
   **Verify:** ViewModel tests; on the emulator the form opens with the item's values, and
   `am kill` keeps an edit.
+  Note: a separate `EditItemViewModel`/`EditItemRoute` with the add form's parts (`ItemFormParts.kt`);
+  the item screen's pencil opens it. The form has no Save yet (M5.6). "Replace" (camera or picker)
+  is per image; the picker can return several photos, and only the first is used. The draft and
+  the loaded values are in saved state as `EditItemDraft`; M5.6 can build the `ItemSnapshot`
+  diff base from `original`, or read the item again.
 - [ ] **M5.6** — Save the edit: run M5.4 from the form with the M3 progress view and retry. On
   success return to the item screen, which reads the item again, and refresh the collection (a
   new name shows in the list). An upload 500 names the disk quota, as in M3.6. Delete the photo
