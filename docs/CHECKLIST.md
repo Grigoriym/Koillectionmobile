@@ -1,6 +1,6 @@
 # koillectionmobile checklist
 
-**Current step:** M4.1. M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6 and 7 are settled.
+**Current step:** M4 (not broken into steps yet). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6 and 7 are settled.
 
 ## How to use this
 
@@ -32,48 +32,91 @@ M1 (API layer) is done; its steps and notes are in `docs/CHECKLIST_ARCHIVE.md`.
 M2 (browse) is done; its steps and notes are in `docs/CHECKLIST_ARCHIVE.md`.
 M3 (add item with photos) is done; its steps and notes are in `docs/CHECKLIST_ARCHIVE.md`.
 
-## M4 — release
+## M4 — network and security parity with wallosmobile (rough scope)
 
-Both store flavors ship, as in the user's other apps (user, 2026-11-16): `fdroid` to
+The user chose all four gaps found against `../Wallosmobile` (user, 2026-11-16):
+
+- `ACCESS_LOCAL_NETWORK`: with `targetSdk` 37 on Android 17, a LAN server times out without it.
+  Port wallosmobile 28.10 (its plan §4.5c, `rememberLocalNetworkPermissionRequest`,
+  `LocalNetworkBanner`). An API 36 AVD cannot show the block; wallosmobile needed a real phone.
+- A Settings screen, opened from the login screen and from the app, to edit custom headers
+  (reverse-proxy auth). The `CustomHeaders` plugin and storage are already wired
+  (`core/api/.../KoillectionHttpClient.kt`); only the UI is missing. Plus a clear message when
+  a proxy, not Koillection, rejects a request (wallosmobile M28, `ProxyRejection.kt`).
+- A warning at login when the server URL is `http://` and a password is sent.
+- `/masvs-review` to create `docs/security/masvs.md`; `renovate.json` with
+  `osvVulnerabilityAlerts`, as wallosmobile.
+
+Not in scope: self-signed certificate trust (TOFU). Plan §5 decision 3 still holds.
+
+## M5 — edit and delete items (rough scope)
+
+Change an existing item's name, text fields, main image, image fields and tags; delete an item
+(with a confirm). Uses `PATCH`/`DELETE` on `Item` and `Datum` (Koillection source).
+
+## M6 — collections: create, edit, delete (rough scope)
+
+Create a collection (top level or child), rename it, set its image, delete it (with a confirm).
+
+## M7 — search and tags (rough scope)
+
+- Search items by name. Koillection 1.8.5 declares no `ApiFilter` on `Item` or `Collection`
+  (checked 2026-11-16), so search runs in the app over loaded data. Settle the approach at the
+  start of M7.
+- A tag list screen (`feature:tags:ui` is a placeholder today) and the items of a tag
+  (`/api/tags/{id}/items`).
+- Create a tag from the add-item form. This reverses part of plan §5 decision 7 (user,
+  2026-11-16).
+
+## M8 — other Koillection areas (rough scope)
+
+The user wants these before release too (2026-11-16): wishlists and wishes, albums and photos,
+loans, templates (with fields and choice lists), inventories, logs. In 1.8.5, `Inventory` has
+no `Post` and `Log` is read only. At the start of M8, settle the order and the scope of each
+area with the user; split M8 into one milestone per area if it is too big for one.
+
+## M9 — release
+
+Runs after M4–M8 (user, 2026-11-16). Both store flavors ship, as in the user's other apps (user, 2026-11-16): `fdroid` to
 IzzyOnDroid first, `gplay` to Google Play. Model: `../Wallosmobile` (`build-logic`
 `configureAppSigningConfigs`, `androidApp/build.gradle.kts` dependency-info block,
 `.github/workflows/release*.yml`, `fastlane/metadata/`). No Firebase: wallosmobile's
 `google-services.json` steps are not ported. Two inputs come from the user later: the launcher
-icon (M4.4) and the release keystores (M4.5). Those steps wait for them; the others do not.
+icon (M9.4) and the release keystores (M9.5). Those steps wait for them; the others do not.
 
-- [ ] **M4.1** — Release blockers. Check the subpath question read only, from the user's server
+- [ ] **M9.1** — Release blockers. Check the subpath question read only, from the user's server
   URL (`docs/revisit.md`, M1.9 entry). Go through every `docs/revisit.md` entry with the user;
   each one is "fix before release" (gets a step here) or "after release".
   **Verify:** the M1.9 entry is closed or has a recorded answer; each revisit entry has the
   user's verdict, written in the entry.
-- [ ] **M4.2** — R8 release build. `assembleFdroidRelease` and `assembleGplayRelease` build with
+- [ ] **M9.2** — R8 release build. `assembleFdroidRelease` and `assembleGplayRelease` build with
   minify and resource shrinking on (never run so far; `androidApp/proguard-rules.pro` is empty).
   Sign the `fdroidRelease` APK by hand with the debug key (`apksigner`, no build change) and run
   login, browse and add item on the emulator against the local test instance. Add a keep rule
   only for what R8 breaks.
   **Verify:** both release tasks pass; the hand-signed APK passes the flow on the emulator.
-- [ ] **M4.3** — Store texts. `README.md` (what the app does, unofficial and not affiliated with
+- [ ] **M9.3** — Store texts. `README.md` (what the app does, unofficial and not affiliated with
   Koillection, the Koillection version it was tested against, where to install it), a privacy
   policy (Play needs one; the app talks only to the user's own server), and
   `fastlane/metadata/android/en-US/` (title, short and full description, `changelogs/1.txt`,
   phone screenshots). Screenshots come from the local test instance, which is a copy of the
   user's real catalogue: the user approves what they show before they are committed.
   **Verify:** the user approves the texts and the screenshots.
-- [ ] **M4.4** — Launcher icon, from the image the user provides (waits for it). Adaptive icon
+- [ ] **M9.4** — Launcher icon, from the image the user provides (waits for it). Adaptive icon
   with a monochrome layer, plus the 512px `fastlane/.../images/icon.png`.
   **Verify:** the icon shows on the emulator launcher, light and dark.
-- [ ] **M4.5** — Release signing (waits for the user's keystores). Port wallosmobile's
+- [ ] **M9.5** — Release signing (waits for the user's keystores). Port wallosmobile's
   per-flavor signing configs: keystore files at the repo root (gitignored), passwords from env
   vars. Turn off the APK dependency-info block, which F-Droid's scanner rejects. Confirm with the
   user whether wallosmobile's signed `fdroidDebug` channel is wanted here too.
   **Verify:** `apksigner verify --print-certs` shows the right certificate for each flavor; the
   `fdroid` APK has no extra signing block.
-- [ ] **M4.6** — Release workflow. Port wallosmobile's `release.yml`: a `v*` tag builds the signed
+- [ ] **M9.6** — Release workflow. Port wallosmobile's `release.yml`: a `v*` tag builds the signed
   APKs and the `gplay` AAB and attaches them to a GitHub release. Ask the user before this step
   whether the branch flow switches now (ground rules: `dev`/`main` + PRs near release), because
   wallosmobile's `release-prepare`/`release-finalize` need it.
   **Verify:** a manual run on a pre-release tag attaches signed artifacts that pass `apksigner`.
-- [ ] **M4.7** — First release `0.1.0` (version code 1). Tag it, then the IzzyOnDroid inclusion
+- [ ] **M9.7** — First release `0.1.0` (version code 1). Tag it, then the IzzyOnDroid inclusion
   request and the Play upload (internal testing first). Each outward step needs the user's go.
   **Verify:** the GitHub release exists; the IzzyOnDroid request and the Play upload are done or
   handed to the user with what they need.

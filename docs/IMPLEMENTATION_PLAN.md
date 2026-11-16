@@ -181,6 +181,9 @@ code without checking the licence terms are kept.
    accepted the proposal as it was and added log out, so a user can change server without
    clearing the app data. After the M2.7 device pass the user added a top-bar back arrow on the
   collection and item screens (M2.8, 2026-11-15).
+   Pre-release scope extended (user, 2026-11-16): network and security parity with
+   wallosmobile (M4), edit/delete items (M5), collections CRUD (M6), search and tags (M7), and the
+   other Koillection areas (M8). The release is M9.
 6. **Session storage module** — *decided 2026-11-15 (M1.3)*: a separate `core:storage`, as in
    wallosmobile and TaigaMobileNova. It holds `SessionStorage` (server URL, username, password,
    JWT) and the `CustomHeadersStorage` binding, in one DataStore file with one `SecretCipher`.
@@ -193,3 +196,4 @@ code without checking the licence terms are kept.
    photo has a manual rotate button; uploads are downscaled to 2400px JPEG q85, as `add_book.py`
    does. Text fields are free label/value rows: nothing book-specific in the app. Tags are picked
    from the server's existing tags only; the form cannot create one.
+   Changed 2026-11-16 (user): the form gets tag creation in M7.
