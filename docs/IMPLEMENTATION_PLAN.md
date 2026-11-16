@@ -11,12 +11,10 @@ items from the phone: camera photos, text fields, tags.
 The phone adds what the web UI can't: the camera, scanning at a shelf, and a quick look
 while away from the PC.
 
-**First use case: the user's book catalogue.** Today it runs as Python scripts in
-`~/claude/books/00service/` (`koi.py`, `add_book.py`, and that folder's `CLAUDE.md` for the
-workflow). The phone photos go to the PC, then a script creates the item over the API. The
-app should do the "create item + text fields + main image + page images + tags" part on
-the phone. Those scripts prove the API supports it; read them as a worked example of the
-calls, not as a spec.
+**First use case: the user's book catalogue.** Today the phone photos go to the PC, then a
+script creates the item over the API. The app should do the "create item + text fields + main
+image + page images + tags" part on the phone. The scripts (`koi.py`, `add_book.py`) are not
+available; the user does not know them (2026-11-16). Where this plan cites them, it is history.
 
 Not in scope (for now): server administration, the web UI's statistics/history pages,
 scrapers.

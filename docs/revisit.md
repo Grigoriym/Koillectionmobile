@@ -46,9 +46,6 @@ cold session can act on it. Delete an entry when it's fixed.
   takes the strings).
   M4.3 added a `KoillectionError.ProxyRejection` branch to all four mappings (login, collection
   list, item, add item); they share one string, `error_proxy_rejected`.
-- 2026-11-15 — `docs/IMPLEMENTATION_PLAN.md:15` points to `~/claude/books/00service/` (`koi.py`,
-  `add_book.py`) as the worked example of the API calls. That folder does not exist on the current
-  machine. Ask the user where the scripts live now, then fix the path or drop the pointer.
 - 2026-11-15 (M3.6) — Add-item photo files in `cacheDir/photos/` are deleted on photo remove, on
   save, and when the form leaves the back stack (`AddItemViewModel.onCleared`). A form that never
   comes back (the task swiped away, so the saved draft is gone and `onCleared` never runs) leaves
@@ -75,12 +72,6 @@ cold session can act on it. Delete an entry when it's fixed.
   module class in the build (or every `*UiModule`/`*DataModule` in `settings.gradle.kts` modules)
   and checks each is in `AppModule`'s `includes` (read the annotation by reflection). Effort: one
   test, if the annotation keeps runtime retention; otherwise a source-text check of `Koin.kt`.
-- 2026-11-16 (M4.5) — MASVS-CODE-3: no advisory feed checks the dependencies yet. `renovate.json`
-  sets `osvVulnerabilityAlerts`, but Renovate runs only after the user installs the Renovate
-  GitHub app on `Grigoriym/Koillectionmobile`. GitHub's own vulnerability alerts are off
-  (`gh api repos/Grigoriym/Koillectionmobile/vulnerability-alerts`: 404 "disabled"). The
-  `renovate-config-validator` run was skipped (user, 2026-11-16: the bot checks the config on its
-  first run). Close when the app is installed and its first run reports no config error.
 - 2026-11-16 (M4.5) — MASVS-PRIVACY-4: log out does not clear Coil's image disk cache.
   `AuthRepositoryImpl.logOut` (`feature/auth/data/.../AuthRepositoryImpl.kt:57`) clears only the
   session keys; the app uses Coil's default singleton `ImageLoader` (no `diskCache` config). A log

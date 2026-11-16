@@ -42,7 +42,7 @@ reason. No row here is a claim of compliance: see "Needs a device or an APK".
 | MASVS-PLATFORM-3 | Accepted | No `FLAG_SECURE`. The password field is always masked (`LoginScreen.kt:134`); there is no reveal toggle. |
 | MASVS-CODE-1 | Accepted | `minSdk = "24"` (`gradle/libs.versions.toml:9`). |
 | MASVS-CODE-2 | Accepted | No update check on either flavor. |
-| MASVS-CODE-3 | Open | `renovate.json` with `osvVulnerabilityAlerts` added in M4.5. It runs only after the Renovate GitHub app is installed. GitHub's own vulnerability alerts are off (`gh api repos/Grigoriym/Koillectionmobile/vulnerability-alerts`: 404 "disabled", 2026-11-16). |
+| MASVS-CODE-3 | Pass | `renovate.json` with `osvVulnerabilityAlerts` (M4.5). The user installed the Renovate GitHub app on 2026-11-16; its first run opened the Dependency Dashboard (issue #2) and PR #1, with no config error. GitHub's own vulnerability alerts are off. |
 | MASVS-CODE-4 | Pass (source) | `Json { ignoreUnknownKeys = true }` (`NetworkModule.kt:42`). Error bodies that are not JSON read as no message (`ErrorMapping.kt:40`, `ProxyRejection.kt:35`). Server text is shown as plain `Text`; the app opens no server-supplied URL (no `LocalUriHandler`/`openUri`). Image URLs are the server URL plus the server's path (`CollectionMapper.kt:20`, `ItemMapper.kt`), so they stay on the server's host. |
 | MASVS-RESILIENCE-1..4 | Out of scope | See above. |
 | MASVS-PRIVACY-1 | Open | `ACCESS_NETWORK_STATE` is declared (`androidApp/src/main/AndroidManifest.xml:5`); no app code uses it. |
@@ -68,7 +68,6 @@ The STORAGE-2 (`allowBackup`), PLATFORM-3, CODE-1 and CODE-2 rows: accepted by t
 
 | Control | Finding | Where | Severity |
 |---|---|---|---|
-| MASVS-CODE-3 | No advisory feed checks the dependencies until the user installs the Renovate GitHub app (and optionally turns on GitHub's Dependabot alerts). | `renovate.json`; GitHub repo settings | Medium |
 | MASVS-PRIVACY-4 | Log out leaves Coil's image disk cache; a user who logs in to another server keeps the first server's images on the device until Android clears the cache. | `CollectionListViewModel.logOut` → `AuthRepositoryImpl.logOut` (`AuthRepositoryImpl.kt:57-58`); no `diskCache` config | Low |
 | MASVS-PRIVACY-1 | `ACCESS_NETWORK_STATE` declared but unused by app code. A library may use it (Coil's network fetcher checks connectivity when the permission is granted): check the merged manifest before removing it. | `androidApp/src/main/AndroidManifest.xml:5` | Low |
 
@@ -84,6 +83,5 @@ Each Open row has a `docs/revisit.md` entry.
 | MASVS-CRYPTO-1 | The generated key's size (`KeyInfo.getKeySize()`) and whether it is hardware-backed. | The provider default sets it, not the app. |
 | MASVS-PLATFORM-3 | What the recents thumbnail shows on Login and Settings. | Needs a device screenshot. |
 | MASVS-NETWORK-1 | TLS behaviour on the wire against an `https://` server with a bad certificate (expect a refusal). | Needs a TLS front with a bad certificate. |
-| MASVS-CODE-3 | Renovate opens a dashboard issue and reads `renovate.json`. | Needs the GitHub app installed. |
 | All | `grappim-kit` 0.1.8 as published equals the checkout read here. | No sources jar in the Gradle cache. |
 | All | What R8 leaves in the release APK. | M9.2 builds it first. |
