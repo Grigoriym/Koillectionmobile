@@ -237,3 +237,9 @@ code without checking the licence terms are kept.
    one field to a temporary label first (M5.4).
    Built in M5.5 as its own `EditItemViewModel` and route, with the add form's parts shared
    (`ItemFormParts.kt`), not as a mode of `AddItemViewModel`: the two saves have nothing in common.
+9. **Collection form** — *decided 2026-11-16 (start of M6)*: the form edits the title and the
+   image only. The server picks the color (`ColorListener`); visibility and parent stay as they
+   are. The image can be set, replaced and removed: `Collection` has a `deleteImage` property,
+   unlike `Item`. A delete removes the child collections and their items too (`cascade: ['all']`
+   on `children` and `items` in `Collection.php`), so the confirm dialog says how many child
+   collections and items go with it.
