@@ -144,8 +144,9 @@ start of any step that touches the API. Facts that shape the design:
   deleted item or field takes its files with it (`UploadListener::postRemove`); `Item::$data` has
   `orphanRemoval`. `Item`'s `#[Upload]` has no `deleteProperty`, so the API cannot remove a main
   image. `DatumLabelNotExistsInParentValidator` skips the field itself, so a `PATCH` that keeps
-  a label passes; a label used by another field of the item fails. The test instance's items
-  hold only `text` and `image` fields (4007 and 1577).
+  a label passes; a label used by another field of the item fails. The compare is exact (`===`,
+  re-read M5.4): `Author` and `author` are two labels. The test instance's items hold only `text`
+  and `image` fields (4007 and 1577).
 - Edits checked live 2026-11-16 (M5.2, `./gradlew :composeApp:smokeWriteRun`, JVM, local test
   instance at the root path), through the M5.1 repository calls: a rename, a field `label` and
   `value` change, and a `value`-only change were read back as sent. A new main image and a new
