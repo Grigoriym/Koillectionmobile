@@ -54,9 +54,9 @@ entries get deleted — see /finalize.
   the next boot. Both were the crash loop, not a network block or an install bug.
 - 2026-11-16 — `sdkmanager` installing the API 37 system image also updated the shared emulator
   binary (to 37.2.13) without asking. The already-running `koil36` kept the old binary in memory.
-- 2026-11-16 — The auto-mode classifier gave "no verdict (error)" on several Bash calls in a row
-  (M4.1), plain greps too; Read and Edit kept working.
 - 2026-11-16 — `pkill -f "fwd.py ..."` killed the Bash tool's own shell again (exit 144), as in M3.1.
   Second time; kill by PID from `pgrep` (a pattern like `fwd\.py` does not match its own command line).
-- 2026-11-16 — The auto-mode classifier gave "no verdict (error)" once more (M4.2), on a `cat` of
-  another repo's file; Read worked. Second entry; nothing in this repo can fix it.
+- 2026-11-16 — The auto-mode classifier gave "no verdict (error)" on Bash calls in M4.1, M4.2 and
+  M4.3 (three times in M4.3: a `find`, a `docker rm` + `grep`). A retry passed each time; Read kept
+  working. Third session: harness-side, not fixable in this repo. Asked the user (M4.3) whether an
+  allowlist for read-only commands should skip the classifier.

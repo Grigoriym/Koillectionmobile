@@ -44,6 +44,8 @@ cold session can act on it. Delete an entry when it's fixed.
   `feature/items/ui/.../ItemScreen.kt`. Only the string resources differ. A third `ui` screen makes
   it worth one shared copy (a `core:ui` module, or a `KoillectionError` → message function that
   takes the strings).
+  M4.3 added a `KoillectionError.ProxyRejection` branch to all four mappings (login, collection
+  list, item, add item); they share one string, `error_proxy_rejected`.
 - 2026-11-15 — `docs/IMPLEMENTATION_PLAN.md:15` points to `~/claude/books/00service/` (`koi.py`,
   `add_book.py`) as the worked example of the API calls. That folder does not exist on the current
   machine. Ask the user where the scripts live now, then fix the path or drop the pointer.
