@@ -111,6 +111,11 @@ this app.
   dialog's body (the counts) was not in `ui.py list` or a dump grep, though the screenshot showed it:
   read the counts from a screenshot. Build the test tree through the API (`POST /api/collections`
   with a `parent` IRI, `POST /api/items` with a `collection` IRI); the delete cleans it up.
+- New collection (M6.4): the list's FAB (`content-desc` "New collection"), or on a collection
+  screen "More actions" (`content-desc`) → "New collection". The form has "Title", "Take photo",
+  "Pick photo", then "Rotate" and "Remove image" once a photo is set; "Save" in the top bar. On
+  success the new collection opens, and back goes to the list or the parent. The server stores
+  the image at most 200x200, so a rotation is checked in the form's preview, not on the server.
 - Local network permission (M4.1): `10.0.2.2` is the emulator's own gateway, so a check of
   `ACCESS_LOCAL_NETWORK` needs another private host address. The test instance listens on
   `127.0.0.1` only: forward a host-only private address to it for the check, not the Wi-Fi LAN

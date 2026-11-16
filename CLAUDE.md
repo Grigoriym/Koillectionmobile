@@ -145,6 +145,12 @@ extension import. Ktor's `url.fullPath` and `url.encodedPath`, and kotlinx-seria
 `decodeFromJsonElement<T>()`, are extensions (hit in M1.3, M1.6, M1.7), and so is grappim-kit's
 `NativeText.asString()` (M2.5). Import them by name.
 
+## Shell
+
+Don't `cd` into a subfolder in a Bash call: the shell stays there, and the auto-mode classifier
+then gives no verdict on the next calls that start with `cd` to the repo root ("reviewed this
+call without its leading cd"). Hit in M5.5 and twice in M6.4. Run from the root with paths.
+
 ## Test names
 
 No comma in a backtick test name in `commonTest`. It passes `jvmTest` and fails
