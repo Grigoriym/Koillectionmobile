@@ -43,8 +43,8 @@ warning (plan §1.1, "Warn on non-HTTPS base URLs"). Not in scope: self-signed c
   manifest, `rememberLocalNetworkPermissionRequest` (`expect`/`actual`, from wallosmobile `uikit`
   `permission/`), asked at Log in only for a private, link-local or `fc00::/7` address on API 37+,
   a "denied" login message, and `LocalNetworkBanner` above `MainNavHost`. There is no local
-  `uikit` (settled decisions): put the request in `feature:auth:ui` and the banner in `composeApp`,
-  unless the user prefers a `grappim-kit-uikit` release. Ask at the start of the step. Create an
+  `uikit` (settled decisions): put the request in `feature:auth:ui` and the banner in `composeApp`
+  (user, 2026-11-16: here for now; a move to `grappim-kit-uikit` may come later). Create an
   API 37 AVD (`system-images;android-37.0;google_apis;x86_64`) and record it in
   `docs/machine.local.md`.
   **Verify:** unit tests for the address check; on the API 37 AVD, against the test instance at
