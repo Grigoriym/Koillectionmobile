@@ -88,3 +88,9 @@ this app.
   `127.0.0.1` only: forward a host-only private address to it for the check, not the Wi-Fi LAN
   address (the address and the forwarder on a given machine are in `docs/machine.local.md`). The
   permission matters only on API 37+, and no API 37 AVD has worked here yet (`docs/revisit.md`).
+- Settings (M4.2): a "Settings" text button in the collection list top bar and under "Log in" on
+  the login form. The screen holds the custom headers ("Add header", "Header name", "Value",
+  "Save"; Save is off until the rows differ from storage). The app writes no Ktor log on the
+  device: to see the headers a request carries, point the server URL at a forwarder on the host
+  that prints them (M4.2 used a small Python asyncio forwarder, `127.0.0.1:8291` → `8290`, which
+  the emulator reaches as `http://10.0.2.2:8291`).

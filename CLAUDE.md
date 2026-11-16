@@ -113,6 +113,9 @@ first — it is often for a problem this toolchain doesn't have.
   only by `ktlintCheck` (M0.4).
 - **Force Gradle tests with `--rerun`** when the test is the proof. An `UP-TO-DATE` test task
   prints "BUILD SUCCESSFUL" without running anything.
+- **A new Koin module needs its `includes` line in `AppModule`** (`composeApp/.../di/Koin.kt`).
+  Without it every JVM gate passes, `KoinGraphTest` too, and Android crashes with
+  `NoDefinitionFoundException` on the first screen that needs it. Only the device run caught it (M4.2).
 - **A URL check needs a root-path case.** `core:api`'s mock-engine tests use a `/sub` base URL.
   At a root-path server Ktor's merged path has no leading `/` inside a plugin, which hid the M3.1
   login deadlock until a live run.

@@ -66,3 +66,10 @@ cold session can act on it. Delete an entry when it's fixed.
 - 2026-11-16 (M4.1) — Known limits carried over from wallosmobile (its `docs/revisit.md` §6):
   screens do not reload after a grant (the collection list needs Try again); the denied message at
   Log in has no "Open settings" action. `feature/auth/ui/.../permission/`.
+- 2026-11-16 (M4.2) — No JVM gate catches a module missing from `AppModule`'s `includes`
+  (`composeApp/src/commonMain/.../di/Koin.kt`). On the JVM the Koin plugin finds `@Configuration`
+  modules on its own, so `KoinGraphTest` passes; Android does not, and `SettingsUiModule` crashed
+  the app on device until it was added. Fix option: a `jvmTest` that lists every `@Configuration`
+  module class in the build (or every `*UiModule`/`*DataModule` in `settings.gradle.kts` modules)
+  and checks each is in `AppModule`'s `includes` (read the annotation by reflection). Effort: one
+  test, if the annotation keeps runtime retention; otherwise a source-text check of `Koin.kt`.
