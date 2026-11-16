@@ -58,5 +58,7 @@ entries get deleted — see /finalize.
   Second time; kill by PID from `pgrep` (a pattern like `fwd\.py` does not match its own command line).
 - 2026-11-16 — The auto-mode classifier gave "no verdict (error)" on Bash calls in M4.1, M4.2 and
   M4.3 (three times in M4.3: a `find`, a `docker rm` + `grep`). A retry passed each time; Read kept
-  working. Third session: harness-side, not fixable in this repo. Asked the user (M4.3) whether an
-  allowlist for read-only commands should skip the classifier.
+  working. Third session: harness-side. Promoted: `.claude/settings.json` allows read-only
+  commands (user, 2026-11-16); delete this entry if it stops recurring.
+- 2026-11-16 — `jq` is not installed on this machine; a `jq -e ... && next` chain skipped the next
+  step and the rest ran anyway. Validate JSON with `python3 -c "import json; ..."`.
