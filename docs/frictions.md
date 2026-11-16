@@ -66,3 +66,6 @@ entries get deleted — see /finalize.
   `docs/machine.local.md`, which says to prefix `ANDROID_HOME=$HOME/Android/Sdk`.
 - 2026-11-16 — `npx --yes --package renovate -- renovate-config-validator` (M4.5) was denied by the
   auto-mode classifier ("Unauthorized Access"), as a package download. The user chose to skip it.
+- 2026-11-16 — A mutation run (M5.1) reported "13 tests completed, 2 failed" of 22: the
+  convention plugin sets `failFast = true` (`build-logic/.../Quality.kt`), so a run with a
+  mutation stops early and shows only the first tests that caught it, not all of them.
