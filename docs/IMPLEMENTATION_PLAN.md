@@ -264,3 +264,11 @@ code without checking the licence terms are kept.
    unlike `Item`. A delete removes the child collections and their items too (`cascade: ['all']`
    on `children` and `items` in `Collection.php`), so the confirm dialog says how many child
    collections and items go with it.
+10. **Search and tags** — *decided 2026-11-17 (start of M7)*: Koillection 1.8.5 declares no
+   `ApiFilter` on any entity (re-checked 2026-11-17), so search runs in the app, by item name. Two
+   places: a filter on the collection screen over the items it already loaded, and a global search
+   screen that reads every item (`GET /api/items`, all pages; about 15 requests for 445 items) once
+   when it opens. The tag list groups tags by category, with the tags without a category last. A
+   tag created from the add-item form gets a label only. `Tag.label` is `NotBlank` but not unique
+   on the server, so the form selects an existing tag with the same label (ignoring case) instead
+   of creating a second one.

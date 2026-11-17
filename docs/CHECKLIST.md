@@ -1,6 +1,6 @@
 # koillectionmobile checklist
 
-**Current step:** M7 (break it into steps first). M6 done 2026-11-17. M6.6 done 2026-11-17. M6.5 done 2026-11-16. M6.4 done 2026-11-16. M6.3 done 2026-11-16. M6.2 done 2026-11-16. M6.1 done 2026-11-16. M6 broken into steps 2026-11-16. M5 done 2026-11-16. M5.7 done 2026-11-16. M5.6 done 2026-11-16. M5.5 done 2026-11-16. M5.4 done 2026-11-16. M5.3 done 2026-11-16. M5.2 done 2026-11-16. M5.1 done 2026-11-16. M5 broken into steps 2026-11-16. M4 done 2026-11-16. M4.4 done 2026-11-16. M4.3 done 2026-11-16. M4.2 done 2026-11-16. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6, 7 and 8 are settled.
+**Current step:** M7.1. M7 broken into steps 2026-11-17. M6 done 2026-11-17. M6.6 done 2026-11-17. M6.5 done 2026-11-16. M6.4 done 2026-11-16. M6.3 done 2026-11-16. M6.2 done 2026-11-16. M6.1 done 2026-11-16. M6 broken into steps 2026-11-16. M5 done 2026-11-16. M5.7 done 2026-11-16. M5.6 done 2026-11-16. M5.5 done 2026-11-16. M5.4 done 2026-11-16. M5.3 done 2026-11-16. M5.2 done 2026-11-16. M5.1 done 2026-11-16. M5 broken into steps 2026-11-16. M4 done 2026-11-16. M4.4 done 2026-11-16. M4.3 done 2026-11-16. M4.2 done 2026-11-16. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6, 7, 8, 9 and 10 are settled.
 
 ## How to use this
 
@@ -35,15 +35,59 @@ M4 (network and security parity with wallosmobile) is done; its steps and notes 
 M5 (edit and delete items) is done; its steps and notes are in `docs/CHECKLIST_ARCHIVE.md`.
 M6 (collections: create, edit, delete) is done; its steps and notes are in `docs/CHECKLIST_ARCHIVE.md`.
 
-## M7 — search and tags (rough scope)
+## M7 — search and tags
 
-- Search items by name. Koillection 1.8.5 declares no `ApiFilter` on `Item` or `Collection`
-  (checked 2026-11-16), so search runs in the app over loaded data. Settle the approach at the
-  start of M7.
-- A tag list screen (`feature:tags:ui` is a placeholder today) and the items of a tag
-  (`/api/tags/{id}/items`).
-- Create a tag from the add-item form. This reverses part of plan §5 decision 7 (user,
-  2026-11-16).
+Search items by name, browse tags and the items of a tag, create a tag from the add-item form.
+Choices are plan §5 decision 10 (user, 2026-11-17). Every write goes to the local test instance
+only (`docs/local-info.md`).
+
+- [ ] **M7.1** — Filter in a collection: a search field on the collection screen filters the items
+  it already loaded by name (substring, ignoring case). No new API call. The query survives
+  rotation and process death. An empty result shows a "no match" text, not the empty-collection
+  text.
+  **Verify:** ViewModel tests (match, no match, empty query shows all, case); on the emulator a
+  query on the 445-item collection narrows the list and clearing it shows all items again.
+- [ ] **M7.2** — Global item search. `ItemsRepository.getAllItems()` reads `GET /api/items`, all
+  pages. A search action on the collection list opens a search screen. It reads all items once on
+  open (loading and error states, with retry) and then filters by name in the app, as M7.1 does.
+  A result row shows the item name and its collection title; a tap opens the item. Re-read
+  `Item.php` first.
+  **Verify:** mock-engine test (path, every page, root-path base URL case); ViewModel tests
+  (load, failure and retry, filter); on the emulator a query finds an item and opens it.
+- [ ] **M7.3** — Tag repository calls. `ItemsRepository.getTagItems(tagId)` reads
+  `GET /api/tags/{id}/items`, all pages (in `feature:items`, because `feature:items:domain`
+  already depends on `feature:tags:domain`). `TagsRepository.createTag(label)` sends
+  `POST /api/tags` with `{"label"}` only. Re-read `Tag.php` and `Item.php` first.
+  **Verify:** mock-engine tests for each call (method, path, content type, body keys), with a
+  root-path base URL case; mutation-check the body key and one path.
+- [ ] **M7.4** — Live tag smoke against the local test instance: a task (as
+  `smokeCollectionRun`) creates a tag, sets it on an item next to the item's existing tags, reads
+  `/api/tags/{id}/items` (the item is there), takes it off the item again, then deletes the tag.
+  Also send a create with an empty label (expect 422) and a create with a label that already
+  exists (record what the server does). Record the answers in plan §2.
+  **Verify:** the run prints each step and passes; the item's tags end as they started; plan §2
+  has the results.
+- [ ] **M7.5** — Tag list and tag items (`feature:tags:ui`, the placeholder today). A tags action
+  on the collection list opens the tag list: one section per tag category with its colour, sorted
+  by label, then the tags without a category; tags sorted by label inside a section, ignoring case.
+  A tap opens the tag's items (M7.3); a tap on an item opens the item. Loading, empty and error
+  states with retry on both screens. Reuse the add form's grouping (`groupTags`,
+  `feature:items:ui`); move it if the new screen needs it.
+  **Verify:** ViewModel tests (grouping and order, empty, failure and retry) for both screens; on
+  the emulator the list matches the web UI's tags and one tag shows its items.
+- [ ] **M7.6** — Create a tag from the add-item form: a "new tag" action in `TagPicker` takes a
+  label. A label that exists already (ignoring case) selects the existing tag and creates nothing.
+  A new tag is created on Save, before the item's tags are set, so an abandoned form leaves no
+  tag; a retry does not create it twice. The pending tag survives rotation and process death. The
+  edit form shares `TagPicker`: ask the user at the start of the step whether it gets the action
+  too.
+  **Verify:** ViewModel and use-case tests (new label, existing label, failure at the tag create
+  and the retry); on the emulator an item is saved with a new tag, and the web UI shows the tag on
+  the item.
+- [ ] **M7.7** — Device pass of search, the tag screens and tag creation, then the user confirms
+  with screenshots. Fix what breaks, or put it in `docs/revisit.md` with evidence. Delete the test
+  tags and items afterwards.
+  **Verify:** the user confirms.
 
 ## M8 — other Koillection areas (rough scope)
 

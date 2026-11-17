@@ -58,3 +58,4 @@ entries get deleted — see /finalize.
   `docs/machine.local.md`. Second time (first M4.4); a third makes it a fix (`local.properties` or a `CLAUDE.md` line).
 - 2026-11-16 — `uiautomator dump` (M6.3) had the delete dialog's title and buttons but not its body text,
   which the screenshot showed. Read dialog body text from a screenshot.
+- 2026-11-17 — `cd ../../koillection` (M7.0) failed: no checkout on this machine. `docs/machine.local.md` already says to read the source with `docker exec koillection-test`; read it first.
