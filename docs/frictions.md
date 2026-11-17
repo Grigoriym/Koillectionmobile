@@ -50,12 +50,7 @@ entries get deleted — see /finalize.
   commands (user, 2026-11-16); delete this entry if it stops recurring.
 - 2026-11-16 — `jq` is not installed on this machine; a `jq -e ... && next` chain skipped the next
   step and the rest ran anyway. Validate JSON with `python3 -c "import json; ..."`.
-- 2026-11-16 — `./gradlew build` (M4.4) failed "SDK location not found": ran it before reading
-  `docs/machine.local.md`, which says to prefix `ANDROID_HOME=$HOME/Android/Sdk`.
 - 2026-11-16 — `npx --yes --package renovate -- renovate-config-validator` (M4.5) was denied by the
   auto-mode classifier ("Unauthorized Access"), as a package download. The user chose to skip it.
-- 2026-11-16 — `./gradlew build` (M5.3) failed "SDK location not found" again: ran it before reading
-  `docs/machine.local.md`. Second time (first M4.4); a third makes it a fix (`local.properties` or a `CLAUDE.md` line).
 - 2026-11-16 — `uiautomator dump` (M6.3) had the delete dialog's title and buttons but not its body text,
   which the screenshot showed. Read dialog body text from a screenshot.
-- 2026-11-17 — `cd ../../koillection` (M7.0) failed: no checkout on this machine. `docs/machine.local.md` already says to read the source with `docker exec koillection-test`; read it first.

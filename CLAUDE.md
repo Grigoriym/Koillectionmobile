@@ -35,7 +35,8 @@ One checklist step per session: "read `docs/CHECKLIST.md` and do step `<N>`". Th
 rules are at the top of that file. Do exactly that step, run its Verify line, tick it, update
 the banner.
 
-**Before starting a step:** check `git status` and the current branch. A prior session can
+**Before starting a step:** read `docs/machine.local.md` (if present) before the first Gradle,
+source or container command; skipping it failed three times (M4.4, M5.3, M7.0). Then check `git status` and the current branch. A prior session can
 leave uncommitted work behind. Commit stray work separately (or ask); don't fold it into the
 new step.
 
