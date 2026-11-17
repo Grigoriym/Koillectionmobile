@@ -1,5 +1,6 @@
 package com.grappim.koillectionmobile.feature.collections.ui
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.grappim.kit.uikit.NativeText
@@ -39,6 +40,9 @@ import org.koin.core.annotation.KoinViewModel
  * Before the delete confirm, the screen counts what goes with the collection: the server deletes
  * the child collections at every level and their items (`cascade: all` in `Collection.php`).
  * A delete then tells the parent's list to read its children again.
+ *
+ * The search query filters the loaded items in the app; it sends no call. It is kept in
+ * [savedStateHandle], so it survives process death.
  */
 @KoinViewModel
 class CollectionViewModel(
@@ -47,11 +51,14 @@ class CollectionViewModel(
     private val itemsRepository: ItemsRepository,
     private val itemListChanges: ItemListChanges,
     private val collectionListChanges: CollectionListChanges,
-    private val collectionChanges: CollectionChanges
+    private val collectionChanges: CollectionChanges,
+    private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(
         CollectionUiState(
+            query = savedStateHandle.get<String>(QUERY_KEY).orEmpty(),
+            onQueryChange = ::changeQuery,
             onRetry = ::retry,
             onDeleteClick = ::countForDelete,
             onDeleteConfirm = ::delete,
@@ -81,6 +88,11 @@ class CollectionViewModel(
                 .filter { it == collectionId }
                 .collect { load() }
         }
+    }
+
+    private fun changeQuery(query: String) {
+        savedStateHandle[QUERY_KEY] = query
+        _uiState.update { it.copy(query = query) }
     }
 
     private fun retry() {
@@ -179,6 +191,8 @@ class CollectionViewModel(
         }
     }
 }
+
+private const val QUERY_KEY = "collection_query"
 
 /** The ids of every collection under [rootId] in [all], at every level. [rootId] itself is not in it. */
 internal fun descendantIds(rootId: String, all: List<Collection>): List<String> {

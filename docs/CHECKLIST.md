@@ -1,6 +1,6 @@
 # koillectionmobile checklist
 
-**Current step:** M7.1. M7 broken into steps 2026-11-17. M6 done 2026-11-17. M6.6 done 2026-11-17. M6.5 done 2026-11-16. M6.4 done 2026-11-16. M6.3 done 2026-11-16. M6.2 done 2026-11-16. M6.1 done 2026-11-16. M6 broken into steps 2026-11-16. M5 done 2026-11-16. M5.7 done 2026-11-16. M5.6 done 2026-11-16. M5.5 done 2026-11-16. M5.4 done 2026-11-16. M5.3 done 2026-11-16. M5.2 done 2026-11-16. M5.1 done 2026-11-16. M5 broken into steps 2026-11-16. M4 done 2026-11-16. M4.4 done 2026-11-16. M4.3 done 2026-11-16. M4.2 done 2026-11-16. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6, 7, 8, 9 and 10 are settled.
+**Current step:** M7.2. M7.1 done 2026-11-17. M7 broken into steps 2026-11-17. M6 done 2026-11-17. M6.6 done 2026-11-17. M6.5 done 2026-11-16. M6.4 done 2026-11-16. M6.3 done 2026-11-16. M6.2 done 2026-11-16. M6.1 done 2026-11-16. M6 broken into steps 2026-11-16. M5 done 2026-11-16. M5.7 done 2026-11-16. M5.6 done 2026-11-16. M5.5 done 2026-11-16. M5.4 done 2026-11-16. M5.3 done 2026-11-16. M5.2 done 2026-11-16. M5.1 done 2026-11-16. M5 broken into steps 2026-11-16. M4 done 2026-11-16. M4.4 done 2026-11-16. M4.3 done 2026-11-16. M4.2 done 2026-11-16. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6, 7, 8, 9 and 10 are settled.
 
 ## How to use this
 
@@ -41,12 +41,13 @@ Search items by name, browse tags and the items of a tag, create a tag from the 
 Choices are plan §5 decision 10 (user, 2026-11-17). Every write goes to the local test instance
 only (`docs/local-info.md`).
 
-- [ ] **M7.1** — Filter in a collection: a search field on the collection screen filters the items
+- [x] **M7.1** — Filter in a collection: a search field on the collection screen filters the items
   it already loaded by name (substring, ignoring case). No new API call. The query survives
   rotation and process death. An empty result shows a "no match" text, not the empty-collection
   text.
   **Verify:** ViewModel tests (match, no match, empty query shows all, case); on the emulator a
   query on the 445-item collection narrows the list and clearing it shows all items again.
+  Note: the filter covers items only; child collections stay listed. A blank query counts as empty.
 - [ ] **M7.2** — Global item search. `ItemsRepository.getAllItems()` reads `GET /api/items`, all
   pages. A search action on the collection list opens a search screen. It reads all items once on
   open (loading and error states, with retry) and then filters by name in the app, as M7.1 does.

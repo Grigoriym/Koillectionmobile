@@ -1,5 +1,6 @@
 package com.grappim.koillectionmobile.feature.collections.ui
 
+import androidx.lifecycle.SavedStateHandle
 import com.grappim.kit.testing.MainDispatcherRule
 import com.grappim.kit.uikit.NativeText
 import com.grappim.koillectionmobile.core.domain.KoillectionError
@@ -50,14 +51,23 @@ class CollectionViewModelTest {
     private val collectionListChanges = CollectionListChanges()
     private val collectionChanges = CollectionChanges()
 
-    private fun createSut() =
-        CollectionViewModel(BOOKS.id, collections, items, itemListChanges, collectionListChanges, collectionChanges)
+    private val savedStateHandle = SavedStateHandle()
+
+    private fun createSut(handle: SavedStateHandle = savedStateHandle) = CollectionViewModel(
+        BOOKS.id,
+        collections,
+        items,
+        itemListChanges,
+        collectionListChanges,
+        collectionChanges,
+        handle
+    )
 
     /** A view model whose first load has succeeded, so the delete is offered. */
-    private fun loadedSut(): CollectionViewModel {
+    private fun loadedSut(itemList: List<Item> = listOf(DUNE)): CollectionViewModel {
         queueAll()
         val sut = createSut()
-        answerAll()
+        answerAll(itemList = Result.success(itemList))
         return sut
     }
 
@@ -86,6 +96,71 @@ class CollectionViewModelTest {
     private fun queueAll() {
         collections.queue()
         items.queue()
+    }
+
+    @Test
+    fun `a query keeps only the items whose name contains it`() {
+        val sut = loadedSut(listOf(DUNE, MESSIAH, SOLARIS))
+
+        sut.uiState.value.onQueryChange("Messiah")
+
+        assertEquals(listOf(MESSIAH), sut.uiState.value.visibleItems)
+        assertEquals(listOf(DUNE, MESSIAH, SOLARIS), sut.uiState.value.items)
+    }
+
+    @Test
+    fun `the query ignores case`() {
+        val sut = loadedSut(listOf(DUNE, MESSIAH, SOLARIS))
+
+        sut.uiState.value.onQueryChange("dUNE")
+
+        assertEquals(listOf(DUNE, MESSIAH), sut.uiState.value.visibleItems)
+    }
+
+    @Test
+    fun `a query with no match keeps no item`() {
+        val sut = loadedSut(listOf(DUNE, MESSIAH, SOLARIS))
+
+        sut.uiState.value.onQueryChange("Foundation")
+
+        assertTrue(sut.uiState.value.visibleItems.isEmpty())
+        assertEquals(listOf(DUNE, MESSIAH, SOLARIS), sut.uiState.value.items)
+    }
+
+    @Test
+    fun `an empty or blank query shows every item`() {
+        val sut = loadedSut(listOf(DUNE, MESSIAH, SOLARIS))
+        sut.uiState.value.onQueryChange("Solaris")
+
+        sut.uiState.value.onQueryChange("")
+        assertEquals(listOf(DUNE, MESSIAH, SOLARIS), sut.uiState.value.visibleItems)
+
+        sut.uiState.value.onQueryChange("   ")
+        assertEquals(listOf(DUNE, MESSIAH, SOLARIS), sut.uiState.value.visibleItems)
+    }
+
+    @Test
+    fun `a query sends no call to the server`() {
+        val sut = loadedSut(listOf(DUNE, MESSIAH, SOLARIS))
+
+        sut.uiState.value.onQueryChange("Dune")
+
+        assertEquals(listOf(BOOKS.id), collections.collectionCalls)
+        assertEquals(listOf(BOOKS.id), collections.childrenCalls)
+        assertEquals(listOf(BOOKS.id), items.calls)
+    }
+
+    @Test
+    fun `the query survives process death`() {
+        loadedSut(listOf(DUNE, MESSIAH, SOLARIS)).uiState.value.onQueryChange("solaris")
+        val restored = SavedStateHandle(savedStateHandle.keys().associateWith { savedStateHandle.get<Any>(it) })
+
+        queueAll()
+        val sut = createSut(restored)
+        answerAll(itemList = Result.success(listOf(DUNE, MESSIAH, SOLARIS)))
+
+        assertEquals("solaris", sut.uiState.value.query)
+        assertEquals(listOf(SOLARIS), sut.uiState.value.visibleItems)
     }
 
     @Test
@@ -498,6 +573,7 @@ class CollectionViewModelTest {
 
     private companion object {
         val MESSIAH by lazy { DUNE.copy(id = "messiah", name = "Dune Messiah") }
+        val SOLARIS by lazy { DUNE.copy(id = "solaris", name = "Solaris") }
         val BOOKS = Collection(id = "books", title = "Books", parentId = null, color = null, imageUrl = null)
         val NOVELS = Collection(id = "novels", title = "Novels", parentId = "books", color = null, imageUrl = null)
         val SCI_FI = Collection(id = "sci-fi", title = "Sci-fi", parentId = "novels", color = null, imageUrl = null)

@@ -2,7 +2,9 @@ package com.grappim.koillectionmobile.feature.collections.ui
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -10,8 +12,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
@@ -22,6 +26,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -55,6 +60,9 @@ import com.grappim.koillectionmobile.strings.generated.resources.collection_edit
 import com.grappim.koillectionmobile.strings.generated.resources.collection_empty
 import com.grappim.koillectionmobile.strings.generated.resources.collection_more
 import com.grappim.koillectionmobile.strings.generated.resources.collection_new
+import com.grappim.koillectionmobile.strings.generated.resources.collection_search_clear
+import com.grappim.koillectionmobile.strings.generated.resources.collection_search_label
+import com.grappim.koillectionmobile.strings.generated.resources.collection_search_no_match
 import com.grappim.koillectionmobile.strings.generated.resources.collection_section_children
 import com.grappim.koillectionmobile.strings.generated.resources.collection_section_items
 import org.jetbrains.compose.resources.pluralStringResource
@@ -157,36 +165,88 @@ private fun CollectionContent(
                 retryEnabled = true
             )
 
-            else -> LazyColumn(modifier = contentModifier) {
-                if (uiState.children.isNotEmpty()) {
-                    item { SectionHeader(stringResource(RString.collection_section_children)) }
-                    items(uiState.children, key = { "collection-${it.id}" }) { child ->
-                        ListItem(
-                            modifier = Modifier.clickable { onCollectionClick(child.id) },
-                            headlineContent = { Text(child.title) },
-                            leadingContent = { Thumbnail(imageUrl = child.imageUrl, title = child.title) }
-                        )
-                    }
-                }
+            else -> Column(modifier = contentModifier) {
                 if (uiState.items.isNotEmpty()) {
-                    item { SectionHeader(stringResource(RString.collection_section_items)) }
-                    items(uiState.items, key = { "item-${it.id}" }) { item ->
-                        ListItem(
-                            modifier = Modifier.clickable { onItemClick(item.id) },
-                            headlineContent = { Text(item.name) },
-                            leadingContent = {
-                                Thumbnail(
-                                    imageUrl = item.image?.let { it.smallThumbnailUrl ?: it.url },
-                                    title = item.name
-                                )
-                            }
-                        )
-                    }
+                    SearchField(query = uiState.query, onQueryChange = uiState.onQueryChange)
                 }
+                CollectionList(
+                    uiState = uiState,
+                    onCollectionClick = onCollectionClick,
+                    onItemClick = onItemClick,
+                    modifier = Modifier.weight(1f)
+                )
             }
         }
     }
     DeleteDialogs(uiState)
+}
+
+@Composable
+private fun SearchField(query: String, onQueryChange: (String) -> Unit, modifier: Modifier = Modifier) {
+    OutlinedTextField(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = PADDING),
+        value = query,
+        onValueChange = onQueryChange,
+        singleLine = true,
+        placeholder = { Text(stringResource(RString.collection_search_label)) },
+        leadingIcon = { Icon(imageVector = Icons.Filled.Search, contentDescription = null) },
+        trailingIcon = {
+            if (query.isNotEmpty()) {
+                IconButton(onClick = { onQueryChange("") }) {
+                    Icon(
+                        imageVector = Icons.Filled.Clear,
+                        contentDescription = stringResource(RString.collection_search_clear)
+                    )
+                }
+            }
+        }
+    )
+}
+
+@Composable
+private fun CollectionList(
+    uiState: CollectionUiState,
+    onCollectionClick: (String) -> Unit,
+    onItemClick: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val visibleItems = uiState.visibleItems
+    LazyColumn(modifier = modifier) {
+        if (uiState.children.isNotEmpty()) {
+            item { SectionHeader(stringResource(RString.collection_section_children)) }
+            items(uiState.children, key = { "collection-${it.id}" }) { child ->
+                ListItem(
+                    modifier = Modifier.clickable { onCollectionClick(child.id) },
+                    headlineContent = { Text(child.title) },
+                    leadingContent = { Thumbnail(imageUrl = child.imageUrl, title = child.title) }
+                )
+            }
+        }
+        if (visibleItems.isNotEmpty()) {
+            item { SectionHeader(stringResource(RString.collection_section_items)) }
+            items(visibleItems, key = { "item-${it.id}" }) { item ->
+                ListItem(
+                    modifier = Modifier.clickable { onItemClick(item.id) },
+                    headlineContent = { Text(item.name) },
+                    leadingContent = {
+                        Thumbnail(
+                            imageUrl = item.image?.let { it.smallThumbnailUrl ?: it.url },
+                            title = item.name
+                        )
+                    }
+                )
+            }
+        } else if (uiState.items.isNotEmpty()) {
+            item {
+                Text(
+                    modifier = Modifier.padding(PADDING),
+                    text = stringResource(RString.collection_search_no_match, uiState.query.trim())
+                )
+            }
+        }
+    }
 }
 
 @Composable

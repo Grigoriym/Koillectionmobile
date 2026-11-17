@@ -14,6 +14,8 @@ import com.grappim.koillectionmobile.feature.items.domain.Item
  * [isDeleting] is true while the delete runs. [isDeleted] is set once the server deleted the
  * collection: the screen then leaves. A failed count or delete sets [deleteError];
  * [onDeleteErrorShown] clears it.
+ *
+ * [query] filters [items] by name into [visibleItems]; [onQueryChange] sets it.
  */
 data class CollectionUiState(
     val title: String = "",
@@ -21,6 +23,8 @@ data class CollectionUiState(
     val items: List<Item> = emptyList(),
     val isLoading: Boolean = true,
     val error: NativeText = NativeText.Empty,
+    val query: String = "",
+    val onQueryChange: (String) -> Unit = {},
     val onRetry: () -> Unit = {},
     val isCountingDelete: Boolean = false,
     val deleteSummary: DeleteSummary? = null,
@@ -36,6 +40,12 @@ data class CollectionUiState(
     val canDelete: Boolean
         get() = !isLoading && error.isEmpty() && !isCountingDelete && deleteSummary == null && !isDeleting &&
             !isDeleted
+
+    /** The [items] whose name holds [query], ignoring case. A blank [query] keeps every item. */
+    val visibleItems: List<Item>
+        get() = query.trim().let { q ->
+            if (q.isEmpty()) items else items.filter { it.name.contains(q, ignoreCase = true) }
+        }
 }
 
 /**
