@@ -674,3 +674,79 @@ Create a collection (top level or child), rename it, set, replace or remove its 
   404). The delete dialog counted 1 collection and 1 item (item added through the API); after it
   the collection, the child and the item gave 404. The list showed a new image as a thumbnail. The
   user confirmed from the screenshots.
+
+## M7 — search and tags
+
+Search items by name, browse tags and the items of a tag, create a tag from the add-item form.
+Choices are plan §5 decision 10 (user, 2026-11-17). Every write goes to the local test instance
+only (`docs/local-info.md`).
+
+- [x] **M7.1** — Filter in a collection: a search field on the collection screen filters the items
+  it already loaded by name (substring, ignoring case). No new API call. The query survives
+  rotation and process death. An empty result shows a "no match" text, not the empty-collection
+  text.
+  **Verify:** ViewModel tests (match, no match, empty query shows all, case); on the emulator a
+  query on the 445-item collection narrows the list and clearing it shows all items again.
+  Note: the filter covers items only; child collections stay listed. A blank query counts as empty.
+- [x] **M7.2** — Global item search. `ItemsRepository.getAllItems()` reads `GET /api/items`, all
+  pages. A search action on the collection list opens a search screen. It reads all items once on
+  open (loading and error states, with retry) and then filters by name in the app, as M7.1 does.
+  A result row shows the item name and its collection title; a tap opens the item. Re-read
+  `Item.php` first.
+  **Verify:** mock-engine test (path, every page, root-path base URL case); ViewModel tests
+  (load, failure and retry, filter); on the emulator a query finds an item and opens it.
+  Note: the screen lives in `feature:collections:ui` (it needs both domains) and reads
+  `getCollections()` in parallel for the titles, as an item names its collection by IRI only. It
+  reads everything again on any `ItemListChanges` signal, so a deleted item leaves the results.
+- [x] **M7.3** — Tag repository calls. `ItemsRepository.getTagItems(tagId)` reads
+  `GET /api/tags/{id}/items`, all pages (in `feature:items`, because `feature:items:domain`
+  already depends on `feature:tags:domain`). `TagsRepository.createTag(label)` sends
+  `POST /api/tags` with `{"label"}` only. Re-read `Tag.php` and `Item.php` first.
+  **Verify:** mock-engine tests for each call (method, path, content type, body keys), with a
+  root-path base URL case; mutation-check the body key and one path.
+  Note: `createTag` returns the new `Tag`. The mutations were the body key (`label` → `name`) and
+  the `getTagItems` path (`tags` → `tag`); each failed its test.
+- [x] **M7.4** — Live tag smoke against the local test instance: a task (as
+  `smokeCollectionRun`) creates a tag, sets it on an item next to the item's existing tags, reads
+  `/api/tags/{id}/items` (the item is there), takes it off the item again, then deletes the tag.
+  Also send a create with an empty label (expect 422) and a create with a label that already
+  exists (record what the server does). Record the answers in plan §2.
+  **Verify:** the run prints each step and passes; the item's tags end as they started; plan §2
+  has the results.
+  Note: the task is `smokeTagRun`. The app has no tag delete call, so the run sends
+  `DELETE /api/tags/{id}` through the app's own `HttpClient`. A duplicate label creates a second tag.
+- [x] **M7.5** — Tag list and tag items (`feature:tags:ui`, the placeholder today). A tags action
+  on the collection list opens the tag list: one section per tag category with its colour, sorted
+  by label, then the tags without a category; tags sorted by label inside a section, ignoring case.
+  A tap opens the tag's items (M7.3); a tap on an item opens the item. Loading, empty and error
+  states with retry on both screens. Reuse the add form's grouping (`groupTags`,
+  `feature:items:ui`); move it if the new screen needs it.
+  **Verify:** ViewModel tests (grouping and order, empty, failure and retry) for both screens; on
+  the emulator the list matches the web UI's tags and one tag shows its items.
+  Note: `TagGroup`, `groupTags` and `loadTagGroups` moved to `feature:tags:domain`; `TagGroup` got
+  the category `color`. The tag items screen lives in `feature:tags:ui` (now on
+  `feature:items:domain`), keeps the server's order and reads again on `ItemListChanges`. Its route
+  carries the tag label for the title. The device check compared with `GET /api/tags` and
+  `/api/tag_categories` (30 tags, 4 categories, none without one), not the web page itself.
+- [x] **M7.6** — Create a tag from the add-item form: a "new tag" action in `TagPicker` takes a
+  label. A label that exists already (ignoring case) selects the existing tag and creates nothing.
+  A new tag is created on Save, before the item's tags are set, so an abandoned form leaves no
+  tag; a retry does not create it twice. The pending tag survives rotation and process death. The
+  edit form shares `TagPicker`: ask the user at the start of the step whether it gets the action
+  too.
+  **Verify:** ViewModel and use-case tests (new label, existing label, failure at the tag create
+  and the retry); on the emulator an item is saved with a new tag, and the web UI shows the tag on
+  the item.
+  Note: the edit form got the action too (user). The save reads `GET /api/tags` before it creates,
+  so the add and edit retries need no stored tag ids. The tag step counts as one step in the
+  progress. Device check: add form (pending tag after `am kill`, "german" picked German) and edit
+  form, both on the web item page; test data deleted.
+- [x] **M7.7** — Device pass of search, the tag screens and tag creation, then the user confirms
+  with screenshots. Fix what breaks, or put it in `docs/revisit.md` with evidence. Delete the test
+  tags and items afterwards.
+  **Verify:** the user confirms.
+  Note: nothing broke. Search found "Ut mine Stromtid" and opened it; Tags → Drama → "Medea" opened
+  the item; the category dots match the server's pale colours. The add form saved an item with a new
+  tag (30 → 31 tags only on Save) and the edit form a second new tag plus "poetry", which picked the
+  existing Poetry. Both new tags showed under "No category" and on the web item page. Test
+  collection, item and tags deleted (back to 30 tags). The user confirmed from the screenshots.
