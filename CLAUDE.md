@@ -125,7 +125,8 @@ first — it is often for a problem this toolchain doesn't have.
   Run it without `-q`: `-q` hides the failing test names, and "BUILD FAILED" alone also fits a
   compile error (M6.1, M6.3, M6.5).
 - **Force Gradle tests with `--rerun`** when the test is the proof. An `UP-TO-DATE` test task
-  prints "BUILD SUCCESSFUL" without running anything.
+  prints "BUILD SUCCESSFUL" without running anything. `--rerun` applies only to the task just
+  before it: write `:a:jvmTest --rerun :b:jvmTest --rerun`, not one `--rerun` at the end (M7.3).
 - **A new Koin module needs its `includes` line in `AppModule`** (`composeApp/.../di/Koin.kt`).
   Without it every JVM gate passes, `KoinGraphTest` too, and Android crashes with
   `NoDefinitionFoundException` on the first screen that needs it. Only the device run caught it (M4.2).
