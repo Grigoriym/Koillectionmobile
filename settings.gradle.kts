@@ -66,4 +66,10 @@ include(
     ":feature:tags:mapper",
     ":feature:tags:ui"
 )
+include(
+    ":feature:templates:data",
+    ":feature:templates:domain",
+    ":feature:templates:dto",
+    ":feature:templates:mapper"
+)
 include(":feature:settings:ui")

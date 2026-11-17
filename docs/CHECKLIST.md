@@ -1,6 +1,6 @@
 # koillectionmobile checklist
 
-**Current step:** M8.1. M8 broken into steps 2026-11-17; the other areas became M9–M13 and the release moved to M14 (user, 2026-11-17). M7 done 2026-11-17. M7.7 done 2026-11-17. M7.6 done 2026-11-17. M7.5 done 2026-11-17. M7.4 done 2026-11-17. M7.3 done 2026-11-17. M7.2 done 2026-11-17. M7.1 done 2026-11-17. M7 broken into steps 2026-11-17. M6 done 2026-11-17. M6.6 done 2026-11-17. M6.5 done 2026-11-16. M6.4 done 2026-11-16. M6.3 done 2026-11-16. M6.2 done 2026-11-16. M6.1 done 2026-11-16. M6 broken into steps 2026-11-16. M5 done 2026-11-16. M5.7 done 2026-11-16. M5.6 done 2026-11-16. M5.5 done 2026-11-16. M5.4 done 2026-11-16. M5.3 done 2026-11-16. M5.2 done 2026-11-16. M5.1 done 2026-11-16. M5 broken into steps 2026-11-16. M4 done 2026-11-16. M4.4 done 2026-11-16. M4.3 done 2026-11-16. M4.2 done 2026-11-16. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6, 7, 8, 9, 10 and 11 are settled.
+**Current step:** M8.2. M8.1 done 2026-11-17. M8 broken into steps 2026-11-17; the other areas became M9–M13 and the release moved to M14 (user, 2026-11-17). M7 done 2026-11-17. M7.7 done 2026-11-17. M7.6 done 2026-11-17. M7.5 done 2026-11-17. M7.4 done 2026-11-17. M7.3 done 2026-11-17. M7.2 done 2026-11-17. M7.1 done 2026-11-17. M7 broken into steps 2026-11-17. M6 done 2026-11-17. M6.6 done 2026-11-17. M6.5 done 2026-11-16. M6.4 done 2026-11-16. M6.3 done 2026-11-16. M6.2 done 2026-11-16. M6.1 done 2026-11-16. M6 broken into steps 2026-11-16. M5 done 2026-11-16. M5.7 done 2026-11-16. M5.6 done 2026-11-16. M5.5 done 2026-11-16. M5.4 done 2026-11-16. M5.3 done 2026-11-16. M5.2 done 2026-11-16. M5.1 done 2026-11-16. M5 broken into steps 2026-11-16. M4 done 2026-11-16. M4.4 done 2026-11-16. M4.3 done 2026-11-16. M4.2 done 2026-11-16. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6, 7, 8, 9, 10 and 11 are settled.
 
 ## How to use this
 
@@ -43,7 +43,7 @@ default template. Choices are plan §5 decision 11 (user, 2026-11-17). Every wri
 local test instance only (`docs/local-info.md`). Re-read `Template.php`, `Field.php`,
 `ChoiceList.php` and `Datum.php` at the start of each step that touches the API.
 
-- [ ] **M8.1** — Repository calls (new `feature:templates:{data,domain,dto,mapper}`, the
+- [x] **M8.1** — Repository calls (new `feature:templates:{data,domain,dto,mapper}`, the
   wallosmobile split). Templates: list, get, create (`{"name"}`), rename, delete. Fields:
   `GET /api/templates/{id}/fields` (all pages, sorted by `position` in the app), create
   (`name`, `position`, `type`, `template` IRI, `choiceList` IRI for `choice-list`), edit, delete.
@@ -51,6 +51,11 @@ local test instance only (`docs/local-info.md`). Re-read `Template.php`, `Field.
   `Groups`, not from memory.
   **Verify:** mock-engine tests per call (method, path, content type, body keys), with a
   root-path base URL case; mutation-check one body key and one path.
+  Note: done 2026-11-17. The test instance has no templates or choice lists, so the tests use
+  inline bodies, not fixtures. `TemplatesDataModule` and `TemplatesMapperModule` are in
+  `AppModule` now, and `KoinGraphTest` resolves `TemplatesRepository`. `editField` with a null
+  `choiceListId` keeps the stored choice list: a merge patch cannot clear it without an explicit
+  null, which the app does not send yet.
 - [ ] **M8.2** — Live template smoke against the local test instance (a task, as `smokeTagRun`):
   create a choice list, a template, one field of each type the item form will send (`text`,
   `number`, `checkbox`, `choice-list`), set the template as a collection's
