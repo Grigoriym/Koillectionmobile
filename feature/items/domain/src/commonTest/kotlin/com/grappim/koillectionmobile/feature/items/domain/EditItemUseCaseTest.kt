@@ -280,6 +280,8 @@ class EditItemUseCaseTest {
         private fun newFile(name: String): Image = imageOf("$name#${nextId++}")
 
         val items = object : ItemsRepository {
+            override suspend fun getTagItems(tagId: String): Result<List<Item>> = error("not used")
+
             override suspend fun getItems(collectionId: String): Result<List<Item>> = error("not used")
 
             override suspend fun getAllItems(): Result<List<Item>> = error("not used")
@@ -335,6 +337,8 @@ class EditItemUseCaseTest {
 
             override suspend fun getItemTags(itemId: String): Result<List<Tag>> =
                 Result.success(tagIds.map { Tag(it, it, null, null) })
+
+            override suspend fun createTag(label: String): Result<Tag> = error("not used")
 
             override suspend fun setItemTags(itemId: String, tagIds: List<String>) =
                 write("setItemTags $tagIds") { this@FakeServer.tagIds = tagIds.toSet() }

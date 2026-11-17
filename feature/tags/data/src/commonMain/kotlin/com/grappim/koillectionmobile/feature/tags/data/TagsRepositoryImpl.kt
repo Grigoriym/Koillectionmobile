@@ -1,17 +1,21 @@
 package com.grappim.koillectionmobile.feature.tags.data
 
 import com.grappim.kit.domain.resultOf
+import com.grappim.koillectionmobile.core.api.ContentTypeLdJson
 import com.grappim.koillectionmobile.core.api.ContentTypeMergePatchJson
 import com.grappim.koillectionmobile.core.api.getAllHydraPages
 import com.grappim.koillectionmobile.feature.tags.domain.Tag
 import com.grappim.koillectionmobile.feature.tags.domain.TagCategory
 import com.grappim.koillectionmobile.feature.tags.domain.TagsRepository
 import com.grappim.koillectionmobile.feature.tags.dto.ItemTagsPatchDto
+import com.grappim.koillectionmobile.feature.tags.dto.NewTagDto
 import com.grappim.koillectionmobile.feature.tags.dto.TagCategoryDto
 import com.grappim.koillectionmobile.feature.tags.dto.TagDto
 import com.grappim.koillectionmobile.feature.tags.mapper.TagMapper
 import io.ktor.client.HttpClient
+import io.ktor.client.call.body
 import io.ktor.client.request.patch
+import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.contentType
 import org.koin.core.annotation.Single
@@ -22,11 +26,19 @@ internal class TagsRepositoryImpl(private val httpClient: HttpClient, private va
     TagsRepository {
 
     override suspend fun getTags(): Result<List<Tag>> = resultOf {
-        httpClient.getAllHydraPages<TagDto>("api/tags").map(mapper::toDomain)
+        httpClient.getAllHydraPages<TagDto>(TAGS_PATH).map(mapper::toDomain)
     }
 
     override suspend fun getTagCategories(): Result<List<TagCategory>> = resultOf {
         httpClient.getAllHydraPages<TagCategoryDto>("api/tag_categories").map(mapper::toDomain)
+    }
+
+    override suspend fun createTag(label: String): Result<Tag> = resultOf {
+        val dto = httpClient.post(TAGS_PATH) {
+            contentType(ContentTypeLdJson)
+            setBody(NewTagDto(label = label))
+        }.body<TagDto>()
+        mapper.toDomain(dto)
     }
 
     override suspend fun getItemTags(itemId: String): Result<List<Tag>> = resultOf {
@@ -42,3 +54,5 @@ internal class TagsRepositoryImpl(private val httpClient: HttpClient, private va
         Unit
     }
 }
+
+private const val TAGS_PATH = "api/tags"

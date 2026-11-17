@@ -398,6 +398,8 @@ class ItemViewModelTest {
             data.addLast(CompletableDeferred())
         }
 
+        override suspend fun getTagItems(tagId: String): Result<List<Item>> = error("not used")
+
         override suspend fun getItems(collectionId: String): Result<List<Item>> = error("not used")
 
         override suspend fun getAllItems(): Result<List<Item>> = error("not used")
@@ -466,6 +468,8 @@ class ItemViewModelTest {
             calls += itemId
             return tags.first().await()
         }
+
+        override suspend fun createTag(label: String): Result<Tag> = error("not used")
 
         override suspend fun setItemTags(itemId: String, tagIds: List<String>): Result<Unit> = error("not used")
     }

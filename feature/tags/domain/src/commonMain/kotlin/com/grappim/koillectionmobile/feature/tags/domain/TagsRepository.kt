@@ -12,6 +12,12 @@ interface TagsRepository {
     /** All tag categories of the user, from all pages. */
     suspend fun getTagCategories(): Result<List<TagCategory>>
 
+    /**
+     * Creates a tag with [label] only and returns it as the server sent it. The tag has no
+     * category, and the server sets the visibility. A blank [label] fails with a validation error.
+     */
+    suspend fun createTag(label: String): Result<Tag>
+
     /** The tags of item [itemId], from all pages. */
     suspend fun getItemTags(itemId: String): Result<List<Tag>>
 

@@ -255,6 +255,8 @@ class ItemSearchViewModelTest {
             return all.first().await()
         }
 
+        override suspend fun getTagItems(tagId: String): Result<List<Item>> = error("not used")
+
         override suspend fun getItems(collectionId: String): Result<List<Item>> = error("not used")
 
         override suspend fun getItem(id: String): Result<Item> = error("not used")

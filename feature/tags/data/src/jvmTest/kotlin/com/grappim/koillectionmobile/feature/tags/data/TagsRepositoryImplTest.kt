@@ -4,6 +4,7 @@ import com.grappim.kit.testing.FakeCustomHeadersStorage
 import com.grappim.koillectionmobile.core.api.BaseUrlProvider
 import com.grappim.koillectionmobile.core.api.configureKoillectionClient
 import com.grappim.koillectionmobile.core.domain.KoillectionError
+import com.grappim.koillectionmobile.feature.tags.domain.Tag
 import com.grappim.koillectionmobile.feature.tags.mapper.TagMapper
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.mock.MockEngine
@@ -33,9 +34,15 @@ class TagsRepositoryImplTest {
     private val requests = mutableListOf<HttpRequestData>()
 
     /** Path (with query) → status and body. Any other path gets a 404. */
-    private fun repository(vararg routes: Pair<String, Pair<HttpStatusCode, String>>): TagsRepositoryImpl {
+    private fun repository(vararg routes: Pair<String, Pair<HttpStatusCode, String>>): TagsRepositoryImpl =
+        repository("https://koi.example/sub", *routes)
+
+    private fun repository(
+        serverUrl: String,
+        vararg routes: Pair<String, Pair<HttpStatusCode, String>>
+    ): TagsRepositoryImpl {
         val byPath = routes.toMap()
-        val session = FakeSessionStorage(serverUrl = "https://koi.example/sub", token = "jwt")
+        val session = FakeSessionStorage(serverUrl = serverUrl, token = "jwt")
         val client = HttpClient(
             MockEngine { request ->
                 requests += request
@@ -142,7 +149,51 @@ class TagsRepositoryImplTest {
         )
     }
 
+    @Test
+    fun `createTag posts only the label as ld+json and maps the answer`() = runTest {
+        val repository = repository("/sub/api/tags" to (HttpStatusCode.Created to NEW_TAG))
+
+        val tag = repository.createTag("Sci-fi").getOrThrow()
+
+        val request = requests.single()
+        assertEquals(HttpMethod.Post, request.method)
+        assertEquals("/sub/api/tags", request.url.fullPath)
+        assertEquals("application/ld+json", request.body.contentType.toString())
+        assertEquals(
+            json.parseToJsonElement("""{"label":"Sci-fi"}"""),
+            json.parseToJsonElement((request.body as TextContent).text)
+        )
+        assertEquals(Tag(id = "new-tag", label = "Sci-fi", description = null, categoryId = null), tag)
+    }
+
+    @Test
+    fun `a rejected createTag is a failed result that holds the KoillectionError`() = runTest {
+        val repository = repository(
+            "/sub/api/tags" to (
+                HttpStatusCode.UnprocessableEntity to
+                    """{"title":"An error occurred","detail":"label: This value should not be blank."}"""
+                )
+        )
+
+        assertIs<KoillectionError.Validation>(repository.createTag("").exceptionOrNull())
+    }
+
+    /** `CLAUDE.md`, Verification: at a root-path server Ktor's merged path differs from `/sub`. */
+    @Test
+    fun `createTag keeps its path at a root-path server`() = runTest {
+        val repository = repository("https://koi.example", "/api/tags" to (HttpStatusCode.Created to NEW_TAG))
+
+        repository.createTag("Sci-fi").getOrThrow()
+
+        assertEquals(listOf("POST /api/tags"), requests.map { "${it.method.value} ${it.url.fullPath}" })
+    }
+
     private companion object {
+        /** A trimmed `POST /api/tags` answer, in the shape of `tags_page.json`'s members. */
+        const val NEW_TAG =
+            """{"@id":"/api/tags/new-tag","@type":"Tag","id":"new-tag","label":"Sci-fi","description":null,""" +
+                """"category":null,"visibility":"public","seenCounter":0}"""
+
         const val ITEM_ID = "01a1de6f-bff4-7eb7-8d9f-973b4ac86da8"
     }
 }

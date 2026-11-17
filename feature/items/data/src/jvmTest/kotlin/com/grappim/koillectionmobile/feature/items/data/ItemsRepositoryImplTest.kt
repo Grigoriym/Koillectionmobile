@@ -159,6 +159,53 @@ class ItemsRepositoryImplTest {
     }
 
     @Test
+    fun `getTagItems reads the tag's items path and every next page`() = runTest {
+        val repository = repository(
+            "/sub/api/tags/$TAG_ID/items" to
+                (HttpStatusCode.OK to allItemsPage(listOf("a", "b"), next = "/sub/api/tags/$TAG_ID/items?page=2")),
+            "/sub/api/tags/$TAG_ID/items?page=2" to (HttpStatusCode.OK to allItemsPage(listOf("c"), next = null))
+        )
+
+        val items = repository.getTagItems(TAG_ID).getOrThrow()
+
+        assertEquals(listOf("a", "b", "c"), items.map { it.name })
+        assertEquals(
+            listOf("GET /sub/api/tags/$TAG_ID/items", "GET /sub/api/tags/$TAG_ID/items?page=2"),
+            requests.map { "${it.method.value} ${it.url.fullPath}" }
+        )
+    }
+
+    /** `CLAUDE.md`, Verification: at a root-path server Ktor's merged path differs from `/sub`. */
+    @Test
+    fun `getTagItems keeps its path at a root-path server`() = runTest {
+        val repository = repository(FakeSessionStorage(serverUrl = "https://koi.example", token = "jwt")) { request ->
+            val body = when (request.url.fullPath) {
+                "/api/tags/$TAG_ID/items" -> allItemsPage(listOf("a"), next = "/api/tags/$TAG_ID/items?page=2")
+                "/api/tags/$TAG_ID/items?page=2" -> allItemsPage(listOf("b"), next = null)
+                else -> null
+            }
+            respond(
+                body ?: """{"title":"An error occurred","detail":"Not Found"}""",
+                if (body == null) HttpStatusCode.NotFound else HttpStatusCode.OK,
+                headersOf(HttpHeaders.ContentType, "application/ld+json")
+            )
+        }
+
+        assertEquals(listOf("a", "b"), repository.getTagItems(TAG_ID).getOrThrow().map { it.name })
+        assertEquals(
+            listOf("/api/tags/$TAG_ID/items", "/api/tags/$TAG_ID/items?page=2"),
+            requests.map { it.url.fullPath }
+        )
+    }
+
+    @Test
+    fun `an unknown tag fails getTagItems with the KoillectionError`() = runTest {
+        val repository = repository()
+
+        assertIs<KoillectionError.NotFound>(repository.getTagItems("missing").exceptionOrNull())
+    }
+
+    @Test
     fun `getItem reads one item and resolves its image against the server URL`() = runTest {
         val repository = repository("/sub/api/items/$ITEM_ID" to (HttpStatusCode.OK to fixture("item_one.json")))
 
@@ -510,6 +557,8 @@ class ItemsRepositoryImplTest {
         json.parseToJsonElement((request.body as TextContent).text)
 
     private companion object {
+        const val TAG_ID = "01a1de6f-0000-7000-8000-00000000a7a6"
+
         /** The server's answer to `POST /api/data`: the new field in the `datum:read` group. */
         const val DATUM_TEXT =
             """{"id":"datum-1","item":"/api/items/01a1de6f-bff4-7eb7-8d9f-973b4ac86da8","type":"text",""" +

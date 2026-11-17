@@ -571,6 +571,8 @@ class EditItemViewModelTest {
         val itemCalls = mutableListOf<String>()
         val dataCalls = mutableListOf<String>()
 
+        override suspend fun getTagItems(tagId: String): Result<List<Item>> = error("not used")
+
         override suspend fun getItems(collectionId: String): Result<List<Item>> = error("not used")
 
         override suspend fun getAllItems(): Result<List<Item>> = error("not used")

@@ -42,6 +42,8 @@ internal class FakeTagsRepository : TagsRepository {
         return itemTags
     }
 
+    override suspend fun createTag(label: String): Result<Tag> = error("not used")
+
     override suspend fun setItemTags(itemId: String, tagIds: List<String>): Result<Unit> = error("not used")
 }
 

@@ -125,6 +125,8 @@ class AddItemUseCaseTest {
         }
 
         val items = object : ItemsRepository {
+            override suspend fun getTagItems(tagId: String): Result<List<Item>> = error("not used")
+
             override suspend fun getItems(collectionId: String): Result<List<Item>> = error("not used")
 
             override suspend fun getAllItems(): Result<List<Item>> = error("not used")
@@ -172,6 +174,8 @@ class AddItemUseCaseTest {
             override suspend fun getTagCategories(): Result<List<TagCategory>> = error("not used")
 
             override suspend fun getItemTags(itemId: String): Result<List<Tag>> = error("not used")
+
+            override suspend fun createTag(label: String): Result<Tag> = error("not used")
 
             override suspend fun setItemTags(itemId: String, tagIds: List<String>) =
                 answer("setItemTags $itemId $tagIds") { }

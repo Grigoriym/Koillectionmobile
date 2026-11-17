@@ -527,6 +527,8 @@ class CollectionViewModelTest {
             items.addLast(CompletableDeferred())
         }
 
+        override suspend fun getTagItems(tagId: String): Result<List<Item>> = error("not used")
+
         override suspend fun getItems(collectionId: String): Result<List<Item>> {
             calls += collectionId
             return items.first().await()

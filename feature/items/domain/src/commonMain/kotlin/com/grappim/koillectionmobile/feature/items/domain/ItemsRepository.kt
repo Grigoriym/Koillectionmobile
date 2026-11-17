@@ -15,6 +15,9 @@ interface ItemsRepository {
      */
     suspend fun getAllItems(): Result<List<Item>>
 
+    /** The items that carry tag [tagId], in every collection, from all pages. */
+    suspend fun getTagItems(tagId: String): Result<List<Item>>
+
     suspend fun getItem(id: String): Result<Item>
 
     /** The fields of item [itemId], sorted by `position`. A field without a position comes last. */

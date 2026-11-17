@@ -1,6 +1,6 @@
 # koillectionmobile checklist
 
-**Current step:** M7.3. M7.2 done 2026-11-17. M7.1 done 2026-11-17. M7 broken into steps 2026-11-17. M6 done 2026-11-17. M6.6 done 2026-11-17. M6.5 done 2026-11-16. M6.4 done 2026-11-16. M6.3 done 2026-11-16. M6.2 done 2026-11-16. M6.1 done 2026-11-16. M6 broken into steps 2026-11-16. M5 done 2026-11-16. M5.7 done 2026-11-16. M5.6 done 2026-11-16. M5.5 done 2026-11-16. M5.4 done 2026-11-16. M5.3 done 2026-11-16. M5.2 done 2026-11-16. M5.1 done 2026-11-16. M5 broken into steps 2026-11-16. M4 done 2026-11-16. M4.4 done 2026-11-16. M4.3 done 2026-11-16. M4.2 done 2026-11-16. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6, 7, 8, 9 and 10 are settled.
+**Current step:** M7.4. M7.3 done 2026-11-17. M7.2 done 2026-11-17. M7.1 done 2026-11-17. M7 broken into steps 2026-11-17. M6 done 2026-11-17. M6.6 done 2026-11-17. M6.5 done 2026-11-16. M6.4 done 2026-11-16. M6.3 done 2026-11-16. M6.2 done 2026-11-16. M6.1 done 2026-11-16. M6 broken into steps 2026-11-16. M5 done 2026-11-16. M5.7 done 2026-11-16. M5.6 done 2026-11-16. M5.5 done 2026-11-16. M5.4 done 2026-11-16. M5.3 done 2026-11-16. M5.2 done 2026-11-16. M5.1 done 2026-11-16. M5 broken into steps 2026-11-16. M4 done 2026-11-16. M4.4 done 2026-11-16. M4.3 done 2026-11-16. M4.2 done 2026-11-16. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6, 7, 8, 9 and 10 are settled.
 
 ## How to use this
 
@@ -58,12 +58,14 @@ only (`docs/local-info.md`).
   Note: the screen lives in `feature:collections:ui` (it needs both domains) and reads
   `getCollections()` in parallel for the titles, as an item names its collection by IRI only. It
   reads everything again on any `ItemListChanges` signal, so a deleted item leaves the results.
-- [ ] **M7.3** — Tag repository calls. `ItemsRepository.getTagItems(tagId)` reads
+- [x] **M7.3** — Tag repository calls. `ItemsRepository.getTagItems(tagId)` reads
   `GET /api/tags/{id}/items`, all pages (in `feature:items`, because `feature:items:domain`
   already depends on `feature:tags:domain`). `TagsRepository.createTag(label)` sends
   `POST /api/tags` with `{"label"}` only. Re-read `Tag.php` and `Item.php` first.
   **Verify:** mock-engine tests for each call (method, path, content type, body keys), with a
   root-path base URL case; mutation-check the body key and one path.
+  Note: `createTag` returns the new `Tag`. The mutations were the body key (`label` → `name`) and
+  the `getTagItems` path (`tags` → `tag`); each failed its test.
 - [ ] **M7.4** — Live tag smoke against the local test instance: a task (as
   `smokeCollectionRun`) creates a tag, sets it on an item next to the item's existing tags, reads
   `/api/tags/{id}/items` (the item is there), takes it off the item again, then deletes the tag.
