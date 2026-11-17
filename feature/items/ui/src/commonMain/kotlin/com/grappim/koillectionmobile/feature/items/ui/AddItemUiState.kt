@@ -2,7 +2,7 @@ package com.grappim.koillectionmobile.feature.items.ui
 
 import com.grappim.kit.uikit.NativeText
 import com.grappim.koillectionmobile.core.image.Rotation
-import com.grappim.koillectionmobile.feature.tags.domain.Tag
+import com.grappim.koillectionmobile.feature.tags.domain.TagGroup
 import kotlinx.serialization.Serializable
 
 /** One free label/value row. [id] is local to the form: a key for the list, not a server id. */
@@ -16,9 +16,6 @@ data class FieldRow(val id: Int, val label: String = "", val value: String = "")
  */
 @Serializable
 data class PhotoRow(val id: Int, val uri: String, val rotation: Rotation = Rotation.NONE, val label: String = "")
-
-/** The tags of one category, sorted by label. [label] is null for tags without a category. */
-data class TagGroup(val label: String?, val tags: List<Tag>)
 
 /** The save, once it has started. While it is set, the screen shows it instead of the form. */
 sealed interface SaveStatus {

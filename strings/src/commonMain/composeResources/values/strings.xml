@@ -64,6 +64,15 @@
     <string name="item_search_title">Search items</string>
     <string name="item_search_empty">There are no items yet.</string>
     <string name="item_search_error_unexpected">Loading the items failed with an unexpected error.</string>
+    <string name="tags_title">Tags</string>
+    <string name="tags_empty">There are no tags yet.</string>
+    <string name="tags_no_category">No category</string>
+    <string name="tags_retry">Try again</string>
+    <string name="tags_error_network">The server does not answer. Check the network connection.</string>
+    <string name="tags_error_http">The server answered with an error (HTTP %1$d).</string>
+    <string name="tags_error_unexpected">Loading the tags failed with an unexpected error.</string>
+    <string name="tag_items_empty">No item has this tag.</string>
+    <string name="tag_items_error_unexpected">Loading the items of the tag failed with an unexpected error.</string>
     <string name="collection_form_new_title">New collection</string>
     <string name="collection_form_back">Back</string>
     <string name="collection_form_title_label">Title</string>

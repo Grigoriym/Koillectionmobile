@@ -25,6 +25,10 @@ import com.grappim.koillectionmobile.feature.items.ui.ItemRoute
 import com.grappim.koillectionmobile.feature.items.ui.ItemScreen
 import com.grappim.koillectionmobile.feature.settings.ui.SettingsRoute
 import com.grappim.koillectionmobile.feature.settings.ui.SettingsScreen
+import com.grappim.koillectionmobile.feature.tags.ui.TagItemsRoute
+import com.grappim.koillectionmobile.feature.tags.ui.TagItemsScreen
+import com.grappim.koillectionmobile.feature.tags.ui.TagListRoute
+import com.grappim.koillectionmobile.feature.tags.ui.TagListScreen
 
 /**
  * The logged-in side: one back stack that starts at the collection list.
@@ -51,11 +55,26 @@ internal fun MainNavHost(modifier: Modifier = Modifier) {
                     onCollectionClick = { id -> backStack.add(CollectionRoute(id)) },
                     onSettingsClick = { backStack.add(SettingsRoute) },
                     onNewCollectionClick = { backStack.add(NewCollectionRoute()) },
-                    onSearchClick = { backStack.add(ItemSearchRoute) }
+                    onSearchClick = { backStack.add(ItemSearchRoute) },
+                    onTagsClick = { backStack.add(TagListRoute) }
                 )
             }
             entry<ItemSearchRoute> {
                 ItemSearchScreen(
+                    onItemClick = { id -> backStack.add(ItemRoute(id)) },
+                    onBack = { backStack.removeLastOrNull() }
+                )
+            }
+            entry<TagListRoute> {
+                TagListScreen(
+                    onTagClick = { tag -> backStack.add(TagItemsRoute(tagId = tag.id, label = tag.label)) },
+                    onBack = { backStack.removeLastOrNull() }
+                )
+            }
+            entry<TagItemsRoute> { route ->
+                TagItemsScreen(
+                    tagId = route.tagId,
+                    label = route.label,
                     onItemClick = { id -> backStack.add(ItemRoute(id)) },
                     onBack = { backStack.removeLastOrNull() }
                 )

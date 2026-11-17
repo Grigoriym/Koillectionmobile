@@ -1,6 +1,6 @@
 # koillectionmobile checklist
 
-**Current step:** M7.5. M7.4 done 2026-11-17. M7.3 done 2026-11-17. M7.2 done 2026-11-17. M7.1 done 2026-11-17. M7 broken into steps 2026-11-17. M6 done 2026-11-17. M6.6 done 2026-11-17. M6.5 done 2026-11-16. M6.4 done 2026-11-16. M6.3 done 2026-11-16. M6.2 done 2026-11-16. M6.1 done 2026-11-16. M6 broken into steps 2026-11-16. M5 done 2026-11-16. M5.7 done 2026-11-16. M5.6 done 2026-11-16. M5.5 done 2026-11-16. M5.4 done 2026-11-16. M5.3 done 2026-11-16. M5.2 done 2026-11-16. M5.1 done 2026-11-16. M5 broken into steps 2026-11-16. M4 done 2026-11-16. M4.4 done 2026-11-16. M4.3 done 2026-11-16. M4.2 done 2026-11-16. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6, 7, 8, 9 and 10 are settled.
+**Current step:** M7.6. M7.5 done 2026-11-17. M7.4 done 2026-11-17. M7.3 done 2026-11-17. M7.2 done 2026-11-17. M7.1 done 2026-11-17. M7 broken into steps 2026-11-17. M6 done 2026-11-17. M6.6 done 2026-11-17. M6.5 done 2026-11-16. M6.4 done 2026-11-16. M6.3 done 2026-11-16. M6.2 done 2026-11-16. M6.1 done 2026-11-16. M6 broken into steps 2026-11-16. M5 done 2026-11-16. M5.7 done 2026-11-16. M5.6 done 2026-11-16. M5.5 done 2026-11-16. M5.4 done 2026-11-16. M5.3 done 2026-11-16. M5.2 done 2026-11-16. M5.1 done 2026-11-16. M5 broken into steps 2026-11-16. M4 done 2026-11-16. M4.4 done 2026-11-16. M4.3 done 2026-11-16. M4.2 done 2026-11-16. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6, 7, 8, 9 and 10 are settled.
 
 ## How to use this
 
@@ -75,7 +75,7 @@ only (`docs/local-info.md`).
   has the results.
   Note: the task is `smokeTagRun`. The app has no tag delete call, so the run sends
   `DELETE /api/tags/{id}` through the app's own `HttpClient`. A duplicate label creates a second tag.
-- [ ] **M7.5** — Tag list and tag items (`feature:tags:ui`, the placeholder today). A tags action
+- [x] **M7.5** — Tag list and tag items (`feature:tags:ui`, the placeholder today). A tags action
   on the collection list opens the tag list: one section per tag category with its colour, sorted
   by label, then the tags without a category; tags sorted by label inside a section, ignoring case.
   A tap opens the tag's items (M7.3); a tap on an item opens the item. Loading, empty and error
@@ -83,6 +83,11 @@ only (`docs/local-info.md`).
   `feature:items:ui`); move it if the new screen needs it.
   **Verify:** ViewModel tests (grouping and order, empty, failure and retry) for both screens; on
   the emulator the list matches the web UI's tags and one tag shows its items.
+  Note: `TagGroup`, `groupTags` and `loadTagGroups` moved to `feature:tags:domain`; `TagGroup` got
+  the category `color`. The tag items screen lives in `feature:tags:ui` (now on
+  `feature:items:domain`), keeps the server's order and reads again on `ItemListChanges`. Its route
+  carries the tag label for the title. The device check compared with `GET /api/tags` and
+  `/api/tag_categories` (30 tags, 4 categories, none without one), not the web page itself.
 - [ ] **M7.6** — Create a tag from the add-item form: a "new tag" action in `TagPicker` takes a
   label. A label that exists already (ignoring case) selects the existing tag and creates nothing.
   A new tag is created on Save, before the item's tags are set, so an abandoned form leaves no

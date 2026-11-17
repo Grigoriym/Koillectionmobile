@@ -129,6 +129,11 @@ this app.
   items") opens "Search items". Each row is the item name with its collection title below it. The
   field is the M7.1 field. After "Clear search" the list keeps the last match at the top (the lazy
   list keeps its scroll anchor by key), so the rows above it are off screen, not missing.
+- Tags (M7.5): a "Tags" text button in the collection list's top bar opens "Tags": one header per
+  category (a colour dot and the label), the tag rows below it. A tap opens the tag's items, titled
+  with the tag label. Compare with `GET /api/tags` and `/api/tag_categories` (bearer token, as in
+  M3.4); "Fraktur" has 121 items over 5 pages, the last one "Brettspiel des Lebens". In airplane mode
+  the list shows the network error and "Try again".
 - Local network permission (M4.1): `10.0.2.2` is the emulator's own gateway, so a check of
   `ACCESS_LOCAL_NETWORK` needs another private host address. The test instance listens on
   `127.0.0.1` only: forward a host-only private address to it for the check, not the Wi-Fi LAN

@@ -14,6 +14,7 @@ import com.grappim.koillectionmobile.feature.items.ui.ItemsUiModule
 import com.grappim.koillectionmobile.feature.settings.ui.SettingsUiModule
 import com.grappim.koillectionmobile.feature.tags.data.TagsDataModule
 import com.grappim.koillectionmobile.feature.tags.mapper.TagsMapperModule
+import com.grappim.koillectionmobile.feature.tags.ui.TagsUiModule
 import org.koin.core.annotation.ComponentScan
 import org.koin.core.annotation.Configuration
 import org.koin.core.annotation.KoinApplication
@@ -42,6 +43,7 @@ import org.koin.core.annotation.Module
         PlatformPhotoModule::class,
         TagsMapperModule::class,
         TagsDataModule::class,
+        TagsUiModule::class,
         SettingsUiModule::class
     ]
 )

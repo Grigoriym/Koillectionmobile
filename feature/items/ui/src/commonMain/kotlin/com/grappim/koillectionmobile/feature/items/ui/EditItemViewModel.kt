@@ -25,6 +25,7 @@ import com.grappim.koillectionmobile.feature.items.domain.NewImage
 import com.grappim.koillectionmobile.feature.items.domain.NewImageField
 import com.grappim.koillectionmobile.feature.items.domain.NewTextField
 import com.grappim.koillectionmobile.feature.tags.domain.TagsRepository
+import com.grappim.koillectionmobile.feature.tags.domain.loadTagGroups
 import com.grappim.koillectionmobile.strings.RString
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_save_error_photo
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_save_unfinished

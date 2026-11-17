@@ -17,9 +17,8 @@ import com.grappim.koillectionmobile.feature.items.domain.NewImage
 import com.grappim.koillectionmobile.feature.items.domain.NewImageField
 import com.grappim.koillectionmobile.feature.items.domain.NewItem
 import com.grappim.koillectionmobile.feature.items.domain.NewTextField
-import com.grappim.koillectionmobile.feature.tags.domain.Tag
-import com.grappim.koillectionmobile.feature.tags.domain.TagCategory
 import com.grappim.koillectionmobile.feature.tags.domain.TagsRepository
+import com.grappim.koillectionmobile.feature.tags.domain.loadTagGroups
 import com.grappim.koillectionmobile.strings.RString
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_error_http
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_error_network
@@ -33,8 +32,6 @@ import com.grappim.koillectionmobile.strings.generated.resources.add_item_save_e
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_save_unfinished
 import com.grappim.koillectionmobile.strings.generated.resources.error_proxy_rejected
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -368,37 +365,7 @@ private const val HTTP_NOT_FOUND = 404
 
 private val json = Json { ignoreUnknownKeys = true }
 
-/** The server's tags and categories, read in parallel and grouped by [groupTags]. */
-internal suspend fun TagsRepository.loadTagGroups(): Result<List<TagGroup>> = coroutineScope {
-    val tags = async { getTags() }
-    val categories = async { getTagCategories() }
-    val tagsResult = tags.await()
-    val categoriesResult = categories.await()
-    val failure = tagsResult.exceptionOrNull() ?: categoriesResult.exceptionOrNull()
-    if (failure != null) {
-        Result.failure(failure)
-    } else {
-        Result.success(groupTags(tagsResult.getOrThrow(), categoriesResult.getOrThrow()))
-    }
-}
-
-/**
- * One group per category that has tags, sorted by category label; tags without a category (or
- * with a category the list does not hold) go last. Tags in a group are sorted by label.
- */
-internal fun groupTags(tags: List<Tag>, categories: List<TagCategory>): List<TagGroup> {
-    val categoryById = categories.associateBy { it.id }
-    val byCategory = tags.groupBy { tag -> tag.categoryId?.let { categoryById[it] } }
-    val categorized = byCategory.mapNotNull { (category, list) ->
-        category?.let { TagGroup(label = it.label.orEmpty(), tags = list.sortedByLabel()) }
-    }.sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER) { it.label.orEmpty() })
-    val uncategorized = byCategory[null]?.let { TagGroup(label = null, tags = it.sortedByLabel()) }
-    return categorized + listOfNotNull(uncategorized)
-}
-
-private fun List<Tag>.sortedByLabel(): List<Tag> = sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER) { it.label })
-
-/** The message of a failed [loadTagGroups]. */
+/** The message of a failed `loadTagGroups`. */
 internal fun Throwable.toTagsMessage(): NativeText = when (this) {
     is KoillectionError.Network -> NativeText.Resource(RString.add_item_error_network)
     is KoillectionError.ProxyRejection -> NativeText.Arguments(RString.error_proxy_rejected, listOf(status))

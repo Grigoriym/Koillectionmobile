@@ -11,6 +11,8 @@ import com.grappim.koillectionmobile.feature.items.ui.AddItemRoute
 import com.grappim.koillectionmobile.feature.items.ui.EditItemRoute
 import com.grappim.koillectionmobile.feature.items.ui.ItemRoute
 import com.grappim.koillectionmobile.feature.settings.ui.SettingsRoute
+import com.grappim.koillectionmobile.feature.tags.ui.TagItemsRoute
+import com.grappim.koillectionmobile.feature.tags.ui.TagListRoute
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 import kotlinx.serialization.modules.subclass
@@ -31,6 +33,8 @@ private val navKeySerializersModule = SerializersModule {
         subclass(AddItemRoute::class)
         subclass(EditItemRoute::class)
         subclass(SettingsRoute::class)
+        subclass(TagListRoute::class)
+        subclass(TagItemsRoute::class)
     }
 }
 

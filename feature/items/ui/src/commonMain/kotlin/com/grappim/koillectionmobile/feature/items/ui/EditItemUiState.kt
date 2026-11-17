@@ -2,6 +2,7 @@ package com.grappim.koillectionmobile.feature.items.ui
 
 import com.grappim.kit.uikit.NativeText
 import com.grappim.koillectionmobile.core.image.Rotation
+import com.grappim.koillectionmobile.feature.tags.domain.TagGroup
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 

@@ -8,6 +8,7 @@ import com.grappim.koillectionmobile.core.image.Rotation
 import com.grappim.koillectionmobile.feature.items.domain.ItemListChanges
 import com.grappim.koillectionmobile.feature.tags.domain.Tag
 import com.grappim.koillectionmobile.feature.tags.domain.TagCategory
+import com.grappim.koillectionmobile.feature.tags.domain.TagGroup
 import com.grappim.koillectionmobile.strings.RString
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_error_http
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_error_network
@@ -72,9 +73,9 @@ class AddItemViewModelTest {
         assertFalse(state.isLoadingTags)
         assertEquals(
             listOf(
-                TagGroup(label = "Genre", tags = listOf(NOVEL)),
-                TagGroup(label = "Language", tags = listOf(FRAKTUR, GERMAN)),
-                TagGroup(label = null, tags = listOf(LOOSE))
+                TagGroup(label = "Genre", color = null, tags = listOf(NOVEL)),
+                TagGroup(label = "Language", color = "F3E5F5", tags = listOf(FRAKTUR, GERMAN)),
+                TagGroup(label = null, color = null, tags = listOf(LOOSE))
             ),
             state.tagGroups
         )
@@ -87,7 +88,7 @@ class AddItemViewModelTest {
 
         answer(tagList = Result.success(listOf(NOVEL)))
 
-        assertEquals(listOf(TagGroup(label = "Genre", tags = listOf(NOVEL))), sut.uiState.value.tagGroups)
+        assertEquals(listOf(TagGroup(label = "Genre", color = null, tags = listOf(NOVEL))), sut.uiState.value.tagGroups)
     }
 
     @Test
@@ -98,7 +99,7 @@ class AddItemViewModelTest {
 
         answer(tagList = Result.success(listOf(orphan)))
 
-        assertEquals(listOf(TagGroup(label = null, tags = listOf(orphan))), sut.uiState.value.tagGroups)
+        assertEquals(listOf(TagGroup(label = null, color = null, tags = listOf(orphan))), sut.uiState.value.tagGroups)
     }
 
     @Test
@@ -110,7 +111,7 @@ class AddItemViewModelTest {
 
         answer(tagList = Result.success(listOf(tag)), categoryList = Result.success(listOf(unnamed)))
 
-        assertEquals(listOf(TagGroup(label = "", tags = listOf(tag))), sut.uiState.value.tagGroups)
+        assertEquals(listOf(TagGroup(label = "", color = null, tags = listOf(tag))), sut.uiState.value.tagGroups)
     }
 
     @Test

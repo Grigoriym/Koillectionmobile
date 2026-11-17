@@ -43,6 +43,7 @@ import com.grappim.koillectionmobile.strings.generated.resources.collections_ret
 import com.grappim.koillectionmobile.strings.generated.resources.collections_settings
 import com.grappim.koillectionmobile.strings.generated.resources.collections_title
 import com.grappim.koillectionmobile.strings.generated.resources.item_search_title
+import com.grappim.koillectionmobile.strings.generated.resources.tags_title
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -52,6 +53,7 @@ fun CollectionListScreen(
     onSettingsClick: () -> Unit,
     onNewCollectionClick: () -> Unit,
     onSearchClick: () -> Unit,
+    onTagsClick: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: CollectionListViewModel = koinViewModel()
 ) {
@@ -62,6 +64,7 @@ fun CollectionListScreen(
         onSettingsClick = onSettingsClick,
         onNewCollectionClick = onNewCollectionClick,
         onSearchClick = onSearchClick,
+        onTagsClick = onTagsClick,
         modifier = modifier
     )
 }
@@ -74,6 +77,7 @@ private fun CollectionListContent(
     onSettingsClick: () -> Unit,
     onNewCollectionClick: () -> Unit,
     onSearchClick: () -> Unit,
+    onTagsClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Scaffold(
@@ -87,6 +91,9 @@ private fun CollectionListContent(
                             imageVector = Icons.Filled.Search,
                             contentDescription = stringResource(RString.item_search_title)
                         )
+                    }
+                    TextButton(onClick = onTagsClick) {
+                        Text(stringResource(RString.tags_title))
                     }
                     TextButton(onClick = onSettingsClick) {
                         Text(stringResource(RString.collections_settings))
