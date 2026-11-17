@@ -65,3 +65,5 @@ entries get deleted — see /finalize.
   after the class.
 - 2026-11-17 — `adb shell input text "m7.7%sedittag"` (M7.7) landed as "m76.7 edittag" in the
   new-tag dialog; the same call with "M7.7%sdevicetag" a minute earlier landed correctly.
+- 2026-11-17 — `./gradlew build | grep -E 'FAILED|error'` (M8.1) printed a page of PASSED tests whose
+  names hold "error". Redirect the run to a log and grep `BUILD (SUCC|FAIL)|What went wrong`.
