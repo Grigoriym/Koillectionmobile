@@ -1,6 +1,7 @@
 package com.grappim.koillectionmobile.feature.items.domain
 
 import com.grappim.koillectionmobile.feature.tags.domain.TagsRepository
+import com.grappim.koillectionmobile.feature.tags.domain.findOrCreateTags
 
 /** An item with its fields (sorted by position) and the ids of its tags, as read from the server. */
 data class ItemSnapshot(val item: Item, val data: List<Datum>, val tagIds: Set<String>)
@@ -9,7 +10,8 @@ data class ItemSnapshot(val item: Item, val data: List<Datum>, val tagIds: Set<S
  * The edit form's values for an item. [fields] holds each existing `text` and `image` field that
  * stays: an existing field of those types that is not in [fields] is deleted. Fields of other
  * types are never touched, whether they are in [fields] or not. [newMainImage] replaces the main
- * image; null keeps it (the API cannot remove a main image).
+ * image; null keeps it (the API cannot remove a main image). [tagIds] are existing tags;
+ * [newTagLabels] are tags to create (or to find, see `findOrCreateTags`) before the tags are set.
  */
 data class ItemEdit(
     val name: String,
@@ -17,7 +19,8 @@ data class ItemEdit(
     val newTextFields: List<NewTextField>,
     val newImageFields: List<NewImageField>,
     val newMainImage: NewImage?,
-    val tagIds: List<String>
+    val tagIds: List<String>,
+    val newTagLabels: List<String> = emptyList()
 )
 
 /** An existing field as the form has it. [datumId] is the server id of the field. */
@@ -54,7 +57,8 @@ interface EditItemUseCase {
      * Sends what [edit] changes in [original] (the item as the form loaded it). Order: field
      * deletes (a freed label can be reused), the rename, field label and value changes, field
      * image replacements, new text fields, new image fields (created, then the image uploaded),
-     * the main image, the tags (only if the set changed). New fields get positions after the last
+     * the main image, the tags (only if the set changed or there are new tags). New tags are found
+     * or created just before the tags are set. New fields get positions after the last
      * field that stays. A label swap between fields goes through a temporary label.
      */
     suspend fun editItem(
@@ -145,7 +149,15 @@ class EditItemUseCaseImpl(private val itemsRepository: ItemsRepository, private 
             is Call.UploadMainImage ->
                 itemsRepository.uploadItemImage(itemId, call.image.bytes, call.image.fileName, call.image.mimeType)
 
-            is Call.SetTags -> tagsRepository.setItemTags(itemId, call.tagIds)
+            is Call.SetTags -> {
+                val newTagIds = if (call.newTagLabels.isEmpty()) {
+                    emptyList()
+                } else {
+                    tagsRepository.findOrCreateTags(call.newTagLabels)
+                        .getOrElse { return EditItemResult.Failure(it) }
+                }
+                tagsRepository.setItemTags(itemId, (call.tagIds + newTagIds).distinct())
+            }
         }
         return result.fold(
             onSuccess = {
@@ -211,7 +223,9 @@ class EditItemUseCaseImpl(private val itemsRepository: ItemsRepository, private 
         if (mainImage != null && current.item.image?.url == original.item.image?.url) {
             calls += Call.UploadMainImage(mainImage)
         }
-        if (edit.tagIds.toSet() != current.tagIds) calls += Call.SetTags(edit.tagIds)
+        if (edit.newTagLabels.isNotEmpty() || edit.tagIds.toSet() != current.tagIds) {
+            calls += Call.SetTags(edit.tagIds, edit.newTagLabels)
+        }
         return Plan.Calls(calls)
     }
 
@@ -295,7 +309,8 @@ class EditItemUseCaseImpl(private val itemsRepository: ItemsRepository, private 
             override val isUpload: Boolean get() = true
         }
 
-        class SetTags(val tagIds: List<String>) : Call
+        /** [newTagLabels] are found or created first; that counts as part of this one call. */
+        class SetTags(val tagIds: List<String>, val newTagLabels: List<String>) : Call
     }
 
     private companion object {

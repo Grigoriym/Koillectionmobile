@@ -261,7 +261,7 @@ code without checking the licence terms are kept.
    photo has a manual rotate button; uploads are downscaled to 2400px JPEG q85, as `add_book.py`
    does. Text fields are free label/value rows: nothing book-specific in the app. Tags are picked
    from the server's existing tags only; the form cannot create one.
-   Changed 2026-11-16 (user): the form gets tag creation in M7.
+   Changed 2026-11-16 (user): the form gets tag creation in M7. Built in M7.6, see decision 10.
 8. **Edit-item form** — *decided 2026-11-16 (start of M5)*: the edit screen is the M3 add form,
    prefilled from the server, and the save sends only what changed. The main image can be
    replaced but not removed: Koillection 1.8.5's `Item` upload has no delete property, so the API
@@ -283,4 +283,9 @@ code without checking the licence terms are kept.
    when it opens. The tag list groups tags by category, with the tags without a category last. A
    tag created from the add-item form gets a label only. `Tag.label` is `NotBlank` but not unique
    on the server, so the form selects an existing tag with the same label (ignoring case) instead
-   of creating a second one.
+   of creating a second one. The edit form gets the same action (user, 2026-11-17, M7.6).
+   Built in M7.6: the form keeps a new label as pending (saved state) and the save creates it just
+   before it sets the item's tags (`findOrCreateTags`, `feature:tags:domain`). That call reads
+   `GET /api/tags` first and uses a tag with the label (ignoring case), so a retry after a create
+   that went through does not create a second tag. The label field takes at most 255 characters:
+   `Tag.label` is a Doctrine `string` with no length check.

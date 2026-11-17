@@ -1,6 +1,6 @@
 # koillectionmobile checklist
 
-**Current step:** M7.6. M7.5 done 2026-11-17. M7.4 done 2026-11-17. M7.3 done 2026-11-17. M7.2 done 2026-11-17. M7.1 done 2026-11-17. M7 broken into steps 2026-11-17. M6 done 2026-11-17. M6.6 done 2026-11-17. M6.5 done 2026-11-16. M6.4 done 2026-11-16. M6.3 done 2026-11-16. M6.2 done 2026-11-16. M6.1 done 2026-11-16. M6 broken into steps 2026-11-16. M5 done 2026-11-16. M5.7 done 2026-11-16. M5.6 done 2026-11-16. M5.5 done 2026-11-16. M5.4 done 2026-11-16. M5.3 done 2026-11-16. M5.2 done 2026-11-16. M5.1 done 2026-11-16. M5 broken into steps 2026-11-16. M4 done 2026-11-16. M4.4 done 2026-11-16. M4.3 done 2026-11-16. M4.2 done 2026-11-16. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6, 7, 8, 9 and 10 are settled.
+**Current step:** M7.7. M7.6 done 2026-11-17. M7.5 done 2026-11-17. M7.4 done 2026-11-17. M7.3 done 2026-11-17. M7.2 done 2026-11-17. M7.1 done 2026-11-17. M7 broken into steps 2026-11-17. M6 done 2026-11-17. M6.6 done 2026-11-17. M6.5 done 2026-11-16. M6.4 done 2026-11-16. M6.3 done 2026-11-16. M6.2 done 2026-11-16. M6.1 done 2026-11-16. M6 broken into steps 2026-11-16. M5 done 2026-11-16. M5.7 done 2026-11-16. M5.6 done 2026-11-16. M5.5 done 2026-11-16. M5.4 done 2026-11-16. M5.3 done 2026-11-16. M5.2 done 2026-11-16. M5.1 done 2026-11-16. M5 broken into steps 2026-11-16. M4 done 2026-11-16. M4.4 done 2026-11-16. M4.3 done 2026-11-16. M4.2 done 2026-11-16. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6, 7, 8, 9 and 10 are settled.
 
 ## How to use this
 
@@ -88,7 +88,7 @@ only (`docs/local-info.md`).
   `feature:items:domain`), keeps the server's order and reads again on `ItemListChanges`. Its route
   carries the tag label for the title. The device check compared with `GET /api/tags` and
   `/api/tag_categories` (30 tags, 4 categories, none without one), not the web page itself.
-- [ ] **M7.6** — Create a tag from the add-item form: a "new tag" action in `TagPicker` takes a
+- [x] **M7.6** — Create a tag from the add-item form: a "new tag" action in `TagPicker` takes a
   label. A label that exists already (ignoring case) selects the existing tag and creates nothing.
   A new tag is created on Save, before the item's tags are set, so an abandoned form leaves no
   tag; a retry does not create it twice. The pending tag survives rotation and process death. The
@@ -97,6 +97,10 @@ only (`docs/local-info.md`).
   **Verify:** ViewModel and use-case tests (new label, existing label, failure at the tag create
   and the retry); on the emulator an item is saved with a new tag, and the web UI shows the tag on
   the item.
+  Note: the edit form got the action too (user). The save reads `GET /api/tags` before it creates,
+  so the add and edit retries need no stored tag ids. The tag step counts as one step in the
+  progress. Device check: add form (pending tag after `am kill`, "german" picked German) and edit
+  form, both on the web item page; test data deleted.
 - [ ] **M7.7** — Device pass of search, the tag screens and tag creation, then the user confirms
   with screenshots. Fix what breaks, or put it in `docs/revisit.md` with evidence. Delete the test
   tags and items afterwards.

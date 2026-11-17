@@ -42,14 +42,18 @@ sealed interface EditRow {
         EditRow
 }
 
-/** What the edit form holds: the values as loaded, and the user's edits of them. */
+/**
+ * What the edit form holds: the values as loaded, and the user's edits of them. [newTagLabels] are
+ * the tags the save creates (see [withNewTagLabel]); empty as loaded.
+ */
 @Serializable
 data class EditItemDraft(
     val name: String,
     val mainImage: EditPhoto,
     val photos: List<EditPhoto>,
     val fields: List<EditRow>,
-    val selectedTagIds: Set<String>
+    val selectedTagIds: Set<String>,
+    val newTagLabels: List<String> = emptyList()
 )
 
 /**
@@ -80,6 +84,8 @@ data class EditItemUiState(
     val onLabelChange: (Int, String) -> Unit = { _, _ -> },
     val onValueChange: (Int, String) -> Unit = { _, _ -> },
     val onTagToggle: (String) -> Unit = {},
+    val onNewTag: (String) -> Unit = {},
+    val onNewTagRemove: (String) -> Unit = {},
     val onRetryTags: () -> Unit = {},
     val onPhotosAdd: (List<String>) -> Unit = {},
     val onPhotoReplace: (Int, List<String>) -> Unit = { _, _ -> },

@@ -89,6 +89,40 @@ class EditItemUseCaseTest {
     }
 
     @Test
+    fun `a new tag is created then set with the picked tags`() = runTest {
+        assertEquals(EditItemResult.Success, edit(UNCHANGED.copy(newTagLabels = listOf("Signed"))))
+
+        assertEquals(listOf("getTags", "createTag Signed", "setItemTags [tag-a, tag-b, tag-1]"), server.calls)
+    }
+
+    @Test
+    fun `a new label that a server tag has in another case uses that tag`() = runTest {
+        assertEquals(EditItemResult.Success, edit(UNCHANGED.copy(newTagLabels = listOf("classic"))))
+
+        assertEquals(listOf("getTags", "setItemTags [tag-a, tag-b, tag-c]"), server.calls)
+    }
+
+    @Test
+    fun `a failed tag create is retried without a second tag`() = runTest {
+        for (applied in listOf(false, true)) {
+            server.reset()
+            val original = server.snapshot()
+            val edit = UNCHANGED.copy(newTagLabels = listOf("Signed"))
+            server.fail("createTag Signed", applied)
+
+            assertIs<EditItemResult.Failure>(useCase.editItem(original, edit), "applied: $applied")
+            server.calls.clear()
+            assertEquals(EditItemResult.Success, useCase.retry(original, edit), "applied: $applied")
+
+            val retryCalls =
+                listOfNotNull("getTags", "createTag Signed".takeUnless { applied }, "setItemTags [tag-a, tag-b, tag-1]")
+            assertEquals(retryCalls, server.calls, "applied: $applied")
+            assertEquals(1, server.serverTags.count { it.label == "Signed" }, "applied: $applied")
+            assertEquals(setOf("tag-a", "tag-b", "tag-1"), server.tagIds, "applied: $applied")
+        }
+    }
+
+    @Test
     fun `a mix sends deletes then changes then new fields then main image then tags`() = runTest {
         assertEquals(EditItemResult.Success, edit(MIX))
         assertEquals(MIX_CALLS, server.calls)
@@ -225,7 +259,9 @@ class EditItemUseCaseTest {
         lateinit var item: Item
         lateinit var data: MutableList<Datum>
         lateinit var tagIds: Set<String>
+        lateinit var serverTags: MutableList<Tag>
         private var nextId = 0
+        private var nextTagId = 0
 
         init {
             reset()
@@ -236,7 +272,9 @@ class EditItemUseCaseTest {
             item = Item(ITEM_ID, "Jörn Uhl", 1, "books", imageOf("main-0"))
             data = START_DATA.toMutableList()
             tagIds = setOf("tag-a", "tag-b")
+            serverTags = SERVER_TAGS.toMutableList()
             nextId = 0
+            nextTagId = 0
         }
 
         /** Fails [call] once: before it changes anything, or, with [applied], after (a lost answer). */
@@ -331,14 +369,19 @@ class EditItemUseCaseTest {
         }
 
         val tags = object : TagsRepository {
-            override suspend fun getTags(): Result<List<Tag>> = error("not used")
+            override suspend fun getTags(): Result<List<Tag>> {
+                calls += "getTags"
+                return Result.success(serverTags.toList())
+            }
 
             override suspend fun getTagCategories(): Result<List<TagCategory>> = error("not used")
 
             override suspend fun getItemTags(itemId: String): Result<List<Tag>> =
                 Result.success(tagIds.map { Tag(it, it, null, null) })
 
-            override suspend fun createTag(label: String): Result<Tag> = error("not used")
+            override suspend fun createTag(label: String): Result<Tag> = write("createTag $label") {
+                Tag("tag-${++nextTagId}", label, null, null).also { serverTags += it }
+            }
 
             override suspend fun setItemTags(itemId: String, tagIds: List<String>) =
                 write("setItemTags $tagIds") { this@FakeServer.tagIds = tagIds.toSet() }
@@ -349,6 +392,12 @@ class EditItemUseCaseTest {
         const val ITEM_ID = "item-1"
 
         fun imageOf(url: String) = Image(url, null, null)
+
+        val SERVER_TAGS = listOf(
+            Tag("tag-a", "Novel", null, null),
+            Tag("tag-b", "German", null, null),
+            Tag("tag-c", "Classic", null, null)
+        )
 
         fun image(fileName: String) = NewImage(byteArrayOf(1), fileName, "image/jpeg")
 

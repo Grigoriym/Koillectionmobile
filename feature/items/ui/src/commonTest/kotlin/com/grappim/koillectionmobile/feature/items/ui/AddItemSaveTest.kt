@@ -10,6 +10,7 @@ import com.grappim.koillectionmobile.feature.items.domain.AddItemProgress
 import com.grappim.koillectionmobile.feature.items.domain.AddItemResult
 import com.grappim.koillectionmobile.feature.items.domain.AddItemState
 import com.grappim.koillectionmobile.feature.items.domain.ItemListChanges
+import com.grappim.koillectionmobile.feature.tags.domain.Tag
 import com.grappim.koillectionmobile.strings.RString
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_save_error_http
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_save_error_photo
@@ -166,6 +167,86 @@ class AddItemSaveTest {
         assertEquals(FakeAddItemUseCase.NEW_ITEM_ID, sut.uiState.value.savedItemId)
         assertEquals(listOf("content://a", "content://b", "content://c"), photoFiles.deleted)
         assertEquals(listOf(COLLECTION_ID), changed)
+    }
+
+    /** Answers the tag list of the last [createSut] with "Novel" and "German". */
+    private fun answerTags() {
+        tags.tags.removeFirst().complete(Result.success(listOf(NOVEL, GERMAN)))
+        tags.categories.removeFirst().complete(Result.success(emptyList()))
+    }
+
+    @Test
+    fun `a new tag label is kept for the save and creates nothing before it`() {
+        val sut = createSut()
+        answerTags()
+        sut.fillForm()
+
+        sut.uiState.value.onNewTag("  Signed ")
+
+        assertEquals(listOf("Signed"), sut.uiState.value.newTagLabels)
+        assertEquals(setOf("novel"), sut.uiState.value.selectedTagIds)
+        assertTrue(useCase.calls.isEmpty())
+        sut.uiState.value.onSave()
+        val item = useCase.calls.single().first
+        assertEquals(listOf("novel"), item.tagIds)
+        assertEquals(listOf("Signed"), item.newTagLabels)
+    }
+
+    @Test
+    fun `a new tag label that a tag has in another case picks that tag`() {
+        val sut = createSut()
+        answerTags()
+
+        sut.uiState.value.onNewTag("german")
+
+        assertEquals(setOf(GERMAN.id), sut.uiState.value.selectedTagIds)
+        assertEquals(emptyList(), sut.uiState.value.newTagLabels)
+    }
+
+    @Test
+    fun `a blank or repeated new tag label adds nothing and a pending one can be removed`() {
+        val sut = createSut()
+        answerTags()
+
+        sut.uiState.value.onNewTag("Signed")
+        sut.uiState.value.onNewTag("SIGNED")
+        sut.uiState.value.onNewTag("  ")
+        assertEquals(listOf("Signed"), sut.uiState.value.newTagLabels)
+        assertTrue(sut.uiState.value.hasInput)
+
+        sut.uiState.value.onNewTagRemove("Signed")
+        assertEquals(emptyList(), sut.uiState.value.newTagLabels)
+        assertFalse(sut.uiState.value.hasInput)
+    }
+
+    @Test
+    fun `a pending new tag survives process death`() {
+        val first = createSut()
+        answerTags()
+        first.uiState.value.onNewTag("Signed")
+
+        val second = createSut()
+
+        assertEquals(listOf("Signed"), second.uiState.value.newTagLabels)
+    }
+
+    @Test
+    fun `a failed tag create is retried with the same new tag label`() {
+        val atTags = AddItemState(itemId = "item-1", textFieldsDone = 2, mainImageDone = true)
+        useCase.answer = { _, _, _ -> AddItemResult.Failure(KoillectionError.Network(Exception("offline")), atTags) }
+        val sut = createSut()
+        answerTags()
+        sut.fillForm()
+        sut.uiState.value.onNewTag("Signed")
+        sut.uiState.value.onSave()
+        assertIs<SaveStatus.Failed>(sut.uiState.value.save)
+
+        useCase.answer = { _, _, _ -> AddItemResult.Success("item-1") }
+        sut.uiState.value.onRetrySave()
+
+        assertEquals(listOf("Signed"), useCase.calls[1].first.newTagLabels)
+        assertEquals(atTags, useCase.calls[1].second)
+        assertEquals("item-1", sut.uiState.value.savedItemId)
     }
 
     @Test
@@ -343,5 +424,7 @@ class AddItemSaveTest {
 
     private companion object {
         const val COLLECTION_ID = "books"
+        val NOVEL = Tag(id = "novel", label = "Novel", description = null, categoryId = null)
+        val GERMAN = Tag(id = "german", label = "German", description = null, categoryId = null)
     }
 }

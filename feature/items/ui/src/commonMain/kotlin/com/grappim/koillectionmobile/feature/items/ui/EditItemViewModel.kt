@@ -109,6 +109,8 @@ class EditItemViewModel(
             onLabelChange = ::changeLabel,
             onValueChange = ::changeValue,
             onTagToggle = ::toggleTag,
+            onNewTag = ::addNewTag,
+            onNewTagRemove = ::removeNewTag,
             onRetryTags = ::retryTags,
             onPhotosAdd = ::addPhotos,
             onPhotoReplace = ::replacePhoto,
@@ -228,6 +230,16 @@ class EditItemViewModel(
         val selected = d.selectedTagIds
         d.copy(selectedTagIds = if (tagId in selected) selected - tagId else selected + tagId)
     }
+
+    private fun addNewTag(label: String) {
+        val tagGroups = _uiState.value.tagGroups
+        updateDraft { d ->
+            val choice = TagChoice(d.selectedTagIds, d.newTagLabels).withNewTagLabel(label, tagGroups)
+            d.copy(selectedTagIds = choice.selectedTagIds, newTagLabels = choice.newTagLabels)
+        }
+    }
+
+    private fun removeNewTag(label: String) = updateDraft { it.copy(newTagLabels = it.newTagLabels - label) }
 
     /** New image fields, after the existing ones. */
     private fun addPhotos(uris: List<String>) {
@@ -373,7 +385,8 @@ class EditItemViewModel(
             newTextFields = texts.filter { it.datumId == null }.map { NewTextField(it.label, it.value) },
             newImageFields = newPhotos.map { NewImageField(it.label, checkNotNull(it.newImage())) },
             newMainImage = mainImage.newImage(),
-            tagIds = selectedTagIds.toList()
+            tagIds = selectedTagIds.toList(),
+            newTagLabels = newTagLabels
         )
     }
 

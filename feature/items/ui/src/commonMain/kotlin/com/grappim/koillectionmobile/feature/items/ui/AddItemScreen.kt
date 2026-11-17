@@ -211,9 +211,12 @@ private fun AddItemContent(uiState: AddItemUiState, onBack: () -> Unit, modifier
                 TagPicker(
                     tagGroups = uiState.tagGroups,
                     selectedTagIds = uiState.selectedTagIds,
+                    newTagLabels = uiState.newTagLabels,
                     isLoading = uiState.isLoadingTags,
                     error = uiState.tagsError,
                     onTagToggle = uiState.onTagToggle,
+                    onNewTag = uiState.onNewTag,
+                    onNewTagRemove = uiState.onNewTagRemove,
                     onRetry = uiState.onRetryTags,
                     modifier = Modifier
                         .padding(horizontal = PADDING)

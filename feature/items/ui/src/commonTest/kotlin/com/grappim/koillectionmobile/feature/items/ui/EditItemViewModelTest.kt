@@ -435,6 +435,69 @@ class EditItemViewModelTest {
     }
 
     @Test
+    fun `a new tag label is sent with the edit and creates nothing before the save`() {
+        val sut = loaded()
+
+        sut.uiState.value.onNewTag(" Signed ")
+
+        assertEquals(listOf("Signed"), draft.newTagLabels)
+        assertTrue(sut.uiState.value.hasChanges)
+        assertTrue(editUseCase.calls.isEmpty())
+        sut.uiState.value.onSave()
+        val edit = editUseCase.calls.single().third
+        assertEquals(listOf(NOVEL.id), edit.tagIds)
+        assertEquals(listOf("Signed"), edit.newTagLabels)
+    }
+
+    @Test
+    fun `a new tag label that a tag has in another case picks that tag`() {
+        val sut = loaded()
+
+        sut.uiState.value.onNewTag("GERMAN")
+
+        assertEquals(setOf(NOVEL.id, GERMAN.id), draft.selectedTagIds)
+        assertEquals(emptyList(), draft.newTagLabels)
+    }
+
+    @Test
+    fun `a removed new tag label leaves no change`() {
+        val sut = loaded()
+        sut.uiState.value.onNewTag("Signed")
+
+        sut.uiState.value.onNewTagRemove("Signed")
+
+        assertFalse(sut.uiState.value.hasChanges)
+    }
+
+    @Test
+    fun `a pending new tag survives process death`() {
+        loaded().uiState.value.onNewTag("Signed")
+
+        val restored = createSut(restoredHandle())
+
+        assertEquals(listOf("Signed"), restored.uiState.value.draft?.newTagLabels)
+    }
+
+    @Test
+    fun `a failed tag create is retried with the same new tag label`() {
+        val sut = loaded()
+        sut.uiState.value.onNewTag("Signed")
+        editUseCase.answer = { onProgress ->
+            onProgress(EditItemProgress(0, 1))
+            EditItemResult.Failure(KoillectionError.Network(Exception("offline")))
+        }
+        sut.uiState.value.onSave()
+        assertIs<SaveStatus.Failed>(sut.uiState.value.save)
+
+        editUseCase.answer = { EditItemResult.Success }
+        sut.uiState.value.onRetrySave()
+
+        assertEquals(listOf("edit", "retry"), editUseCase.calls.map { it.first })
+        assertEquals(listOf("Signed"), editUseCase.calls[1].third.newTagLabels)
+        assertTrue(sut.uiState.value.isSaved)
+    }
+
+    @Test
     fun `a failure after a call went through offers only the retry and the retry sends the same edit`() {
         val sut = loaded()
         sut.uiState.value.onPhotoReplace(draft.mainImage.id, listOf("content://a"))

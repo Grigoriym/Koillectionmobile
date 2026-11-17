@@ -141,6 +141,12 @@
     <string name="add_item_no_category">No category</string>
     <string name="add_item_no_tags">The server has no tags.</string>
     <string name="add_item_retry">Try again</string>
+    <string name="add_item_new_tag">New tag</string>
+    <string name="add_item_new_tag_label">Tag name</string>
+    <string name="add_item_new_tag_too_long">At most %1$d characters.</string>
+    <string name="add_item_new_tag_add">Add</string>
+    <string name="add_item_new_tag_cancel">Cancel</string>
+    <string name="add_item_new_tags">New tags, created on save</string>
     <string name="add_item_error_network">Loading the tags failed: the server does not answer. Check the network connection.</string>
     <string name="add_item_error_http">Loading the tags failed: the server answered with an error (HTTP %1$d).</string>
     <string name="add_item_error_unexpected">Loading the tags failed with an unexpected error.</string>

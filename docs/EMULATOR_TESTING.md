@@ -134,6 +134,12 @@ this app.
   with the tag label. Compare with `GET /api/tags` and `/api/tag_categories` (bearer token, as in
   M3.4); "Fraktur" has 121 items over 5 pages, the last one "Brettspiel des Lebens". In airplane mode
   the list shows the network error and "Try again".
+- New tag (M7.6): "New tag" is a text button under the last tag group (scroll to the bottom of
+  the form). It opens a dialog with "Tag name", "Cancel" and "Add". With the keyboard open, "Add"
+  moves up (y 975 instead of 1385): tap it from a fresh dump. "Add" closes the keyboard with the
+  dialog, so a `KEYCODE_BACK` after it opens "Discard this item?". Pending tags show under "New
+  tags, created on save". To see that no tag exists before Save, count `GET /api/tags`
+  (`totalItems`).
 - Local network permission (M4.1): `10.0.2.2` is the emulator's own gateway, so a check of
   `ACCESS_LOCAL_NETWORK` needs another private host address. The test instance listens on
   `127.0.0.1` only: forward a host-only private address to it for the check, not the Wi-Fi LAN

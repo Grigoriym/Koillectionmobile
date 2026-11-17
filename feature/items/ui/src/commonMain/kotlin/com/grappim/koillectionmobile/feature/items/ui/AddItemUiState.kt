@@ -34,7 +34,8 @@ sealed interface SaveStatus {
 
 /**
  * The add-item form: the [name], the free [fields] in order, the [photos] (the first is the main
- * image, the rest are image fields in order), and the tags picked from the server's [tagGroups].
+ * image, the rest are image fields in order), the tags picked from the server's [tagGroups], and
+ * the [newTagLabels] of tags the save creates (see [withNewTagLabel]).
  * [tagsError] is set when the tag load failed; the rest of the form still works.
  * [savedItemId] is set once the item is saved: the screen then opens it.
  */
@@ -44,6 +45,7 @@ data class AddItemUiState(
     val photos: List<PhotoRow> = emptyList(),
     val tagGroups: List<TagGroup> = emptyList(),
     val selectedTagIds: Set<String> = emptySet(),
+    val newTagLabels: List<String> = emptyList(),
     val isLoadingTags: Boolean = true,
     val tagsError: NativeText = NativeText.Empty,
     val save: SaveStatus? = null,
@@ -54,6 +56,8 @@ data class AddItemUiState(
     val onLabelChange: (Int, String) -> Unit = { _, _ -> },
     val onValueChange: (Int, String) -> Unit = { _, _ -> },
     val onTagToggle: (String) -> Unit = {},
+    val onNewTag: (String) -> Unit = {},
+    val onNewTagRemove: (String) -> Unit = {},
     val onRetryTags: () -> Unit = {},
     val onPhotosAdd: (List<String>) -> Unit = {},
     val onPhotoRotate: (Int) -> Unit = {},
@@ -84,7 +88,8 @@ data class AddItemUiState(
 
     /** The user entered something, so leaving the form asks first. */
     val hasInput: Boolean
-        get() = name.isNotBlank() || fields.isNotEmpty() || photos.isNotEmpty() || selectedTagIds.isNotEmpty()
+        get() = name.isNotBlank() || fields.isNotEmpty() || photos.isNotEmpty() ||
+            selectedTagIds.isNotEmpty() || newTagLabels.isNotEmpty()
 
     /** The server needs a name (`NotBlank`) and unique, non-blank labels. */
     val canSave: Boolean

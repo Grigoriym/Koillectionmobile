@@ -1,15 +1,21 @@
 package com.grappim.koillectionmobile.feature.items.domain
 
 import com.grappim.koillectionmobile.feature.tags.domain.TagsRepository
+import com.grappim.koillectionmobile.feature.tags.domain.findOrCreateTags
 
-/** An item to create in collection [collectionId]. Labels must be unique within the item (server rule). */
+/**
+ * An item to create in collection [collectionId]. Labels must be unique within the item (server
+ * rule). [tagIds] are existing tags; [newTagLabels] are tags to create (or to find, see
+ * `findOrCreateTags`) before the tags are set.
+ */
 data class NewItem(
     val collectionId: String,
     val name: String,
     val textFields: List<NewTextField>,
     val mainImage: NewImage?,
     val imageFields: List<NewImageField>,
-    val tagIds: List<String>
+    val tagIds: List<String>,
+    val newTagLabels: List<String> = emptyList()
 )
 
 data class NewTextField(val label: String, val value: String)
@@ -52,7 +58,8 @@ interface AddItemUseCase {
 
     /**
      * Creates [newItem] in this order: the item, the text fields, the main image, each image field
-     * (created, then its image uploaded), the tags. Positions: text fields from 1, then the image
+     * (created, then its image uploaded), the tags. The tags are one step: the new tags are found
+     * or created, then the item's tags are set. Positions: text fields from 1, then the image
      * fields. Starts from [state], so a retry never creates a second item or a field twice.
      */
     suspend fun addItem(
@@ -116,8 +123,14 @@ class AddItemUseCaseImpl(private val itemsRepository: ItemsRepository, private v
         }
 
         // A new item has no tags, so an empty list needs no call.
-        if (newItem.tagIds.isNotEmpty() && !current.tagsDone) {
-            tagsRepository.setItemTags(itemId, newItem.tagIds)
+        if (newItem.hasTags && !current.tagsDone) {
+            val newTagIds = if (newItem.newTagLabels.isEmpty()) {
+                emptyList()
+            } else {
+                tagsRepository.findOrCreateTags(newItem.newTagLabels)
+                    .getOrElse { return AddItemResult.Failure(it, current) }
+            }
+            tagsRepository.setItemTags(itemId, (newItem.tagIds + newTagIds).distinct())
                 .onFailure { return AddItemResult.Failure(it, current) }
             current = current.copy(tagsDone = true)
             report()
@@ -130,7 +143,7 @@ class AddItemUseCaseImpl(private val itemsRepository: ItemsRepository, private v
         newItem.textFields.size +
         (if (newItem.mainImage != null) 1 else 0) +
         2 * newItem.imageFields.size +
-        (if (newItem.tagIds.isNotEmpty()) 1 else 0)
+        (if (newItem.hasTags) 1 else 0)
 
     private fun callsDone(state: AddItemState, newItem: NewItem): Int = (if (state.itemId != null) 1 else 0) +
         state.textFieldsDone +
@@ -138,4 +151,6 @@ class AddItemUseCaseImpl(private val itemsRepository: ItemsRepository, private v
         state.imageFieldIds.size +
         state.imageFieldsUploaded +
         (if (state.tagsDone) 1 else 0)
+
+    private val NewItem.hasTags: Boolean get() = tagIds.isNotEmpty() || newTagLabels.isNotEmpty()
 }

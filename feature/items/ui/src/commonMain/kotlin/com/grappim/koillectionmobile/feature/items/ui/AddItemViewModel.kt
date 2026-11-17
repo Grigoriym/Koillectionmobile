@@ -45,9 +45,10 @@ import org.koin.core.annotation.InjectedParam
 import org.koin.core.annotation.KoinViewModel
 
 /**
- * The add-item form: name, free label/value rows, photos, and a pick from the server's existing
- * tags. The form cannot create a tag (plan §5 decision 7). The save creates the item in
- * [collectionId] through [AddItemUseCase].
+ * The add-item form: name, free label/value rows, photos, a pick from the server's existing tags,
+ * and labels of new tags. A new tag is created by the save, not when it is added, so a form left
+ * without saving creates no tag. The save creates the item in [collectionId] through
+ * [AddItemUseCase].
  *
  * What the user typed and picked is kept in [savedStateHandle], so it survives process death. The
  * tags are loaded again. A started save keeps what exists on the server there too, so a retry
@@ -89,12 +90,15 @@ class AddItemViewModel(
             fields = draft.fields,
             photos = draft.photos,
             selectedTagIds = draft.selectedTagIds,
+            newTagLabels = draft.newTagLabels,
             onNameChange = ::changeName,
             onAddField = ::addField,
             onRemoveField = ::removeField,
             onLabelChange = ::changeLabel,
             onValueChange = ::changeValue,
             onTagToggle = ::toggleTag,
+            onNewTag = ::addNewTag,
+            onNewTagRemove = ::removeNewTag,
             onRetryTags = ::retryTags,
             onPhotosAdd = ::addPhotos,
             onPhotoRotate = ::rotatePhoto,
@@ -117,7 +121,7 @@ class AddItemViewModel(
     init {
         viewModelScope.launch {
             _uiState
-                .map { AddItemDraft(it.name, it.fields, it.photos, it.selectedTagIds) }
+                .map { AddItemDraft(it.name, it.fields, it.photos, it.selectedTagIds, it.newTagLabels) }
                 .distinctUntilChanged()
                 .collect { savedStateHandle[DRAFT_KEY] = json.encodeToString(it) }
         }
@@ -177,6 +181,17 @@ class AddItemViewModel(
             val selected = s.selectedTagIds
             s.copy(selectedTagIds = if (tagId in selected) selected - tagId else selected + tagId)
         }
+    }
+
+    private fun addNewTag(label: String) {
+        _uiState.update { s ->
+            val choice = TagChoice(s.selectedTagIds, s.newTagLabels).withNewTagLabel(label, s.tagGroups)
+            s.copy(selectedTagIds = choice.selectedTagIds, newTagLabels = choice.newTagLabels)
+        }
+    }
+
+    private fun removeNewTag(label: String) {
+        _uiState.update { s -> s.copy(newTagLabels = s.newTagLabels - label) }
     }
 
     private fun retryTags() {
@@ -262,7 +277,8 @@ class AddItemViewModel(
             textFields = fields.map { NewTextField(it.label, it.value) },
             mainImage = images.firstOrNull(),
             imageFields = photos.drop(1).zip(images.drop(1)) { photo, image -> NewImageField(photo.label, image) },
-            tagIds = selectedTagIds.toList()
+            tagIds = selectedTagIds.toList(),
+            newTagLabels = newTagLabels
         )
     }
 
@@ -290,7 +306,8 @@ private data class AddItemDraft(
     val name: String = "",
     val fields: List<FieldRow> = emptyList(),
     val photos: List<PhotoRow> = emptyList(),
-    val selectedTagIds: Set<String> = emptySet()
+    val selectedTagIds: Set<String> = emptySet(),
+    val newTagLabels: List<String> = emptyList()
 )
 
 private const val DRAFT_KEY = "add_item_draft"

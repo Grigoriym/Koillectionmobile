@@ -270,9 +270,12 @@ private fun EditForm(draft: EditItemDraft, uiState: EditItemUiState, modifier: M
             TagPicker(
                 tagGroups = uiState.tagGroups,
                 selectedTagIds = draft.selectedTagIds,
+                newTagLabels = draft.newTagLabels,
                 isLoading = uiState.isLoadingTags,
                 error = uiState.tagsError,
                 onTagToggle = uiState.onTagToggle,
+                onNewTag = uiState.onNewTag,
+                onNewTagRemove = uiState.onNewTagRemove,
                 onRetry = uiState.onRetryTags,
                 modifier = Modifier
                     .padding(horizontal = PADDING)

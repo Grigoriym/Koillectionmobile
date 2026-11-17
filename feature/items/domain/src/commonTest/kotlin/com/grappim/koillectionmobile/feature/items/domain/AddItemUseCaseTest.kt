@@ -74,6 +74,47 @@ class AddItemUseCaseTest {
     }
 
     @Test
+    fun `a new tag is created then set with the picked tags`() = runTest {
+        val result = useCase.addItem(BOOK.copy(newTagLabels = listOf("Signed")))
+
+        assertEquals(AddItemResult.Success(ITEM_ID), result)
+        assertEquals(
+            ALL_CALLS.dropLast(1) + listOf("getTags", "createTag Signed", "setItemTags item-1 [tag-a, tag-b, tag-new]"),
+            server.calls
+        )
+    }
+
+    @Test
+    fun `a new label that a server tag has in another case uses that tag`() = runTest {
+        useCase.addItem(BOOK.copy(tagIds = emptyList(), newTagLabels = listOf("classic")))
+
+        assertEquals(ALL_CALLS.dropLast(1) + listOf("getTags", "setItemTags item-1 [tag-c]"), server.calls)
+    }
+
+    @Test
+    fun `a failed tag create is retried without a second tag`() = runTest {
+        for (applied in listOf(false, true)) {
+            server.calls.clear()
+            server.serverTags.removeAll { it.label == "Signed" }
+            server.failOnce = "createTag Signed"
+            server.failAfterApply = applied
+            val item = BOOK.copy(newTagLabels = listOf("Signed"))
+
+            val failure = assertIs<AddItemResult.Failure>(useCase.addItem(item), "applied: $applied")
+            server.calls.clear()
+            assertEquals(AddItemResult.Success(ITEM_ID), useCase.addItem(item, failure.state), "applied: $applied")
+
+            val retryCalls = listOfNotNull(
+                "getTags",
+                "createTag Signed".takeUnless { applied },
+                "setItemTags item-1 [tag-a, tag-b, tag-new]"
+            )
+            assertEquals(retryCalls, server.calls, "applied: $applied")
+            assertEquals(1, server.serverTags.count { it.label == "Signed" }, "applied: $applied")
+        }
+    }
+
+    @Test
     fun `progress counts every call up to the total`() = runTest {
         val progress = mutableListOf<AddItemProgress>()
 
@@ -113,12 +154,17 @@ class AddItemUseCaseTest {
     private class FakeServer {
         val calls = mutableListOf<String>()
         var failOnce: String? = null
+
+        /** The failing call of [failOnce] goes through first: a lost answer. */
+        var failAfterApply = false
         val error = IllegalStateException("server down")
+        val serverTags = mutableListOf(Tag("tag-a", "Novel", null, null), Tag("tag-c", "Classic", null, null))
 
         private fun <T> answer(call: String, value: () -> T): Result<T> {
             calls += call
             if (call == failOnce) {
                 failOnce = null
+                if (failAfterApply) value()
                 return Result.failure(error)
             }
             return Result.success(value())
@@ -169,13 +215,14 @@ class AddItemUseCaseTest {
         }
 
         val tags = object : TagsRepository {
-            override suspend fun getTags(): Result<List<Tag>> = error("not used")
+            override suspend fun getTags(): Result<List<Tag>> = answer("getTags") { serverTags.toList() }
 
             override suspend fun getTagCategories(): Result<List<TagCategory>> = error("not used")
 
             override suspend fun getItemTags(itemId: String): Result<List<Tag>> = error("not used")
 
-            override suspend fun createTag(label: String): Result<Tag> = error("not used")
+            override suspend fun createTag(label: String): Result<Tag> =
+                answer("createTag $label") { Tag("tag-new", label, null, null).also { serverTags += it } }
 
             override suspend fun setItemTags(itemId: String, tagIds: List<String>) =
                 answer("setItemTags $itemId $tagIds") { }

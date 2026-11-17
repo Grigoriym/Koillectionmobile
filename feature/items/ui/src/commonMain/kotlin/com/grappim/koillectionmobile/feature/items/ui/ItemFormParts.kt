@@ -21,6 +21,10 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -35,6 +39,12 @@ import com.grappim.koillectionmobile.strings.generated.resources.add_item_field_
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_keep_editing
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_label_duplicate
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_label_required
+import com.grappim.koillectionmobile.strings.generated.resources.add_item_new_tag
+import com.grappim.koillectionmobile.strings.generated.resources.add_item_new_tag_add
+import com.grappim.koillectionmobile.strings.generated.resources.add_item_new_tag_cancel
+import com.grappim.koillectionmobile.strings.generated.resources.add_item_new_tag_label
+import com.grappim.koillectionmobile.strings.generated.resources.add_item_new_tag_too_long
+import com.grappim.koillectionmobile.strings.generated.resources.add_item_new_tags
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_no_category
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_no_tags
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_preparing
@@ -103,12 +113,16 @@ internal fun labelError(label: String, duplicates: Set<String>): StringResource?
 internal fun TagPicker(
     tagGroups: List<TagGroup>,
     selectedTagIds: Set<String>,
+    newTagLabels: List<String>,
     isLoading: Boolean,
     error: NativeText,
     onTagToggle: (String) -> Unit,
+    onNewTag: (String) -> Unit,
+    onNewTagRemove: (String) -> Unit,
     onRetry: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    var isNewTagShown by rememberSaveable { mutableStateOf(false) }
     Column(modifier = modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(TAG_SPACING)) {
         Text(
             text = stringResource(RString.add_item_section_tags),
@@ -141,8 +155,64 @@ internal fun TagPicker(
                 }
             }
         }
+        if (newTagLabels.isNotEmpty()) {
+            Text(text = stringResource(RString.add_item_new_tags), style = MaterialTheme.typography.labelLarge)
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(TAG_SPACING)) {
+                newTagLabels.forEach { label ->
+                    FilterChip(selected = true, onClick = { onNewTagRemove(label) }, label = { Text(label) })
+                }
+            }
+        }
+        if (!isLoading) {
+            TextButton(onClick = { isNewTagShown = true }) { Text(stringResource(RString.add_item_new_tag)) }
+        }
+    }
+    if (isNewTagShown) {
+        NewTagDialog(
+            onAdd = {
+                onNewTag(it)
+                isNewTagShown = false
+            },
+            onDismiss = { isNewTagShown = false }
+        )
     }
 }
+
+/** Asks for the label of a new tag. The server stores at most [MAX_TAG_LABEL] characters. */
+@Composable
+private fun NewTagDialog(onAdd: (String) -> Unit, onDismiss: () -> Unit) {
+    var label by rememberSaveable { mutableStateOf("") }
+    val isTooLong = label.trim().length > MAX_TAG_LABEL
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(RString.add_item_new_tag)) },
+        text = {
+            OutlinedTextField(
+                value = label,
+                onValueChange = { label = it },
+                label = { Text(stringResource(RString.add_item_new_tag_label)) },
+                singleLine = true,
+                isError = isTooLong,
+                supportingText = if (isTooLong) {
+                    { Text(stringResource(RString.add_item_new_tag_too_long, MAX_TAG_LABEL)) }
+                } else {
+                    null
+                }
+            )
+        },
+        confirmButton = {
+            TextButton(onClick = { onAdd(label) }, enabled = label.isNotBlank() && !isTooLong) {
+                Text(stringResource(RString.add_item_new_tag_add))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text(stringResource(RString.add_item_new_tag_cancel)) }
+        }
+    )
+}
+
+/** `Tag.label` is a Doctrine `string` column: 255 characters, and the entity has no length check. */
+private const val MAX_TAG_LABEL = 255
 
 /**
  * The save instead of the form: a progress bar while it runs; on a failure the message and a
