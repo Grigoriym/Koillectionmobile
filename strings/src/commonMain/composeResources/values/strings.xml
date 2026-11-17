@@ -73,6 +73,15 @@
     <string name="tags_error_unexpected">Loading the tags failed with an unexpected error.</string>
     <string name="tag_items_empty">No item has this tag.</string>
     <string name="tag_items_error_unexpected">Loading the items of the tag failed with an unexpected error.</string>
+    <string name="templates_title">Templates</string>
+    <string name="templates_empty">There are no templates yet.</string>
+    <string name="templates_retry">Try again</string>
+    <string name="templates_error_network">The server does not answer. Check the network connection.</string>
+    <string name="templates_error_http">The server answered with an error (HTTP %1$d).</string>
+    <string name="templates_error_unexpected">Loading the templates failed with an unexpected error.</string>
+    <string name="template_empty">This template has no fields.</string>
+    <string name="template_field_choice_list">%1$s: %2$s</string>
+    <string name="template_error_unexpected">Loading the fields of the template failed with an unexpected error.</string>
     <string name="collection_form_new_title">New collection</string>
     <string name="collection_form_back">Back</string>
     <string name="collection_form_title_label">Title</string>

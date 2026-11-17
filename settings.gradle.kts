@@ -70,6 +70,7 @@ include(
     ":feature:templates:data",
     ":feature:templates:domain",
     ":feature:templates:dto",
-    ":feature:templates:mapper"
+    ":feature:templates:mapper",
+    ":feature:templates:ui"
 )
 include(":feature:settings:ui")

@@ -29,6 +29,10 @@ import com.grappim.koillectionmobile.feature.tags.ui.TagItemsRoute
 import com.grappim.koillectionmobile.feature.tags.ui.TagItemsScreen
 import com.grappim.koillectionmobile.feature.tags.ui.TagListRoute
 import com.grappim.koillectionmobile.feature.tags.ui.TagListScreen
+import com.grappim.koillectionmobile.feature.templates.ui.TemplateListRoute
+import com.grappim.koillectionmobile.feature.templates.ui.TemplateListScreen
+import com.grappim.koillectionmobile.feature.templates.ui.TemplateRoute
+import com.grappim.koillectionmobile.feature.templates.ui.TemplateScreen
 
 /**
  * The logged-in side: one back stack that starts at the collection list.
@@ -56,7 +60,8 @@ internal fun MainNavHost(modifier: Modifier = Modifier) {
                     onSettingsClick = { backStack.add(SettingsRoute) },
                     onNewCollectionClick = { backStack.add(NewCollectionRoute()) },
                     onSearchClick = { backStack.add(ItemSearchRoute) },
-                    onTagsClick = { backStack.add(TagListRoute) }
+                    onTagsClick = { backStack.add(TagListRoute) },
+                    onTemplatesClick = { backStack.add(TemplateListRoute) }
                 )
             }
             entry<ItemSearchRoute> {
@@ -76,6 +81,21 @@ internal fun MainNavHost(modifier: Modifier = Modifier) {
                     tagId = route.tagId,
                     label = route.label,
                     onItemClick = { id -> backStack.add(ItemRoute(id)) },
+                    onBack = { backStack.removeLastOrNull() }
+                )
+            }
+            entry<TemplateListRoute> {
+                TemplateListScreen(
+                    onTemplateClick = { template ->
+                        backStack.add(TemplateRoute(templateId = template.id, name = template.name))
+                    },
+                    onBack = { backStack.removeLastOrNull() }
+                )
+            }
+            entry<TemplateRoute> { route ->
+                TemplateScreen(
+                    templateId = route.templateId,
+                    name = route.name,
                     onBack = { backStack.removeLastOrNull() }
                 )
             }

@@ -109,3 +109,8 @@ cold session can act on it. Delete an entry when it's fixed.
   edited screen looks the same; the user sees the change only in the parent or the list. Not a
   bug against any step: M2 never asked for it. Decide in M14.1 whether the screen gets a header
   image.
+- 2026-11-17 (M8.3) — The collection list top bar now holds a search icon and four text actions
+  (Tags, Templates, Settings, Log out) next to the title
+  (`feature/collections/ui/.../CollectionListScreen.kt`, `TopAppBar` `actions`). On a phone width
+  the title may get very little room. Not checked on a device in M8.3. Look at it in the M8.9
+  device pass; an overflow menu for Settings and Log out is one fix.
