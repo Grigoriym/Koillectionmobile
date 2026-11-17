@@ -60,3 +60,6 @@ entries get deleted — see /finalize.
 - 2026-11-17 — `ui.py list` (M7.1) did not print the "No item name contains "zzqx"." line, though the
   screenshot showed it. Second hit after M6.3; both missing texts hold a `"`. Untested guess: the
   quote breaks the dump or the parse.
+- 2026-11-17 — detekt `MatchingDeclarationName` (M7.6) failed `build` for `NewTagLabel.kt`, whose one
+  top-level class is `TagChoice` (an extension function next to it does not count). Name the file
+  after the class.
