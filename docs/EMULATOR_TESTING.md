@@ -125,6 +125,10 @@ this app.
   collection has items. With the keyboard closed, Back leaves the screen. The "No item name
   contains ..." line was not in `ui.py list` though the screenshot showed it: read it from a
   screenshot.
+- Item search (M7.2): the magnifier in the collection list's top bar (`content-desc` "Search
+  items") opens "Search items". Each row is the item name with its collection title below it. The
+  field is the M7.1 field. After "Clear search" the list keeps the last match at the top (the lazy
+  list keeps its scroll anchor by key), so the rows above it are off screen, not missing.
 - Local network permission (M4.1): `10.0.2.2` is the emulator's own gateway, so a check of
   `ACCESS_LOCAL_NETWORK` needs another private host address. The test instance listens on
   `127.0.0.1` only: forward a host-only private address to it for the check, not the Wi-Fi LAN

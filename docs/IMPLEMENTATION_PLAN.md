@@ -95,6 +95,10 @@ start of any step that touches the API. Facts that shape the design:
   `OrderBy` on `Item::$data` is a Doctrine collection setting, and API Platform reads the Datum
   rows with its own query (`Datum.php` sets no `order`). So `feature:items` sorts by `position`.
   Not checked against a server with reordered fields: the fixture is already in `position` order.
+- `GET /api/items` (checked live 2026-11-17, M7.2) lists every item of the user: 30 per page, a
+  `view.next` link per page, 15 pages for the 445 items of the test instance. Two full reads gave
+  445 distinct ids in the same order. An item's `collection` is an IRI only, so the search screen
+  reads `GET /api/collections` for the titles.
 - Read side checked live 2026-11-15 (M1.11, `./gradlew :composeApp:smokeRun`, JVM, local test
   instance at the root path): login, all collections, 445 items of one collection over every page
   (matches the server's `totalItems`, so the `next` links work), one item and its 23 fields. A
