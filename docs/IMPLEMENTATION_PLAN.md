@@ -142,6 +142,14 @@ start of any step that touches the API. Facts that shape the design:
   parent took the child and an item in the child with it: all three gave 404. A create with an
   empty title got 422 (`title: This value should not be blank.`). Not checked: a server behind a
   subpath, and whether a non-image file passes the upload (the `colletion:image` group typo).
+- Tag writes checked live 2026-11-17 (M7.4, `./gradlew :composeApp:smokeTagRun`, JVM, local test
+  instance at the root path), through the M7.3 repository calls: `POST /api/tags` with `label` only
+  answered a tag with no category. `PATCH /api/items/{id}` with the item's three tags plus the new
+  one gave the item four tags, and `GET /api/tags/{id}/items` listed exactly that item. A `PATCH`
+  with the three old tags took the new one off, and the tag's items were empty after. A create with
+  an empty label got 422 (`label: This value should not be blank.`). A create with a label that
+  exists already succeeded: the server made a second tag with the same label and a new id. `DELETE
+  /api/tags/{id}` answered 204, and a read after it gave 404. Not checked: a server behind a subpath.
 - Counting what a collection delete takes (M6.3, 1.8.5 source): the API has no counters.
   `Collection::$cachedValues` holds them but has no `Groups`, and `Item.php` has no `#[ApiFilter]`,
   so items cannot be counted for several collections in one call. The app reads all collections

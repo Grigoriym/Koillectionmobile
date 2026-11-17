@@ -89,3 +89,18 @@ tasks.register<JavaExec>("smokeCollectionRun") {
     systemProperty("user.home", smokeHome.get().asFile.absolutePath)
     javaLauncher.set(javaToolchains.launcherFor { languageVersion.set(JavaLanguageVersion.of(21)) })
 }
+
+// M7.4: live tag smoke run against the local test instance. It creates a tag, puts it on an item
+// that has tags, takes it off again and deletes it. Same setup as `smokeRun`; never point it at the
+// real server.
+tasks.register<JavaExec>("smokeTagRun") {
+    group = "verification"
+    description = "Creates, assigns, removes and deletes a tag on the local test instance."
+    val jvmTestCompilation = kotlin.jvm().compilations.getByName("test")
+    dependsOn(jvmTestCompilation.compileAllTaskName)
+    classpath = files(jvmTestCompilation.output.allOutputs, jvmTestCompilation.runtimeDependencyFiles)
+    mainClass.set("com.grappim.koillectionmobile.composeapp.smoke.LiveTagSmokeKt")
+    val smokeHome = layout.buildDirectory.dir("smoke-home")
+    systemProperty("user.home", smokeHome.get().asFile.absolutePath)
+    javaLauncher.set(javaToolchains.launcherFor { languageVersion.set(JavaLanguageVersion.of(21)) })
+}

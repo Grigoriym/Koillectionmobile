@@ -65,7 +65,13 @@ still tries to delete the parent; look for a leftover `M6.2 smoke parent <millis
 the cleanup line reports an error. Its constants are in `LiveCollectionSmoke.kt`: the same rule
 applies.
 
-All three runs keep their session in `composeApp/build/smoke-home`. A run more than an hour after the
+`./gradlew :composeApp:smokeTagRun` writes (M7.4): it creates a tag, puts it on the first item it
+finds with tags, takes it off again and deletes it. It also sends an empty label (422) and a
+duplicate label, and deletes the duplicate tag. If it fails halfway, it still puts the item's tags
+back and deletes its tags; look for a leftover `M7.4 smoke <millis>` tag if a cleanup line reports
+an error. Its constants are in `LiveTagSmoke.kt`: the same rule applies.
+
+All four runs keep their session in `composeApp/build/smoke-home`. A run more than an hour after the
 last one starts with an expired JWT. That is the path that hung in M3.1, so do not delete the
 directory to make a hang go away: find out why first.
 

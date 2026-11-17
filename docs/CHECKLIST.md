@@ -1,6 +1,6 @@
 # koillectionmobile checklist
 
-**Current step:** M7.4. M7.3 done 2026-11-17. M7.2 done 2026-11-17. M7.1 done 2026-11-17. M7 broken into steps 2026-11-17. M6 done 2026-11-17. M6.6 done 2026-11-17. M6.5 done 2026-11-16. M6.4 done 2026-11-16. M6.3 done 2026-11-16. M6.2 done 2026-11-16. M6.1 done 2026-11-16. M6 broken into steps 2026-11-16. M5 done 2026-11-16. M5.7 done 2026-11-16. M5.6 done 2026-11-16. M5.5 done 2026-11-16. M5.4 done 2026-11-16. M5.3 done 2026-11-16. M5.2 done 2026-11-16. M5.1 done 2026-11-16. M5 broken into steps 2026-11-16. M4 done 2026-11-16. M4.4 done 2026-11-16. M4.3 done 2026-11-16. M4.2 done 2026-11-16. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6, 7, 8, 9 and 10 are settled.
+**Current step:** M7.5. M7.4 done 2026-11-17. M7.3 done 2026-11-17. M7.2 done 2026-11-17. M7.1 done 2026-11-17. M7 broken into steps 2026-11-17. M6 done 2026-11-17. M6.6 done 2026-11-17. M6.5 done 2026-11-16. M6.4 done 2026-11-16. M6.3 done 2026-11-16. M6.2 done 2026-11-16. M6.1 done 2026-11-16. M6 broken into steps 2026-11-16. M5 done 2026-11-16. M5.7 done 2026-11-16. M5.6 done 2026-11-16. M5.5 done 2026-11-16. M5.4 done 2026-11-16. M5.3 done 2026-11-16. M5.2 done 2026-11-16. M5.1 done 2026-11-16. M5 broken into steps 2026-11-16. M4 done 2026-11-16. M4.4 done 2026-11-16. M4.3 done 2026-11-16. M4.2 done 2026-11-16. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6, 7, 8, 9 and 10 are settled.
 
 ## How to use this
 
@@ -66,13 +66,15 @@ only (`docs/local-info.md`).
   root-path base URL case; mutation-check the body key and one path.
   Note: `createTag` returns the new `Tag`. The mutations were the body key (`label` → `name`) and
   the `getTagItems` path (`tags` → `tag`); each failed its test.
-- [ ] **M7.4** — Live tag smoke against the local test instance: a task (as
+- [x] **M7.4** — Live tag smoke against the local test instance: a task (as
   `smokeCollectionRun`) creates a tag, sets it on an item next to the item's existing tags, reads
   `/api/tags/{id}/items` (the item is there), takes it off the item again, then deletes the tag.
   Also send a create with an empty label (expect 422) and a create with a label that already
   exists (record what the server does). Record the answers in plan §2.
   **Verify:** the run prints each step and passes; the item's tags end as they started; plan §2
   has the results.
+  Note: the task is `smokeTagRun`. The app has no tag delete call, so the run sends
+  `DELETE /api/tags/{id}` through the app's own `HttpClient`. A duplicate label creates a second tag.
 - [ ] **M7.5** — Tag list and tag items (`feature:tags:ui`, the placeholder today). A tags action
   on the collection list opens the tag list: one section per tag category with its colour, sorted
   by label, then the tags without a category; tags sorted by label inside a section, ignoring case.
