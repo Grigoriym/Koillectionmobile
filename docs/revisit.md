@@ -101,3 +101,9 @@ cold session can act on it. Delete an entry when it's fixed.
   the web meanwhile) after a partial save shows only "Try again", which gives the same answer each
   time; the user can only leave the form. Fix option for both: let `retry` diff against the server
   as reloaded, with a fresh `original`, once the form changes after a failure.
+- 2026-11-17 (M6.6) — The collection screen does not show the collection's own image. Only the
+  parent's child row and the collection list show it, as a thumbnail (`CollectionScreen.kt:112`
+  puts only `uiState.title` in the top bar). After an edit that sets or replaces the image, the
+  edited screen looks the same; the user sees the change only in the parent or the list. Not a
+  bug against any step: M2 never asked for it. Decide in M9.1 whether the screen gets a header
+  image.
