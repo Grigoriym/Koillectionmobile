@@ -1,6 +1,6 @@
 # koillectionmobile checklist
 
-**Current step:** M6.6. M6.5 done 2026-11-16. M6.4 done 2026-11-16. M6.3 done 2026-11-16. M6.2 done 2026-11-16. M6.1 done 2026-11-16. M6 broken into steps 2026-11-16. M5 done 2026-11-16. M5.7 done 2026-11-16. M5.6 done 2026-11-16. M5.5 done 2026-11-16. M5.4 done 2026-11-16. M5.3 done 2026-11-16. M5.2 done 2026-11-16. M5.1 done 2026-11-16. M5 broken into steps 2026-11-16. M4 done 2026-11-16. M4.4 done 2026-11-16. M4.3 done 2026-11-16. M4.2 done 2026-11-16. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6, 7 and 8 are settled.
+**Current step:** M7 (break it into steps first). M6 done 2026-11-17. M6.6 done 2026-11-17. M6.5 done 2026-11-16. M6.4 done 2026-11-16. M6.3 done 2026-11-16. M6.2 done 2026-11-16. M6.1 done 2026-11-16. M6 broken into steps 2026-11-16. M5 done 2026-11-16. M5.7 done 2026-11-16. M5.6 done 2026-11-16. M5.5 done 2026-11-16. M5.4 done 2026-11-16. M5.3 done 2026-11-16. M5.2 done 2026-11-16. M5.1 done 2026-11-16. M5 broken into steps 2026-11-16. M4 done 2026-11-16. M4.4 done 2026-11-16. M4.3 done 2026-11-16. M4.2 done 2026-11-16. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6, 7 and 8 are settled.
 
 ## How to use this
 
@@ -33,67 +33,7 @@ M2 (browse) is done; its steps and notes are in `docs/CHECKLIST_ARCHIVE.md`.
 M3 (add item with photos) is done; its steps and notes are in `docs/CHECKLIST_ARCHIVE.md`.
 M4 (network and security parity with wallosmobile) is done; its steps and notes are in `docs/CHECKLIST_ARCHIVE.md`.
 M5 (edit and delete items) is done; its steps and notes are in `docs/CHECKLIST_ARCHIVE.md`.
-
-## M6 — collections: create, edit, delete
-
-Create a collection (top level or child), rename it, set, replace or remove its image, delete it
-(with a confirm that counts what goes with it). Form choices are plan §5 decision 9 (user,
-2026-11-16). Every write goes to the local test instance only (`docs/local-info.md`).
-
-- [x] **M6.1** — Repository writes (`feature:collections`): create (`POST /api/collections`,
-  `title` and an optional `parent` IRI), rename (`PATCH /api/collections/{id}`, `{"title"}`),
-  upload the image (`POST /api/collections/{id}/image`, multipart), remove the image (`PATCH`
-  with `deleteImage`), delete (`DELETE /api/collections/{id}`). Re-read `Collection.php` first,
-  and copy the multipart part name and headers from `feature:items:data` (`CLAUDE.md`, API
-  contract). A `PATCH` sends `application/merge-patch+json` and only the changed keys.
-  **Verify:** mock-engine tests for each call (method, path, content type, body keys), with a
-  root-path base URL case; mutation-check one body key and one method.
-- [x] **M6.2** — Live collection smoke against the local test instance: extend `smokeWriteRun`
-  (or add a task) to create a top-level collection and a child, rename the child, upload an
-  image, replace it (the old file gives 404), remove it (the file gives 404 and `image` is null),
-  add an item to the child, then delete the parent. After the delete, the child and the item give
-  404. Also send a create with an empty title (expect 422). Record the answers in plan §2.
-  **Verify:** the run prints each step and passes; plan §2 has the results.
-  Note: a separate task, `./gradlew :composeApp:smokeCollectionRun` (`LiveCollectionSmoke.kt`),
-  so the item run stays as it was. The empty-title 422 was also confirmed with `curl`, since
-  `KoillectionError.Validation` covers 400 and 422.
-- [x] **M6.3** — Delete collection: a delete action on the collection screen. The confirm dialog
-  names the collection and counts the child collections (every level) and the items they hold;
-  decide in the step how to count the items (for example `totalItems` of each
-  `/api/collections/{id}/items`). On success the screen leaves the back stack, and the list or
-  the parent collection reads its children again. A failure shows the error and keeps the screen.
-  **Verify:** ViewModel tests (counts, success, failure); on the emulator a temporary collection
-  with a child and an item is deleted, the list no longer shows it, and the web UI agrees.
-  Note: the count is one `getCollections()` (descendants by `parentId`) plus a new
-  `CollectionsRepository.countItems` per collection (`totalItems` of the first item page); the API
-  has no counters (plan §2). A new `CollectionListChanges` signal makes the list or the parent read
-  again. On the device a child (1 collection, 2 items) and then its parent (0, 0) were deleted.
-- [x] **M6.4** — Create collection: a "new collection" action on the collection list (top level)
-  and on the collection screen (child). A form with the title and an optional image (camera or
-  picker, M3's photo preparation), saved with the M3 progress view and retry. On success the new
-  collection opens, and the list or the parent shows it. The form survives rotation and process
-  death. Delete the photo files in `cacheDir/photos/` as M3.6 does.
-  **Verify:** ViewModel tests; on the emulator a top-level and a child collection are created,
-  one with an image, and the web UI shows them.
-  Note: the photo code moved to a new `core:photos` (plan §5 decision 4). The form has its own
-  save view and messages in `feature:collections:ui`, a small copy of M3's. The list has a FAB;
-  the collection screen has a "More actions" menu with "New collection". "Pick photo" opens the
-  multi-select picker and keeps the first photo, as the edit form's "Replace" does.
-- [x] **M6.5** — Edit collection: an "edit" action on the collection screen opens the M6.4 form,
-  prefilled (title, image from its URL). The image can be replaced or removed. The save sends only
-  what changed. On success the collection screen and the list read the collection again.
-  **Verify:** ViewModel tests (each change alone, no change sends no call, a failure and the
-  retry); on the emulator a rename, an image replace and an image remove show in the app and in
-  the web UI.
-  Note: its own `EditCollectionViewModel`; the screen shares the M6.4 frame, form and save view
-  (`CollectionFormScaffold`, `CollectionForm`, `CollectionSaveView`). One call per change (rename,
-  upload, image delete); the calls that went through are kept in `SavedStateHandle`, so a retry
-  sends only the rest. "Remove image" drops a new photo and the server image both. A new
-  `CollectionChanges` signal makes the collection screen read again; `CollectionListChanges` (the
-  parent) does the list. Process death is covered by ViewModel tests only, not on the device.
-- [ ] **M6.6** — Device pass of create, edit and delete, then the user confirms with screenshots.
-  Fix what breaks, or put it in `docs/revisit.md` with evidence.
-  **Verify:** the user confirms.
+M6 (collections: create, edit, delete) is done; its steps and notes are in `docs/CHECKLIST_ARCHIVE.md`.
 
 ## M7 — search and tags (rough scope)
 
