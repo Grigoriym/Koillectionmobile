@@ -63,3 +63,5 @@ entries get deleted — see /finalize.
 - 2026-11-17 — detekt `MatchingDeclarationName` (M7.6) failed `build` for `NewTagLabel.kt`, whose one
   top-level class is `TagChoice` (an extension function next to it does not count). Name the file
   after the class.
+- 2026-11-17 — `adb shell input text "m7.7%sedittag"` (M7.7) landed as "m76.7 edittag" in the
+  new-tag dialog; the same call with "M7.7%sdevicetag" a minute earlier landed correctly.

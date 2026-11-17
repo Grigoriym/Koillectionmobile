@@ -45,7 +45,9 @@ this app.
   `curl` (a cookie jar, `GET /` for `_csrf_token`, then `POST /` with `_login`, `_password` and the
   token) and read `/items/<id>`.
 - Log out (M2.6) is the "Log out" text button in the collection list's top bar. After it the
-  login form shows only the server URL. To prove that a re-login loads fresh data and does not
+  login form shows only the server URL. A collection made through the API shows in the list after a
+  pull to refresh: `input swipe 540 400 540 1800 800`. A 300 ms swipe from y 600 did not refresh
+  (M7.7). To prove that a re-login loads fresh data and does not
   show the old screen state, change the server while logged out: create a temporary collection
   through the API, log in, log out, delete it, log in again. The list must not show it.
 - Two different items in a row (`Books` → "Jörn Uhl", back, "Die Pappenheimer") must show
@@ -133,13 +135,16 @@ this app.
   category (a colour dot and the label), the tag rows below it. A tap opens the tag's items, titled
   with the tag label. Compare with `GET /api/tags` and `/api/tag_categories` (bearer token, as in
   M3.4); "Fraktur" has 121 items over 5 pages, the last one "Brettspiel des Lebens". In airplane mode
-  the list shows the network error and "Try again".
+  the list shows the network error and "Try again". The category dots are pale because the server's colours are
+  (`F3E5F5`, `E8EAF6`, `E3F2FD`; M7.7): compare a pixel with `GET /api/tag_categories`, not with
+  a guess.
 - New tag (M7.6): "New tag" is a text button under the last tag group (scroll to the bottom of
   the form). It opens a dialog with "Tag name", "Cancel" and "Add". With the keyboard open, "Add"
   moves up (y 975 instead of 1385): tap it from a fresh dump. "Add" closes the keyboard with the
   dialog, so a `KEYCODE_BACK` after it opens "Discard this item?". Pending tags show under "New
   tags, created on save". To see that no tag exists before Save, count `GET /api/tags`
-  (`totalItems`).
+  (`totalItems`). The test instance has exactly 30 tags, one full page of `/api/tags`, so a new tag
+  lands on page 2: read every page before a cleanup by label (M7.7 missed one).
 - Local network permission (M4.1): `10.0.2.2` is the emulator's own gateway, so a check of
   `ACCESS_LOCAL_NETWORK` needs another private host address. The test instance listens on
   `127.0.0.1` only: forward a host-only private address to it for the check, not the Wi-Fi LAN
