@@ -47,7 +47,7 @@ reason. No row here is a claim of compliance: see "Needs a device or an APK".
 | MASVS-RESILIENCE-1..4 | Out of scope | See above. |
 | MASVS-PRIVACY-1 | Open | `ACCESS_NETWORK_STATE` is declared (`androidApp/src/main/AndroidManifest.xml:5`); no app code uses it. |
 | MASVS-PRIVACY-2 | Pass (source) | No analytics, ad id, crash reporter or telemetry dependency (grep of `*.kts`/`*.toml`). The app talks to the user's server only. |
-| MASVS-PRIVACY-3 | Pass (source) | Nothing is collected. The privacy policy is M9.3. |
+| MASVS-PRIVACY-3 | Pass (source) | Nothing is collected. The privacy policy is M14.3. |
 | MASVS-PRIVACY-4 | Open | Log out clears the username, password and JWT (`SessionStorageImpl.kt:67-73`), but not Coil's image cache. |
 
 ## Accepted deviations
@@ -77,11 +77,11 @@ Each Open row has a `docs/revisit.md` entry.
 
 | Control | Check | Why source can't answer it |
 |---|---|---|
-| MASVS-PRIVACY-1, PLATFORM-1, STORAGE-2 | The merged release manifest: permissions and components the libraries add, `allowBackup`, `exported`. | Manifest merging happens at build time (M9.2 builds the release APK). |
+| MASVS-PRIVACY-1, PLATFORM-1, STORAGE-2 | The merged release manifest: permissions and components the libraries add, `allowBackup`, `exported`. | Manifest merging happens at build time (M14.2 builds the release APK). |
 | MASVS-STORAGE-2 | A backup and restore (`bmgr`) logs the user out and carries no readable secret. | Backup contents need a device. |
 | MASVS-STORAGE-2 | No app log lines in logcat from a release build. | Source shows no logger is installed; a library could still log. |
 | MASVS-CRYPTO-1 | The generated key's size (`KeyInfo.getKeySize()`) and whether it is hardware-backed. | The provider default sets it, not the app. |
 | MASVS-PLATFORM-3 | What the recents thumbnail shows on Login and Settings. | Needs a device screenshot. |
 | MASVS-NETWORK-1 | TLS behaviour on the wire against an `https://` server with a bad certificate (expect a refusal). | Needs a TLS front with a bad certificate. |
 | All | `grappim-kit` 0.1.8 as published equals the checkout read here. | No sources jar in the Gradle cache. |
-| All | What R8 leaves in the release APK. | M9.2 builds it first. |
+| All | What R8 leaves in the release APK. | M14.2 builds it first. |

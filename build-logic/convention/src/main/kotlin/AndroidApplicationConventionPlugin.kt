@@ -49,7 +49,7 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
                     compose = true
                 }
 
-                // Release signing per store flavor arrives with the release milestone (M9).
+                // Release signing per store flavor arrives with the release milestone (M14).
                 configureFlavors(this)
                 configureKotlinAndroid(this)
             }

@@ -33,7 +33,7 @@ cold session can act on it. Delete an entry when it's fixed.
   Whether API Platform accepts an unprefixed IRI on a server behind a subpath is not checked:
   the source has no `vendor/`, and the local test instance runs at the root. `add_book.py` uses
   unprefixed IRIs against the user's server, but whether that server has a subpath is not
-  recorded here. Check once against a subpath instance (or the user's setup) before release (M9).
+  recorded here. Check once against a subpath instance (or the user's setup) before release (M14).
   User, 2026-11-15: their server is reached through Tailscale, with no subpath ("I presume").
   Deferred by the user (2026-11-15): not part of M3.7. Confirm it later from the server URL
   itself, read only.
@@ -81,7 +81,7 @@ cold session can act on it. Delete an entry when it's fixed.
   `ImageLoader`'s disk and memory cache on log out.
 - 2026-11-16 (M4.5) — MASVS-PRIVACY-1: `ACCESS_NETWORK_STATE`
   (`androidApp/src/main/AndroidManifest.xml:5`) has no user in app code. Coil's network fetcher
-  may use it. Check the merged release manifest (M9.2) and the libraries before removing it.
+  may use it. Check the merged release manifest (M14.2) and the libraries before removing it.
 - 2026-11-16 (M4.5) — Images do not get the custom headers (M4.2). Coil loads them with its own
   Ktor client (`coil-network-ktor3`, `composeApp/build.gradle.kts:30`), not the app's
   `HttpClient`, so the `CustomHeaders` plugin does not run. Behind a header-checking proxy
@@ -107,5 +107,5 @@ cold session can act on it. Delete an entry when it's fixed.
   parent's child row and the collection list show it, as a thumbnail (`CollectionScreen.kt:112`
   puts only `uiState.title` in the top bar). After an edit that sets or replaces the image, the
   edited screen looks the same; the user sees the change only in the parent or the list. Not a
-  bug against any step: M2 never asked for it. Decide in M9.1 whether the screen gets a header
+  bug against any step: M2 never asked for it. Decide in M14.1 whether the screen gets a header
   image.

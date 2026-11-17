@@ -249,6 +249,10 @@ code without checking the licence terms are kept.
    Pre-release scope extended (user, 2026-11-16): network and security parity with
    wallosmobile (M4), edit/delete items (M5), collections CRUD (M6), search and tags (M7), and the
    other Koillection areas (M8). The release is M9.
+   Changed 2026-11-17 (user, start of M8): one milestone per area, in this order: templates (M8),
+   wishlists and wishes (M9), loans (M10), albums and photos (M11), inventories (M12), logs (M13).
+   The release is M14. Writable areas get full CRUD with images; inventories are view and delete;
+   logs are view only.
 6. **Session storage module** — *decided 2026-11-15 (M1.3)*: a separate `core:storage`, as in
    wallosmobile and TaigaMobileNova. It holds `SessionStorage` (server URL, username, password,
    JWT) and the `CustomHeadersStorage` binding, in one DataStore file with one `SecretCipher`.
@@ -289,3 +293,9 @@ code without checking the licence terms are kept.
    `GET /api/tags` first and uses a tag with the label (ignoring case), so a retry after a create
    that went through does not create a second tag. The label field takes at most 255 characters:
    `Tag.label` is a Doctrine `string` with no length check.
+11. **Templates** — *decided 2026-11-17 (start of M8)*: full CRUD of templates, their fields and
+   choice lists. A template field keeps its type in the item forms, with a plain input per type:
+   a number keyboard for `number` and `price`, a switch for `checkbox`, a multi-select for
+   `choice-list`, a text box for the other text types (no date picker, rating stars or country
+   picker). A collection's `itemsDefaultTemplate` is in scope: the add form in that collection
+   applies it when it opens.
