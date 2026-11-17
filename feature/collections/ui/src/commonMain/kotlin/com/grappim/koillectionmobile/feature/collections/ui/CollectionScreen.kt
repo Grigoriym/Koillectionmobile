@@ -182,7 +182,7 @@ private fun CollectionContent(
 }
 
 @Composable
-private fun SearchField(query: String, onQueryChange: (String) -> Unit, modifier: Modifier = Modifier) {
+internal fun SearchField(query: String, onQueryChange: (String) -> Unit, modifier: Modifier = Modifier) {
     OutlinedTextField(
         modifier = modifier
             .fillMaxWidth()

@@ -12,11 +12,13 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -40,6 +42,7 @@ import com.grappim.koillectionmobile.strings.generated.resources.collections_log
 import com.grappim.koillectionmobile.strings.generated.resources.collections_retry
 import com.grappim.koillectionmobile.strings.generated.resources.collections_settings
 import com.grappim.koillectionmobile.strings.generated.resources.collections_title
+import com.grappim.koillectionmobile.strings.generated.resources.item_search_title
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -48,6 +51,7 @@ fun CollectionListScreen(
     onCollectionClick: (String) -> Unit,
     onSettingsClick: () -> Unit,
     onNewCollectionClick: () -> Unit,
+    onSearchClick: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: CollectionListViewModel = koinViewModel()
 ) {
@@ -57,6 +61,7 @@ fun CollectionListScreen(
         onCollectionClick = onCollectionClick,
         onSettingsClick = onSettingsClick,
         onNewCollectionClick = onNewCollectionClick,
+        onSearchClick = onSearchClick,
         modifier = modifier
     )
 }
@@ -68,6 +73,7 @@ private fun CollectionListContent(
     onCollectionClick: (String) -> Unit,
     onSettingsClick: () -> Unit,
     onNewCollectionClick: () -> Unit,
+    onSearchClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Scaffold(
@@ -76,6 +82,12 @@ private fun CollectionListContent(
             TopAppBar(
                 title = { Text(stringResource(RString.collections_title)) },
                 actions = {
+                    IconButton(onClick = onSearchClick) {
+                        Icon(
+                            imageVector = Icons.Filled.Search,
+                            contentDescription = stringResource(RString.item_search_title)
+                        )
+                    }
                     TextButton(onClick = onSettingsClick) {
                         Text(stringResource(RString.collections_settings))
                     }

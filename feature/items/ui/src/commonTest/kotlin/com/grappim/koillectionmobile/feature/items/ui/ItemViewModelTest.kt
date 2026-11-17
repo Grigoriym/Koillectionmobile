@@ -400,6 +400,8 @@ class ItemViewModelTest {
 
         override suspend fun getItems(collectionId: String): Result<List<Item>> = error("not used")
 
+        override suspend fun getAllItems(): Result<List<Item>> = error("not used")
+
         override suspend fun getItem(id: String): Result<Item> {
             itemCalls += id
             return item.first().await()

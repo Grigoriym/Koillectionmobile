@@ -61,6 +61,9 @@
     <string name="collection_search_label">Search items by name</string>
     <string name="collection_search_clear">Clear search</string>
     <string name="collection_search_no_match">No item name contains "%1$s".</string>
+    <string name="item_search_title">Search items</string>
+    <string name="item_search_empty">There are no items yet.</string>
+    <string name="item_search_error_unexpected">Loading the items failed with an unexpected error.</string>
     <string name="collection_form_new_title">New collection</string>
     <string name="collection_form_back">Back</string>
     <string name="collection_form_title_label">Title</string>

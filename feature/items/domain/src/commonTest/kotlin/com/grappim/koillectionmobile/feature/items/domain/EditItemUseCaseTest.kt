@@ -282,6 +282,8 @@ class EditItemUseCaseTest {
         val items = object : ItemsRepository {
             override suspend fun getItems(collectionId: String): Result<List<Item>> = error("not used")
 
+            override suspend fun getAllItems(): Result<List<Item>> = error("not used")
+
             override suspend fun getItem(id: String): Result<Item> =
                 if (loadFails) Result.failure(error) else Result.success(item)
 

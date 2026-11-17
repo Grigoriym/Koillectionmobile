@@ -24,3 +24,7 @@ data class NewCollectionRoute(val parentId: String? = null) : NavKey
 /** The edit form of collection [collectionId]. */
 @Serializable
 data class EditCollectionRoute(val collectionId: String) : NavKey
+
+/** The search over every item of the user. */
+@Serializable
+data object ItemSearchRoute : NavKey

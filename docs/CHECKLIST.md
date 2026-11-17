@@ -1,6 +1,6 @@
 # koillectionmobile checklist
 
-**Current step:** M7.2. M7.1 done 2026-11-17. M7 broken into steps 2026-11-17. M6 done 2026-11-17. M6.6 done 2026-11-17. M6.5 done 2026-11-16. M6.4 done 2026-11-16. M6.3 done 2026-11-16. M6.2 done 2026-11-16. M6.1 done 2026-11-16. M6 broken into steps 2026-11-16. M5 done 2026-11-16. M5.7 done 2026-11-16. M5.6 done 2026-11-16. M5.5 done 2026-11-16. M5.4 done 2026-11-16. M5.3 done 2026-11-16. M5.2 done 2026-11-16. M5.1 done 2026-11-16. M5 broken into steps 2026-11-16. M4 done 2026-11-16. M4.4 done 2026-11-16. M4.3 done 2026-11-16. M4.2 done 2026-11-16. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6, 7, 8, 9 and 10 are settled.
+**Current step:** M7.3. M7.2 done 2026-11-17. M7.1 done 2026-11-17. M7 broken into steps 2026-11-17. M6 done 2026-11-17. M6.6 done 2026-11-17. M6.5 done 2026-11-16. M6.4 done 2026-11-16. M6.3 done 2026-11-16. M6.2 done 2026-11-16. M6.1 done 2026-11-16. M6 broken into steps 2026-11-16. M5 done 2026-11-16. M5.7 done 2026-11-16. M5.6 done 2026-11-16. M5.5 done 2026-11-16. M5.4 done 2026-11-16. M5.3 done 2026-11-16. M5.2 done 2026-11-16. M5.1 done 2026-11-16. M5 broken into steps 2026-11-16. M4 done 2026-11-16. M4.4 done 2026-11-16. M4.3 done 2026-11-16. M4.2 done 2026-11-16. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6, 7, 8, 9 and 10 are settled.
 
 ## How to use this
 
@@ -48,13 +48,16 @@ only (`docs/local-info.md`).
   **Verify:** ViewModel tests (match, no match, empty query shows all, case); on the emulator a
   query on the 445-item collection narrows the list and clearing it shows all items again.
   Note: the filter covers items only; child collections stay listed. A blank query counts as empty.
-- [ ] **M7.2** — Global item search. `ItemsRepository.getAllItems()` reads `GET /api/items`, all
+- [x] **M7.2** — Global item search. `ItemsRepository.getAllItems()` reads `GET /api/items`, all
   pages. A search action on the collection list opens a search screen. It reads all items once on
   open (loading and error states, with retry) and then filters by name in the app, as M7.1 does.
   A result row shows the item name and its collection title; a tap opens the item. Re-read
   `Item.php` first.
   **Verify:** mock-engine test (path, every page, root-path base URL case); ViewModel tests
   (load, failure and retry, filter); on the emulator a query finds an item and opens it.
+  Note: the screen lives in `feature:collections:ui` (it needs both domains) and reads
+  `getCollections()` in parallel for the titles, as an item names its collection by IRI only. It
+  reads everything again on any `ItemListChanges` signal, so a deleted item leaves the results.
 - [ ] **M7.3** — Tag repository calls. `ItemsRepository.getTagItems(tagId)` reads
   `GET /api/tags/{id}/items`, all pages (in `feature:items`, because `feature:items:domain`
   already depends on `feature:tags:domain`). `TagsRepository.createTag(label)` sends

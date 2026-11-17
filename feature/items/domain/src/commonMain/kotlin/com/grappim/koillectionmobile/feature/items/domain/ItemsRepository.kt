@@ -9,6 +9,12 @@ interface ItemsRepository {
     /** The items of collection [collectionId], from all pages. */
     suspend fun getItems(collectionId: String): Result<List<Item>>
 
+    /**
+     * Every item of the user, in every collection, from all pages. The server has no name filter:
+     * search in the app.
+     */
+    suspend fun getAllItems(): Result<List<Item>>
+
     suspend fun getItem(id: String): Result<Item>
 
     /** The fields of item [itemId], sorted by `position`. A field without a position comes last. */

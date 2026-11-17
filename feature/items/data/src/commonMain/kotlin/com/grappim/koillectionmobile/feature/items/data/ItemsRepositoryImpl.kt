@@ -50,6 +50,11 @@ internal class ItemsRepositoryImpl(
             .map { mapper.toDomain(it, serverUrl) }
     }
 
+    override suspend fun getAllItems(): Result<List<Item>> = resultOf {
+        val serverUrl = serverUrl()
+        httpClient.getAllHydraPages<ItemDto>(ITEMS_PATH).map { mapper.toDomain(it, serverUrl) }
+    }
+
     override suspend fun getItem(id: String): Result<Item> = resultOf {
         mapper.toDomain(httpClient.get("$ITEMS_PATH/$id").body<ItemDto>(), serverUrl())
     }

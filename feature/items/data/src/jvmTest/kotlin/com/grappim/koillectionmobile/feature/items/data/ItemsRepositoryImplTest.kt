@@ -98,6 +98,66 @@ class ItemsRepositoryImplTest {
         assertEquals(setOf(BOOKS_ID), items.map { it.collectionId }.toSet())
     }
 
+    /**
+     * A page of `GET /api/items` as the 1.8.5 test instance sends it (keys cut to the ones the app
+     * reads). [next] is the `view.next` link, or null on the last page.
+     */
+    private fun allItemsPage(names: List<String>, next: String?): String {
+        val members = names.joinToString(",") { name ->
+            """{"id":"id-$name","name":"$name","quantity":1,"collection":"/api/collections/c-$name","image":null}"""
+        }
+        val view = next?.let { ""","view":{"@id":"/api/items?page=1","next":"$it"}""" }.orEmpty()
+        return """{"member":[$members],"totalItems":5$view}"""
+    }
+
+    @Test
+    fun `getAllItems reads api items and every next page`() = runTest {
+        val repository = repository(
+            "/sub/api/items" to (HttpStatusCode.OK to allItemsPage(listOf("a", "b"), next = "/sub/api/items?page=2")),
+            "/sub/api/items?page=2" to
+                (HttpStatusCode.OK to allItemsPage(listOf("c", "d"), next = "/sub/api/items?page=3")),
+            "/sub/api/items?page=3" to (HttpStatusCode.OK to allItemsPage(listOf("e"), next = null))
+        )
+
+        val items = repository.getAllItems().getOrThrow()
+
+        assertEquals(listOf("a", "b", "c", "d", "e"), items.map { it.name })
+        assertEquals("c-c", items[2].collectionId)
+        assertEquals(
+            listOf("GET /sub/api/items", "GET /sub/api/items?page=2", "GET /sub/api/items?page=3"),
+            requests.map { "${it.method.value} ${it.url.fullPath}" }
+        )
+    }
+
+    /** `CLAUDE.md`, Verification: at a root-path server Ktor's merged path differs from `/sub`. */
+    @Test
+    fun `getAllItems keeps its path at a root-path server`() = runTest {
+        val repository = repository(FakeSessionStorage(serverUrl = "https://koi.example", token = "jwt")) { request ->
+            val body = when (request.url.fullPath) {
+                "/api/items" -> allItemsPage(listOf("a"), next = "/api/items?page=2")
+                "/api/items?page=2" -> allItemsPage(listOf("b"), next = null)
+                else -> null
+            }
+            respond(
+                body ?: """{"title":"An error occurred","detail":"Not Found"}""",
+                if (body == null) HttpStatusCode.NotFound else HttpStatusCode.OK,
+                headersOf(HttpHeaders.ContentType, "application/ld+json")
+            )
+        }
+
+        assertEquals(listOf("a", "b"), repository.getAllItems().getOrThrow().map { it.name })
+        assertEquals(listOf("/api/items", "/api/items?page=2"), requests.map { it.url.fullPath })
+    }
+
+    @Test
+    fun `a failed page fails getAllItems with the KoillectionError`() = runTest {
+        val repository = repository(
+            "/sub/api/items" to (HttpStatusCode.OK to allItemsPage(listOf("a"), next = "/sub/api/items?page=2"))
+        )
+
+        assertIs<KoillectionError.NotFound>(repository.getAllItems().exceptionOrNull())
+    }
+
     @Test
     fun `getItem reads one item and resolves its image against the server URL`() = runTest {
         val repository = repository("/sub/api/items/$ITEM_ID" to (HttpStatusCode.OK to fixture("item_one.json")))
