@@ -1,6 +1,6 @@
 # koillectionmobile checklist
 
-**Current step:** M8.2. M8.1 done 2026-11-17. M8 broken into steps 2026-11-17; the other areas became M9–M13 and the release moved to M14 (user, 2026-11-17). M7 done 2026-11-17. M7.7 done 2026-11-17. M7.6 done 2026-11-17. M7.5 done 2026-11-17. M7.4 done 2026-11-17. M7.3 done 2026-11-17. M7.2 done 2026-11-17. M7.1 done 2026-11-17. M7 broken into steps 2026-11-17. M6 done 2026-11-17. M6.6 done 2026-11-17. M6.5 done 2026-11-16. M6.4 done 2026-11-16. M6.3 done 2026-11-16. M6.2 done 2026-11-16. M6.1 done 2026-11-16. M6 broken into steps 2026-11-16. M5 done 2026-11-16. M5.7 done 2026-11-16. M5.6 done 2026-11-16. M5.5 done 2026-11-16. M5.4 done 2026-11-16. M5.3 done 2026-11-16. M5.2 done 2026-11-16. M5.1 done 2026-11-16. M5 broken into steps 2026-11-16. M4 done 2026-11-16. M4.4 done 2026-11-16. M4.3 done 2026-11-16. M4.2 done 2026-11-16. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6, 7, 8, 9, 10 and 11 are settled.
+**Current step:** M8.3. M8.2 done 2026-11-17. M8.1 done 2026-11-17. M8 broken into steps 2026-11-17; the other areas became M9–M13 and the release moved to M14 (user, 2026-11-17). M7 done 2026-11-17. M7.7 done 2026-11-17. M7.6 done 2026-11-17. M7.5 done 2026-11-17. M7.4 done 2026-11-17. M7.3 done 2026-11-17. M7.2 done 2026-11-17. M7.1 done 2026-11-17. M7 broken into steps 2026-11-17. M6 done 2026-11-17. M6.6 done 2026-11-17. M6.5 done 2026-11-16. M6.4 done 2026-11-16. M6.3 done 2026-11-16. M6.2 done 2026-11-16. M6.1 done 2026-11-16. M6 broken into steps 2026-11-16. M5 done 2026-11-16. M5.7 done 2026-11-16. M5.6 done 2026-11-16. M5.5 done 2026-11-16. M5.4 done 2026-11-16. M5.3 done 2026-11-16. M5.2 done 2026-11-16. M5.1 done 2026-11-16. M5 broken into steps 2026-11-16. M4 done 2026-11-16. M4.4 done 2026-11-16. M4.3 done 2026-11-16. M4.2 done 2026-11-16. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6, 7, 8, 9, 10 and 11 are settled.
 
 ## How to use this
 
@@ -56,7 +56,7 @@ local test instance only (`docs/local-info.md`). Re-read `Template.php`, `Field.
   `AppModule` now, and `KoinGraphTest` resolves `TemplatesRepository`. `editField` with a null
   `choiceListId` keeps the stored choice list: a merge patch cannot clear it without an explicit
   null, which the app does not send yet.
-- [ ] **M8.2** — Live template smoke against the local test instance (a task, as `smokeTagRun`):
+- [x] **M8.2** — Live template smoke against the local test instance (a task, as `smokeTagRun`):
   create a choice list, a template, one field of each type the item form will send (`text`,
   `number`, `checkbox`, `choice-list`), set the template as a collection's
   `itemsDefaultTemplate`, read `/api/collections/{id}/items_default_template`, add an item with a
@@ -67,6 +67,10 @@ local test instance only (`docs/local-info.md`). Re-read `Template.php`, `Field.
   `Y-m-d`; confirm over the API) and what a template delete does to its fields.
   **Verify:** the run prints each step and passes; the test instance ends as it started; plan §2
   has the results.
+  Note: done 2026-11-17 (`smokeTemplateRun`). It uses its own top-level collection, not `Books`.
+  A second field with a name the template has already got 201: the server does not check field
+  names, so M8.4 must. The run also checked a template delete while it is a collection's default
+  (the default becomes null) and a `checkbox` value `true` (422).
 - [ ] **M8.3** — Template list and template screen (`feature:templates:ui`). An action on the
   collection list opens the template list (sorted by name, ignoring case); a tap shows the
   template's fields in position order with their type (and the choice list for `choice-list`).
@@ -74,7 +78,8 @@ local test instance only (`docs/local-info.md`). Re-read `Template.php`, `Field.
   `includes` line in `AppModule`.
   **Verify:** ViewModel tests (order, empty, failure and retry) for both screens.
 - [ ] **M8.4** — Template form: create, edit, delete. The form edits the name and the field
-  rows (name, type, choice list for `choice-list`; add, remove, move up and down). The save sends
+  rows (name, type, choice list for `choice-list`; add, remove, move up and down). The form blocks
+  a duplicate field name: the server takes one (plan §2, M8.2). The save sends
   only what changed, as the item edit form does. Delete asks first. The form survives rotation
   and process death. Ask the user at the start of the step which types the type picker offers
   (all of `DatumTypeEnum::TYPES`, or the ones the item form can fill).

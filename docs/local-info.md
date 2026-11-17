@@ -71,7 +71,16 @@ duplicate label, and deletes the duplicate tag. If it fails halfway, it still pu
 back and deletes its tags; look for a leftover `M7.4 smoke <millis>` tag if a cleanup line reports
 an error. Its constants are in `LiveTagSmoke.kt`: the same rule applies.
 
-All four runs keep their session in `composeApp/build/smoke-home`. A run more than an hour after the
+`./gradlew :composeApp:smokeTemplateRun` writes (M8.2): it creates a choice list, a template with
+typed fields and a top-level collection. It sets and clears the collection's default template, adds
+an item with typed fields, deletes the template while it is the default, and deletes the rest. It
+also sends a `choice-list` field without a choice list (422), a duplicate field name and a `checkbox`
+value `true` (422). It checks that the counts of templates, choice lists and collections end as they
+started. If it fails halfway, it still deletes what it made; look for a leftover `M8.2 smoke
+<millis>` collection, template or choice list if a cleanup line reports an error. Its constants are
+in `LiveTemplateSmoke.kt`: the same rule applies.
+
+All five runs keep their session in `composeApp/build/smoke-home`. A run more than an hour after the
 last one starts with an expired JWT. That is the path that hung in M3.1, so do not delete the
 directory to make a hang go away: find out why first.
 

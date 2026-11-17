@@ -108,3 +108,18 @@ tasks.register<JavaExec>("smokeTagRun") {
     systemProperty("user.home", smokeHome.get().asFile.absolutePath)
     javaLauncher.set(javaToolchains.launcherFor { languageVersion.set(JavaLanguageVersion.of(21)) })
 }
+
+// M8.2: live template smoke run against the local test instance. It creates a choice list, a
+// template with typed fields, a collection with it as the default template and an item with typed
+// fields, then deletes them all. Same setup as `smokeRun`; never point it at the real server.
+tasks.register<JavaExec>("smokeTemplateRun") {
+    group = "verification"
+    description = "Creates and deletes a template, a choice list and typed item fields on the local test instance."
+    val jvmTestCompilation = kotlin.jvm().compilations.getByName("test")
+    dependsOn(jvmTestCompilation.compileAllTaskName)
+    classpath = files(jvmTestCompilation.output.allOutputs, jvmTestCompilation.runtimeDependencyFiles)
+    mainClass.set("com.grappim.koillectionmobile.composeapp.smoke.LiveTemplateSmokeKt")
+    val smokeHome = layout.buildDirectory.dir("smoke-home")
+    systemProperty("user.home", smokeHome.get().asFile.absolutePath)
+    javaLauncher.set(javaToolchains.launcherFor { languageVersion.set(JavaLanguageVersion.of(21)) })
+}

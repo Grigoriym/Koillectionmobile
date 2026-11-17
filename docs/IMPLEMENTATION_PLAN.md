@@ -150,6 +150,28 @@ start of any step that touches the API. Facts that shape the design:
   an empty label got 422 (`label: This value should not be blank.`). A create with a label that
   exists already succeeded: the server made a second tag with the same label and a new id. `DELETE
   /api/tags/{id}` answered 204, and a read after it gave 404. Not checked: a server behind a subpath.
+- Template writes checked live 2026-11-17 (M8.2, `./gradlew :composeApp:smokeTemplateRun`, JVM,
+  local test instance at the root path), through the M8.1 repository calls. The test instance had
+  no templates and no choice lists before. A choice list kept its choices in the order sent. Four
+  fields (`text`, `number`, `checkbox`, `choice-list`) created out of position order came back
+  sorted by the app, and the `choice-list` field kept its `choiceList` IRI.
+  - A `choice-list` field without `choiceList` got 422 (`choiceList: This value should not be
+    null.`).
+  - A second field with a name the template has already got **201**: the template then had two
+    `Publisher` fields. `Template::$fields` has `UniqueDatumLabel`, but `POST /api/fields` does not
+    validate the template, so the app must block a duplicate field name itself.
+  - `PATCH /api/collections/{id}` with `itemsDefaultTemplate` as an IRI set the default, and
+    `GET /api/collections/{id}/items_default_template` answered the template. The same `PATCH`
+    with `null` cleared it; the `items_default_template` read then gave 404.
+  - Item field values, sent to `POST /api/data` and read back unchanged: `checkbox` `"1"` and
+    `"0"`; `choice-list` a JSON array string (`["Hardcover","Ebook"]`) plus the `choiceList` IRI;
+    `number` `"352"`; `date` `"2026-11-17"` (`Y-m-d`). A `checkbox` value `"true"` got 422 (`value:
+    Value must be '0' or '1'`). These match the web form (`DatumType.php`).
+  - `DELETE /api/templates/{id}` deleted its fields (each `GET /api/fields/{id}` gave 404:
+    `cascade: all`, `orphanRemoval`). A collection that had the template as its default had
+    `itemsDefaultTemplate: null` after (`onDelete: SET NULL`). An item's fields have no link to a
+    template (`Datum.php`), so a template delete cannot change them; not sent live.
+  Not checked: a server behind a subpath, a choice list delete while a field uses it.
 - Counting what a collection delete takes (M6.3, 1.8.5 source): the API has no counters.
   `Collection::$cachedValues` holds them but has no `Groups`, and `Item.php` has no `#[ApiFilter]`,
   so items cannot be counted for several collections in one call. The app reads all collections
