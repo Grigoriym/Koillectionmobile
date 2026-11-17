@@ -120,6 +120,11 @@ this app.
   the server image shows with "Remove image", and Save is off until something changed. On success
   the form closes onto the collection screen. To check the image on the server, read `image` from
   `GET /api/collections/<id>` and a pixel of that file; the replaced or removed file gives 404.
+- Collection search (M7.1): the field above the items has the placeholder "Search items by name"
+  (`ui.py tap`), and "Clear search" (`content-desc`) once it holds text. It shows only when the
+  collection has items. With the keyboard closed, Back leaves the screen. The "No item name
+  contains ..." line was not in `ui.py list` though the screenshot showed it: read it from a
+  screenshot.
 - Local network permission (M4.1): `10.0.2.2` is the emulator's own gateway, so a check of
   `ACCESS_LOCAL_NETWORK` needs another private host address. The test instance listens on
   `127.0.0.1` only: forward a host-only private address to it for the check, not the Wi-Fi LAN
