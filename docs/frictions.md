@@ -70,3 +70,6 @@ entries get deleted — see /finalize.
 - 2026-11-18 — The M8.4 position mutation run of `:feature:templates:domain:jvmTest` listed 9 failed
   tests, though `CLAUDE.md` says `failFast = true` (`Quality.kt:19`) stops at the first failure.
   Not looked into; "one failure per run" is not a safe reading of a report.
+- 2026-11-18 — A lambda in a `MutableStateFlow(...)` initializer that used `_uiState` itself (M8.5)
+  failed with "Type checking has run into a recursive problem", plus a false "needs opt-in" and "No
+  parameter with name" error on the same line. A method reference (`::dismissActionError`) fixed it.

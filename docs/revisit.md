@@ -121,4 +121,5 @@ cold session can act on it. Delete an entry when it's fixed.
   `choiceList` that the patch DTO sends as `null` on purpose.
   (2) A new template whose `POST /api/templates` answer was lost has no known id, so the retry
   (`TemplateFormViewModel.runSave`, `record.createdId == null`) creates a second template. The
-  new-collection form has the same gap.
+  new-collection form has the same gap, and so has the M8.5 choice list form
+  (`ChoiceListFormViewModel.save`: a create stopped by a process death is sent again).
