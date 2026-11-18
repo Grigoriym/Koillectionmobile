@@ -150,6 +150,10 @@ extension import. Ktor's `url.fullPath` and `url.encodedPath`, and kotlinx-seria
 `decodeFromJsonElement<T>()`, are extensions (hit in M1.3, M1.6, M1.7), and so is grappim-kit's
 `NativeText.asString()` (M2.5). Import them by name.
 
+A `@Serializable` sealed subclass must not have a property named `type`: it clashes with the
+default class discriminator, and the encode throws at runtime, not at compile time (M8.6,
+`EditRow.Text`; that is why it says `datumType`).
+
 ## Shell
 
 Don't `cd` into a subfolder in a Bash call: the shell stays there, and the auto-mode classifier
