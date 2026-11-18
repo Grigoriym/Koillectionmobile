@@ -12,6 +12,8 @@ kotlin {
             implementation(projects.feature.items.domain)
             // The item screen shows the item's tags.
             implementation(projects.feature.tags.domain)
+            // The choice lists of the `choice-list` fields.
+            implementation(projects.feature.templates.domain)
             // `KoillectionError`, to pick the error message.
             implementation(projects.core.domain)
             // `Rotation` in the form state.

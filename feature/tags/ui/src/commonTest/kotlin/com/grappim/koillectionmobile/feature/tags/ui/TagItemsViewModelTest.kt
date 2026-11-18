@@ -186,7 +186,9 @@ class TagItemsViewModelTest {
             itemId: String,
             label: String,
             value: String,
-            position: Int
+            position: Int,
+            type: String,
+            choiceListId: String?
         ): Result<Datum> = error("not used")
 
         override suspend fun createImageDatum(itemId: String, label: String, position: Int): Result<Datum> =

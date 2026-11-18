@@ -7,9 +7,9 @@ import com.grappim.koillectionmobile.feature.tags.domain.findOrCreateTags
 data class ItemSnapshot(val item: Item, val data: List<Datum>, val tagIds: Set<String>)
 
 /**
- * The edit form's values for an item. [fields] holds each existing `text` and `image` field that
- * stays: an existing field of those types that is not in [fields] is deleted. Fields of other
- * types are never touched, whether they are in [fields] or not. [newMainImage] replaces the main
+ * The edit form's values for an item. [fields] holds each existing field of [TEXT_TYPES] or
+ * `image` that stays: an existing field of those types that is not in [fields] is deleted. Fields
+ * of other types are never touched, whether they are in [fields] or not. [newMainImage] replaces the main
  * image; null keeps it (the API cannot remove a main image). [tagIds] are existing tags;
  * [newTagLabels] are tags to create (or to find, see `findOrCreateTags`) before the tags are set.
  */
@@ -28,6 +28,7 @@ sealed interface EditedField {
     val datumId: String
     val label: String
 
+    /** A field of one of [TEXT_TYPES]; its type does not change. [value] as in [NewTextField.value]. */
     data class Text(override val datumId: String, override val label: String, val value: String) : EditedField
 
     /** [newImage] replaces the field's image; null keeps it. */
@@ -137,7 +138,14 @@ class EditItemUseCaseImpl(private val itemsRepository: ItemsRepository, private 
             is Call.UploadFieldImage -> upload(call.datumId, call.image)
 
             is Call.CreateTextField ->
-                itemsRepository.createTextDatum(itemId, call.field.label, call.field.value, call.position)
+                itemsRepository.createTextDatum(
+                    itemId,
+                    call.field.label,
+                    call.field.value,
+                    call.position,
+                    call.field.type,
+                    call.field.choiceListId
+                )
 
             is Call.CreateImageField -> {
                 val datum = itemsRepository.createImageDatum(itemId, call.field.label, call.position)
@@ -175,7 +183,7 @@ class EditItemUseCaseImpl(private val itemsRepository: ItemsRepository, private 
     private fun plan(original: ItemSnapshot, current: ItemSnapshot, edit: ItemEdit): Plan {
         val originalIds = original.data.mapTo(mutableSetOf()) { it.id }
         val edited = edit.fields
-            .filter { field -> original.data.any { it.id == field.datumId && it.type == field.type } }
+            .filter { field -> original.data.any { it.id == field.datumId && field.fits(it.type) } }
             .associateBy { it.datumId }
         val keptIds = edit.fields.mapTo(mutableSetOf()) { it.datumId }
         val deletedIds = original.data.filter {
@@ -239,7 +247,9 @@ class EditItemUseCaseImpl(private val itemsRepository: ItemsRepository, private 
         val pending = staying.mapNotNull { datum ->
             val field = edited[datum.id] ?: return@mapNotNull null
             val label = field.label.takeIf { it != datum.label }
-            val value = (field as? EditedField.Text)?.value?.takeIf { it != datum.value }
+            // The form shows a null value as empty: an empty value is no change (a `checkbox` or a
+            // `rating` would reject an empty string).
+            val value = (field as? EditedField.Text)?.value?.takeIf { it != datum.value.orEmpty() }
             if (label == null && value == null) null else Pending(datum.id, label, value)
         }.toMutableList()
 
@@ -267,11 +277,11 @@ class EditItemUseCaseImpl(private val itemsRepository: ItemsRepository, private 
         return calls
     }
 
-    private val EditedField.type: String
-        get() = when (this) {
-            is EditedField.Text -> TYPE_TEXT
-            is EditedField.Image -> TYPE_IMAGE
-        }
+    /** A [EditedField.Text] edits a field of a text type, a [EditedField.Image] an `image` field. */
+    private fun EditedField.fits(type: String): Boolean = when (this) {
+        is EditedField.Text -> type in TEXT_TYPES
+        is EditedField.Image -> type == TYPE_IMAGE
+    }
 
     private class Pending(val id: String, val label: String?, val value: String?)
 
@@ -314,9 +324,7 @@ class EditItemUseCaseImpl(private val itemsRepository: ItemsRepository, private 
     }
 
     private companion object {
-        const val TYPE_TEXT = "text"
-        const val TYPE_IMAGE = "image"
-        val EDITABLE_TYPES = setOf(TYPE_TEXT, TYPE_IMAGE)
+        val EDITABLE_TYPES = TEXT_TYPES.toSet() + TYPE_IMAGE
 
         /** Part of a temporary label during a swap. The label is visible on the server if the save stops there. */
         const val TEMPORARY_LABEL = "moving"

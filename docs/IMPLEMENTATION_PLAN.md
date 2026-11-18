@@ -330,3 +330,8 @@ code without checking the licence terms are kept.
    applies it when it opens.
    The template form's type picker offers all 17 `DatumTypeEnum::TYPES`, also the ones the item
    form cannot fill (user, 2026-11-18, M8.4); M8.7 decides what those do in the add form.
+   A free row of the item forms gets a type picker too (user, 2026-11-18, M8.6). It offers the 11
+   text types (`TEXT_TYPES` in `feature:items:domain`); an existing field keeps its type. The form
+   blocks a save for a `choice-list` row without a list and for a `number`, `price` or `rating`
+   value that `Datum.php` rejects (an empty `rating` too: `Choice` checks an empty string). The
+   other types (`date`, `link`, `country`, `list`) are checked by the server only (a 422).

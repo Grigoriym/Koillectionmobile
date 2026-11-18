@@ -10,6 +10,7 @@ import kotlinx.serialization.Serializable
  *   `image`, `date`, `rating` and others.
  * - [value] is null for the file types (`image`, `file`, `video`, `sign`).
  * - [image] and its thumbnails are paths relative to the server root, as on [ItemDto].
+ * - [choiceList] is an IRI (`/api/choice_lists/<id>`), set on a `choice-list` field (M8.2).
  */
 @Serializable
 data class DatumDto(
@@ -20,5 +21,6 @@ data class DatumDto(
     val position: Int? = null,
     val image: String? = null,
     val imageSmallThumbnail: String? = null,
-    val imageLargeThumbnail: String? = null
+    val imageLargeThumbnail: String? = null,
+    val choiceList: String? = null
 )

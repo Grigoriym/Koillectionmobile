@@ -2,6 +2,8 @@ package com.grappim.koillectionmobile.feature.items.ui
 
 import com.grappim.kit.uikit.NativeText
 import com.grappim.koillectionmobile.core.image.Rotation
+import com.grappim.koillectionmobile.feature.items.domain.TYPE_CHOICE_LIST
+import com.grappim.koillectionmobile.feature.items.domain.TYPE_TEXT
 import com.grappim.koillectionmobile.feature.tags.domain.TagGroup
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -29,11 +31,21 @@ sealed interface EditRow {
     val id: Int
     val label: String
 
-    /** A `text` field. [datumId] is the server id; null for a new field. */
+    /**
+     * A field of one of `TEXT_TYPES`. [datumId] is the server id; null for a new field.
+     * [datumType], [value] and [choiceListId] as `type`, `value` and `choiceListId` in [FieldRow];
+     * not `type`, which is the saved state's class discriminator. Only a new field can change its type.
+     */
     @Serializable
     @SerialName("text")
-    data class Text(override val id: Int, val datumId: String?, override val label: String, val value: String) :
-        EditRow
+    data class Text(
+        override val id: Int,
+        val datumId: String?,
+        override val label: String,
+        val value: String,
+        val datumType: String = TYPE_TEXT,
+        val choiceListId: String? = null
+    ) : EditRow
 
     /** A field of a type the form cannot edit: shown, never changed. [datumType] and [value] as the server sent them. */
     @Serializable
@@ -75,6 +87,7 @@ data class EditItemUiState(
     val tagGroups: List<TagGroup> = emptyList(),
     val isLoadingTags: Boolean = true,
     val tagsError: NativeText = NativeText.Empty,
+    val choiceLists: ChoiceListsUi = ChoiceListsUi(),
     val save: SaveStatus? = null,
     val isSaved: Boolean = false,
     val onRetry: () -> Unit = {},
@@ -83,6 +96,11 @@ data class EditItemUiState(
     val onRemoveField: (Int) -> Unit = {},
     val onLabelChange: (Int, String) -> Unit = { _, _ -> },
     val onValueChange: (Int, String) -> Unit = { _, _ -> },
+    val onTypeChange: (Int, String) -> Unit = { _, _ -> },
+    val onChoiceListChange: (Int, String) -> Unit = { _, _ -> },
+    val onCheckedChange: (Int, Boolean) -> Unit = { _, _ -> },
+    val onChoiceToggle: (Int, String) -> Unit = { _, _ -> },
+    val onRetryChoiceLists: () -> Unit = {},
     val onTagToggle: (String) -> Unit = {},
     val onNewTag: (String) -> Unit = {},
     val onNewTagRemove: (String) -> Unit = {},
@@ -122,7 +140,21 @@ data class EditItemUiState(
             return blankText || draft.photos.any { it.label.isBlank() }
         }
 
-    /** As on the add form: a name, and unique, non-blank labels. */
+    /**
+     * As [AddItemUiState.hasInvalidField]. A value is checked only when the user changed it: a value
+     * the server already holds does not block the save of other changes.
+     */
+    val hasInvalidField: Boolean
+        get() {
+            val loaded = original?.fields.orEmpty().filterIsInstance<EditRow.Text>().associate { it.id to it.value }
+            return draft?.fields.orEmpty().filterIsInstance<EditRow.Text>().any {
+                (it.datumType == TYPE_CHOICE_LIST && it.choiceListId == null) ||
+                    (loaded[it.id] != it.value && isValueInvalid(it.datumType, it.value))
+            }
+        }
+
+    /** As on the add form: a name, unique, non-blank labels, and valid fields. */
     val canSave: Boolean
-        get() = draft != null && draft.name.isNotBlank() && duplicateLabels.isEmpty() && !hasBlankLabel
+        get() = draft != null && draft.name.isNotBlank() && duplicateLabels.isEmpty() && !hasBlankLabel &&
+            !hasInvalidField
 }

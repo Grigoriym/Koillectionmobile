@@ -29,7 +29,8 @@ class ItemMapper {
         label = dto.label,
         value = dto.value,
         position = dto.position,
-        image = image(dto.image, dto.imageSmallThumbnail, dto.imageLargeThumbnail, serverUrl)
+        image = image(dto.image, dto.imageSmallThumbnail, dto.imageLargeThumbnail, serverUrl),
+        choiceListId = dto.choiceList?.substringAfterLast('/')
     )
 
     private fun image(path: String?, small: String?, large: String?, serverUrl: String): Image? = path?.let {

@@ -34,6 +34,7 @@ import kotlin.test.assertTrue
 class AddItemSaveTest {
 
     private val tags = FakeTagsRepository()
+    private val choiceLists = FakeChoiceLists()
     private val useCase = FakeAddItemUseCase()
     private val photoFiles = FakePhotoFiles()
     private val itemListChanges = ItemListChanges()
@@ -52,7 +53,7 @@ class AddItemSaveTest {
 
     private fun createSut(handle: SavedStateHandle = savedStateHandle): AddItemViewModel {
         tags.queue()
-        return AddItemViewModel(COLLECTION_ID, tags, useCase, photoFiles, itemListChanges, handle)
+        return AddItemViewModel(COLLECTION_ID, tags, choiceLists, useCase, photoFiles, itemListChanges, handle)
     }
 
     /** Name, two text rows, three photos (the first rotated), one tag. */

@@ -2,12 +2,24 @@ package com.grappim.koillectionmobile.feature.items.ui
 
 import com.grappim.kit.uikit.NativeText
 import com.grappim.koillectionmobile.core.image.Rotation
+import com.grappim.koillectionmobile.feature.items.domain.TYPE_CHOICE_LIST
+import com.grappim.koillectionmobile.feature.items.domain.TYPE_TEXT
 import com.grappim.koillectionmobile.feature.tags.domain.TagGroup
 import kotlinx.serialization.Serializable
 
-/** One free label/value row. [id] is local to the form: a key for the list, not a server id. */
+/**
+ * One label/value row. [id] is local to the form: a key for the list, not a server id. [type] is
+ * one of `TEXT_TYPES`; [value] is in the server's format for it (see `FieldInput.kt`). A
+ * `choice-list` row needs [choiceListId] before the save.
+ */
 @Serializable
-data class FieldRow(val id: Int, val label: String = "", val value: String = "")
+data class FieldRow(
+    val id: Int,
+    val label: String = "",
+    val value: String = "",
+    val type: String = TYPE_TEXT,
+    val choiceListId: String? = null
+)
 
 /**
  * One photo: a content [uri], the user's extra [rotation] on top of the EXIF orientation, and the
@@ -36,7 +48,8 @@ sealed interface SaveStatus {
  * The add-item form: the [name], the free [fields] in order, the [photos] (the first is the main
  * image, the rest are image fields in order), the tags picked from the server's [tagGroups], and
  * the [newTagLabels] of tags the save creates (see [withNewTagLabel]).
- * [tagsError] is set when the tag load failed; the rest of the form still works.
+ * [tagsError] is set when the tag load failed; the rest of the form still works. [choiceLists]
+ * serve the `choice-list` rows.
  * [savedItemId] is set once the item is saved: the screen then opens it.
  */
 data class AddItemUiState(
@@ -48,6 +61,7 @@ data class AddItemUiState(
     val newTagLabels: List<String> = emptyList(),
     val isLoadingTags: Boolean = true,
     val tagsError: NativeText = NativeText.Empty,
+    val choiceLists: ChoiceListsUi = ChoiceListsUi(),
     val save: SaveStatus? = null,
     val savedItemId: String? = null,
     val onNameChange: (String) -> Unit = {},
@@ -55,6 +69,11 @@ data class AddItemUiState(
     val onRemoveField: (Int) -> Unit = {},
     val onLabelChange: (Int, String) -> Unit = { _, _ -> },
     val onValueChange: (Int, String) -> Unit = { _, _ -> },
+    val onTypeChange: (Int, String) -> Unit = { _, _ -> },
+    val onChoiceListChange: (Int, String) -> Unit = { _, _ -> },
+    val onCheckedChange: (Int, Boolean) -> Unit = { _, _ -> },
+    val onChoiceToggle: (Int, String) -> Unit = { _, _ -> },
+    val onRetryChoiceLists: () -> Unit = {},
     val onTagToggle: (String) -> Unit = {},
     val onNewTag: (String) -> Unit = {},
     val onNewTagRemove: (String) -> Unit = {},
@@ -91,7 +110,14 @@ data class AddItemUiState(
         get() = name.isNotBlank() || fields.isNotEmpty() || photos.isNotEmpty() ||
             selectedTagIds.isNotEmpty() || newTagLabels.isNotEmpty()
 
-    /** The server needs a name (`NotBlank`) and unique, non-blank labels. */
+    /** The server needs a choice list for a `choice-list` field, and rejects some values (see [isValueInvalid]). */
+    val hasInvalidField: Boolean
+        get() = fields.any {
+            (it.type == TYPE_CHOICE_LIST && it.choiceListId == null) ||
+                isValueInvalid(it.type, it.value)
+        }
+
+    /** The server needs a name (`NotBlank`), unique, non-blank labels, and valid fields. */
     val canSave: Boolean
-        get() = name.isNotBlank() && duplicateLabels.isEmpty() && !hasBlankLabel
+        get() = name.isNotBlank() && duplicateLabels.isEmpty() && !hasBlankLabel && !hasInvalidField
 }

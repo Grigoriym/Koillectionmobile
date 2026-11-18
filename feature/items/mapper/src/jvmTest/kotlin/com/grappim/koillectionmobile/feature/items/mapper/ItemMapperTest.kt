@@ -93,6 +93,18 @@ class ItemMapperTest {
         )
     }
 
+    @Test
+    fun `a choice-list field keeps the id of its choice list`() {
+        val dto = DatumDto(
+            id = "d",
+            type = "choice-list",
+            value = """["Ebook"]""",
+            choiceList = "/api/choice_lists/list-1"
+        )
+
+        assertEquals("list-1", mapper.toDomain(dto, SERVER).choiceListId)
+    }
+
     private companion object {
         /** With a subpath: the image URL must keep it. */
         const val SERVER = "https://koi.example/sub/"

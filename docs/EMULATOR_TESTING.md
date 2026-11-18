@@ -104,8 +104,9 @@ this app.
   Author value right after typing in Name (keyboard still open) landed in Name again: close the
   keyboard after every field. To build the test item, `/api/collections` takes `{"title"}`, and the
   tags go in a merge-patch `{"tags": [IRIs]}` on the item (`TagsRepositoryImpl.setItemTags`).
-- Edit and delete pass (M5.7): a `number` field added through the API (`"type":"number"`) shows the
-  read-only row in the edit form, and a new text row goes below it. The tag chips sit below "Add
+- Edit and delete pass (M5.7): a `number` field added through the API (`"type":"number"`) showed a
+  read-only row in the edit form, and a new text row went below it. Since M8.6 every text type
+  (`number` too) is an editable row; a `file`, `video` or `sign` field is still read-only. The tag chips sit below "Add
   field": the first dump of the form has none of them, so scroll before you read `checked`. The
   main image's Replace → "Pick photos" needs the photo media-scanned first (skill, Step 5).
 - Delete collection (M6.3): a trash icon in the collection screen's top bar (`content-desc` "Delete

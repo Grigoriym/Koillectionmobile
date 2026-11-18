@@ -150,6 +150,30 @@ class AddItemUseCaseTest {
         assertEquals(ALL_CALLS.drop(ALL_CALLS.indexOf("createTextDatum item-1 Year 1901 2")), server.calls)
     }
 
+    @Test
+    fun `a typed field is created with its type and its choice list`() = runTest {
+        val book = BOOK.copy(
+            textFields = listOf(
+                NewTextField("Signed", "1", TYPE_CHECKBOX),
+                NewTextField("Format", """["Hardcover","Ebook"]""", TYPE_CHOICE_LIST, "list-1")
+            ),
+            mainImage = null,
+            imageFields = emptyList(),
+            tagIds = emptyList()
+        )
+
+        useCase.addItem(book)
+
+        assertEquals(
+            listOf(
+                "createItem books Jörn Uhl",
+                "createTextDatum item-1 Signed 1 1 checkbox null",
+                """createTextDatum item-1 Format ["Hardcover","Ebook"] 2 choice-list list-1"""
+            ),
+            server.calls
+        )
+    }
+
     /** Both repositories, recording each call as one line. [failOnce] fails the call with that line once. */
     private class FakeServer {
         val calls = mutableListOf<String>()
@@ -184,10 +208,16 @@ class AddItemUseCaseTest {
             override suspend fun createItem(collectionId: String, name: String): Result<Item> =
                 answer("createItem $collectionId $name") { Item(ITEM_ID, name, 1, collectionId, null) }
 
-            override suspend fun createTextDatum(itemId: String, label: String, value: String, position: Int) =
-                answer("createTextDatum $itemId $label $value $position") {
-                    Datum("datum-$label", "text", label, value, position, null)
-                }
+            override suspend fun createTextDatum(
+                itemId: String,
+                label: String,
+                value: String,
+                position: Int,
+                type: String,
+                choiceListId: String?
+            ) = answer("createTextDatum $itemId $label $value $position" + typeSuffix(type, choiceListId)) {
+                Datum("datum-$label", type, label, value, position, null, choiceListId)
+            }
 
             override suspend fun createImageDatum(itemId: String, label: String, position: Int) =
                 answer("createImageDatum $itemId $label $position") {
@@ -231,6 +261,9 @@ class AddItemUseCaseTest {
 
     private companion object {
         const val ITEM_ID = "item-1"
+
+        /** A `text` field's call line is as before typed fields; another type adds its type and choice list. */
+        fun typeSuffix(type: String, choiceListId: String?) = if (type == TYPE_TEXT) "" else " $type $choiceListId"
 
         val BOOK = NewItem(
             collectionId = "books",

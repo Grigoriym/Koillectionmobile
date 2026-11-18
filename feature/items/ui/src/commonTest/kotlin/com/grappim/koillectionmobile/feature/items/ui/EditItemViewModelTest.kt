@@ -48,6 +48,7 @@ class EditItemViewModelTest {
 
     private val items = FakeItemsRepository()
     private val tags = FakeTagsRepository()
+    private val choiceLists = FakeChoiceLists()
     private val photoFiles = FakePhotoFiles()
     private val editUseCase = FakeEditItemUseCase()
     private val itemListChanges = ItemListChanges()
@@ -69,7 +70,17 @@ class EditItemViewModelTest {
     /** Creates the ViewModel and answers the tag list at once. */
     private fun createSut(handle: SavedStateHandle = savedStateHandle): EditItemViewModel {
         tags.queue()
-        val sut = EditItemViewModel(DUNE.id, items, tags, editUseCase, photoFiles, itemListChanges, itemChanges, handle)
+        val sut = EditItemViewModel(
+            DUNE.id,
+            items,
+            tags,
+            choiceLists,
+            editUseCase,
+            photoFiles,
+            itemListChanges,
+            itemChanges,
+            handle
+        )
         tags.tags.removeFirst().complete(Result.success(listOf(NOVEL, GERMAN)))
         tags.categories.removeFirst().complete(Result.success(emptyList<TagCategory>()))
         return sut
@@ -103,7 +114,7 @@ class EditItemViewModelTest {
         assertEquals(
             listOf(
                 EditRow.Text(id = 2, datumId = "author", label = "Author", value = "Frank Herbert"),
-                EditRow.ReadOnly(id = 3, label = "Published", datumType = "date", value = "1965-08-01")
+                EditRow.ReadOnly(id = 3, label = "Published", datumType = "file", value = null)
             ),
             draft.fields
         )
@@ -376,6 +387,95 @@ class EditItemViewModelTest {
         assertEquals("content://c@NONE", page.newImage?.text())
         assertNull(edit.newMainImage)
         assertEquals(listOf("content://c"), photoFiles.prepared)
+    }
+
+    /** Loads an item that has a `checkbox`, a `choice-list` and a `rating` field after the author. */
+    private fun loadedTyped(): EditItemViewModel {
+        items.data = Result.success(listOf(AUTHOR, SIGNED, FORMAT, RATING))
+        return loaded()
+    }
+
+    @Test
+    fun `existing typed fields load with their type value and choice list`() {
+        loadedTyped()
+
+        assertEquals(
+            listOf(
+                EditRow.Text(1, "author", "Author", "Frank Herbert"),
+                EditRow.Text(2, "signed", "Signed", "0", "checkbox"),
+                EditRow.Text(3, "format", "Format", """["Ebook"]""", "choice-list", "formats"),
+                EditRow.Text(4, "rating", "Rating", "", "rating")
+            ),
+            draft.fields
+        )
+    }
+
+    @Test
+    fun `an existing checkbox switched on and a choice picked are sent as the server takes them`() {
+        val sut = loadedTyped()
+        sut.uiState.value.onCheckedChange(2, true)
+        sut.uiState.value.onChoiceToggle(3, "Hardcover")
+
+        sut.uiState.value.onSave()
+
+        val edit = editUseCase.calls.single().third
+        assertEquals(
+            listOf<EditedField>(
+                EditedField.Text("author", "Author", "Frank Herbert"),
+                EditedField.Text("signed", "Signed", "1"),
+                EditedField.Text("format", "Format", """["Hardcover","Ebook"]"""),
+                EditedField.Text("rating", "Rating", "")
+            ),
+            edit.fields
+        )
+    }
+
+    @Test
+    fun `an existing field keeps its type and its choice list`() {
+        val sut = loadedTyped()
+
+        sut.uiState.value.onTypeChange(2, "text")
+        sut.uiState.value.onChoiceListChange(3, "genres")
+
+        assertEquals(sut.uiState.value.original, draft)
+    }
+
+    @Test
+    fun `a value the server already holds does not block the save and a changed one does`() {
+        val sut = loadedTyped()
+        assertTrue(sut.uiState.value.canSave, "the loaded empty rating")
+
+        sut.uiState.value.onValueChange(4, "11")
+        assertFalse(sut.uiState.value.canSave)
+    }
+
+    @Test
+    fun `a new typed field is sent with its type and choice list`() {
+        val sut = loaded()
+        val s = { sut.uiState.value }
+        s().onAddField()
+        val id = draft.fields.last().id
+        s().onLabelChange(id, "Format")
+        s().onTypeChange(id, "choice-list")
+        s().onChoiceListChange(id, "formats")
+        s().onChoiceToggle(id, "Paperback")
+
+        s().onSave()
+
+        assertEquals(
+            listOf(NewTextField("Format", """["Paperback"]""", "choice-list", "formats")),
+            editUseCase.calls.single().third.newTextFields
+        )
+    }
+
+    @Test
+    fun `the choice list of an existing field survives process death`() {
+        loadedTyped()
+
+        createSut(restoredHandle()).uiState.value.onSave()
+
+        val original = editUseCase.calls.single().second
+        assertEquals("formats", original.data.single { it.id == "format" }.choiceListId)
     }
 
     @Test
@@ -656,7 +756,9 @@ class EditItemViewModelTest {
             itemId: String,
             label: String,
             value: String,
-            position: Int
+            position: Int,
+            type: String,
+            choiceListId: String?
         ): Result<Datum> = error("not used")
 
         override suspend fun createImageDatum(itemId: String, label: String, position: Int): Result<Datum> =
@@ -706,7 +808,12 @@ class EditItemViewModelTest {
             position = 2,
             image = Image("https://k.test/uploads/page.jpg", null, null)
         )
-        val PUBLISHED = Datum("published", "date", "Published", "1965-08-01", 3, null)
+
+        // A type the form does not edit.
+        val PUBLISHED = Datum("published", "file", "Published", null, 3, null)
+        val SIGNED = Datum("signed", "checkbox", "Signed", "0", 4, null)
+        val FORMAT = Datum("format", "choice-list", "Format", """["Ebook"]""", 5, null, "formats")
+        val RATING = Datum("rating", "rating", "Rating", null, 6, null)
         val NOVEL = Tag(id = "novel", label = "Novel", description = null, categoryId = null)
         val GERMAN = Tag(id = "german", label = "German", description = null, categoryId = null)
     }

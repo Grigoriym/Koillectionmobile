@@ -250,10 +250,21 @@ private fun EditForm(draft: EditItemDraft, uiState: EditItemUiState, modifier: M
                 is EditRow.Text -> FieldRowEditor(
                     label = row.label,
                     value = row.value,
+                    type = row.datumType,
+                    choiceListId = row.choiceListId,
                     labelError = labelError(row.label, duplicates),
-                    onLabelChange = { uiState.onLabelChange(row.id, it) },
-                    onValueChange = { uiState.onValueChange(row.id, it) },
-                    onRemove = { uiState.onRemoveField(row.id) },
+                    canChangeType = row.datumId == null,
+                    choiceLists = uiState.choiceLists,
+                    actions = FieldRowActions(
+                        onLabelChange = { uiState.onLabelChange(row.id, it) },
+                        onValueChange = { uiState.onValueChange(row.id, it) },
+                        onTypeChange = { uiState.onTypeChange(row.id, it) },
+                        onChoiceListChange = { uiState.onChoiceListChange(row.id, it) },
+                        onCheckedChange = { uiState.onCheckedChange(row.id, it) },
+                        onChoiceToggle = { uiState.onChoiceToggle(row.id, it) },
+                        onRetryChoiceLists = uiState.onRetryChoiceLists,
+                        onRemove = { uiState.onRemoveField(row.id) }
+                    ),
                     modifier = rowModifier
                 )
 

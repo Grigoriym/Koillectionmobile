@@ -194,10 +194,21 @@ private fun AddItemContent(uiState: AddItemUiState, onBack: () -> Unit, modifier
                 FieldRowEditor(
                     label = row.label,
                     value = row.value,
+                    type = row.type,
+                    choiceListId = row.choiceListId,
                     labelError = labelError(row.label, duplicates),
-                    onLabelChange = { uiState.onLabelChange(row.id, it) },
-                    onValueChange = { uiState.onValueChange(row.id, it) },
-                    onRemove = { uiState.onRemoveField(row.id) },
+                    canChangeType = true,
+                    choiceLists = uiState.choiceLists,
+                    actions = FieldRowActions(
+                        onLabelChange = { uiState.onLabelChange(row.id, it) },
+                        onValueChange = { uiState.onValueChange(row.id, it) },
+                        onTypeChange = { uiState.onTypeChange(row.id, it) },
+                        onChoiceListChange = { uiState.onChoiceListChange(row.id, it) },
+                        onCheckedChange = { uiState.onCheckedChange(row.id, it) },
+                        onChoiceToggle = { uiState.onChoiceToggle(row.id, it) },
+                        onRetryChoiceLists = uiState.onRetryChoiceLists,
+                        onRemove = { uiState.onRemoveField(row.id) }
+                    ),
                     modifier = Modifier.padding(horizontal = PADDING)
                 )
             }

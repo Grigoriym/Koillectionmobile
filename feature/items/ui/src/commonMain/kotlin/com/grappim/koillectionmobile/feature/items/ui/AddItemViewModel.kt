@@ -17,8 +17,10 @@ import com.grappim.koillectionmobile.feature.items.domain.NewImage
 import com.grappim.koillectionmobile.feature.items.domain.NewImageField
 import com.grappim.koillectionmobile.feature.items.domain.NewItem
 import com.grappim.koillectionmobile.feature.items.domain.NewTextField
+import com.grappim.koillectionmobile.feature.items.domain.TYPE_CHOICE_LIST
 import com.grappim.koillectionmobile.feature.tags.domain.TagsRepository
 import com.grappim.koillectionmobile.feature.tags.domain.loadTagGroups
+import com.grappim.koillectionmobile.feature.templates.domain.TemplatesRepository
 import com.grappim.koillectionmobile.strings.RString
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_error_http
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_error_network
@@ -45,13 +47,14 @@ import org.koin.core.annotation.InjectedParam
 import org.koin.core.annotation.KoinViewModel
 
 /**
- * The add-item form: name, free label/value rows, photos, a pick from the server's existing tags,
- * and labels of new tags. A new tag is created by the save, not when it is added, so a form left
+ * The add-item form: name, typed label/value rows, photos, a pick from the server's existing tags,
+ * and labels of new tags. A row's type picks its input (`FieldInput.kt`); a `choice-list` row
+ * picks from the server's choice lists, which load with the tags. A new tag is created by the save, not when it is added, so a form left
  * without saving creates no tag. The save creates the item in [collectionId] through
  * [AddItemUseCase].
  *
  * What the user typed and picked is kept in [savedStateHandle], so it survives process death. The
- * tags are loaded again. A started save keeps what exists on the server there too, so a retry
+ * tags and the choice lists are loaded again. A started save keeps what exists on the server there too, so a retry
  * after a process death never creates a second item.
  *
  * The photos are cache files ([PhotoFiles]). They are deleted when a photo is removed, after a
@@ -63,6 +66,7 @@ import org.koin.core.annotation.KoinViewModel
 class AddItemViewModel(
     @InjectedParam private val collectionId: String,
     private val tagsRepository: TagsRepository,
+    private val templatesRepository: TemplatesRepository,
     private val addItemUseCase: AddItemUseCase,
     private val photoFiles: PhotoFiles,
     private val itemListChanges: ItemListChanges,
@@ -96,6 +100,11 @@ class AddItemViewModel(
             onRemoveField = ::removeField,
             onLabelChange = ::changeLabel,
             onValueChange = ::changeValue,
+            onTypeChange = ::changeType,
+            onChoiceListChange = ::changeChoiceList,
+            onCheckedChange = ::changeChecked,
+            onChoiceToggle = ::toggleChoice,
+            onRetryChoiceLists = ::retryChoiceLists,
             onTagToggle = ::toggleTag,
             onNewTag = ::addNewTag,
             onNewTagRemove = ::removeNewTag,
@@ -126,6 +135,7 @@ class AddItemViewModel(
                 .collect { savedStateHandle[DRAFT_KEY] = json.encodeToString(it) }
         }
         loadTags()
+        loadChoiceLists()
     }
 
     private fun addPhotos(uris: List<String>) {
@@ -171,6 +181,31 @@ class AddItemViewModel(
     private fun changeLabel(id: Int, label: String) = updateField(id) { it.copy(label = label) }
 
     private fun changeValue(id: Int, value: String) = updateField(id) { it.copy(value = value) }
+
+    private fun changeType(id: Int, type: String) = updateField(id) {
+        it.copy(
+            type = type,
+            value = valueAfterTypeChange(it.value, it.type, type),
+            choiceListId = if (type == TYPE_CHOICE_LIST) it.choiceListId else null
+        )
+    }
+
+    /** A new choice list has other choices: the picks of the old one go. */
+    private fun changeChoiceList(id: Int, choiceListId: String) = updateField(id) {
+        if (it.choiceListId == choiceListId) it else it.copy(choiceListId = choiceListId, value = emptyValue(it.type))
+    }
+
+    private fun changeChecked(id: Int, isChecked: Boolean) = updateField(id) {
+        it.copy(value = checkboxValue(isChecked))
+    }
+
+    private fun toggleChoice(id: Int, choice: String) {
+        val lists = _uiState.value.choiceLists.lists
+        updateField(id) { row ->
+            val choices = lists.firstOrNull { it.id == row.choiceListId }?.choices.orEmpty()
+            row.copy(value = withChoiceToggled(row.value, choice, choices))
+        }
+    }
 
     private fun updateField(id: Int, change: (FieldRow) -> FieldRow) {
         _uiState.update { s -> s.copy(fields = s.fields.map { if (it.id == id) change(it) else it }) }
@@ -274,7 +309,7 @@ class AddItemViewModel(
         return NewItem(
             collectionId = collectionId,
             name = name.trim(),
-            textFields = fields.map { NewTextField(it.label, it.value) },
+            textFields = fields.map { NewTextField(it.label, it.value, it.type, it.choiceListId) },
             mainImage = images.firstOrNull(),
             imageFields = photos.drop(1).zip(images.drop(1)) { photo, image -> NewImageField(photo.label, image) },
             tagIds = selectedTagIds.toList(),
@@ -284,6 +319,19 @@ class AddItemViewModel(
 
     override fun onCleared() {
         photoFiles.delete(_uiState.value.photos.map { it.uri })
+    }
+
+    private fun retryChoiceLists() {
+        if (_uiState.value.choiceLists.isLoading) return
+        _uiState.update { it.copy(choiceLists = ChoiceListsUi()) }
+        loadChoiceLists()
+    }
+
+    private fun loadChoiceLists() {
+        viewModelScope.launch {
+            val choiceLists = templatesRepository.loadChoiceLists()
+            _uiState.update { it.copy(choiceLists = choiceLists) }
+        }
     }
 
     private fun loadTags() {

@@ -83,10 +83,23 @@ internal class ItemsRepositoryImpl(
         mapper.toDomain(dto, serverUrl())
     }
 
-    override suspend fun createTextDatum(itemId: String, label: String, value: String, position: Int): Result<Datum> =
-        createDatum(
-            NewDatumDto(item = itemIri(itemId), type = "text", label = label, position = position, value = value)
+    override suspend fun createTextDatum(
+        itemId: String,
+        label: String,
+        value: String,
+        position: Int,
+        type: String,
+        choiceListId: String?
+    ): Result<Datum> = createDatum(
+        NewDatumDto(
+            item = itemIri(itemId),
+            type = type,
+            label = label,
+            position = position,
+            value = value,
+            choiceList = choiceListId?.let { "/api/choice_lists/$it" }
         )
+    )
 
     override suspend fun createImageDatum(itemId: String, label: String, position: Int): Result<Datum> =
         createDatum(NewDatumDto(item = itemIri(itemId), type = "image", label = label, position = position))

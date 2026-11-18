@@ -294,6 +294,28 @@ class ItemsRepositoryImplTest {
     }
 
     @Test
+    fun `createTextDatum posts a choice-list field with its type and choice list IRI`() = runTest {
+        val repository = repository("/sub/api/data" to (HttpStatusCode.Created to DATUM_TEXT))
+
+        repository.createTextDatum(
+            ITEM_ID,
+            "Format",
+            """["Hardcover","Ebook"]""",
+            3,
+            type = "choice-list",
+            choiceListId = "list-1"
+        ).getOrThrow()
+
+        assertEquals(
+            json.parseToJsonElement(
+                """{"item":"/api/items/$ITEM_ID","type":"choice-list","label":"Format","position":3,""" +
+                    """"value":"[\"Hardcover\",\"Ebook\"]","choiceList":"/api/choice_lists/list-1"}"""
+            ),
+            body(requests.single())
+        )
+    }
+
+    @Test
     fun `createImageDatum posts an image field without a value key`() = runTest {
         val repository = repository("/sub/api/data" to (HttpStatusCode.Created to DATUM_IMAGE))
 

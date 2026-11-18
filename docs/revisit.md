@@ -123,3 +123,9 @@ cold session can act on it. Delete an entry when it's fixed.
   (`TemplateFormViewModel.runSave`, `record.createdId == null`) creates a second template. The
   new-collection form has the same gap, and so has the M8.5 choice list form
   (`ChoiceListFormViewModel.save`: a create stopped by a process death is sent again).
+- 2026-11-18 (M8.6) — The item screen shows a typed value as the server stores it: a `checkbox` as
+  `1` or `0`, a `choice-list` as a JSON array (`["Hardcover","Ebook"]`)
+  (`feature/items/ui/.../ItemField.kt`, `Datum.toField`: every text type becomes
+  `ItemField.Text` with the raw `value`). The item forms show them with their own input since
+  M8.6. Fix option: a checkmark (or yes/no) for `checkbox` and the picks joined by commas for
+  `choice-list`, with `pickedChoices` from `FieldInput.kt`. Look at it in the M8.9 device pass.

@@ -10,6 +10,10 @@ import com.grappim.koillectionmobile.feature.items.domain.NewItem
 import com.grappim.koillectionmobile.feature.tags.domain.Tag
 import com.grappim.koillectionmobile.feature.tags.domain.TagCategory
 import com.grappim.koillectionmobile.feature.tags.domain.TagsRepository
+import com.grappim.koillectionmobile.feature.templates.domain.ChoiceList
+import com.grappim.koillectionmobile.feature.templates.domain.Template
+import com.grappim.koillectionmobile.feature.templates.domain.TemplateField
+import com.grappim.koillectionmobile.feature.templates.domain.TemplatesRepository
 import kotlinx.coroutines.CompletableDeferred
 
 internal class FakeTagsRepository : TagsRepository {
@@ -81,5 +85,58 @@ internal class FakePhotoFiles : PhotoFiles {
 
     override fun delete(uris: List<String>) {
         deleted += uris
+    }
+}
+
+/** Only the choice lists: [answer] is given at once to each read. */
+internal class FakeChoiceLists : TemplatesRepository {
+    var answer: Result<List<ChoiceList>> = Result.success(listOf(GENRES, FORMATS))
+    var calls = 0
+
+    override suspend fun getChoiceLists(): Result<List<ChoiceList>> {
+        calls++
+        return answer
+    }
+
+    override suspend fun getTemplates(): Result<List<Template>> = error("not used")
+
+    override suspend fun getTemplate(id: String): Result<Template> = error("not used")
+
+    override suspend fun createTemplate(name: String): Result<Template> = error("not used")
+
+    override suspend fun renameTemplate(id: String, name: String): Result<Template> = error("not used")
+
+    override suspend fun deleteTemplate(id: String): Result<Unit> = error("not used")
+
+    override suspend fun getFields(templateId: String): Result<List<TemplateField>> = error("not used")
+
+    override suspend fun createField(
+        templateId: String,
+        name: String,
+        position: Int,
+        type: String,
+        choiceListId: String?
+    ): Result<TemplateField> = error("not used")
+
+    override suspend fun editField(
+        id: String,
+        name: String?,
+        position: Int?,
+        type: String?,
+        choiceListId: String?
+    ): Result<TemplateField> = error("not used")
+
+    override suspend fun deleteField(id: String): Result<Unit> = error("not used")
+
+    override suspend fun createChoiceList(name: String, choices: List<String>): Result<ChoiceList> = error("not used")
+
+    override suspend fun editChoiceList(id: String, name: String, choices: List<String>): Result<ChoiceList> =
+        error("not used")
+
+    override suspend fun deleteChoiceList(id: String): Result<Unit> = error("not used")
+
+    companion object {
+        val FORMATS = ChoiceList("formats", "Format", listOf("Hardcover", "Paperback", "Ebook"))
+        val GENRES = ChoiceList("genres", "genre", listOf("Novel", "Poetry"))
     }
 }

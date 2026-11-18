@@ -24,8 +24,12 @@ import com.grappim.koillectionmobile.feature.items.domain.ItemsRepository
 import com.grappim.koillectionmobile.feature.items.domain.NewImage
 import com.grappim.koillectionmobile.feature.items.domain.NewImageField
 import com.grappim.koillectionmobile.feature.items.domain.NewTextField
+import com.grappim.koillectionmobile.feature.items.domain.TEXT_TYPES
+import com.grappim.koillectionmobile.feature.items.domain.TYPE_CHOICE_LIST
+import com.grappim.koillectionmobile.feature.items.domain.TYPE_IMAGE
 import com.grappim.koillectionmobile.feature.tags.domain.TagsRepository
 import com.grappim.koillectionmobile.feature.tags.domain.loadTagGroups
+import com.grappim.koillectionmobile.feature.templates.domain.TemplatesRepository
 import com.grappim.koillectionmobile.strings.RString
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_save_error_photo
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_save_unfinished
@@ -47,13 +51,14 @@ import org.koin.core.annotation.InjectedParam
 import org.koin.core.annotation.KoinViewModel
 
 /**
- * The edit form of item [itemId]: the add form (plan §5 decision 8), filled from the server. Text
- * and image fields can change; fields of other types show read only. The main image can be
- * replaced, not removed.
+ * The edit form of item [itemId]: the add form (plan §5 decision 8), filled from the server. Fields
+ * of the text types (`TEXT_TYPES`) and image fields can change; fields of other types show read
+ * only. An existing field keeps its type; a new one picks it. The main image can be replaced, not
+ * removed.
  *
  * The item is read once. The loaded values and the edits are kept in [savedStateHandle], so after
- * a process death the form shows the edits and does not read the item again. The tag list is read
- * again.
+ * a process death the form shows the edits and does not read the item again. The tag list and
+ * the choice lists are read again.
  *
  * The save sends the edit through [EditItemUseCase], against the item as loaded (an [ItemSnapshot],
  * also kept in [savedStateHandle]). The first try is [EditItemUseCase.editItem]; every later one,
@@ -70,6 +75,7 @@ class EditItemViewModel(
     @InjectedParam private val itemId: String,
     private val itemsRepository: ItemsRepository,
     private val tagsRepository: TagsRepository,
+    private val templatesRepository: TemplatesRepository,
     private val editItemUseCase: EditItemUseCase,
     private val photoFiles: PhotoFiles,
     private val itemListChanges: ItemListChanges,
@@ -108,6 +114,11 @@ class EditItemViewModel(
             onRemoveField = ::removeField,
             onLabelChange = ::changeLabel,
             onValueChange = ::changeValue,
+            onTypeChange = ::changeType,
+            onChoiceListChange = ::changeChoiceList,
+            onCheckedChange = ::changeChecked,
+            onChoiceToggle = ::toggleChoice,
+            onRetryChoiceLists = ::retryChoiceLists,
             onTagToggle = ::toggleTag,
             onNewTag = ::addNewTag,
             onNewTagRemove = ::removeNewTag,
@@ -140,6 +151,7 @@ class EditItemViewModel(
         }
         if (saved == null) load()
         loadTags()
+        loadChoiceLists()
     }
 
     private fun retry() {
@@ -185,8 +197,15 @@ class EditItemViewModel(
     private fun Datum.toPhoto() =
         EditPhoto(id = nextId++, datumId = id, previewUrl = image?.previewUrl, label = label.orEmpty())
 
-    private fun Datum.toRow(): EditRow = if (type == TYPE_TEXT) {
-        EditRow.Text(id = nextId++, datumId = id, label = label.orEmpty(), value = value.orEmpty())
+    private fun Datum.toRow(): EditRow = if (type in TEXT_TYPES) {
+        EditRow.Text(
+            id = nextId++,
+            datumId = id,
+            label = label.orEmpty(),
+            value = value.orEmpty(),
+            datumType = type,
+            choiceListId = choiceListId
+        )
     } else {
         EditRow.ReadOnly(id = nextId++, label = label.orEmpty(), datumType = type, value = value)
     }
@@ -202,6 +221,19 @@ class EditItemViewModel(
                 )
             }
         }
+    }
+
+    private fun loadChoiceLists() {
+        viewModelScope.launch {
+            val choiceLists = templatesRepository.loadChoiceLists()
+            _uiState.update { it.copy(choiceLists = choiceLists) }
+        }
+    }
+
+    private fun retryChoiceLists() {
+        if (_uiState.value.choiceLists.isLoading) return
+        _uiState.update { it.copy(choiceLists = ChoiceListsUi()) }
+        loadChoiceLists()
     }
 
     private fun retryTags() {
@@ -221,6 +253,40 @@ class EditItemViewModel(
     private fun changeLabel(id: Int, label: String) = updateText(id) { it.copy(label = label) }
 
     private fun changeValue(id: Int, value: String) = updateText(id) { it.copy(value = value) }
+
+    /** Only a new field changes its type: the server keeps the type of an existing one. */
+    private fun changeType(id: Int, type: String) = updateText(id) {
+        if (it.datumId != null) {
+            it
+        } else {
+            it.copy(
+                datumType = type,
+                value = valueAfterTypeChange(it.value, it.datumType, type),
+                choiceListId = if (type == TYPE_CHOICE_LIST) it.choiceListId else null
+            )
+        }
+    }
+
+    /** As [changeType], for a new field only. A new choice list has other choices: the picks of the old one go. */
+    private fun changeChoiceList(id: Int, choiceListId: String) = updateText(id) {
+        if (it.datumId != null || it.choiceListId == choiceListId) {
+            it
+        } else {
+            it.copy(choiceListId = choiceListId, value = emptyValue(it.datumType))
+        }
+    }
+
+    private fun changeChecked(id: Int, isChecked: Boolean) = updateText(id) {
+        it.copy(value = checkboxValue(isChecked))
+    }
+
+    private fun toggleChoice(id: Int, choice: String) {
+        val lists = _uiState.value.choiceLists.lists
+        updateText(id) { row ->
+            val choices = lists.firstOrNull { it.id == row.choiceListId }?.choices.orEmpty()
+            row.copy(value = withChoiceToggled(row.value, choice, choices))
+        }
+    }
 
     private fun updateText(id: Int, change: (EditRow.Text) -> EditRow.Text) = updateDraft { d ->
         d.copy(fields = d.fields.map { if (it.id == id && it is EditRow.Text) change(it) else it })
@@ -382,7 +448,9 @@ class EditItemViewModel(
             name = name.trim(),
             fields = texts.mapNotNull { row -> row.datumId?.let { EditedField.Text(it, row.label, row.value) } } +
                 existingPhotos.map { EditedField.Image(checkNotNull(it.datumId), it.label, it.newImage()) },
-            newTextFields = texts.filter { it.datumId == null }.map { NewTextField(it.label, it.value) },
+            newTextFields = texts.filter { it.datumId == null }.map {
+                NewTextField(it.label, it.value, it.datumType, it.choiceListId)
+            },
             newImageFields = newPhotos.map { NewImageField(it.label, checkNotNull(it.newImage())) },
             newMainImage = mainImage.newImage(),
             tagIds = selectedTagIds.toList(),
@@ -414,10 +482,6 @@ private fun EditItemDraft.localUris(): List<String> = (listOf(mainImage) + photo
 /** The large thumbnail, or the full image when the server sent no thumbnail, as on the item screen. */
 private val Image.previewUrl: String get() = largeThumbnailUrl ?: url
 
-/** The types the form edits; the same as `EditItemUseCaseImpl`'s. */
-private const val TYPE_TEXT = "text"
-private const val TYPE_IMAGE = "image"
-
 private const val FORM_KEY = "edit_item_form"
 private const val SNAPSHOT_KEY = "edit_item_snapshot"
 private const val TRIED_KEY = "edit_item_tried"
@@ -436,7 +500,9 @@ private data class SavedSnapshot(
 ) {
     fun toSnapshot() = ItemSnapshot(
         item = Item(id, name, quantity, collectionId, image?.toImage()),
-        data = data.map { Datum(it.id, it.type, it.label, it.value, it.position, it.image?.toImage()) },
+        data = data.map {
+            Datum(it.id, it.type, it.label, it.value, it.position, it.image?.toImage(), it.choiceListId)
+        },
         tagIds = tagIds
     )
 
@@ -449,7 +515,15 @@ private data class SavedSnapshot(
                 collectionId = collectionId,
                 image = image?.let(SavedImage::of),
                 data = snapshot.data.map {
-                    SavedDatum(it.id, it.type, it.label, it.value, it.position, it.image?.let(SavedImage::of))
+                    SavedDatum(
+                        it.id,
+                        it.type,
+                        it.label,
+                        it.value,
+                        it.position,
+                        it.image?.let(SavedImage::of),
+                        it.choiceListId
+                    )
                 },
                 tagIds = snapshot.tagIds
             )
@@ -464,7 +538,8 @@ private data class SavedDatum(
     val label: String?,
     val value: String?,
     val position: Int?,
-    val image: SavedImage?
+    val image: SavedImage?,
+    val choiceListId: String? = null
 )
 
 @Serializable

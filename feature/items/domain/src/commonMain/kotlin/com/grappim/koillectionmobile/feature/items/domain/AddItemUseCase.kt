@@ -18,7 +18,17 @@ data class NewItem(
     val newTagLabels: List<String> = emptyList()
 )
 
-data class NewTextField(val label: String, val value: String)
+/**
+ * A field of one of [TEXT_TYPES]. [value] is in the server's format for [type] (`checkbox`: `"1"` or
+ * `"0"`; `choice-list`: a JSON array of the picked choices). A `choice-list` field needs
+ * [choiceListId].
+ */
+data class NewTextField(
+    val label: String,
+    val value: String,
+    val type: String = TYPE_TEXT,
+    val choiceListId: String? = null
+)
 
 data class NewImageField(val label: String, val image: NewImage)
 
@@ -91,7 +101,14 @@ class AddItemUseCaseImpl(private val itemsRepository: ItemsRepository, private v
         while (current.textFieldsDone < newItem.textFields.size) {
             val index = current.textFieldsDone
             val field = newItem.textFields[index]
-            itemsRepository.createTextDatum(itemId, field.label, field.value, position = index + 1)
+            itemsRepository.createTextDatum(
+                itemId,
+                field.label,
+                field.value,
+                position = index + 1,
+                type = field.type,
+                choiceListId = field.choiceListId
+            )
                 .onFailure { return AddItemResult.Failure(it, current) }
             current = current.copy(textFieldsDone = index + 1)
             report()

@@ -236,6 +236,52 @@ class EditItemUseCaseTest {
     }
 
     @Test
+    fun `an existing checkbox field sends its new value`() = runTest {
+        server.data += Datum("signed", TYPE_CHECKBOX, "Signed", "0", 5, null)
+        val form = UNCHANGED.copy(fields = UNCHANGED.fields + EditedField.Text("signed", "Signed", "1"))
+
+        assertEquals(EditItemResult.Success, edit(form))
+        assertEquals(listOf("updateDatum signed null 1"), server.calls)
+    }
+
+    @Test
+    fun `an existing choice-list field sends its new value and keeps its choice list`() = runTest {
+        server.data += Datum("format", TYPE_CHOICE_LIST, "Format", """["Ebook"]""", 5, null, "list-1")
+        val picked = """["Hardcover","Ebook"]"""
+        val form = UNCHANGED.copy(fields = UNCHANGED.fields + EditedField.Text("format", "Format", picked))
+
+        assertEquals(EditItemResult.Success, edit(form))
+        assertEquals(listOf("updateDatum format null $picked"), server.calls)
+        assertEquals("list-1", server.data.single { it.id == "format" }.choiceListId)
+    }
+
+    @Test
+    fun `a field without a value that the form shows as empty sends nothing`() = runTest {
+        server.data += Datum("rating", TYPE_RATING, "Rating", null, 5, null)
+        val form = UNCHANGED.copy(fields = UNCHANGED.fields + EditedField.Text("rating", "Rating", ""))
+
+        assertEquals(EditItemResult.Success, edit(form))
+        assertEquals(emptyList(), server.calls)
+    }
+
+    @Test
+    fun `an existing number field left out of the form is deleted`() = runTest {
+        server.data += Datum("pages", TYPE_NUMBER, "Pages", "412", 5, null)
+
+        edit(UNCHANGED)
+
+        assertEquals(listOf("deleteDatum pages"), server.calls)
+    }
+
+    @Test
+    fun `a new typed field is created with its type and choice list`() = runTest {
+        edit(
+            UNCHANGED.copy(newTextFields = listOf(NewTextField("Format", """["Ebook"]""", TYPE_CHOICE_LIST, "list-1")))
+        )
+        assertEquals(listOf("""createTextDatum Format ["Ebook"] 5 choice-list list-1"""), server.calls)
+    }
+
+    @Test
     fun `progress counts every call up to the total`() = runTest {
         val progress = mutableListOf<EditItemProgress>()
 
@@ -331,11 +377,25 @@ class EditItemUseCaseTest {
 
             override suspend fun createItem(collectionId: String, name: String): Result<Item> = error("not used")
 
-            override suspend fun createTextDatum(itemId: String, label: String, value: String, position: Int) =
-                write("createTextDatum $label $value $position") {
-                    checkFree(label, null)
-                    Datum("datum-${++nextId}", "text", label, value, position, null).also { data += it }
+            override suspend fun createTextDatum(
+                itemId: String,
+                label: String,
+                value: String,
+                position: Int,
+                type: String,
+                choiceListId: String?
+            ) = write(
+                "createTextDatum $label $value $position" + if (type ==
+                    TYPE_TEXT
+                ) {
+                    ""
+                } else {
+                    " $type $choiceListId"
                 }
+            ) {
+                checkFree(label, null)
+                Datum("datum-${++nextId}", type, label, value, position, null, choiceListId).also { data += it }
+            }
 
             override suspend fun createImageDatum(itemId: String, label: String, position: Int) =
                 write("createImageDatum $label $position") {
@@ -405,7 +465,8 @@ class EditItemUseCaseTest {
             Datum("author", "text", "Author", "Frenssen", 1, null),
             Datum("year", "text", "Year", "1901", 2, null),
             Datum("cover", "image", "Cover", null, 3, imageOf("cover-0")),
-            Datum("date", "date", "Read on", "2020-01-01", 4, null)
+            // A type the form does not edit.
+            Datum("date", "file", "Read on", null, 4, null)
         )
 
         /** The form as loaded: every text and image field, nothing changed. */
@@ -455,7 +516,7 @@ class EditItemUseCaseTest {
             listOf(
                 listOf("text", "Cover", "G. Frenssen", 1, null),
                 listOf("text", "Year", "1905", 2, null),
-                listOf("date", "Read on", "2020-01-01", 4, null),
+                listOf("file", "Read on", null, 4, null),
                 listOf("text", "Pages", "412", 5, null),
                 listOf("image", "Spine", null, 6, "spine.jpg")
             ),

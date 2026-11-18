@@ -37,8 +37,15 @@ class AddItemViewModelTest {
 
     private val savedStateHandle = SavedStateHandle()
 
-    private fun createSut(handle: SavedStateHandle = savedStateHandle) =
-        AddItemViewModel("books", tags, FakeAddItemUseCase(), FakePhotoFiles(), ItemListChanges(), handle)
+    private fun createSut(handle: SavedStateHandle = savedStateHandle) = AddItemViewModel(
+        "books",
+        tags,
+        FakeChoiceLists(),
+        FakeAddItemUseCase(),
+        FakePhotoFiles(),
+        ItemListChanges(),
+        handle
+    )
 
     private fun answer(
         tagList: Result<List<Tag>> = Result.success(listOf(NOVEL, GERMAN, FRAKTUR, LOOSE)),

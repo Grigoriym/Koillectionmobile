@@ -1,6 +1,6 @@
 # koillectionmobile checklist
 
-**Current step:** M8.6. M8.5 done 2026-11-18. M8.4 done 2026-11-18. M8.3 done 2026-11-17. M8.2 done 2026-11-17. M8.1 done 2026-11-17. M8 broken into steps 2026-11-17; the other areas became M9–M13 and the release moved to M14 (user, 2026-11-17). M7 done 2026-11-17. M7.7 done 2026-11-17. M7.6 done 2026-11-17. M7.5 done 2026-11-17. M7.4 done 2026-11-17. M7.3 done 2026-11-17. M7.2 done 2026-11-17. M7.1 done 2026-11-17. M7 broken into steps 2026-11-17. M6 done 2026-11-17. M6.6 done 2026-11-17. M6.5 done 2026-11-16. M6.4 done 2026-11-16. M6.3 done 2026-11-16. M6.2 done 2026-11-16. M6.1 done 2026-11-16. M6 broken into steps 2026-11-16. M5 done 2026-11-16. M5.7 done 2026-11-16. M5.6 done 2026-11-16. M5.5 done 2026-11-16. M5.4 done 2026-11-16. M5.3 done 2026-11-16. M5.2 done 2026-11-16. M5.1 done 2026-11-16. M5 broken into steps 2026-11-16. M4 done 2026-11-16. M4.4 done 2026-11-16. M4.3 done 2026-11-16. M4.2 done 2026-11-16. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6, 7, 8, 9, 10 and 11 are settled.
+**Current step:** M8.7. M8.6 done 2026-11-18. M8.5 done 2026-11-18. M8.4 done 2026-11-18. M8.3 done 2026-11-17. M8.2 done 2026-11-17. M8.1 done 2026-11-17. M8 broken into steps 2026-11-17; the other areas became M9–M13 and the release moved to M14 (user, 2026-11-17). M7 done 2026-11-17. M7.7 done 2026-11-17. M7.6 done 2026-11-17. M7.5 done 2026-11-17. M7.4 done 2026-11-17. M7.3 done 2026-11-17. M7.2 done 2026-11-17. M7.1 done 2026-11-17. M7 broken into steps 2026-11-17. M6 done 2026-11-17. M6.6 done 2026-11-17. M6.5 done 2026-11-16. M6.4 done 2026-11-16. M6.3 done 2026-11-16. M6.2 done 2026-11-16. M6.1 done 2026-11-16. M6 broken into steps 2026-11-16. M5 done 2026-11-16. M5.7 done 2026-11-16. M5.6 done 2026-11-16. M5.5 done 2026-11-16. M5.4 done 2026-11-16. M5.3 done 2026-11-16. M5.2 done 2026-11-16. M5.1 done 2026-11-16. M5 broken into steps 2026-11-16. M4 done 2026-11-16. M4.4 done 2026-11-16. M4.3 done 2026-11-16. M4.2 done 2026-11-16. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6, 7, 8, 9, 10 and 11 are settled.
 
 ## How to use this
 
@@ -105,7 +105,7 @@ local test instance only (`docs/local-info.md`). Re-read `Template.php`, `Field.
   and the template screen read the lists again; the template form blocks a save while a field
   names a list that is gone. A delete while a field uses the list gets 500 (plan §2): the app
   names that cause. Mutation-checked: the trimmed duplicate-choice check. Not run on a device.
-- [ ] **M8.6** — Typed fields in the add and edit item forms. A text row carries its type (and
+- [x] **M8.6** — Typed fields in the add and edit item forms. A text row carries its type (and
   its choice list for `choice-list`). Input by type: a number keyboard for `number` and
   `price`, a switch for `checkbox`, a multi-select from the choice list for `choice-list`, a text
   box for every other text type. The values go to the server in the M8.2 formats. "Add field"
@@ -113,6 +113,12 @@ local test instance only (`docs/local-info.md`). Re-read `Template.php`, `Field.
   input. Ask the user at the start whether a free row gets a type picker too.
   **Verify:** ViewModel and use-case tests (each input type, the value sent per type, edit of an
   existing `checkbox` and `choice-list` field); mutation-check the `checkbox` value.
+  Note: done 2026-11-18. A free row gets a type picker with the 11 text types (user, 2026-11-18);
+  an existing field keeps its type. Every text type is now editable in the edit form (was `text`
+  only). The forms read the choice lists (`feature:templates:domain`) with the tags, with an error
+  and retry. The app checks `number`, `price` and `rating` values (plan §5 decision 11). The edit
+  diff treats a null server value as empty, so an untouched empty `checkbox` or `rating` sends
+  nothing. Mutation-checked: `checkbox` `"1"` → `"true"` fails the edit test. Not run on a device.
 - [ ] **M8.7** — Apply a template in the add form: a template picker adds the template's fields
   as empty typed rows after the rows the form has. A label the form already has is not added
   twice. Ask the user at the start what an `image`, `sign`, `file`, `video`, `section` or

@@ -26,8 +26,19 @@ interface ItemsRepository {
     /** Creates an item named [name] in collection [collectionId] and returns it as the server sent it. */
     suspend fun createItem(collectionId: String, name: String): Result<Item>
 
-    /** Adds a `text` field to item [itemId]. [label] must not be in use on that item yet. */
-    suspend fun createTextDatum(itemId: String, label: String, value: String, position: Int): Result<Datum>
+    /**
+     * Adds a field of [type] (one of [TEXT_TYPES]) to item [itemId]. [label] must not be in use on
+     * that item yet. [value] is in the server's format for [type]; the server rejects a value it
+     * does not take (a 422). A `choice-list` field needs [choiceListId].
+     */
+    suspend fun createTextDatum(
+        itemId: String,
+        label: String,
+        value: String,
+        position: Int,
+        type: String = TYPE_TEXT,
+        choiceListId: String? = null
+    ): Result<Datum>
 
     /**
      * Adds an `image` field to item [itemId], without the image. The image goes up in a second
