@@ -29,6 +29,8 @@ import com.grappim.koillectionmobile.feature.tags.ui.TagItemsRoute
 import com.grappim.koillectionmobile.feature.tags.ui.TagItemsScreen
 import com.grappim.koillectionmobile.feature.tags.ui.TagListRoute
 import com.grappim.koillectionmobile.feature.tags.ui.TagListScreen
+import com.grappim.koillectionmobile.feature.templates.ui.TemplateFormRoute
+import com.grappim.koillectionmobile.feature.templates.ui.TemplateFormScreen
 import com.grappim.koillectionmobile.feature.templates.ui.TemplateListRoute
 import com.grappim.koillectionmobile.feature.templates.ui.TemplateListScreen
 import com.grappim.koillectionmobile.feature.templates.ui.TemplateRoute
@@ -89,6 +91,7 @@ internal fun MainNavHost(modifier: Modifier = Modifier) {
                     onTemplateClick = { template ->
                         backStack.add(TemplateRoute(templateId = template.id, name = template.name))
                     },
+                    onNewTemplateClick = { backStack.add(TemplateFormRoute()) },
                     onBack = { backStack.removeLastOrNull() }
                 )
             }
@@ -96,7 +99,22 @@ internal fun MainNavHost(modifier: Modifier = Modifier) {
                 TemplateScreen(
                     templateId = route.templateId,
                     name = route.name,
-                    onBack = { backStack.removeLastOrNull() }
+                    onBack = { backStack.removeLastOrNull() },
+                    onEdit = { backStack.add(TemplateFormRoute(route.templateId)) },
+                    // The template is gone; the list reads its list again (TemplateChanges).
+                    onClose = { backStack.remove(route) }
+                )
+            }
+            entry<TemplateFormRoute> { route ->
+                TemplateFormScreen(
+                    templateId = route.templateId,
+                    onBack = { backStack.removeLastOrNull() },
+                    // An edit goes back to the template screen, which reads it again (TemplateChanges).
+                    // A new template replaces the form, so back goes to the list.
+                    onSave = { id ->
+                        backStack.remove(route)
+                        if (route.templateId == null) backStack.add(TemplateRoute(templateId = id, name = ""))
+                    }
                 )
             }
             entry<CollectionRoute> { route ->

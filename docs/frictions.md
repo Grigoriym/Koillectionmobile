@@ -67,3 +67,6 @@ entries get deleted — see /finalize.
   new-tag dialog; the same call with "M7.7%sdevicetag" a minute earlier landed correctly.
 - 2026-11-17 — `./gradlew build | grep -E 'FAILED|error'` (M8.1) printed a page of PASSED tests whose
   names hold "error". Redirect the run to a log and grep `BUILD (SUCC|FAIL)|What went wrong`.
+- 2026-11-18 — The M8.4 position mutation run of `:feature:templates:domain:jvmTest` listed 9 failed
+  tests, though `CLAUDE.md` says `failFast = true` (`Quality.kt:19`) stops at the first failure.
+  Not looked into; "one failure per run" is not a safe reading of a report.

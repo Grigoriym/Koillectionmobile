@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.grappim.kit.uikit.NativeText
 import com.grappim.koillectionmobile.core.domain.KoillectionError
+import com.grappim.koillectionmobile.feature.templates.domain.TemplateChanges
 import com.grappim.koillectionmobile.feature.templates.domain.TemplatesRepository
 import com.grappim.koillectionmobile.strings.RString
 import com.grappim.koillectionmobile.strings.generated.resources.error_proxy_rejected
@@ -18,15 +19,22 @@ import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.StringResource
 import org.koin.core.annotation.KoinViewModel
 
-/** Reads the templates once when the screen opens, and again on retry. */
+/**
+ * Reads the templates once when the screen opens, again on retry, and again when a template
+ * changes ([TemplateChanges]) while the screen waits lower on the back stack.
+ */
 @KoinViewModel
-class TemplateListViewModel(private val templatesRepository: TemplatesRepository) : ViewModel() {
+class TemplateListViewModel(
+    private val templatesRepository: TemplatesRepository,
+    private val templateChanges: TemplateChanges
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(TemplateListUiState(onRetry = ::retry))
     val uiState: StateFlow<TemplateListUiState> = _uiState.asStateFlow()
 
     init {
         load()
+        viewModelScope.launch { templateChanges.changedTemplates.collect { load() } }
     }
 
     private fun retry() {

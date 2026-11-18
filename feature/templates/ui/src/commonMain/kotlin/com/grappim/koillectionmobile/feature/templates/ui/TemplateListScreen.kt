@@ -6,7 +6,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -18,6 +22,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.grappim.koillectionmobile.feature.templates.domain.Template
 import com.grappim.koillectionmobile.strings.RString
 import com.grappim.koillectionmobile.strings.generated.resources.templates_empty
+import com.grappim.koillectionmobile.strings.generated.resources.templates_new
 import com.grappim.koillectionmobile.strings.generated.resources.templates_title
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -25,24 +30,37 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun TemplateListScreen(
     onTemplateClick: (Template) -> Unit,
+    onNewTemplateClick: () -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: TemplateListViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    TemplateListContent(uiState = uiState, onTemplateClick = onTemplateClick, onBack = onBack, modifier = modifier)
+    TemplateListContent(
+        uiState = uiState,
+        onTemplateClick = onTemplateClick,
+        onNewTemplateClick = onNewTemplateClick,
+        onBack = onBack,
+        modifier = modifier
+    )
 }
 
 @Composable
 private fun TemplateListContent(
     uiState: TemplateListUiState,
     onTemplateClick: (Template) -> Unit,
+    onNewTemplateClick: () -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
-        topBar = { BackTopBar(title = stringResource(RString.templates_title), onBack = onBack) }
+        topBar = { BackTopBar(title = stringResource(RString.templates_title), onBack = onBack) },
+        floatingActionButton = {
+            FloatingActionButton(onClick = onNewTemplateClick) {
+                Icon(imageVector = Icons.Filled.Add, contentDescription = stringResource(RString.templates_new))
+            }
+        }
     ) { padding ->
         val contentModifier = Modifier
             .fillMaxSize()

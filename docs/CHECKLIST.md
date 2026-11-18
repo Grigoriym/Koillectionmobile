@@ -1,6 +1,6 @@
 # koillectionmobile checklist
 
-**Current step:** M8.4. M8.3 done 2026-11-17. M8.2 done 2026-11-17. M8.1 done 2026-11-17. M8 broken into steps 2026-11-17; the other areas became M9–M13 and the release moved to M14 (user, 2026-11-17). M7 done 2026-11-17. M7.7 done 2026-11-17. M7.6 done 2026-11-17. M7.5 done 2026-11-17. M7.4 done 2026-11-17. M7.3 done 2026-11-17. M7.2 done 2026-11-17. M7.1 done 2026-11-17. M7 broken into steps 2026-11-17. M6 done 2026-11-17. M6.6 done 2026-11-17. M6.5 done 2026-11-16. M6.4 done 2026-11-16. M6.3 done 2026-11-16. M6.2 done 2026-11-16. M6.1 done 2026-11-16. M6 broken into steps 2026-11-16. M5 done 2026-11-16. M5.7 done 2026-11-16. M5.6 done 2026-11-16. M5.5 done 2026-11-16. M5.4 done 2026-11-16. M5.3 done 2026-11-16. M5.2 done 2026-11-16. M5.1 done 2026-11-16. M5 broken into steps 2026-11-16. M4 done 2026-11-16. M4.4 done 2026-11-16. M4.3 done 2026-11-16. M4.2 done 2026-11-16. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6, 7, 8, 9, 10 and 11 are settled.
+**Current step:** M8.5. M8.4 done 2026-11-18. M8.3 done 2026-11-17. M8.2 done 2026-11-17. M8.1 done 2026-11-17. M8 broken into steps 2026-11-17; the other areas became M9–M13 and the release moved to M14 (user, 2026-11-17). M7 done 2026-11-17. M7.7 done 2026-11-17. M7.6 done 2026-11-17. M7.5 done 2026-11-17. M7.4 done 2026-11-17. M7.3 done 2026-11-17. M7.2 done 2026-11-17. M7.1 done 2026-11-17. M7 broken into steps 2026-11-17. M6 done 2026-11-17. M6.6 done 2026-11-17. M6.5 done 2026-11-16. M6.4 done 2026-11-16. M6.3 done 2026-11-16. M6.2 done 2026-11-16. M6.1 done 2026-11-16. M6 broken into steps 2026-11-16. M5 done 2026-11-16. M5.7 done 2026-11-16. M5.6 done 2026-11-16. M5.5 done 2026-11-16. M5.4 done 2026-11-16. M5.3 done 2026-11-16. M5.2 done 2026-11-16. M5.1 done 2026-11-16. M5 broken into steps 2026-11-16. M4 done 2026-11-16. M4.4 done 2026-11-16. M4.3 done 2026-11-16. M4.2 done 2026-11-16. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6, 7, 8, 9, 10 and 11 are settled.
 
 ## How to use this
 
@@ -81,7 +81,7 @@ local test instance only (`docs/local-info.md`). Re-read `Template.php`, `Field.
   (as the tag list does); a failure of either shows the error. The type shows as the server's
   value (`choice-list: Genres`); readable type labels wait for the M8.4 type picker. The
   "Templates" action is a fifth top-bar action: see `docs/revisit.md` (M8.3).
-- [ ] **M8.4** — Template form: create, edit, delete. The form edits the name and the field
+- [x] **M8.4** — Template form: create, edit, delete. The form edits the name and the field
   rows (name, type, choice list for `choice-list`; add, remove, move up and down). The form blocks
   a duplicate field name: the server takes one (plan §2, M8.2). The save sends
   only what changed, as the item edit form does. Delete asks first. The form survives rotation
@@ -89,6 +89,12 @@ local test instance only (`docs/local-info.md`). Re-read `Template.php`, `Field.
   (all of `DatumTypeEnum::TYPES`, or the ones the item form can fill).
   **Verify:** ViewModel and use-case tests (create, rename, add and remove and move a field,
   failure part way, delete); mutation-check one.
+  Note: done 2026-11-18. The type picker offers all 17 `DatumTypeEnum::TYPES` (user, 2026-11-18).
+  `SaveTemplateUseCase` (`feature:templates:domain`) diffs the form against the template as loaded;
+  a retry reads it again and matches a field an earlier try created by its name. The form is
+  one screen for new and edit (`TemplateFormRoute`); edit and delete are on the template screen.
+  `TemplateChanges` makes the list and the template screen read again. Mutation-checked: field
+  positions (use case) and the trimmed duplicate-name check (form). Not run on a device.
 - [ ] **M8.5** — Choice lists: list, create, edit (name and choices: add, remove, reorder),
   delete with a confirm. Entry point: the template list and the choice-list picker in the M8.4
   form. `ChoiceList::$choices` is `Assert\Unique`: the form blocks a duplicate choice.

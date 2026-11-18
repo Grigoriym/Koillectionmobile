@@ -4,6 +4,7 @@ import com.grappim.kit.testing.MainDispatcherRule
 import com.grappim.kit.uikit.NativeText
 import com.grappim.koillectionmobile.core.domain.KoillectionError
 import com.grappim.koillectionmobile.feature.templates.domain.Template
+import com.grappim.koillectionmobile.feature.templates.domain.TemplateChanges
 import com.grappim.koillectionmobile.strings.RString
 import com.grappim.koillectionmobile.strings.generated.resources.error_proxy_rejected
 import com.grappim.koillectionmobile.strings.generated.resources.templates_error_http
@@ -20,6 +21,7 @@ import kotlin.test.assertTrue
 class TemplateListViewModelTest {
 
     private val repository = FakeTemplatesRepository()
+    private val templateChanges = TemplateChanges()
     private val mainDispatcherRule = MainDispatcherRule()
 
     @BeforeTest
@@ -38,7 +40,7 @@ class TemplateListViewModelTest {
 
     private fun createSut(): TemplateListViewModel {
         queue()
-        return TemplateListViewModel(repository)
+        return TemplateListViewModel(repository, templateChanges)
     }
 
     private fun answer(result: Result<List<Template>> = Result.success(listOf(novel, atlas, comic))) {
@@ -141,6 +143,19 @@ class TemplateListViewModelTest {
         sut.uiState.value.onRetry()
 
         assertEquals(1, repository.templateCalls)
+    }
+
+    @Test
+    fun `a template change reads the list again`() {
+        val sut = createSut()
+        answer()
+
+        queue()
+        templateChanges.notifyChanged("novel")
+        answer(Result.success(listOf(novel)))
+
+        assertEquals(listOf(novel), sut.uiState.value.templates)
+        assertEquals(2, repository.templateCalls)
     }
 
     private val novel = Template(id = "novel", name = "Novel")

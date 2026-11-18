@@ -321,3 +321,5 @@ code without checking the licence terms are kept.
    `choice-list`, a text box for the other text types (no date picker, rating stars or country
    picker). A collection's `itemsDefaultTemplate` is in scope: the add form in that collection
    applies it when it opens.
+   The template form's type picker offers all 17 `DatumTypeEnum::TYPES`, also the ones the item
+   form cannot fill (user, 2026-11-18, M8.4); M8.7 decides what those do in the add form.

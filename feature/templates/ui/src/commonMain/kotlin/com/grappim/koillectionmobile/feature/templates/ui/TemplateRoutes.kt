@@ -13,3 +13,7 @@ data object TemplateListRoute : NavKey
 /** The fields of template [templateId]. [name] is the screen title, as the template list showed it. */
 @Serializable
 data class TemplateRoute(val templateId: String, val name: String) : NavKey
+
+/** The template form: a new template when [templateId] is null, else the edit form of that template. */
+@Serializable
+data class TemplateFormRoute(val templateId: String? = null) : NavKey

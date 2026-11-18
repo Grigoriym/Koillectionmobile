@@ -11,7 +11,11 @@ class FakeTemplatesRepository : TemplatesRepository {
     val templates = ArrayDeque<CompletableDeferred<Result<List<Template>>>>()
     val fields = ArrayDeque<CompletableDeferred<Result<List<TemplateField>>>>()
     val choiceLists = ArrayDeque<CompletableDeferred<Result<List<ChoiceList>>>>()
+    val template = ArrayDeque<CompletableDeferred<Result<Template>>>()
+    val deletes = ArrayDeque<CompletableDeferred<Result<Unit>>>()
     var templateCalls = 0
+    val getTemplateCalls = mutableListOf<String>()
+    val deleteCalls = mutableListOf<String>()
     val fieldCalls = mutableListOf<String>()
     var choiceListCalls = 0
 
@@ -30,13 +34,19 @@ class FakeTemplatesRepository : TemplatesRepository {
         return choiceLists.first().await()
     }
 
-    override suspend fun getTemplate(id: String): Result<Template> = error("not used")
+    override suspend fun getTemplate(id: String): Result<Template> {
+        getTemplateCalls += id
+        return template.first().await()
+    }
 
     override suspend fun createTemplate(name: String): Result<Template> = error("not used")
 
     override suspend fun renameTemplate(id: String, name: String): Result<Template> = error("not used")
 
-    override suspend fun deleteTemplate(id: String): Result<Unit> = error("not used")
+    override suspend fun deleteTemplate(id: String): Result<Unit> {
+        deleteCalls += id
+        return deletes.first().await()
+    }
 
     override suspend fun createField(
         templateId: String,

@@ -4,12 +4,19 @@ import com.grappim.kit.testing.MainDispatcherRule
 import com.grappim.kit.uikit.NativeText
 import com.grappim.koillectionmobile.core.domain.KoillectionError
 import com.grappim.koillectionmobile.feature.templates.domain.ChoiceList
+import com.grappim.koillectionmobile.feature.templates.domain.Template
+import com.grappim.koillectionmobile.feature.templates.domain.TemplateChanges
 import com.grappim.koillectionmobile.feature.templates.domain.TemplateField
 import com.grappim.koillectionmobile.strings.RString
+import com.grappim.koillectionmobile.strings.generated.resources.template_delete_error_unexpected
 import com.grappim.koillectionmobile.strings.generated.resources.template_error_unexpected
 import com.grappim.koillectionmobile.strings.generated.resources.templates_error_http
 import com.grappim.koillectionmobile.strings.generated.resources.templates_error_network
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runTest
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -20,6 +27,7 @@ import kotlin.test.assertTrue
 class TemplateViewModelTest {
 
     private val repository = FakeTemplatesRepository()
+    private val templateChanges = TemplateChanges()
     private val mainDispatcherRule = MainDispatcherRule()
 
     @BeforeTest
@@ -33,28 +41,32 @@ class TemplateViewModelTest {
     }
 
     private fun queue() {
+        repository.template.addLast(CompletableDeferred())
         repository.fields.addLast(CompletableDeferred())
         repository.choiceLists.addLast(CompletableDeferred())
     }
 
     private fun createSut(): TemplateViewModel {
         queue()
-        return TemplateViewModel(TEMPLATE_ID, repository)
+        return TemplateViewModel(TEMPLATE_ID, repository, templateChanges)
     }
 
     private fun answer(
         fieldList: Result<List<TemplateField>> = Result.success(listOf(author, read, genre)),
-        choiceListList: Result<List<ChoiceList>> = Result.success(listOf(genres))
+        choiceListList: Result<List<ChoiceList>> = Result.success(listOf(genres)),
+        template: Result<Template> = Result.success(Template(TEMPLATE_ID, "Book"))
     ) {
+        repository.template.removeFirst().complete(template)
         repository.fields.removeFirst().complete(fieldList)
         repository.choiceLists.removeFirst().complete(choiceListList)
     }
 
     @Test
-    fun `the screen shows loading until both answers arrive`() {
+    fun `the screen shows loading until all answers arrive`() {
         val sut = createSut()
         assertTrue(sut.uiState.value.isLoading)
 
+        repository.template.removeFirst().complete(Result.success(Template(TEMPLATE_ID, "Book")))
         repository.fields.removeFirst().complete(Result.success(listOf(author)))
         assertTrue(sut.uiState.value.isLoading)
 
@@ -160,6 +172,97 @@ class TemplateViewModelTest {
 
         assertEquals(1, repository.fieldCalls.size)
         assertEquals(1, repository.choiceListCalls)
+    }
+
+    @Test
+    fun `the name comes from the server`() {
+        val sut = createSut()
+        assertEquals(null, sut.uiState.value.name)
+
+        answer(template = Result.success(Template(TEMPLATE_ID, "Novel")))
+
+        assertEquals("Novel", sut.uiState.value.name)
+        assertEquals(listOf(TEMPLATE_ID), repository.getTemplateCalls)
+        assertTrue(sut.uiState.value.canChange)
+    }
+
+    @Test
+    fun `a failed template read shows its error`() {
+        val sut = createSut()
+
+        answer(template = Result.failure(KoillectionError.Network(IllegalStateException("timeout"))))
+
+        assertEquals(NativeText.Resource(RString.templates_error_network), sut.uiState.value.error)
+        assertFalse(sut.uiState.value.canChange)
+    }
+
+    @Test
+    fun `a change of this template reads it again and another template does not`() {
+        val sut = createSut()
+        answer()
+
+        templateChanges.notifyChanged("other")
+        assertEquals(1, repository.getTemplateCalls.size)
+
+        queue()
+        templateChanges.notifyChanged(TEMPLATE_ID)
+        answer(fieldList = Result.success(listOf(author)), template = Result.success(Template(TEMPLATE_ID, "Novel")))
+
+        assertEquals("Novel", sut.uiState.value.name)
+        assertEquals(listOf("author"), sut.uiState.value.fields.map { it.id })
+        assertEquals(2, repository.getTemplateCalls.size)
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `a delete marks the screen deleted and tells the list`() = runTest {
+        val sut = createSut()
+        answer()
+        val changed = mutableListOf<String>()
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            templateChanges.changedTemplates.collect { changed += it }
+        }
+        repository.deletes.addLast(CompletableDeferred())
+
+        sut.uiState.value.onDelete()
+        assertTrue(sut.uiState.value.isDeleting)
+        assertFalse(sut.uiState.value.canChange)
+
+        repository.deletes.removeFirst().complete(Result.success(Unit))
+
+        assertFalse(sut.uiState.value.isDeleting)
+        assertTrue(sut.uiState.value.isDeleted)
+        assertEquals(listOf(TEMPLATE_ID), repository.deleteCalls)
+        assertEquals(listOf(TEMPLATE_ID), changed)
+        // The screen does not read the deleted template again.
+        assertEquals(1, repository.getTemplateCalls.size)
+    }
+
+    @Test
+    fun `a failed delete shows its error and keeps the screen`() {
+        val sut = createSut()
+        answer()
+        repository.deletes.addLast(CompletableDeferred())
+
+        sut.uiState.value.onDelete()
+        repository.deletes.removeFirst().complete(Result.failure(IllegalStateException("parse")))
+
+        assertFalse(sut.uiState.value.isDeleted)
+        assertEquals(NativeText.Resource(RString.template_delete_error_unexpected), sut.uiState.value.deleteError)
+        assertTrue(sut.uiState.value.canChange)
+
+        sut.uiState.value.onDeleteErrorDismiss()
+
+        assertTrue(sut.uiState.value.deleteError.isEmpty())
+    }
+
+    @Test
+    fun `a delete before the template is loaded sends nothing`() {
+        val sut = createSut()
+
+        sut.uiState.value.onDelete()
+
+        assertTrue(repository.deleteCalls.isEmpty())
     }
 
     private val author = TemplateField(id = "author", name = "Author", position = 1, type = "text", choiceListId = null)
