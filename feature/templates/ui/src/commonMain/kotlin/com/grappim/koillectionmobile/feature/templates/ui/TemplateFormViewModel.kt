@@ -5,6 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.grappim.kit.uikit.NativeText
 import com.grappim.koillectionmobile.core.domain.KoillectionError
+import com.grappim.koillectionmobile.feature.templates.domain.ChoiceList
+import com.grappim.koillectionmobile.feature.templates.domain.ChoiceListChanges
 import com.grappim.koillectionmobile.feature.templates.domain.EditedTemplateField
 import com.grappim.koillectionmobile.feature.templates.domain.SaveTemplateProgress
 import com.grappim.koillectionmobile.feature.templates.domain.SaveTemplateResult
@@ -44,7 +46,8 @@ import org.koin.core.annotation.KoinViewModel
  *
  * The template is read once. The loaded values and the edits are kept in [savedStateHandle], so
  * after a process death the form shows the edits and does not read the template again. The choice
- * lists are read each time the form starts.
+ * lists are read each time the form starts, and again when a choice list changes
+ * ([ChoiceListChanges]) while the form waits lower on the back stack.
  *
  * The save goes through [SaveTemplateUseCase]: the first try is [SaveTemplateUseCase.save]; every
  * later one, after a process death too, is [SaveTemplateUseCase.retry] once the template id is
@@ -57,6 +60,7 @@ class TemplateFormViewModel(
     private val templatesRepository: TemplatesRepository,
     private val saveTemplateUseCase: SaveTemplateUseCase,
     private val templateChanges: TemplateChanges,
+    private val choiceListChanges: ChoiceListChanges,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -117,6 +121,16 @@ class TemplateFormViewModel(
                 .collect { savedStateHandle[FORM_KEY] = json.encodeToString(it) }
         }
         load()
+        viewModelScope.launch { choiceListChanges.changed.collect { reloadChoiceLists() } }
+    }
+
+    /** A failure keeps the choice lists the form has. */
+    private fun reloadChoiceLists() {
+        viewModelScope.launch {
+            templatesRepository.getChoiceLists().onSuccess { lists ->
+                _uiState.update { it.copy(choiceLists = lists.sortedByName()) }
+            }
+        }
     }
 
     private fun retry() {
@@ -168,11 +182,7 @@ class TemplateFormViewModel(
                 state.copy(
                     draft = state.draft ?: loaded,
                     original = state.original ?: loaded,
-                    choiceLists = choiceListsResult.getOrThrow().sortedWith(
-                        compareBy(String.CASE_INSENSITIVE_ORDER) {
-                            it.name
-                        }
-                    ),
+                    choiceLists = choiceListsResult.getOrThrow().sortedByName(),
                     isLoading = false,
                     error = NativeText.Empty
                 )
@@ -276,13 +286,15 @@ class TemplateFormViewModel(
     }
 }
 
+private fun List<ChoiceList>.sortedByName() = sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER) { it.name })
+
 /** The form as the use case takes it: names trimmed. */
 private fun TemplateDraft.toEdit() = TemplateEdit(
     name = name.trim(),
     fields = fields.map { EditedTemplateField(it.fieldId, it.name.trim(), it.type, it.choiceListId) }
 )
 
-private fun Throwable.toSaveMessage(): NativeText = when (this) {
+internal fun Throwable.toSaveMessage(): NativeText = when (this) {
     is KoillectionError.Network -> NativeText.Resource(RString.collection_form_save_error_network)
     is KoillectionError.ProxyRejection -> NativeText.Arguments(RString.error_proxy_rejected, listOf(status))
     is KoillectionError.Server -> NativeText.Arguments(RString.collection_form_save_error_http, listOf(status))

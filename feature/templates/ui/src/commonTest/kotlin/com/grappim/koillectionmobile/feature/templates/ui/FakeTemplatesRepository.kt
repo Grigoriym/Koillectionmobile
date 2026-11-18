@@ -13,6 +13,12 @@ class FakeTemplatesRepository : TemplatesRepository {
     val choiceLists = ArrayDeque<CompletableDeferred<Result<List<ChoiceList>>>>()
     val template = ArrayDeque<CompletableDeferred<Result<Template>>>()
     val deletes = ArrayDeque<CompletableDeferred<Result<Unit>>>()
+    val choiceListWrites = ArrayDeque<CompletableDeferred<Result<ChoiceList>>>()
+    val choiceListDeletes = ArrayDeque<CompletableDeferred<Result<Unit>>>()
+
+    /** The choice list writes, in order: `create:<name>:<choices>` or `edit:<id>:<name>:<choices>`. */
+    val choiceListWriteCalls = mutableListOf<String>()
+    val choiceListDeleteCalls = mutableListOf<String>()
     var templateCalls = 0
     val getTemplateCalls = mutableListOf<String>()
     val deleteCalls = mutableListOf<String>()
@@ -66,10 +72,18 @@ class FakeTemplatesRepository : TemplatesRepository {
 
     override suspend fun deleteField(id: String): Result<Unit> = error("not used")
 
-    override suspend fun createChoiceList(name: String, choices: List<String>): Result<ChoiceList> = error("not used")
+    override suspend fun createChoiceList(name: String, choices: List<String>): Result<ChoiceList> {
+        choiceListWriteCalls += "create:$name:$choices"
+        return choiceListWrites.first().await()
+    }
 
-    override suspend fun editChoiceList(id: String, name: String, choices: List<String>): Result<ChoiceList> =
-        error("not used")
+    override suspend fun editChoiceList(id: String, name: String, choices: List<String>): Result<ChoiceList> {
+        choiceListWriteCalls += "edit:$id:$name:$choices"
+        return choiceListWrites.first().await()
+    }
 
-    override suspend fun deleteChoiceList(id: String): Result<Unit> = error("not used")
+    override suspend fun deleteChoiceList(id: String): Result<Unit> {
+        choiceListDeleteCalls += id
+        return choiceListDeletes.first().await()
+    }
 }

@@ -29,6 +29,10 @@ import com.grappim.koillectionmobile.feature.tags.ui.TagItemsRoute
 import com.grappim.koillectionmobile.feature.tags.ui.TagItemsScreen
 import com.grappim.koillectionmobile.feature.tags.ui.TagListRoute
 import com.grappim.koillectionmobile.feature.tags.ui.TagListScreen
+import com.grappim.koillectionmobile.feature.templates.ui.ChoiceListFormRoute
+import com.grappim.koillectionmobile.feature.templates.ui.ChoiceListFormScreen
+import com.grappim.koillectionmobile.feature.templates.ui.ChoiceListListRoute
+import com.grappim.koillectionmobile.feature.templates.ui.ChoiceListListScreen
 import com.grappim.koillectionmobile.feature.templates.ui.TemplateFormRoute
 import com.grappim.koillectionmobile.feature.templates.ui.TemplateFormScreen
 import com.grappim.koillectionmobile.feature.templates.ui.TemplateListRoute
@@ -92,6 +96,7 @@ internal fun MainNavHost(modifier: Modifier = Modifier) {
                         backStack.add(TemplateRoute(templateId = template.id, name = template.name))
                     },
                     onNewTemplateClick = { backStack.add(TemplateFormRoute()) },
+                    onChoiceListsClick = { backStack.add(ChoiceListListRoute) },
                     onBack = { backStack.removeLastOrNull() }
                 )
             }
@@ -114,7 +119,23 @@ internal fun MainNavHost(modifier: Modifier = Modifier) {
                     onSave = { id ->
                         backStack.remove(route)
                         if (route.templateId == null) backStack.add(TemplateRoute(templateId = id, name = ""))
-                    }
+                    },
+                    onChoiceListsClick = { backStack.add(ChoiceListListRoute) }
+                )
+            }
+            entry<ChoiceListListRoute> {
+                ChoiceListListScreen(
+                    onChoiceListClick = { id -> backStack.add(ChoiceListFormRoute(id)) },
+                    onNewChoiceListClick = { backStack.add(ChoiceListFormRoute()) },
+                    onBack = { backStack.removeLastOrNull() }
+                )
+            }
+            entry<ChoiceListFormRoute> { route ->
+                ChoiceListFormScreen(
+                    choiceListId = route.choiceListId,
+                    onBack = { backStack.removeLastOrNull() },
+                    // The screens below read the choice lists again (ChoiceListChanges).
+                    onDone = { backStack.remove(route) }
                 )
             }
             entry<CollectionRoute> { route ->

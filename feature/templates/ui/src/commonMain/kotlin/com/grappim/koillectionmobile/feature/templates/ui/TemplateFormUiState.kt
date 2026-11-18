@@ -77,15 +77,19 @@ data class TemplateFormUiState(
             .keys
 
     /**
-     * A name, a non-blank unique name per field, a choice list for each `choice-list` field, and,
-     * on the edit form, a change.
+     * A name, a non-blank unique name per field, for each `choice-list` field a choice list that
+     * [choiceLists] still has (one can be deleted while the form is open), and, on the edit form, a
+     * change.
      */
     val canSave: Boolean
         get() {
             val draft = draft ?: return false
             return draft.name.isNotBlank() &&
                 draft.fields.none { it.name.isBlank() } &&
-                draft.fields.none { it.type == TYPE_CHOICE_LIST && it.choiceListId == null } &&
+                draft.fields.none { field ->
+                    field.type == TYPE_CHOICE_LIST &&
+                        choiceLists.none { it.id == field.choiceListId }
+                } &&
                 duplicateNames.isEmpty() &&
                 (isNew || hasChanges)
         }

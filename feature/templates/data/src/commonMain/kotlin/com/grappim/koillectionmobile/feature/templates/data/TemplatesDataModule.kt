@@ -1,5 +1,6 @@
 package com.grappim.koillectionmobile.feature.templates.data
 
+import com.grappim.koillectionmobile.feature.templates.domain.ChoiceListChanges
 import com.grappim.koillectionmobile.feature.templates.domain.SaveTemplateUseCase
 import com.grappim.koillectionmobile.feature.templates.domain.SaveTemplateUseCaseImpl
 import com.grappim.koillectionmobile.feature.templates.domain.TemplateChanges
@@ -17,6 +18,9 @@ class TemplatesDataModule {
 
     @Single
     fun provideTemplateChanges(): TemplateChanges = TemplateChanges()
+
+    @Single
+    fun provideChoiceListChanges(): ChoiceListChanges = ChoiceListChanges()
 
     @Single
     fun provideSaveTemplateUseCase(templatesRepository: TemplatesRepository): SaveTemplateUseCase =

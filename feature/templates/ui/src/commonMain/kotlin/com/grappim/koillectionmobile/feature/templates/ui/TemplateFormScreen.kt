@@ -59,6 +59,7 @@ import com.grappim.koillectionmobile.strings.generated.resources.collection_form
 import com.grappim.koillectionmobile.strings.generated.resources.collection_form_save
 import com.grappim.koillectionmobile.strings.generated.resources.collection_form_sending
 import com.grappim.koillectionmobile.strings.generated.resources.template_form_add_field
+import com.grappim.koillectionmobile.strings.generated.resources.template_form_choice_lists
 import com.grappim.koillectionmobile.strings.generated.resources.template_form_discard_text
 import com.grappim.koillectionmobile.strings.generated.resources.template_form_discard_title
 import com.grappim.koillectionmobile.strings.generated.resources.template_form_duplicate_name
@@ -84,12 +85,14 @@ import org.koin.core.parameter.parametersOf
 /**
  * The template form: a new template when [templateId] is null, else the edit form. [onSave] runs
  * once every change is on the server, with the template's id, to take the form off the back stack.
+ * [onChoiceListsClick] opens the choice lists from a `choice-list` field.
  */
 @Composable
 fun TemplateFormScreen(
     templateId: String?,
     onBack: () -> Unit,
     onSave: (String) -> Unit,
+    onChoiceListsClick: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: TemplateFormViewModel = koinViewModel { parametersOf(templateId) }
 ) {
@@ -98,12 +101,22 @@ fun TemplateFormScreen(
     LaunchedEffect(uiState.savedTemplateId) {
         uiState.savedTemplateId?.let { currentOnSave(it) }
     }
-    TemplateFormContent(uiState = uiState, onBack = onBack, modifier = modifier)
+    TemplateFormContent(
+        uiState = uiState,
+        onBack = onBack,
+        onChoiceListsClick = onChoiceListsClick,
+        modifier = modifier
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun TemplateFormContent(uiState: TemplateFormUiState, onBack: () -> Unit, modifier: Modifier = Modifier) {
+private fun TemplateFormContent(
+    uiState: TemplateFormUiState,
+    onBack: () -> Unit,
+    onChoiceListsClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     // While the form has changes, one back tap must not lose them: the arrow and the system back ask first.
     var isDiscardShown by rememberSaveable { mutableStateOf(false) }
     val asksFirst = uiState.hasChanges && uiState.save == null
@@ -171,7 +184,12 @@ private fun TemplateFormContent(uiState: TemplateFormUiState, onBack: () -> Unit
                 modifier = contentModifier
             )
 
-            else -> TemplateForm(draft = draft, uiState = uiState, modifier = contentModifier)
+            else -> TemplateForm(
+                draft = draft,
+                uiState = uiState,
+                onChoiceListsClick = onChoiceListsClick,
+                modifier = contentModifier
+            )
         }
     }
 }
@@ -202,7 +220,12 @@ private fun DiscardDialog(isNew: Boolean, onDiscard: () -> Unit, onDismiss: () -
 }
 
 @Composable
-private fun TemplateForm(draft: TemplateDraft, uiState: TemplateFormUiState, modifier: Modifier = Modifier) {
+private fun TemplateForm(
+    draft: TemplateDraft,
+    uiState: TemplateFormUiState,
+    onChoiceListsClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     val duplicates = uiState.duplicateNames
     LazyColumn(
         modifier = modifier,
@@ -232,7 +255,8 @@ private fun TemplateForm(draft: TemplateDraft, uiState: TemplateFormUiState, mod
                 isLast = field.id == draft.fields.last().id,
                 isDuplicate = field.name.trim() in duplicates,
                 choiceLists = uiState.choiceLists,
-                uiState = uiState
+                uiState = uiState,
+                onChoiceListsClick = onChoiceListsClick
             )
         }
         item {
@@ -251,7 +275,8 @@ private fun FieldCard(
     isLast: Boolean,
     isDuplicate: Boolean,
     choiceLists: List<ChoiceList>,
-    uiState: TemplateFormUiState
+    uiState: TemplateFormUiState,
+    onChoiceListsClick: () -> Unit
 ) {
     Card(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(PADDING), verticalArrangement = Arrangement.spacedBy(PADDING / 2)) {
@@ -285,6 +310,9 @@ private fun FieldCard(
                         options = choiceLists.map { it.id to it.name },
                         onSelect = { uiState.onFieldChoiceListChange(field.id, it) }
                     )
+                }
+                TextButton(onClick = onChoiceListsClick) {
+                    Text(stringResource(RString.template_form_choice_lists))
                 }
             }
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {

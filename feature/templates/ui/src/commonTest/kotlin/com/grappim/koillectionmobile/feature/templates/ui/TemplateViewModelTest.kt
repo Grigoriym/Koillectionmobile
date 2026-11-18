@@ -4,6 +4,7 @@ import com.grappim.kit.testing.MainDispatcherRule
 import com.grappim.kit.uikit.NativeText
 import com.grappim.koillectionmobile.core.domain.KoillectionError
 import com.grappim.koillectionmobile.feature.templates.domain.ChoiceList
+import com.grappim.koillectionmobile.feature.templates.domain.ChoiceListChanges
 import com.grappim.koillectionmobile.feature.templates.domain.Template
 import com.grappim.koillectionmobile.feature.templates.domain.TemplateChanges
 import com.grappim.koillectionmobile.feature.templates.domain.TemplateField
@@ -28,6 +29,7 @@ class TemplateViewModelTest {
 
     private val repository = FakeTemplatesRepository()
     private val templateChanges = TemplateChanges()
+    private val choiceListChanges = ChoiceListChanges()
     private val mainDispatcherRule = MainDispatcherRule()
 
     @BeforeTest
@@ -48,7 +50,7 @@ class TemplateViewModelTest {
 
     private fun createSut(): TemplateViewModel {
         queue()
-        return TemplateViewModel(TEMPLATE_ID, repository, templateChanges)
+        return TemplateViewModel(TEMPLATE_ID, repository, templateChanges, choiceListChanges)
     }
 
     private fun answer(
@@ -210,6 +212,19 @@ class TemplateViewModelTest {
 
         assertEquals("Novel", sut.uiState.value.name)
         assertEquals(listOf("author"), sut.uiState.value.fields.map { it.id })
+        assertEquals(2, repository.getTemplateCalls.size)
+    }
+
+    @Test
+    fun `a choice list change reads the template again with the new list name`() {
+        val sut = createSut()
+        answer()
+
+        queue()
+        choiceListChanges.notifyChanged()
+        answer(choiceListList = Result.success(listOf(genres.copy(name = "Kinds"))))
+
+        assertEquals("Kinds", sut.uiState.value.fields.single { it.id == "genre" }.choiceListName)
         assertEquals(2, repository.getTemplateCalls.size)
     }
 

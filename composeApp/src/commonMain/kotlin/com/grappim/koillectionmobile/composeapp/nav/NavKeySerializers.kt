@@ -13,6 +13,8 @@ import com.grappim.koillectionmobile.feature.items.ui.ItemRoute
 import com.grappim.koillectionmobile.feature.settings.ui.SettingsRoute
 import com.grappim.koillectionmobile.feature.tags.ui.TagItemsRoute
 import com.grappim.koillectionmobile.feature.tags.ui.TagListRoute
+import com.grappim.koillectionmobile.feature.templates.ui.ChoiceListFormRoute
+import com.grappim.koillectionmobile.feature.templates.ui.ChoiceListListRoute
 import com.grappim.koillectionmobile.feature.templates.ui.TemplateFormRoute
 import com.grappim.koillectionmobile.feature.templates.ui.TemplateListRoute
 import com.grappim.koillectionmobile.feature.templates.ui.TemplateRoute
@@ -39,6 +41,8 @@ private val navKeySerializersModule = SerializersModule {
         subclass(TagListRoute::class)
         subclass(TagItemsRoute::class)
         subclass(TemplateFormRoute::class)
+        subclass(ChoiceListListRoute::class)
+        subclass(ChoiceListFormRoute::class)
         subclass(TemplateListRoute::class)
         subclass(TemplateRoute::class)
     }

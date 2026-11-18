@@ -1,6 +1,6 @@
 # koillectionmobile checklist
 
-**Current step:** M8.5. M8.4 done 2026-11-18. M8.3 done 2026-11-17. M8.2 done 2026-11-17. M8.1 done 2026-11-17. M8 broken into steps 2026-11-17; the other areas became M9–M13 and the release moved to M14 (user, 2026-11-17). M7 done 2026-11-17. M7.7 done 2026-11-17. M7.6 done 2026-11-17. M7.5 done 2026-11-17. M7.4 done 2026-11-17. M7.3 done 2026-11-17. M7.2 done 2026-11-17. M7.1 done 2026-11-17. M7 broken into steps 2026-11-17. M6 done 2026-11-17. M6.6 done 2026-11-17. M6.5 done 2026-11-16. M6.4 done 2026-11-16. M6.3 done 2026-11-16. M6.2 done 2026-11-16. M6.1 done 2026-11-16. M6 broken into steps 2026-11-16. M5 done 2026-11-16. M5.7 done 2026-11-16. M5.6 done 2026-11-16. M5.5 done 2026-11-16. M5.4 done 2026-11-16. M5.3 done 2026-11-16. M5.2 done 2026-11-16. M5.1 done 2026-11-16. M5 broken into steps 2026-11-16. M4 done 2026-11-16. M4.4 done 2026-11-16. M4.3 done 2026-11-16. M4.2 done 2026-11-16. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6, 7, 8, 9, 10 and 11 are settled.
+**Current step:** M8.6. M8.5 done 2026-11-18. M8.4 done 2026-11-18. M8.3 done 2026-11-17. M8.2 done 2026-11-17. M8.1 done 2026-11-17. M8 broken into steps 2026-11-17; the other areas became M9–M13 and the release moved to M14 (user, 2026-11-17). M7 done 2026-11-17. M7.7 done 2026-11-17. M7.6 done 2026-11-17. M7.5 done 2026-11-17. M7.4 done 2026-11-17. M7.3 done 2026-11-17. M7.2 done 2026-11-17. M7.1 done 2026-11-17. M7 broken into steps 2026-11-17. M6 done 2026-11-17. M6.6 done 2026-11-17. M6.5 done 2026-11-16. M6.4 done 2026-11-16. M6.3 done 2026-11-16. M6.2 done 2026-11-16. M6.1 done 2026-11-16. M6 broken into steps 2026-11-16. M5 done 2026-11-16. M5.7 done 2026-11-16. M5.6 done 2026-11-16. M5.5 done 2026-11-16. M5.4 done 2026-11-16. M5.3 done 2026-11-16. M5.2 done 2026-11-16. M5.1 done 2026-11-16. M5 broken into steps 2026-11-16. M4 done 2026-11-16. M4.4 done 2026-11-16. M4.3 done 2026-11-16. M4.2 done 2026-11-16. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6, 7, 8, 9, 10 and 11 are settled.
 
 ## How to use this
 
@@ -95,10 +95,16 @@ local test instance only (`docs/local-info.md`). Re-read `Template.php`, `Field.
   one screen for new and edit (`TemplateFormRoute`); edit and delete are on the template screen.
   `TemplateChanges` makes the list and the template screen read again. Mutation-checked: field
   positions (use case) and the trimmed duplicate-name check (form). Not run on a device.
-- [ ] **M8.5** — Choice lists: list, create, edit (name and choices: add, remove, reorder),
+- [x] **M8.5** — Choice lists: list, create, edit (name and choices: add, remove, reorder),
   delete with a confirm. Entry point: the template list and the choice-list picker in the M8.4
   form. `ChoiceList::$choices` is `Assert\Unique`: the form blocks a duplicate choice.
   **Verify:** ViewModel tests (create, edit, duplicate choice, delete, failure and retry).
+  Note: done 2026-11-18. A tap on a list opens its edit form, which also deletes it (no separate
+  detail screen). The form keeps its edits across process death; a create that a process death
+  stops can be sent twice. `ChoiceListChanges` makes the choice list screen, the template form
+  and the template screen read the lists again; the template form blocks a save while a field
+  names a list that is gone. A delete while a field uses the list gets 500 (plan §2): the app
+  names that cause. Mutation-checked: the trimmed duplicate-choice check. Not run on a device.
 - [ ] **M8.6** — Typed fields in the add and edit item forms. A text row carries its type (and
   its choice list for `choice-list`). Input by type: a number keyboard for `number` and
   `price`, a switch for `checkbox`, a multi-select from the choice list for `choice-list`, a text

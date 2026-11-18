@@ -5,6 +5,7 @@ import com.grappim.kit.testing.MainDispatcherRule
 import com.grappim.kit.uikit.NativeText
 import com.grappim.koillectionmobile.core.domain.KoillectionError
 import com.grappim.koillectionmobile.feature.templates.domain.ChoiceList
+import com.grappim.koillectionmobile.feature.templates.domain.ChoiceListChanges
 import com.grappim.koillectionmobile.feature.templates.domain.EditedTemplateField
 import com.grappim.koillectionmobile.feature.templates.domain.SaveTemplateProgress
 import com.grappim.koillectionmobile.feature.templates.domain.SaveTemplateResult
@@ -35,6 +36,7 @@ class TemplateFormViewModelTest {
     private val repository = FakeTemplatesRepository()
     private val useCase = FakeSaveTemplateUseCase()
     private val templateChanges = TemplateChanges()
+    private val choiceListChanges = ChoiceListChanges()
     private val savedStateHandle = SavedStateHandle()
     private val mainDispatcherRule = MainDispatcherRule()
 
@@ -54,7 +56,14 @@ class TemplateFormViewModelTest {
             repository.template.addLast(CompletableDeferred())
             repository.fields.addLast(CompletableDeferred())
         }
-        return TemplateFormViewModel(templateId, repository, useCase, templateChanges, savedStateHandle)
+        return TemplateFormViewModel(
+            templateId,
+            repository,
+            useCase,
+            templateChanges,
+            choiceListChanges,
+            savedStateHandle
+        )
     }
 
     private fun answerChoiceLists(result: Result<List<ChoiceList>> = Result.success(listOf(genres, formats))) {
@@ -371,6 +380,37 @@ class TemplateFormViewModelTest {
         assertEquals(BOOK_ID, useCase.calls.last().retryId)
         assertEquals(TemplateSnapshot(book, listOf(author, genre)), useCase.calls.last().original)
         assertEquals(BOOK_ID, restored.uiState.value.savedTemplateId)
+    }
+
+    @Test
+    fun `a choice list change reads the lists again and a deleted list blocks the save`() {
+        val sut = editSut()
+        sut.uiState.value.onNameChange("Novel")
+        assertTrue(sut.uiState.value.canSave)
+
+        repository.choiceLists.addLast(CompletableDeferred())
+        choiceListChanges.notifyChanged()
+        answerChoiceLists(Result.success(listOf(formats)))
+
+        assertEquals(listOf(formats), sut.uiState.value.choiceLists)
+        assertEquals("Novel", sut.draft.name)
+        // The "Genre" field still names "genres", which the server no longer has.
+        assertFalse(sut.uiState.value.canSave)
+
+        sut.uiState.value.onFieldChoiceListChange(sut.idOf("Genre"), "formats")
+        assertTrue(sut.uiState.value.canSave)
+    }
+
+    @Test
+    fun `a failed choice list reread keeps the lists the form has`() {
+        val sut = editSut()
+
+        repository.choiceLists.addLast(CompletableDeferred())
+        choiceListChanges.notifyChanged()
+        answerChoiceLists(Result.failure(KoillectionError.Network(IllegalStateException("timeout"))))
+
+        assertEquals(listOf(formats, genres), sut.uiState.value.choiceLists)
+        assertTrue(sut.uiState.value.error.isEmpty())
     }
 
     private val book = Template(BOOK_ID, "Book")

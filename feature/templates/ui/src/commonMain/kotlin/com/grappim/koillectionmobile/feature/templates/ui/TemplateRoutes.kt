@@ -17,3 +17,11 @@ data class TemplateRoute(val templateId: String, val name: String) : NavKey
 /** The template form: a new template when [templateId] is null, else the edit form of that template. */
 @Serializable
 data class TemplateFormRoute(val templateId: String? = null) : NavKey
+
+/** The choice lists of the user. */
+@Serializable
+data object ChoiceListListRoute : NavKey
+
+/** The choice list form: a new choice list when [choiceListId] is null, else the edit form of that list. */
+@Serializable
+data class ChoiceListFormRoute(val choiceListId: String? = null) : NavKey

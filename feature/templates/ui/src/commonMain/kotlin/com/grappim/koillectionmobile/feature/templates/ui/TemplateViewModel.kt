@@ -3,6 +3,7 @@ package com.grappim.koillectionmobile.feature.templates.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.grappim.kit.uikit.NativeText
+import com.grappim.koillectionmobile.feature.templates.domain.ChoiceListChanges
 import com.grappim.koillectionmobile.feature.templates.domain.TemplateChanges
 import com.grappim.koillectionmobile.feature.templates.domain.TemplatesRepository
 import com.grappim.koillectionmobile.strings.RString
@@ -20,7 +21,8 @@ import org.koin.core.annotation.KoinViewModel
 
 /**
  * Reads template [templateId], its fields and the choice lists when the screen opens, again on
- * retry, and again when the template form saved it ([TemplateChanges]). [templateId] arrives
+ * retry, and again when the template form saved it ([TemplateChanges]) or a choice list changed
+ * ([ChoiceListChanges]: a renamed list shows its new name). [templateId] arrives
  * through `parametersOf` at the call site. The rows keep the repository's order: `getFields` sorts
  * by position.
  *
@@ -31,7 +33,8 @@ import org.koin.core.annotation.KoinViewModel
 class TemplateViewModel(
     @InjectedParam private val templateId: String,
     private val templatesRepository: TemplatesRepository,
-    private val templateChanges: TemplateChanges
+    private val templateChanges: TemplateChanges,
+    private val choiceListChanges: ChoiceListChanges
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(
@@ -43,6 +46,9 @@ class TemplateViewModel(
         load()
         viewModelScope.launch {
             templateChanges.changedTemplates.filter { it == templateId && !_uiState.value.isDeleted }.collect { load() }
+        }
+        viewModelScope.launch {
+            choiceListChanges.changed.filter { !_uiState.value.isDeleted }.collect { load() }
         }
     }
 

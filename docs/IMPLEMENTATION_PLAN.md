@@ -171,7 +171,14 @@ start of any step that touches the API. Facts that shape the design:
     `cascade: all`, `orphanRemoval`). A collection that had the template as its default had
     `itemsDefaultTemplate: null` after (`onDelete: SET NULL`). An item's fields have no link to a
     template (`Datum.php`), so a template delete cannot change them; not sent live.
-  Not checked: a server behind a subpath, a choice list delete while a field uses it.
+  Not checked: a server behind a subpath.
+- Choice list writes checked live 2026-11-18 (M8.5, a `curl` probe on the local test instance with
+  the keys of the M8.1 repository). `DELETE /api/choice_lists/{id}` while a template field uses
+  the list got **500** (`Internal Server Error`): `koi_field.choice_list_id` and
+  `koi_datum.choice_list_id` are foreign keys with no `ON DELETE`, so an item field that uses the
+  list blocks the delete too (schema; not sent live). After the template delete the same
+  `DELETE` got 204. A create with `"choices": ["a","a"]` got 422 (`choices: This collection should
+  contain only unique elements.`).
 - Counting what a collection delete takes (M6.3, 1.8.5 source): the API has no counters.
   `Collection::$cachedValues` holds them but has no `Groups`, and `Item.php` has no `#[ApiFilter]`,
   so items cannot be counted for several collections in one call. The app reads all collections
