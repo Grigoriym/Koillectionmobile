@@ -1,6 +1,6 @@
 # koillectionmobile checklist
 
-**Current step:** M8.9. M8.8 done 2026-11-19. M8.7 done 2026-11-19. M8.6 done 2026-11-18. M8.5 done 2026-11-18. M8.4 done 2026-11-18. M8.3 done 2026-11-17. M8.2 done 2026-11-17. M8.1 done 2026-11-17. M8 broken into steps 2026-11-17; the other areas became M9–M13 and the release moved to M14 (user, 2026-11-17). M7 done 2026-11-17. M7.7 done 2026-11-17. M7.6 done 2026-11-17. M7.5 done 2026-11-17. M7.4 done 2026-11-17. M7.3 done 2026-11-17. M7.2 done 2026-11-17. M7.1 done 2026-11-17. M7 broken into steps 2026-11-17. M6 done 2026-11-17. M6.6 done 2026-11-17. M6.5 done 2026-11-16. M6.4 done 2026-11-16. M6.3 done 2026-11-16. M6.2 done 2026-11-16. M6.1 done 2026-11-16. M6 broken into steps 2026-11-16. M5 done 2026-11-16. M5.7 done 2026-11-16. M5.6 done 2026-11-16. M5.5 done 2026-11-16. M5.4 done 2026-11-16. M5.3 done 2026-11-16. M5.2 done 2026-11-16. M5.1 done 2026-11-16. M5 broken into steps 2026-11-16. M4 done 2026-11-16. M4.4 done 2026-11-16. M4.3 done 2026-11-16. M4.2 done 2026-11-16. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6, 7, 8, 9, 10 and 11 are settled.
+**Current step:** M9 (break into steps). M8 done 2026-11-19. M8.9 done 2026-11-19. M8.8 done 2026-11-19. M8.7 done 2026-11-19. M8.6 done 2026-11-18. M8.5 done 2026-11-18. M8.4 done 2026-11-18. M8.3 done 2026-11-17. M8.2 done 2026-11-17. M8.1 done 2026-11-17. M8 broken into steps 2026-11-17; the other areas became M9–M13 and the release moved to M14 (user, 2026-11-17). M7 done 2026-11-17. M7.7 done 2026-11-17. M7.6 done 2026-11-17. M7.5 done 2026-11-17. M7.4 done 2026-11-17. M7.3 done 2026-11-17. M7.2 done 2026-11-17. M7.1 done 2026-11-17. M7 broken into steps 2026-11-17. M6 done 2026-11-17. M6.6 done 2026-11-17. M6.5 done 2026-11-16. M6.4 done 2026-11-16. M6.3 done 2026-11-16. M6.2 done 2026-11-16. M6.1 done 2026-11-16. M6 broken into steps 2026-11-16. M5 done 2026-11-16. M5.7 done 2026-11-16. M5.6 done 2026-11-16. M5.5 done 2026-11-16. M5.4 done 2026-11-16. M5.3 done 2026-11-16. M5.2 done 2026-11-16. M5.1 done 2026-11-16. M5 broken into steps 2026-11-16. M4 done 2026-11-16. M4.4 done 2026-11-16. M4.3 done 2026-11-16. M4.2 done 2026-11-16. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6, 7, 8, 9, 10 and 11 are settled.
 
 ## How to use this
 
@@ -35,120 +35,7 @@ M4 (network and security parity with wallosmobile) is done; its steps and notes 
 M5 (edit and delete items) is done; its steps and notes are in `docs/CHECKLIST_ARCHIVE.md`.
 M6 (collections: create, edit, delete) is done; its steps and notes are in `docs/CHECKLIST_ARCHIVE.md`.
 M7 (search and tags) is done; its steps and notes are in `docs/CHECKLIST_ARCHIVE.md`.
-
-## M8 — templates
-
-Templates with their fields, choice lists, typed fields in the item forms, and a collection's
-default template. Choices are plan §5 decision 11 (user, 2026-11-17). Every write goes to the
-local test instance only (`docs/local-info.md`). Re-read `Template.php`, `Field.php`,
-`ChoiceList.php` and `Datum.php` at the start of each step that touches the API.
-
-- [x] **M8.1** — Repository calls (new `feature:templates:{data,domain,dto,mapper}`, the
-  wallosmobile split). Templates: list, get, create (`{"name"}`), rename, delete. Fields:
-  `GET /api/templates/{id}/fields` (all pages, sorted by `position` in the app), create
-  (`name`, `position`, `type`, `template` IRI, `choiceList` IRI for `choice-list`), edit, delete.
-  Choice lists: list, create and edit (`name`, `choices`), delete. Take the keys from the entity
-  `Groups`, not from memory.
-  **Verify:** mock-engine tests per call (method, path, content type, body keys), with a
-  root-path base URL case; mutation-check one body key and one path.
-  Note: done 2026-11-17. The test instance has no templates or choice lists, so the tests use
-  inline bodies, not fixtures. `TemplatesDataModule` and `TemplatesMapperModule` are in
-  `AppModule` now, and `KoinGraphTest` resolves `TemplatesRepository`. `editField` with a null
-  `choiceListId` keeps the stored choice list: a merge patch cannot clear it without an explicit
-  null, which the app does not send yet.
-- [x] **M8.2** — Live template smoke against the local test instance (a task, as `smokeTagRun`):
-  create a choice list, a template, one field of each type the item form will send (`text`,
-  `number`, `checkbox`, `choice-list`), set the template as a collection's
-  `itemsDefaultTemplate`, read `/api/collections/{id}/items_default_template`, add an item with a
-  `checkbox` and a `choice-list` datum, then delete everything it made and clear the default.
-  Also send a `choice-list` field without a `choiceList` and two fields with one name in one
-  template; record each answer. Record in plan §2 what the server stores for each value (source:
-  `DatumType.php` gives `checkbox` as `"1"`/`"0"`, `choice-list` as a JSON array, `date` as
-  `Y-m-d`; confirm over the API) and what a template delete does to its fields.
-  **Verify:** the run prints each step and passes; the test instance ends as it started; plan §2
-  has the results.
-  Note: done 2026-11-17 (`smokeTemplateRun`). It uses its own top-level collection, not `Books`.
-  A second field with a name the template has already got 201: the server does not check field
-  names, so M8.4 must. The run also checked a template delete while it is a collection's default
-  (the default becomes null) and a `checkbox` value `true` (422).
-- [x] **M8.3** — Template list and template screen (`feature:templates:ui`). An action on the
-  collection list opens the template list (sorted by name, ignoring case); a tap shows the
-  template's fields in position order with their type (and the choice list for `choice-list`).
-  Loading, empty and error states with retry on both screens. New Koin module: add its
-  `includes` line in `AppModule`.
-  **Verify:** ViewModel tests (order, empty, failure and retry) for both screens.
-  Note: done 2026-11-17. The template screen reads the fields and the choice lists in parallel
-  (as the tag list does); a failure of either shows the error. The type shows as the server's
-  value (`choice-list: Genres`); readable type labels wait for the M8.4 type picker. The
-  "Templates" action is a fifth top-bar action: see `docs/revisit.md` (M8.3).
-- [x] **M8.4** — Template form: create, edit, delete. The form edits the name and the field
-  rows (name, type, choice list for `choice-list`; add, remove, move up and down). The form blocks
-  a duplicate field name: the server takes one (plan §2, M8.2). The save sends
-  only what changed, as the item edit form does. Delete asks first. The form survives rotation
-  and process death. Ask the user at the start of the step which types the type picker offers
-  (all of `DatumTypeEnum::TYPES`, or the ones the item form can fill).
-  **Verify:** ViewModel and use-case tests (create, rename, add and remove and move a field,
-  failure part way, delete); mutation-check one.
-  Note: done 2026-11-18. The type picker offers all 17 `DatumTypeEnum::TYPES` (user, 2026-11-18).
-  `SaveTemplateUseCase` (`feature:templates:domain`) diffs the form against the template as loaded;
-  a retry reads it again and matches a field an earlier try created by its name. The form is
-  one screen for new and edit (`TemplateFormRoute`); edit and delete are on the template screen.
-  `TemplateChanges` makes the list and the template screen read again. Mutation-checked: field
-  positions (use case) and the trimmed duplicate-name check (form). Not run on a device.
-- [x] **M8.5** — Choice lists: list, create, edit (name and choices: add, remove, reorder),
-  delete with a confirm. Entry point: the template list and the choice-list picker in the M8.4
-  form. `ChoiceList::$choices` is `Assert\Unique`: the form blocks a duplicate choice.
-  **Verify:** ViewModel tests (create, edit, duplicate choice, delete, failure and retry).
-  Note: done 2026-11-18. A tap on a list opens its edit form, which also deletes it (no separate
-  detail screen). The form keeps its edits across process death; a create that a process death
-  stops can be sent twice. `ChoiceListChanges` makes the choice list screen, the template form
-  and the template screen read the lists again; the template form blocks a save while a field
-  names a list that is gone. A delete while a field uses the list gets 500 (plan §2): the app
-  names that cause. Mutation-checked: the trimmed duplicate-choice check. Not run on a device.
-- [x] **M8.6** — Typed fields in the add and edit item forms. A text row carries its type (and
-  its choice list for `choice-list`). Input by type: a number keyboard for `number` and
-  `price`, a switch for `checkbox`, a multi-select from the choice list for `choice-list`, a text
-  box for every other text type. The values go to the server in the M8.2 formats. "Add field"
-  still adds a `text` row. The edit form shows a field the server already has with its own
-  input. Ask the user at the start whether a free row gets a type picker too.
-  **Verify:** ViewModel and use-case tests (each input type, the value sent per type, edit of an
-  existing `checkbox` and `choice-list` field); mutation-check the `checkbox` value.
-  Note: done 2026-11-18. A free row gets a type picker with the 11 text types (user, 2026-11-18);
-  an existing field keeps its type. Every text type is now editable in the edit form (was `text`
-  only). The forms read the choice lists (`feature:templates:domain`) with the tags, with an error
-  and retry. The app checks `number`, `price` and `rating` values (plan §5 decision 11). The edit
-  diff treats a null server value as empty, so an untouched empty `checkbox` or `rating` sends
-  nothing. Mutation-checked: `checkbox` `"1"` → `"true"` fails the edit test. Not run on a device.
-- [x] **M8.7** — Apply a template in the add form: a template picker adds the template's fields
-  as empty typed rows after the rows the form has. A label the form already has is not added
-  twice. Ask the user at the start what an `image`, `sign`, `file`, `video`, `section` or
-  `blank-line` field does (default proposal: `image` adds a photo slot with that label, the rest
-  are skipped and the form says which).
-  **Verify:** ViewModel tests (apply, apply twice, label clash, skipped types).
-  Note: done 2026-11-19. The default proposal holds (user, 2026-11-19); an empty image slot is
-  dropped at the save, not a block. A slot is a separate list (`ImageSlot`), so it is never the main
-  image; the screen has a second photo source for it. The duplicate and blank label checks count
-  only filled slots. A name used twice in one template is added once. `applyTemplate`
-  (`AppliedTemplate.kt`) is a plain function, for M8.8 to reuse. Mutation-checked: the label clash
-  check (four tests fail). Not run on a device.
-- [x] **M8.8** — Collection default template. The collection form picks a template or none
-  (`itemsDefaultTemplate`, `collection:write`). The add form in that collection applies it when
-  it opens (once: not again after rotation or process death); the user can still remove the rows.
-  **Verify:** ViewModel and use-case tests (set, clear, add form opens with the rows, no second
-  apply after a saved-state restore).
-  Note: done 2026-11-19. The picker is in the edit form only (user, 2026-11-19); the new form
-  stays title and image. The clear sends an explicit `"itemsDefaultTemplate": null`
-  (`CollectionDefaultTemplatePatchDto` has no default value). The add form reads its collection
-  (`items:ui` now depends on `collections:domain`), then the template's fields, and applies them
-  with `applyTemplate`. A flag in saved state, set with the rows, stops a second apply; a failed
-  read shows an error with retry and is tried again after a restore. Mutation-checked: without
-  the flag two restore tests fail. No use case: mock-engine tests cover the set and the clear
-  call. Not run on a device.
-- [ ] **M8.9** — Device pass on the emulator (`emulator-testing` skill) against the local test
-  instance: create a choice list and a template, set it as a collection's default, add an item
-  with it (photo, `checkbox`, `choice-list`), edit the item, then delete the template and the
-  choice list. Compare the item with the web UI.
-  **Verify:** each action works on the device; the item shows the same values in the web UI.
+M8 (templates) is done; its steps and notes are in `docs/CHECKLIST_ARCHIVE.md`.
 
 ## M9 — wishlists and wishes (rough scope)
 

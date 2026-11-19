@@ -128,4 +128,5 @@ cold session can act on it. Delete an entry when it's fixed.
   (`feature/items/ui/.../ItemField.kt`, `Datum.toField`: every text type becomes
   `ItemField.Text` with the raw `value`). The item forms show them with their own input since
   M8.6. Fix option: a checkmark (or yes/no) for `checkbox` and the picks joined by commas for
-  `choice-list`, with `pickedChoices` from `FieldInput.kt`. Look at it in the M8.9 device pass.
+  `choice-list`, with `pickedChoices` from `FieldInput.kt`. Seen on the device in M8.9: "Read" showed
+  `1`, then `0`, and "Genre" showed `["Novel","Poem"]`; the web item page shows a cross and a list.
