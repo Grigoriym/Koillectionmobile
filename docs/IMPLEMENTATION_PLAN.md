@@ -329,7 +329,10 @@ code without checking the licence terms are kept.
    picker). A collection's `itemsDefaultTemplate` is in scope: the add form in that collection
    applies it when it opens.
    The template form's type picker offers all 17 `DatumTypeEnum::TYPES`, also the ones the item
-   form cannot fill (user, 2026-11-18, M8.4); M8.7 decides what those do in the add form.
+   form cannot fill (user, 2026-11-18, M8.4). In the add form (user, 2026-11-19, M8.7): an `image`
+   field becomes an empty image slot with its label, never the main image; a slot without a photo
+   sends nothing at the save. A `sign`, `file`, `video`, `section` or `blank-line` field is not
+   added, and the form names it.
    A free row of the item forms gets a type picker too (user, 2026-11-18, M8.6). It offers the 11
    text types (`TEXT_TYPES` in `feature:items:domain`); an existing field keeps its type. The form
    blocks a save for a `choice-list` row without a list and for a `number`, `price` or `rating`

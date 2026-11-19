@@ -222,6 +222,16 @@
     <string name="add_item_rotate_photo">Rotate</string>
     <string name="add_item_make_main">Make main image</string>
     <string name="add_item_remove_photo">Remove photo</string>
+    <string name="add_item_slot_empty">No photo yet. Without a photo, the save leaves out this image field.</string>
+    <string name="add_item_pick_photo_one">Pick photo</string>
+    <string name="add_item_remove_slot">Remove image field</string>
+    <string name="add_item_apply_template">Apply template</string>
+    <string name="add_item_templates_title">Apply a template</string>
+    <string name="add_item_no_templates">The server has no templates.</string>
+    <string name="add_item_templates_error">Loading the template failed.</string>
+    <string name="add_item_templates_cancel">Cancel</string>
+    <string name="add_item_skipped_fields">Not added: the app cannot fill these field types. %1$s</string>
+    <string name="add_item_skipped_ok">OK</string>
     <string name="add_item_section_tags">Tags</string>
     <string name="add_item_no_category">No category</string>
     <string name="add_item_no_tags">The server has no tags.</string>

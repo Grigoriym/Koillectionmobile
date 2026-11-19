@@ -88,7 +88,10 @@ internal class FakePhotoFiles : PhotoFiles {
     }
 }
 
-/** Only the choice lists: [answer] is given at once to each read. */
+/**
+ * The reads only: [answer] (the choice lists), [templates] and [fields] (per template id) are
+ * given at once to each read.
+ */
 internal class FakeChoiceLists : TemplatesRepository {
     var answer: Result<List<ChoiceList>> = Result.success(listOf(GENRES, FORMATS))
     var calls = 0
@@ -98,7 +101,15 @@ internal class FakeChoiceLists : TemplatesRepository {
         return answer
     }
 
-    override suspend fun getTemplates(): Result<List<Template>> = error("not used")
+    var templates: Result<List<Template>> = Result.success(emptyList())
+    var templateCalls = 0
+    var fields: Map<String, Result<List<TemplateField>>> = emptyMap()
+    val fieldCalls = mutableListOf<String>()
+
+    override suspend fun getTemplates(): Result<List<Template>> {
+        templateCalls++
+        return templates
+    }
 
     override suspend fun getTemplate(id: String): Result<Template> = error("not used")
 
@@ -108,7 +119,10 @@ internal class FakeChoiceLists : TemplatesRepository {
 
     override suspend fun deleteTemplate(id: String): Result<Unit> = error("not used")
 
-    override suspend fun getFields(templateId: String): Result<List<TemplateField>> = error("not used")
+    override suspend fun getFields(templateId: String): Result<List<TemplateField>> {
+        fieldCalls += templateId
+        return fields.getValue(templateId)
+    }
 
     override suspend fun createField(
         templateId: String,

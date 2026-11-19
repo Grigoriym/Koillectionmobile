@@ -20,6 +20,7 @@ import com.grappim.koillectionmobile.feature.items.domain.NewTextField
 import com.grappim.koillectionmobile.feature.items.domain.TYPE_CHOICE_LIST
 import com.grappim.koillectionmobile.feature.tags.domain.TagsRepository
 import com.grappim.koillectionmobile.feature.tags.domain.loadTagGroups
+import com.grappim.koillectionmobile.feature.templates.domain.TemplateField
 import com.grappim.koillectionmobile.feature.templates.domain.TemplatesRepository
 import com.grappim.koillectionmobile.strings.RString
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_error_http
@@ -32,6 +33,7 @@ import com.grappim.koillectionmobile.strings.generated.resources.add_item_save_e
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_save_error_unexpected
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_save_error_validation
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_save_unfinished
+import com.grappim.koillectionmobile.strings.generated.resources.add_item_templates_error
 import com.grappim.koillectionmobile.strings.generated.resources.error_proxy_rejected
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -49,7 +51,8 @@ import org.koin.core.annotation.KoinViewModel
 /**
  * The add-item form: name, typed label/value rows, photos, a pick from the server's existing tags,
  * and labels of new tags. A row's type picks its input (`FieldInput.kt`); a `choice-list` row
- * picks from the server's choice lists, which load with the tags. A new tag is created by the save, not when it is added, so a form left
+ * picks from the server's choice lists, which load with the tags. A template adds its fields as
+ * empty rows and image slots ([applyTemplate]). A new tag is created by the save, not when it is added, so a form left
  * without saving creates no tag. The save creates the item in [collectionId] through
  * [AddItemUseCase].
  *
@@ -87,12 +90,17 @@ class AddItemViewModel(
 
     private var nextFieldId = (draft.fields.maxOfOrNull { it.id } ?: -1) + 1
     private var nextPhotoId = (draft.photos.maxOfOrNull { it.id } ?: -1) + 1
+    private var nextSlotId = (draft.imageSlots.maxOfOrNull { it.id } ?: -1) + 1
+
+    /** The template whose fields the picker loads, so a retry loads them again. Null: the list loads. */
+    private var pickedTemplateId: String? = null
 
     private val _uiState = MutableStateFlow(
         AddItemUiState(
             name = draft.name,
             fields = draft.fields,
             photos = draft.photos,
+            imageSlots = draft.imageSlots,
             selectedTagIds = draft.selectedTagIds,
             newTagLabels = draft.newTagLabels,
             onNameChange = ::changeName,
@@ -114,6 +122,15 @@ class AddItemViewModel(
             onPhotoRemove = ::removePhoto,
             onPhotoMakeMain = ::makeMain,
             onPhotoLabelChange = ::changePhotoLabel,
+            onSlotPhotos = ::fillSlot,
+            onSlotRotate = ::rotateSlot,
+            onSlotRemove = ::removeSlot,
+            onSlotLabelChange = ::changeSlotLabel,
+            onOpenTemplates = ::openTemplates,
+            onCloseTemplates = ::closeTemplates,
+            onTemplatePick = ::pickTemplate,
+            onRetryTemplates = ::retryTemplates,
+            onSkippedDismiss = ::dismissSkipped,
             onSave = ::save,
             onRetrySave = ::retrySave,
             onEditForm = ::editForm,
@@ -130,7 +147,7 @@ class AddItemViewModel(
     init {
         viewModelScope.launch {
             _uiState
-                .map { AddItemDraft(it.name, it.fields, it.photos, it.selectedTagIds, it.newTagLabels) }
+                .map { AddItemDraft(it.name, it.fields, it.photos, it.imageSlots, it.selectedTagIds, it.newTagLabels) }
                 .distinctUntilChanged()
                 .collect { savedStateHandle[DRAFT_KEY] = json.encodeToString(it) }
         }
@@ -163,6 +180,116 @@ class AddItemViewModel(
 
     private fun updatePhoto(id: Int, change: (PhotoRow) -> PhotoRow) {
         _uiState.update { s -> s.copy(photos = s.photos.map { if (it.id == id) change(it) else it }) }
+    }
+
+    /** The first of [uris] goes into slot [id]; a second pick has no slot, so its copy is deleted. */
+    private fun fillSlot(id: Int, uris: List<String>) {
+        val slot = _uiState.value.imageSlots.firstOrNull { it.id == id && it.uri == null }
+        val uri = uris.firstOrNull()
+        if (slot == null || uri == null) {
+            photoFiles.delete(uris)
+            return
+        }
+        updateSlot(id) { it.copy(uri = uri) }
+        photoFiles.delete(uris.drop(1))
+    }
+
+    private fun rotateSlot(id: Int) = updateSlot(id) { it.copy(rotation = it.rotation.next()) }
+
+    private fun removeSlot(id: Int) {
+        val removed = _uiState.value.imageSlots.filter { it.id == id }
+        _uiState.update { s -> s.copy(imageSlots = s.imageSlots.filterNot { it.id == id }) }
+        photoFiles.delete(removed.mapNotNull { it.uri })
+    }
+
+    private fun changeSlotLabel(id: Int, label: String) = updateSlot(id) { it.copy(label = label) }
+
+    private fun updateSlot(id: Int, change: (ImageSlot) -> ImageSlot) {
+        _uiState.update { s -> s.copy(imageSlots = s.imageSlots.map { if (it.id == id) change(it) else it }) }
+    }
+
+    private fun openTemplates() {
+        if (_uiState.value.templatePicker != null) return
+        pickedTemplateId = null
+        _uiState.update { it.copy(templatePicker = TemplatePickerUi()) }
+        loadTemplates()
+    }
+
+    private fun closeTemplates() {
+        pickedTemplateId = null
+        _uiState.update { it.copy(templatePicker = null) }
+    }
+
+    private fun pickTemplate(templateId: String) {
+        val picker = _uiState.value.templatePicker ?: return
+        if (picker.isLoading) return
+        pickedTemplateId = templateId
+        _uiState.update { it.copy(templatePicker = picker.copy(isLoading = true, error = NativeText.Empty)) }
+        loadTemplateFields(templateId)
+    }
+
+    private fun retryTemplates() {
+        val picker = _uiState.value.templatePicker ?: return
+        if (picker.isLoading) return
+        _uiState.update { it.copy(templatePicker = picker.copy(isLoading = true, error = NativeText.Empty)) }
+        pickedTemplateId?.let(::loadTemplateFields) ?: loadTemplates()
+    }
+
+    /** Sorted by name, ignoring case, as the template list. */
+    private fun loadTemplates() {
+        viewModelScope.launch {
+            val result = templatesRepository.getTemplates()
+            updatePicker { picker ->
+                result.fold(
+                    onSuccess = { templates ->
+                        picker.copy(
+                            templates = templates.sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER) { it.name }),
+                            isLoading = false
+                        )
+                    },
+                    onFailure = { picker.copy(isLoading = false, error = templatesError) }
+                )
+            }
+        }
+    }
+
+    private fun loadTemplateFields(templateId: String) {
+        viewModelScope.launch {
+            val result = templatesRepository.getFields(templateId)
+            // The picker closed while the fields loaded: the user does not want them any more.
+            if (_uiState.value.templatePicker == null || pickedTemplateId != templateId) return@launch
+            result.fold(
+                onSuccess = { fields ->
+                    pickedTemplateId = null
+                    applyTemplateFields(fields)
+                },
+                onFailure = { updatePicker { it.copy(isLoading = false, error = templatesError) } }
+            )
+        }
+    }
+
+    /** Adds [fields] after the rows the form has, closes the picker, and names the skipped fields. */
+    private fun applyTemplateFields(fields: List<TemplateField>) {
+        _uiState.update { s ->
+            val usedLabels =
+                s.fields.map { it.label } + s.photos.drop(1).map { it.label } + s.imageSlots.map { it.label }
+            val applied = applyTemplate(fields, usedLabels.toSet(), { nextFieldId++ }, { nextSlotId++ })
+            s.copy(
+                fields = s.fields + applied.rows,
+                imageSlots = s.imageSlots + applied.slots,
+                templatePicker = null,
+                skippedTemplateFields = applied.skipped
+            )
+        }
+    }
+
+    private fun dismissSkipped() {
+        _uiState.update { it.copy(skippedTemplateFields = emptyList()) }
+    }
+
+    /** Changes the picker only while it is open: a load that ends after a close changes nothing. */
+    private fun updatePicker(change: (TemplatePickerUi) -> TemplatePickerUi) {
+        _uiState.update { s -> s.templatePicker?.let { s.copy(templatePicker = change(it)) } ?: s }
     }
 
     private fun changeName(name: String) {
@@ -278,7 +405,7 @@ class AddItemViewModel(
             when (result) {
                 is AddItemResult.Success -> {
                     savedStateHandle[SAVE_KEY] = json.encodeToString(SaveRecord(savedItemId = result.itemId))
-                    photoFiles.delete(form.photos.map { it.uri })
+                    photoFiles.delete(form.photos.map { it.uri } + form.imageSlots.mapNotNull { it.uri })
                     itemListChanges.notifyChanged(collectionId)
                     _uiState.update { it.copy(savedItemId = result.itemId) }
                 }
@@ -306,19 +433,28 @@ class AddItemViewModel(
         val images = photos.mapIndexed { index, photo ->
             NewImage(photoFiles.prepare(photo.uri, photo.rotation), "photo-$index.jpg", JPEG_MIME_TYPE)
         }
+        val slotFields = filledSlots.mapIndexed { index, slot ->
+            val image = NewImage(
+                photoFiles.prepare(checkNotNull(slot.uri), slot.rotation),
+                "slot-$index.jpg",
+                JPEG_MIME_TYPE
+            )
+            NewImageField(slot.label, image)
+        }
         return NewItem(
             collectionId = collectionId,
             name = name.trim(),
             textFields = fields.map { NewTextField(it.label, it.value, it.type, it.choiceListId) },
             mainImage = images.firstOrNull(),
-            imageFields = photos.drop(1).zip(images.drop(1)) { photo, image -> NewImageField(photo.label, image) },
+            imageFields = photos.drop(1).zip(images.drop(1)) { photo, image -> NewImageField(photo.label, image) } +
+                slotFields,
             tagIds = selectedTagIds.toList(),
             newTagLabels = newTagLabels
         )
     }
 
     override fun onCleared() {
-        photoFiles.delete(_uiState.value.photos.map { it.uri })
+        photoFiles.delete(_uiState.value.photos.map { it.uri } + _uiState.value.imageSlots.mapNotNull { it.uri })
     }
 
     private fun retryChoiceLists() {
@@ -354,6 +490,7 @@ private data class AddItemDraft(
     val name: String = "",
     val fields: List<FieldRow> = emptyList(),
     val photos: List<PhotoRow> = emptyList(),
+    val imageSlots: List<ImageSlot> = emptyList(),
     val selectedTagIds: Set<String> = emptySet(),
     val newTagLabels: List<String> = emptyList()
 )
@@ -429,6 +566,8 @@ private const val HTTP_UNAUTHORIZED = 401
 private const val HTTP_NOT_FOUND = 404
 
 private val json = Json { ignoreUnknownKeys = true }
+
+private val templatesError = NativeText.Resource(RString.add_item_templates_error)
 
 /** The message of a failed `loadTagGroups`. */
 internal fun Throwable.toTagsMessage(): NativeText = when (this) {

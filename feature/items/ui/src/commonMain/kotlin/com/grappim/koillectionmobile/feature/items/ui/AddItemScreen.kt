@@ -44,6 +44,7 @@ import com.grappim.koillectionmobile.core.photos.PhotoPreview
 import com.grappim.koillectionmobile.core.photos.rememberPhotoSources
 import com.grappim.koillectionmobile.strings.RString
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_add_field
+import com.grappim.koillectionmobile.strings.generated.resources.add_item_apply_template
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_back
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_discard_text
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_discard_title
@@ -91,6 +92,14 @@ private fun AddItemContent(uiState: AddItemUiState, onBack: () -> Unit, modifier
         isBackEnabled = uiState.hasInput,
         onBackCompleted = { isDiscardShown = true }
     )
+    uiState.templatePicker?.let { picker ->
+        TemplatePickerDialog(
+            picker = picker,
+            onPick = uiState.onTemplatePick,
+            onRetry = uiState.onRetryTemplates,
+            onDismiss = uiState.onCloseTemplates
+        )
+    }
     if (isDiscardShown) {
         DiscardDialog(
             title = RString.add_item_discard_title,
@@ -140,6 +149,12 @@ private fun AddItemContent(uiState: AddItemUiState, onBack: () -> Unit, modifier
         }
         val duplicates = uiState.duplicateLabels
         val photoSources = rememberPhotoSources(onPhotos = uiState.onPhotosAdd)
+        // The slot a photo source was started for. Saved: the camera often pushes the process out.
+        var slotTarget by rememberSaveable { mutableStateOf(NO_SLOT) }
+        val slotSources = rememberPhotoSources(onPhotos = { uris ->
+            uiState.onSlotPhotos(slotTarget, uris)
+            slotTarget = NO_SLOT
+        })
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
@@ -172,6 +187,17 @@ private fun AddItemContent(uiState: AddItemUiState, onBack: () -> Unit, modifier
                     isMain = index == 0,
                     labelError = labelError(photo.label, duplicates),
                     uiState = uiState,
+                    modifier = Modifier.padding(horizontal = PADDING)
+                )
+            }
+            items(uiState.imageSlots, key = { "slot-${it.id}" }) { slot ->
+                ImageSlotEditor(
+                    slot = slot,
+                    labelError = if (slot.uri != null) labelError(slot.label, duplicates) else null,
+                    uiState = uiState,
+                    sources = slotSources,
+                    onSourceUse = { slotTarget = it },
+                    previewSize = PREVIEW_SIZE,
                     modifier = Modifier.padding(horizontal = PADDING)
                 )
             }
@@ -213,9 +239,26 @@ private fun AddItemContent(uiState: AddItemUiState, onBack: () -> Unit, modifier
                 )
             }
             item(key = "add-field") {
-                OutlinedButton(onClick = uiState.onAddField, modifier = Modifier.padding(horizontal = PADDING)) {
-                    Icon(imageVector = Icons.Filled.Add, contentDescription = null)
-                    Text(stringResource(RString.add_item_add_field))
+                Row(
+                    modifier = Modifier.padding(horizontal = PADDING),
+                    horizontalArrangement = Arrangement.spacedBy(TAG_SPACING)
+                ) {
+                    OutlinedButton(onClick = uiState.onAddField) {
+                        Icon(imageVector = Icons.Filled.Add, contentDescription = null)
+                        Text(stringResource(RString.add_item_add_field))
+                    }
+                    OutlinedButton(onClick = uiState.onOpenTemplates) {
+                        Text(stringResource(RString.add_item_apply_template))
+                    }
+                }
+            }
+            if (uiState.skippedTemplateFields.isNotEmpty()) {
+                item(key = "skipped") {
+                    SkippedFieldsNote(
+                        skipped = uiState.skippedTemplateFields,
+                        onDismiss = uiState.onSkippedDismiss,
+                        modifier = Modifier.padding(horizontal = PADDING)
+                    )
                 }
             }
             item(key = "tags") {
@@ -299,3 +342,6 @@ private fun PhotoRowEditor(
 private val PADDING = 16.dp
 private val TAG_SPACING = 8.dp
 private val PREVIEW_SIZE = 120.dp
+
+/** No slot waits for a photo. Form ids start at 0. */
+private const val NO_SLOT = -1
