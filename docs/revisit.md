@@ -114,6 +114,7 @@ cold session can act on it. Delete an entry when it's fixed.
   (`feature/collections/ui/.../CollectionListScreen.kt`, `TopAppBar` `actions`). On a phone width
   the title may get very little room. Not checked on a device in M8.3. Look at it in the M8.9
   device pass; an overflow menu for Settings and Log out is one fix.
+  Scheduled: M9.3 moves these actions into an overflow menu (user, 2026-11-19, plan §5 decision 12).
 - 2026-11-18 (M8.4) — Two edge cases of the template save, left as they are.
   (1) A field changed from `choice-list` to another type keeps its choice list on the server:
   `SaveTemplateUseCaseImpl.patch` sends no `choiceList`, and `editField` cannot send an explicit

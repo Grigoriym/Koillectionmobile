@@ -340,3 +340,16 @@ code without checking the licence terms are kept.
    blocks a save for a `choice-list` row without a list and for a `number`, `price` or `rating`
    value that `Datum.php` rejects (an empty `rating` too: `Choice` checks an empty string). The
    other types (`date`, `link`, `country`, `list`) are checked by the server only (a 422).
+12. **Wishlists and wishes** — *decided 2026-11-19 (start of M9)*: full CRUD of wishlists
+   (nested, as collections) and wishes, with images. The wishlist list opens from an overflow
+   menu on the collection list. The same menu takes Tags, Templates, Settings and Log out, which
+   closes the M8.3 entry in `docs/revisit.md`. The wishlist form edits the name and the image, as
+   the collection form does (decision 9): the server picks the color, and visibility and parent
+   stay as they are. The image can be set, replaced and removed (`Wishlist` has `deleteImage`).
+   The wish form edits name, URL, price, currency, comment and the image; visibility stays as the
+   server sets it. The wish image can be replaced but not removed: `Wish` has no `deleteProperty`
+   in Koillection 1.8.5, as `Item` (decision 8). The currency is a free text box: the app
+   upper-cases it and blocks a value that is not 3 letters; the server checks the code
+   (`Assert\Currency`, a 422). No move of a wish to another wishlist and no "transfer to
+   collection": the latter is a web route only (`WishController`, `app_wish_transfer_to_collection`),
+   not in the API (user, 2026-11-19).
