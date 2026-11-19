@@ -120,8 +120,9 @@ first — it is often for a problem this toolchain doesn't have.
   a string-replace insert broke the import order four times (last M7.2).
 - **A mutation check copies the file to the scratchpad first and restores from the copy.**
   `git checkout --` fails on an untracked file (M1.8) and drops the step's own uncommitted edits
-  (M5.6). `jvmTest` has `failFast = true` (`Quality.kt`): a run stops at the first failure, so its
-  report lists fewer tests than exist. That is the stop, not missing tests; run one mutation per run.
+  (M5.6). `jvmTest` has `failFast = true` (`Quality.kt`): a run stops early, so its report
+  lists fewer tests than exist. That is the stop, not missing tests; run one mutation per run. It
+  does not stop at exactly one failure (M8.4 listed 9, M8.7 listed 4): the count is no measure.
   Run it without `-q`: `-q` hides the failing test names, and "BUILD FAILED" alone also fits a
   compile error (M6.1, M6.3, M6.5).
 - **Force Gradle tests with `--rerun`** when the test is the proof. An `UP-TO-DATE` test task

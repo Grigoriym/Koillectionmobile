@@ -67,9 +67,8 @@ entries get deleted — see /finalize.
   new-tag dialog; the same call with "M7.7%sdevicetag" a minute earlier landed correctly.
 - 2026-11-17 — `./gradlew build | grep -E 'FAILED|error'` (M8.1) printed a page of PASSED tests whose
   names hold "error". Redirect the run to a log and grep `BUILD (SUCC|FAIL)|What went wrong`.
-- 2026-11-18 — The M8.4 position mutation run of `:feature:templates:domain:jvmTest` listed 9 failed
-  tests, though `CLAUDE.md` says `failFast = true` (`Quality.kt:19`) stops at the first failure.
-  Not looked into; "one failure per run" is not a safe reading of a report.
 - 2026-11-18 — A lambda in a `MutableStateFlow(...)` initializer that used `_uiState` itself (M8.5)
   failed with "Type checking has run into a recursive problem", plus a false "needs opt-in" and "No
   parameter with name" error on the same line. A method reference (`::dismissActionError`) fixed it.
+- 2026-11-19 — ktlint `standard:filename` (M8.7) failed `ktlintCheck` for `TemplateApply.kt`, whose one
+  class is `AppliedTemplate` next to a top-level function. Second hit after detekt in M7.6; renamed.
