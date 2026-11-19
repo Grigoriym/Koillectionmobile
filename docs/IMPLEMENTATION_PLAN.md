@@ -176,7 +176,8 @@ start of any step that touches the API. Facts that shape the design:
   the keys of the M8.1 repository). `DELETE /api/choice_lists/{id}` while a template field uses
   the list got **500** (`Internal Server Error`): `koi_field.choice_list_id` and
   `koi_datum.choice_list_id` are foreign keys with no `ON DELETE`, so an item field that uses the
-  list blocks the delete too (schema; not sent live). After the template delete the same
+  list blocks the delete too (schema; also 500 live in the M8.9 device pass, after the template
+  was gone). After the template delete the same
   `DELETE` got 204. A create with `"choices": ["a","a"]` got 422 (`choices: This collection should
   contain only unique elements.`).
 - Counting what a collection delete takes (M6.3, 1.8.5 source): the API has no counters.

@@ -72,3 +72,5 @@ entries get deleted — see /finalize.
   parameter with name" error on the same line. A method reference (`::dismissActionError`) fixed it.
 - 2026-11-19 — ktlint `standard:filename` (M8.7) failed `ktlintCheck` for `TemplateApply.kt`, whose one
   class is `AppliedTemplate` next to a top-level function. Second hit after detekt in M7.6; renamed.
+- 2026-11-19 — `GET /api/items?name=M89` ignored the filter and returned an unrelated `Books` item
+  (`Item.php` has no `#[ApiFilter]`). Read `/api/collections/<id>/items` instead.

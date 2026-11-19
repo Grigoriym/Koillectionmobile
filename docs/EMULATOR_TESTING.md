@@ -146,6 +146,13 @@ this app.
   tags, created on save". To see that no tag exists before Save, count `GET /api/tags`
   (`totalItems`). The test instance has exactly 30 tags, one full page of `/api/tags`, so a new tag
   lands on page 2: read every page before a cleanup by label (M7.7 missed one).
+- Templates (M8.9): "Templates" in the collection list's top bar; "Choice lists" (`content-desc`)
+  in its top bar. In the template form the field type is a chip with the type's name ("Text"):
+  `ui.py tap Text <n>` opens the 17-type menu. A `choice-list` type adds "Pick a choice list". In
+  the item forms the `checkbox` switch and the `choice-list` chips have no label in the dump: find
+  them by `checkable="true"` in a fresh dump (the chip's `checked` is on that node). The item
+  screen shows the raw stored values (`1`, `["Novel"]`). A choice list that an item still uses
+  cannot be deleted (500, the app names the cause): delete the item or its collection first.
 - Local network permission (M4.1): `10.0.2.2` is the emulator's own gateway, so a check of
   `ACCESS_LOCAL_NETWORK` needs another private host address. The test instance listens on
   `127.0.0.1` only: forward a host-only private address to it for the check, not the Wi-Fi LAN
