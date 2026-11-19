@@ -2,6 +2,7 @@ package com.grappim.koillectionmobile.feature.collections.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -200,7 +201,8 @@ internal fun CollectionFormScaffold(
 
 /**
  * The title and the image. [photo] is a new photo on this device. Without one, [imageUrl] is the
- * image on the server, if the collection has one (the edit form).
+ * image on the server, if the collection has one (the edit form). [extra] goes after the image: the
+ * edit form puts its default-template picker there.
  */
 @Composable
 internal fun CollectionForm(
@@ -211,7 +213,8 @@ internal fun CollectionForm(
     onPhotosAdd: (List<String>) -> Unit,
     onPhotoRotate: () -> Unit,
     onPhotoRemove: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    extra: @Composable ColumnScope.() -> Unit = {}
 ) {
     val photoSources = rememberPhotoSources(onPhotos = onPhotosAdd)
     Column(
@@ -263,6 +266,7 @@ internal fun CollectionForm(
                 }
             }
         }
+        extra()
     }
 }
 

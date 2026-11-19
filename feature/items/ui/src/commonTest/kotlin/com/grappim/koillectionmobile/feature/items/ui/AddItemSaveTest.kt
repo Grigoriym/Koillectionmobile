@@ -53,7 +53,16 @@ class AddItemSaveTest {
 
     private fun createSut(handle: SavedStateHandle = savedStateHandle): AddItemViewModel {
         tags.queue()
-        return AddItemViewModel(COLLECTION_ID, tags, choiceLists, useCase, photoFiles, itemListChanges, handle)
+        return AddItemViewModel(
+            COLLECTION_ID,
+            FakeCollectionsRepository(),
+            tags,
+            choiceLists,
+            useCase,
+            photoFiles,
+            itemListChanges,
+            handle
+        )
     }
 
     /** Name, two text rows, three photos (the first rotated), one tag. */

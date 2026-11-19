@@ -9,6 +9,7 @@ import com.grappim.koillectionmobile.core.api.getAllHydraPages
 import com.grappim.koillectionmobile.core.api.normalizeBaseUrl
 import com.grappim.koillectionmobile.feature.collections.domain.Collection
 import com.grappim.koillectionmobile.feature.collections.domain.CollectionsRepository
+import com.grappim.koillectionmobile.feature.collections.dto.CollectionDefaultTemplatePatchDto
 import com.grappim.koillectionmobile.feature.collections.dto.CollectionDto
 import com.grappim.koillectionmobile.feature.collections.dto.CollectionPatchDto
 import com.grappim.koillectionmobile.feature.collections.dto.NewCollectionDto
@@ -107,12 +108,16 @@ internal class CollectionsRepositoryImpl(
     override suspend fun deleteCollectionImage(id: String): Result<Collection> =
         patch(id, CollectionPatchDto(deleteImage = true))
 
+    override suspend fun setDefaultTemplate(id: String, templateId: String?): Result<Collection> =
+        patch(id, CollectionDefaultTemplatePatchDto(templateId?.let { "/$TEMPLATES_PATH/$it" }))
+
     override suspend fun deleteCollection(id: String): Result<Unit> = resultOf {
         httpClient.delete("$COLLECTIONS_PATH/$id")
         Unit
     }
 
-    private suspend fun patch(id: String, body: CollectionPatchDto): Result<Collection> = resultOf {
+    /** Reified: `setBody` picks the serializer from the static type of [body]. */
+    private suspend inline fun <reified T : Any> patch(id: String, body: T): Result<Collection> = resultOf {
         val dto = httpClient.patch("$COLLECTIONS_PATH/$id") {
             contentType(ContentTypeMergePatchJson)
             setBody(body)
@@ -124,3 +129,4 @@ internal class CollectionsRepositoryImpl(
 }
 
 private const val COLLECTIONS_PATH = "api/collections"
+private const val TEMPLATES_PATH = "api/templates"

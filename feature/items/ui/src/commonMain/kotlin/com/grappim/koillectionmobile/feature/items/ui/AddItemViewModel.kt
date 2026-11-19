@@ -9,6 +9,7 @@ import com.grappim.koillectionmobile.core.domain.KoillectionError
 import com.grappim.koillectionmobile.core.photos.JPEG_MIME_TYPE
 import com.grappim.koillectionmobile.core.photos.PhotoFiles
 import com.grappim.koillectionmobile.core.photos.next
+import com.grappim.koillectionmobile.feature.collections.domain.CollectionsRepository
 import com.grappim.koillectionmobile.feature.items.domain.AddItemResult
 import com.grappim.koillectionmobile.feature.items.domain.AddItemState
 import com.grappim.koillectionmobile.feature.items.domain.AddItemUseCase
@@ -23,6 +24,7 @@ import com.grappim.koillectionmobile.feature.tags.domain.loadTagGroups
 import com.grappim.koillectionmobile.feature.templates.domain.TemplateField
 import com.grappim.koillectionmobile.feature.templates.domain.TemplatesRepository
 import com.grappim.koillectionmobile.strings.RString
+import com.grappim.koillectionmobile.strings.generated.resources.add_item_default_template_error
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_error_http
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_error_network
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_error_unexpected
@@ -52,7 +54,9 @@ import org.koin.core.annotation.KoinViewModel
  * The add-item form: name, typed label/value rows, photos, a pick from the server's existing tags,
  * and labels of new tags. A row's type picks its input (`FieldInput.kt`); a `choice-list` row
  * picks from the server's choice lists, which load with the tags. A template adds its fields as
- * empty rows and image slots ([applyTemplate]). A new tag is created by the save, not when it is added, so a form left
+ * empty rows and image slots ([applyTemplate]). The collection's default template is applied the
+ * same way when the form opens, once: a flag in [savedStateHandle] stops a second apply after
+ * process death, and the user can remove its rows. A new tag is created by the save, not when it is added, so a form left
  * without saving creates no tag. The save creates the item in [collectionId] through
  * [AddItemUseCase].
  *
@@ -68,6 +72,7 @@ import org.koin.core.annotation.KoinViewModel
 @KoinViewModel
 class AddItemViewModel(
     @InjectedParam private val collectionId: String,
+    private val collectionsRepository: CollectionsRepository,
     private val tagsRepository: TagsRepository,
     private val templatesRepository: TemplatesRepository,
     private val addItemUseCase: AddItemUseCase,
@@ -131,6 +136,7 @@ class AddItemViewModel(
             onTemplatePick = ::pickTemplate,
             onRetryTemplates = ::retryTemplates,
             onSkippedDismiss = ::dismissSkipped,
+            onRetryDefaultTemplate = ::retryDefaultTemplate,
             onSave = ::save,
             onRetrySave = ::retrySave,
             onEditForm = ::editForm,
@@ -153,6 +159,41 @@ class AddItemViewModel(
         }
         loadTags()
         loadChoiceLists()
+        if (savedStateHandle.get<Boolean>(DEFAULT_TEMPLATE_KEY) != true) loadDefaultTemplate()
+    }
+
+    private fun retryDefaultTemplate() {
+        if (_uiState.value.defaultTemplateError.isEmpty()) return
+        _uiState.update { it.copy(defaultTemplateError = NativeText.Empty) }
+        loadDefaultTemplate()
+    }
+
+    /**
+     * Reads the collection's default template and adds its fields. Done is kept in saved state as
+     * soon as the fields are in the form, or when the collection has no default template.
+     */
+    private fun loadDefaultTemplate() {
+        viewModelScope.launch {
+            val collection = collectionsRepository.getCollection(collectionId).getOrElse {
+                failDefaultTemplate()
+                return@launch
+            }
+            val templateId = collection.defaultTemplateId
+            val fields = templateId?.let { id ->
+                templatesRepository.getFields(id).getOrElse {
+                    failDefaultTemplate()
+                    return@launch
+                }
+            }
+            if (fields != null) _uiState.update { it.withTemplateFields(fields) }
+            savedStateHandle[DEFAULT_TEMPLATE_KEY] = true
+        }
+    }
+
+    private fun failDefaultTemplate() {
+        _uiState.update {
+            it.copy(defaultTemplateError = NativeText.Resource(RString.add_item_default_template_error))
+        }
     }
 
     private fun addPhotos(uris: List<String>) {
@@ -268,19 +309,20 @@ class AddItemViewModel(
         }
     }
 
-    /** Adds [fields] after the rows the form has, closes the picker, and names the skipped fields. */
+    /** Adds [fields] and closes the picker. */
     private fun applyTemplateFields(fields: List<TemplateField>) {
-        _uiState.update { s ->
-            val usedLabels =
-                s.fields.map { it.label } + s.photos.drop(1).map { it.label } + s.imageSlots.map { it.label }
-            val applied = applyTemplate(fields, usedLabels.toSet(), { nextFieldId++ }, { nextSlotId++ })
-            s.copy(
-                fields = s.fields + applied.rows,
-                imageSlots = s.imageSlots + applied.slots,
-                templatePicker = null,
-                skippedTemplateFields = applied.skipped
-            )
-        }
+        _uiState.update { it.withTemplateFields(fields).copy(templatePicker = null) }
+    }
+
+    /** Adds [fields] after the rows the form has, and names the skipped fields. */
+    private fun AddItemUiState.withTemplateFields(fields: List<TemplateField>): AddItemUiState {
+        val usedLabels = this.fields.map { it.label } + photos.drop(1).map { it.label } + imageSlots.map { it.label }
+        val applied = applyTemplate(fields, usedLabels.toSet(), { nextFieldId++ }, { nextSlotId++ })
+        return copy(
+            fields = this.fields + applied.rows,
+            imageSlots = imageSlots + applied.slots,
+            skippedTemplateFields = applied.skipped
+        )
     }
 
     private fun dismissSkipped() {
@@ -497,6 +539,7 @@ private data class AddItemDraft(
 
 private const val DRAFT_KEY = "add_item_draft"
 private const val SAVE_KEY = "add_item_save"
+private const val DEFAULT_TEMPLATE_KEY = "add_item_default_template_done"
 private const val TAG = "AddItemViewModel"
 
 /**

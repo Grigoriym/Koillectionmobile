@@ -2,6 +2,8 @@ package com.grappim.koillectionmobile.feature.items.ui
 
 import com.grappim.koillectionmobile.core.image.Rotation
 import com.grappim.koillectionmobile.core.photos.PhotoFiles
+import com.grappim.koillectionmobile.feature.collections.domain.Collection
+import com.grappim.koillectionmobile.feature.collections.domain.CollectionsRepository
 import com.grappim.koillectionmobile.feature.items.domain.AddItemProgress
 import com.grappim.koillectionmobile.feature.items.domain.AddItemResult
 import com.grappim.koillectionmobile.feature.items.domain.AddItemState
@@ -49,6 +51,48 @@ internal class FakeTagsRepository : TagsRepository {
     override suspend fun createTag(label: String): Result<Tag> = error("not used")
 
     override suspend fun setItemTags(itemId: String, tagIds: List<String>): Result<Unit> = error("not used")
+}
+
+/**
+ * Only [getCollection] is used: the add form reads its collection's default template. [answer] is
+ * given at once; by default the collection has no default template.
+ */
+internal class FakeCollectionsRepository : CollectionsRepository {
+    var answer: Result<Collection> = Result.success(collectionWith(defaultTemplateId = null))
+    val getCalls = mutableListOf<String>()
+
+    override suspend fun getCollection(id: String): Result<Collection> {
+        getCalls += id
+        return answer
+    }
+
+    override suspend fun getCollections(): Result<List<Collection>> = error("not used")
+
+    override suspend fun getChildren(id: String): Result<List<Collection>> = error("not used")
+
+    override suspend fun countItems(id: String): Result<Int> = error("not used")
+
+    override suspend fun createCollection(title: String, parentId: String?): Result<Collection> = error("not used")
+
+    override suspend fun renameCollection(id: String, title: String): Result<Collection> = error("not used")
+
+    override suspend fun uploadCollectionImage(
+        id: String,
+        bytes: ByteArray,
+        fileName: String,
+        mimeType: String
+    ): Result<Collection> = error("not used")
+
+    override suspend fun setDefaultTemplate(id: String, templateId: String?): Result<Collection> = error("not used")
+
+    override suspend fun deleteCollectionImage(id: String): Result<Collection> = error("not used")
+
+    override suspend fun deleteCollection(id: String): Result<Unit> = error("not used")
+
+    companion object {
+        fun collectionWith(defaultTemplateId: String?) =
+            Collection("books", "Books", parentId = null, color = null, imageUrl = null, defaultTemplateId)
+    }
 }
 
 /** Records each call; [answer] decides the result and may report progress first. */

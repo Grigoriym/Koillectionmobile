@@ -23,6 +23,7 @@ import kotlin.test.assertTrue
 /** A template applied in the add form (M8.7): the rows and image slots it adds, and what it skips. */
 class TemplateApplyTest {
 
+    private val collections = FakeCollectionsRepository()
     private val tags = FakeTagsRepository()
     private val templates = FakeChoiceLists()
     private val useCase = FakeAddItemUseCase()
@@ -44,7 +45,7 @@ class TemplateApplyTest {
 
     private fun createSut(handle: SavedStateHandle = savedStateHandle): AddItemViewModel {
         tags.queue()
-        return AddItemViewModel("books", tags, templates, useCase, photoFiles, ItemListChanges(), handle)
+        return AddItemViewModel("books", collections, tags, templates, useCase, photoFiles, ItemListChanges(), handle)
     }
 
     private val AddItemViewModel.s: AddItemUiState get() = uiState.value

@@ -17,6 +17,7 @@ class CollectionMapper {
         title = dto.title,
         parentId = dto.parent?.substringAfterLast('/'),
         color = dto.color,
-        imageUrl = dto.image?.let { serverUrl + it.removePrefix("/") }
+        imageUrl = dto.image?.let { serverUrl + it.removePrefix("/") },
+        defaultTemplateId = dto.itemsDefaultTemplate?.substringAfterLast('/')
     )
 }

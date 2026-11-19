@@ -53,8 +53,9 @@ private val CHOICES = listOf("Hardcover", "Paperback", "Ebook")
  * It also sends a `choice-list` field without a choice list, two fields with one name in one
  * template, and a `checkbox` value `true`, and prints each answer.
  *
- * The app has no call for the collection's default template or for a `checkbox` or `choice-list`
- * field yet (M8.6, M8.8), so the run sends those through the app's own `HttpClient`. If the run
+ * The run was written before the app had a call for the collection's default template or for a
+ * `checkbox` or `choice-list` field (M8.6, M8.8), so it sends those through the app's own
+ * `HttpClient`. If the run
  * fails halfway, it still deletes what it created.
  */
 fun main() {

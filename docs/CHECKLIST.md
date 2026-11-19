@@ -1,6 +1,6 @@
 # koillectionmobile checklist
 
-**Current step:** M8.8. M8.7 done 2026-11-19. M8.6 done 2026-11-18. M8.5 done 2026-11-18. M8.4 done 2026-11-18. M8.3 done 2026-11-17. M8.2 done 2026-11-17. M8.1 done 2026-11-17. M8 broken into steps 2026-11-17; the other areas became M9–M13 and the release moved to M14 (user, 2026-11-17). M7 done 2026-11-17. M7.7 done 2026-11-17. M7.6 done 2026-11-17. M7.5 done 2026-11-17. M7.4 done 2026-11-17. M7.3 done 2026-11-17. M7.2 done 2026-11-17. M7.1 done 2026-11-17. M7 broken into steps 2026-11-17. M6 done 2026-11-17. M6.6 done 2026-11-17. M6.5 done 2026-11-16. M6.4 done 2026-11-16. M6.3 done 2026-11-16. M6.2 done 2026-11-16. M6.1 done 2026-11-16. M6 broken into steps 2026-11-16. M5 done 2026-11-16. M5.7 done 2026-11-16. M5.6 done 2026-11-16. M5.5 done 2026-11-16. M5.4 done 2026-11-16. M5.3 done 2026-11-16. M5.2 done 2026-11-16. M5.1 done 2026-11-16. M5 broken into steps 2026-11-16. M4 done 2026-11-16. M4.4 done 2026-11-16. M4.3 done 2026-11-16. M4.2 done 2026-11-16. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6, 7, 8, 9, 10 and 11 are settled.
+**Current step:** M8.9. M8.8 done 2026-11-19. M8.7 done 2026-11-19. M8.6 done 2026-11-18. M8.5 done 2026-11-18. M8.4 done 2026-11-18. M8.3 done 2026-11-17. M8.2 done 2026-11-17. M8.1 done 2026-11-17. M8 broken into steps 2026-11-17; the other areas became M9–M13 and the release moved to M14 (user, 2026-11-17). M7 done 2026-11-17. M7.7 done 2026-11-17. M7.6 done 2026-11-17. M7.5 done 2026-11-17. M7.4 done 2026-11-17. M7.3 done 2026-11-17. M7.2 done 2026-11-17. M7.1 done 2026-11-17. M7 broken into steps 2026-11-17. M6 done 2026-11-17. M6.6 done 2026-11-17. M6.5 done 2026-11-16. M6.4 done 2026-11-16. M6.3 done 2026-11-16. M6.2 done 2026-11-16. M6.1 done 2026-11-16. M6 broken into steps 2026-11-16. M5 done 2026-11-16. M5.7 done 2026-11-16. M5.6 done 2026-11-16. M5.5 done 2026-11-16. M5.4 done 2026-11-16. M5.3 done 2026-11-16. M5.2 done 2026-11-16. M5.1 done 2026-11-16. M5 broken into steps 2026-11-16. M4 done 2026-11-16. M4.4 done 2026-11-16. M4.3 done 2026-11-16. M4.2 done 2026-11-16. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6, 7, 8, 9, 10 and 11 are settled.
 
 ## How to use this
 
@@ -131,11 +131,19 @@ local test instance only (`docs/local-info.md`). Re-read `Template.php`, `Field.
   only filled slots. A name used twice in one template is added once. `applyTemplate`
   (`AppliedTemplate.kt`) is a plain function, for M8.8 to reuse. Mutation-checked: the label clash
   check (four tests fail). Not run on a device.
-- [ ] **M8.8** — Collection default template. The collection form picks a template or none
+- [x] **M8.8** — Collection default template. The collection form picks a template or none
   (`itemsDefaultTemplate`, `collection:write`). The add form in that collection applies it when
   it opens (once: not again after rotation or process death); the user can still remove the rows.
   **Verify:** ViewModel and use-case tests (set, clear, add form opens with the rows, no second
   apply after a saved-state restore).
+  Note: done 2026-11-19. The picker is in the edit form only (user, 2026-11-19); the new form
+  stays title and image. The clear sends an explicit `"itemsDefaultTemplate": null`
+  (`CollectionDefaultTemplatePatchDto` has no default value). The add form reads its collection
+  (`items:ui` now depends on `collections:domain`), then the template's fields, and applies them
+  with `applyTemplate`. A flag in saved state, set with the rows, stops a second apply; a failed
+  read shows an error with retry and is tried again after a restore. Mutation-checked: without
+  the flag two restore tests fail. No use case: mock-engine tests cover the set and the clear
+  call. Not run on a device.
 - [ ] **M8.9** — Device pass on the emulator (`emulator-testing` skill) against the local test
   instance: create a choice list and a template, set it as a collection's default, add an item
   with it (photo, `checkbox`, `choice-list`), edit the item, then delete the template and the

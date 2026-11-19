@@ -11,9 +11,11 @@ import com.grappim.koillectionmobile.core.photos.next
 import com.grappim.koillectionmobile.feature.collections.domain.CollectionChanges
 import com.grappim.koillectionmobile.feature.collections.domain.CollectionListChanges
 import com.grappim.koillectionmobile.feature.collections.domain.CollectionsRepository
+import com.grappim.koillectionmobile.feature.templates.domain.TemplatesRepository
 import com.grappim.koillectionmobile.strings.RString
 import com.grappim.koillectionmobile.strings.generated.resources.collection_form_save_error_photo
 import com.grappim.koillectionmobile.strings.generated.resources.collection_form_save_unfinished
+import com.grappim.koillectionmobile.strings.generated.resources.collection_form_templates_error
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -29,13 +31,15 @@ import org.koin.core.annotation.InjectedParam
 import org.koin.core.annotation.KoinViewModel
 
 /**
- * The edit form of collection [collectionId]: the title and the image, filled from the server. The
- * image can be replaced or removed. The save sends only what changed
+ * The edit form of collection [collectionId]: the title, the image and the default template, filled
+ * from the server. The image can be replaced or removed. The default template is picked from the
+ * server's templates, or none. The save sends only what changed
  * ([EditCollectionUiState.changes]), one call per change.
  *
  * The collection is read once. The loaded values and the edits are kept in [savedStateHandle], so
  * after a process death the form shows the edits and does not read the collection again. The
- * calls that went through are kept there too, so a retry sends only the rest.
+ * calls that went through are kept there too, so a retry sends only the rest. The template list is
+ * read again after a process death.
  *
  * On success the collection screen ([CollectionChanges]) and the list that shows the collection
  * ([CollectionListChanges], by its parent) read it again.
@@ -47,6 +51,7 @@ import org.koin.core.annotation.KoinViewModel
 class EditCollectionViewModel(
     @InjectedParam private val collectionId: String,
     private val collectionsRepository: CollectionsRepository,
+    private val templatesRepository: TemplatesRepository,
     private val photoFiles: PhotoFiles,
     private val collectionListChanges: CollectionListChanges,
     private val collectionChanges: CollectionChanges,
@@ -70,6 +75,7 @@ class EditCollectionViewModel(
             title = saved?.title.orEmpty(),
             photo = saved?.photo,
             imageUrl = saved?.imageUrl,
+            defaultTemplateId = saved?.defaultTemplateId,
             isSaved = record.isSaved,
             // A save that a process death stopped: what went through is not known, so only a retry.
             save = if (record.isStarted && !record.isSaved) {
@@ -85,6 +91,8 @@ class EditCollectionViewModel(
             onPhotosAdd = ::addPhotos,
             onPhotoRotate = ::rotatePhoto,
             onPhotoRemove = ::removePhoto,
+            onDefaultTemplateChange = ::changeDefaultTemplate,
+            onRetryTemplates = ::retryTemplates,
             onSave = ::save,
             onRetrySave = ::retrySave,
             onEditForm = ::editForm
@@ -95,12 +103,15 @@ class EditCollectionViewModel(
     init {
         viewModelScope.launch {
             _uiState
-                .map { s -> s.original?.let { EditCollectionForm(it, s.title, s.photo, s.imageUrl) } }
+                .map { s ->
+                    s.original?.let { EditCollectionForm(it, s.title, s.photo, s.imageUrl, s.defaultTemplateId) }
+                }
                 .filterNotNull()
                 .distinctUntilChanged()
                 .collect { savedStateHandle[FORM_KEY] = json.encodeToString(it) }
         }
         if (saved == null) load()
+        loadTemplates()
     }
 
     private fun retry() {
@@ -114,12 +125,18 @@ class EditCollectionViewModel(
         viewModelScope.launch {
             collectionsRepository.getCollection(collectionId)
                 .onSuccess { collection ->
-                    val loaded = LoadedCollection(collection.title, collection.parentId, collection.imageUrl)
+                    val loaded = LoadedCollection(
+                        collection.title,
+                        collection.parentId,
+                        collection.imageUrl,
+                        collection.defaultTemplateId
+                    )
                     _uiState.update {
                         it.copy(
                             original = loaded,
                             title = loaded.title,
                             imageUrl = loaded.imageUrl,
+                            defaultTemplateId = loaded.defaultTemplateId,
                             isLoading = false,
                             error = NativeText.Empty
                         )
@@ -131,6 +148,42 @@ class EditCollectionViewModel(
 
     private fun changeTitle(title: String) {
         _uiState.update { it.copy(title = title) }
+    }
+
+    /** [templateId] null: the collection gets no default template. */
+    private fun changeDefaultTemplate(templateId: String?) {
+        _uiState.update { it.copy(defaultTemplateId = templateId) }
+    }
+
+    private fun retryTemplates() {
+        if (_uiState.value.templates.isLoading) return
+        _uiState.update { it.copy(templates = TemplatesUi()) }
+        loadTemplates()
+    }
+
+    /** Sorted by name, ignoring case, as the template list. */
+    private fun loadTemplates() {
+        viewModelScope.launch {
+            val result = templatesRepository.getTemplates()
+            _uiState.update { state ->
+                state.copy(
+                    templates = result.fold(
+                        onSuccess = { templates ->
+                            TemplatesUi(
+                                templates = templates.sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER) { it.name }),
+                                isLoading = false
+                            )
+                        },
+                        onFailure = {
+                            TemplatesUi(
+                                isLoading = false,
+                                error = NativeText.Resource(RString.collection_form_templates_error)
+                            )
+                        }
+                    )
+                )
+            }
+        }
     }
 
     /**
@@ -211,6 +264,9 @@ class EditCollectionViewModel(
                 val result = when (step) {
                     CollectionEditStep.RENAME -> collectionsRepository.renameCollection(collectionId, form.title.trim())
 
+                    CollectionEditStep.SET_DEFAULT_TEMPLATE ->
+                        collectionsRepository.setDefaultTemplate(collectionId, form.defaultTemplateId)
+
                     CollectionEditStep.UPLOAD_IMAGE -> collectionsRepository.uploadCollectionImage(
                         collectionId,
                         checkNotNull(pendingImage),
@@ -260,7 +316,8 @@ private data class EditCollectionForm(
     val original: LoadedCollection,
     val title: String,
     val photo: FormPhoto?,
-    val imageUrl: String?
+    val imageUrl: String?,
+    val defaultTemplateId: String? = null
 )
 
 /**

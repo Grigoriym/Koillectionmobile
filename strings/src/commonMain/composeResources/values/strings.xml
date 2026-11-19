@@ -179,6 +179,11 @@
     <string name="collection_form_edit_partial">Some changes are on the server, but not all. Try again to send the rest.</string>
     <string name="collection_form_edit_discard_title">Discard the changes?</string>
     <string name="collection_form_edit_discard_text">The changes on this form are lost. The collection stays as it is on the server.</string>
+    <string name="collection_form_section_default_template">Default template</string>
+    <string name="collection_form_default_template_hint">The add-item form in this collection applies it when it opens.</string>
+    <string name="collection_form_default_template_none">None</string>
+    <string name="collection_form_templates_loading">Loading the templates…</string>
+    <string name="collection_form_templates_error">Loading the templates failed.</string>
 
     <string name="item_back">Back</string>
     <string name="item_retry">Try again</string>
@@ -229,6 +234,7 @@
     <string name="add_item_templates_title">Apply a template</string>
     <string name="add_item_no_templates">The server has no templates.</string>
     <string name="add_item_templates_error">Loading the template failed.</string>
+    <string name="add_item_default_template_error">Loading the default template of this collection failed.</string>
     <string name="add_item_templates_cancel">Cancel</string>
     <string name="add_item_skipped_fields">Not added: the app cannot fill these field types. %1$s</string>
     <string name="add_item_skipped_ok">OK</string>

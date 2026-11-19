@@ -279,6 +279,8 @@ class CollectionViewModelTest {
             children.addLast(CompletableDeferred())
         }
 
+        override suspend fun setDefaultTemplate(id: String, templateId: String?): Result<Collection> = error("not used")
+
         override suspend fun getCollections(): Result<List<Collection>> {
             allCalls++
             return all

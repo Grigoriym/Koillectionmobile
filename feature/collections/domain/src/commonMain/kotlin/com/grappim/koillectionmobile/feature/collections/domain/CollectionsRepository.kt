@@ -45,6 +45,12 @@ interface CollectionsRepository {
         mimeType: String
     ): Result<Collection>
 
+    /**
+     * Sets template [templateId] as the default template of collection [id], or clears it when
+     * [templateId] is null. Returns the collection as the server sent it.
+     */
+    suspend fun setDefaultTemplate(id: String, templateId: String?): Result<Collection>
+
     /** Removes the image of collection [id] and returns the collection as the server sent it. */
     suspend fun deleteCollectionImage(id: String): Result<Collection>
 

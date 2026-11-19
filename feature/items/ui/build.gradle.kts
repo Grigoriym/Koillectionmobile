@@ -14,6 +14,8 @@ kotlin {
             implementation(projects.feature.tags.domain)
             // The choice lists of the `choice-list` fields.
             implementation(projects.feature.templates.domain)
+            // The add form reads its collection's default template.
+            implementation(projects.feature.collections.domain)
             // `KoillectionError`, to pick the error message.
             implementation(projects.core.domain)
             // `Rotation` in the form state.

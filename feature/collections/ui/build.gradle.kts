@@ -14,6 +14,8 @@ kotlin {
             implementation(projects.feature.items.domain)
             // Log out sits in the collection list's top bar.
             implementation(projects.feature.auth.domain)
+            // The edit form picks the collection's default template.
+            implementation(projects.feature.templates.domain)
             // `KoillectionError`, to pick the error message.
             implementation(projects.core.domain)
             // The collection form's photo: camera, picker, preview and `PhotoFiles`; `Rotation`.

@@ -11,6 +11,8 @@ import kotlinx.serialization.Serializable
  *   `readableLink: false`.
  * - [image] is a path relative to the server root (`uploads/<user>/<file>.jpg`), or null.
  * - [color] is a hex colour without `#` (`EEEEEE`).
+ * - [itemsDefaultTemplate] is the IRI of the template the add form applies (`/api/templates/<id>`),
+ *   or null.
  */
 @Serializable
 data class CollectionDto(
@@ -18,5 +20,6 @@ data class CollectionDto(
     val title: String,
     val parent: String? = null,
     val color: String? = null,
-    val image: String? = null
+    val image: String? = null,
+    val itemsDefaultTemplate: String? = null
 )

@@ -40,6 +40,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigationevent.NavigationEventInfo
 import androidx.navigationevent.compose.NavigationBackHandler
 import androidx.navigationevent.compose.rememberNavigationEventState
+import com.grappim.kit.uikit.asString
 import com.grappim.koillectionmobile.core.photos.PhotoPreview
 import com.grappim.koillectionmobile.core.photos.rememberPhotoSources
 import com.grappim.koillectionmobile.strings.RString
@@ -54,6 +55,7 @@ import com.grappim.koillectionmobile.strings.generated.resources.add_item_name_l
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_photo_label
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_pick_photos
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_remove_photo
+import com.grappim.koillectionmobile.strings.generated.resources.add_item_retry
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_rotate_photo
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_save
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_save_partial
@@ -249,6 +251,24 @@ private fun AddItemContent(uiState: AddItemUiState, onBack: () -> Unit, modifier
                     }
                     OutlinedButton(onClick = uiState.onOpenTemplates) {
                         Text(stringResource(RString.add_item_apply_template))
+                    }
+                }
+            }
+            if (!uiState.defaultTemplateError.isEmpty()) {
+                item(key = "default-template-error") {
+                    Row(
+                        modifier = Modifier.padding(horizontal = PADDING),
+                        horizontalArrangement = Arrangement.spacedBy(TAG_SPACING),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = uiState.defaultTemplateError.asString(),
+                            color = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.weight(1f)
+                        )
+                        TextButton(onClick = uiState.onRetryDefaultTemplate) {
+                            Text(stringResource(RString.add_item_retry))
+                        }
                     }
                 }
             }

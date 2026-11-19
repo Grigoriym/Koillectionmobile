@@ -280,6 +280,8 @@ class NewCollectionViewModelTest {
         val uploadCalls = mutableListOf<Upload>()
         var uploadAnswer: suspend () -> Result<Collection> = { Result.success(NEW) }
 
+        override suspend fun setDefaultTemplate(id: String, templateId: String?): Result<Collection> = error("not used")
+
         override suspend fun createCollection(title: String, parentId: String?): Result<Collection> {
             createCalls += title to parentId
             return createAnswer()

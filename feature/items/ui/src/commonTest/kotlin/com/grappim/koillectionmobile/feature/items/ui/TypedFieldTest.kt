@@ -38,7 +38,16 @@ class TypedFieldTest {
 
     private fun createSut(handle: SavedStateHandle = savedStateHandle): AddItemViewModel {
         tags.queue()
-        return AddItemViewModel("books", tags, choiceLists, useCase, FakePhotoFiles(), ItemListChanges(), handle)
+        return AddItemViewModel(
+            "books",
+            FakeCollectionsRepository(),
+            tags,
+            choiceLists,
+            useCase,
+            FakePhotoFiles(),
+            ItemListChanges(),
+            handle
+        )
     }
 
     private val AddItemViewModel.s: AddItemUiState get() = uiState.value

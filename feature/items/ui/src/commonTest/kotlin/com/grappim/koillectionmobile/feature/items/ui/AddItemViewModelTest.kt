@@ -39,6 +39,7 @@ class AddItemViewModelTest {
 
     private fun createSut(handle: SavedStateHandle = savedStateHandle) = AddItemViewModel(
         "books",
+        FakeCollectionsRepository(),
         tags,
         FakeChoiceLists(),
         FakeAddItemUseCase(),

@@ -217,6 +217,8 @@ class CollectionListViewModelTest {
         fun next(): CompletableDeferred<Result<List<Collection>>> = CompletableDeferred<Result<List<Collection>>>()
             .also { responses.addLast(it) }
 
+        override suspend fun setDefaultTemplate(id: String, templateId: String?): Result<Collection> = error("not used")
+
         override suspend fun getCollections(): Result<List<Collection>> {
             calls++
             return responses.removeFirst().await()

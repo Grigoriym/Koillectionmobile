@@ -332,7 +332,8 @@ code without checking the licence terms are kept.
    form cannot fill (user, 2026-11-18, M8.4). In the add form (user, 2026-11-19, M8.7): an `image`
    field becomes an empty image slot with its label, never the main image; a slot without a photo
    sends nothing at the save. A `sign`, `file`, `video`, `section` or `blank-line` field is not
-   added, and the form names it.
+   added, and the form names it. Only the edit collection form picks the default template, not
+   the new collection form (user, 2026-11-19, M8.8).
    A free row of the item forms gets a type picker too (user, 2026-11-18, M8.6). It offers the 11
    text types (`TEXT_TYPES` in `feature:items:domain`); an existing field keeps its type. The form
    blocks a save for a `choice-list` row without a list and for a `number`, `price` or `rating`

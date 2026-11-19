@@ -71,6 +71,8 @@ sealed interface SaveStatus {
  * [tagsError] is set when the tag load failed; the rest of the form still works. [choiceLists]
  * serve the `choice-list` rows. [templatePicker] is set while the template picker is open;
  * [skippedTemplateFields] are the fields of the last applied template that the form cannot fill.
+ * [defaultTemplateError] is set when the collection's default template failed to load; the rest of
+ * the form still works.
  * [savedItemId] is set once the item is saved: the screen then opens it.
  */
 data class AddItemUiState(
@@ -86,6 +88,7 @@ data class AddItemUiState(
     val choiceLists: ChoiceListsUi = ChoiceListsUi(),
     val templatePicker: TemplatePickerUi? = null,
     val skippedTemplateFields: List<TemplateField> = emptyList(),
+    val defaultTemplateError: NativeText = NativeText.Empty,
     val save: SaveStatus? = null,
     val savedItemId: String? = null,
     val onNameChange: (String) -> Unit = {},
@@ -116,6 +119,7 @@ data class AddItemUiState(
     val onTemplatePick: (String) -> Unit = {},
     val onRetryTemplates: () -> Unit = {},
     val onSkippedDismiss: () -> Unit = {},
+    val onRetryDefaultTemplate: () -> Unit = {},
     val onSave: () -> Unit = {},
     val onRetrySave: () -> Unit = {},
     val onEditForm: () -> Unit = {}

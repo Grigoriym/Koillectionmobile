@@ -230,6 +230,31 @@ class CollectionsRepositoryImplTest {
     }
 
     @Test
+    fun `setDefaultTemplate patches only the template IRI as merge-patch+json`() = runTest {
+        val repository = repository("/sub/api/collections/new" to (HttpStatusCode.OK to NEW_WITH_TEMPLATE))
+
+        val collection = repository.setDefaultTemplate("new", "book").getOrThrow()
+
+        val request = requests.single()
+        assertEquals(HttpMethod.Patch, request.method)
+        assertEquals("/sub/api/collections/new", request.url.fullPath)
+        assertEquals("application/merge-patch+json", request.body.contentType.toString())
+        assertEquals(json.parseToJsonElement("""{"itemsDefaultTemplate":"/api/templates/book"}"""), body(request))
+        assertEquals("book", collection.defaultTemplateId)
+    }
+
+    /** A merge patch without the key keeps the stored template: the clear must send an explicit null. */
+    @Test
+    fun `setDefaultTemplate with null sends an explicit null`() = runTest {
+        val repository = repository("/sub/api/collections/new" to (HttpStatusCode.OK to NEW_TOP))
+
+        val collection = repository.setDefaultTemplate("new", null).getOrThrow()
+
+        assertEquals(json.parseToJsonElement("""{"itemsDefaultTemplate":null}"""), body(requests.single()))
+        assertEquals(null, collection.defaultTemplateId)
+    }
+
+    @Test
     fun `uploadCollectionImage posts the bytes as multipart part file`() = runTest {
         val repository = repository("/sub/api/collections/new/image" to (HttpStatusCode.Created to NEW_WITH_IMAGE))
 
@@ -306,6 +331,7 @@ class CollectionsRepositoryImplTest {
         repository.renameCollection("new", "Comics").getOrThrow()
         repository.uploadCollectionImage("new", JPEG, "cover.jpg", "image/jpeg").getOrThrow()
         repository.deleteCollectionImage("new").getOrThrow()
+        repository.setDefaultTemplate("new", "book").getOrThrow()
         repository.countItems("new").getOrThrow()
         repository.deleteCollection("new").getOrThrow()
 
@@ -314,6 +340,7 @@ class CollectionsRepositoryImplTest {
                 "POST /api/collections",
                 "PATCH /api/collections/new",
                 "POST /api/collections/new/image",
+                "PATCH /api/collections/new",
                 "PATCH /api/collections/new",
                 "GET /api/collections/new/items",
                 "DELETE /api/collections/new"
@@ -361,6 +388,8 @@ class CollectionsRepositoryImplTest {
         const val NEW_TOP = """{"id":"new","title":"Comics","color":"A1B2C3","image":null}"""
         const val NEW_CHILD =
             """{"id":"child","title":"Novels","parent":"/api/collections/$BOOKS_ID","color":"A1B2C3","image":null}"""
+        const val NEW_WITH_TEMPLATE =
+            """{"id":"new","title":"Comics","color":"A1B2C3","image":null,"itemsDefaultTemplate":"/api/templates/book"}"""
         const val NEW_WITH_IMAGE = """{"id":"new","title":"Comics","color":"A1B2C3","image":"uploads/u/cover.jpg"}"""
 
         /** A JPEG start marker, a CR LF, a zero and bytes above 0x7F: not valid UTF-8 text. */

@@ -45,6 +45,13 @@ class CollectionMapperTest {
     }
 
     @Test
+    fun `the default template IRI maps to the template's id, with a server subpath too`() {
+        val dto = CollectionDto(id = "a", title = "A", itemsDefaultTemplate = "/koillection/api/templates/book")
+
+        assertEquals("book", mapper.toDomain(dto, SERVER_URL).defaultTemplateId)
+    }
+
+    @Test
     fun `the image path resolves to a full URL under the server root`() {
         val dto = CollectionDto(id = "a", title = "A", image = "uploads/user/cover.jpg")
 

@@ -10,10 +10,15 @@ import com.grappim.koillectionmobile.feature.collections.domain.Collection
 import com.grappim.koillectionmobile.feature.collections.domain.CollectionChanges
 import com.grappim.koillectionmobile.feature.collections.domain.CollectionListChanges
 import com.grappim.koillectionmobile.feature.collections.domain.CollectionsRepository
+import com.grappim.koillectionmobile.feature.templates.domain.ChoiceList
+import com.grappim.koillectionmobile.feature.templates.domain.Template
+import com.grappim.koillectionmobile.feature.templates.domain.TemplateField
+import com.grappim.koillectionmobile.feature.templates.domain.TemplatesRepository
 import com.grappim.koillectionmobile.strings.RString
 import com.grappim.koillectionmobile.strings.generated.resources.collection_form_save_error_network
 import com.grappim.koillectionmobile.strings.generated.resources.collection_form_save_error_quota
 import com.grappim.koillectionmobile.strings.generated.resources.collection_form_save_unfinished
+import com.grappim.koillectionmobile.strings.generated.resources.collection_form_templates_error
 import com.grappim.koillectionmobile.strings.generated.resources.collections_error_network
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
@@ -31,6 +36,7 @@ import kotlin.test.assertTrue
 class EditCollectionViewModelTest {
 
     private val collections = FakeCollectionsRepository()
+    private val templates = FakeTemplatesRepository()
     private val photoFiles = FakePhotoFiles()
     private val collectionListChanges = CollectionListChanges()
     private val collectionChanges = CollectionChanges()
@@ -55,8 +61,15 @@ class EditCollectionViewModelTest {
 
     private val savedStateHandle = SavedStateHandle()
 
-    private fun createSut(handle: SavedStateHandle = savedStateHandle) =
-        EditCollectionViewModel(NOVELS.id, collections, photoFiles, collectionListChanges, collectionChanges, handle)
+    private fun createSut(handle: SavedStateHandle = savedStateHandle) = EditCollectionViewModel(
+        NOVELS.id,
+        collections,
+        templates,
+        photoFiles,
+        collectionListChanges,
+        collectionChanges,
+        handle
+    )
 
     private fun restoredHandle() =
         SavedStateHandle(savedStateHandle.keys().associateWith { savedStateHandle.get<Any>(it) })
@@ -287,6 +300,86 @@ class EditCollectionViewModelTest {
         assertTrue(restored.uiState.value.isSaved)
     }
 
+    @Test
+    fun `the form shows the loaded default template and the templates sorted by name ignoring case`() {
+        collections.getAnswer = { Result.success(NOVELS.copy(defaultTemplateId = BOOK.id)) }
+
+        val sut = createSut()
+
+        assertEquals(BOOK.id, sut.uiState.value.defaultTemplateId)
+        assertEquals(TemplatesUi(listOf(ALBUM, BOOK, COMIC), isLoading = false), sut.uiState.value.templates)
+        assertFalse(sut.uiState.value.canSave)
+    }
+
+    @Test
+    fun `a picked default template alone sends only that call then tells the screen`() {
+        val sut = createSut()
+
+        sut.uiState.value.onDefaultTemplateChange(BOOK.id)
+        assertEquals(listOf(CollectionEditStep.SET_DEFAULT_TEMPLATE), sut.uiState.value.changes)
+        sut.uiState.value.onSave()
+
+        assertEquals(listOf("get:novels", "setDefault:novels:${BOOK.id}"), collections.calls)
+        assertTrue(sut.uiState.value.isSaved)
+        assertEquals(listOf(NOVELS.id), changed)
+    }
+
+    @Test
+    fun `none clears the default template`() {
+        collections.getAnswer = { Result.success(NOVELS.copy(defaultTemplateId = BOOK.id)) }
+        val sut = createSut()
+
+        sut.uiState.value.onDefaultTemplateChange(null)
+        sut.uiState.value.onSave()
+
+        assertEquals(listOf("get:novels", "setDefault:novels:null"), collections.calls)
+        assertTrue(sut.uiState.value.isSaved)
+    }
+
+    @Test
+    fun `a default template picked back to the loaded one is no change`() {
+        collections.getAnswer = { Result.success(NOVELS.copy(defaultTemplateId = BOOK.id)) }
+        val sut = createSut()
+        sut.uiState.value.onDefaultTemplateChange(ALBUM.id)
+
+        sut.uiState.value.onDefaultTemplateChange(BOOK.id)
+        sut.uiState.value.onSave()
+
+        assertFalse(sut.uiState.value.canSave)
+        assertNoWrites()
+    }
+
+    @Test
+    fun `a failed template load shows the error and the retry loads again while the rest of the form saves`() {
+        templates.answer = Result.failure(KoillectionError.Network(IllegalStateException("offline")))
+        val sut = createSut()
+        assertEquals(
+            TemplatesUi(isLoading = false, error = NativeText.Resource(RString.collection_form_templates_error)),
+            sut.uiState.value.templates
+        )
+
+        templates.answer = Result.success(listOf(BOOK))
+        sut.uiState.value.onRetryTemplates()
+        assertEquals(TemplatesUi(listOf(BOOK), isLoading = false), sut.uiState.value.templates)
+
+        sut.uiState.value.onTitleChange("Old novels")
+        sut.uiState.value.onSave()
+        assertEquals(listOf("get:novels", "rename:novels:Old novels"), collections.calls)
+    }
+
+    @Test
+    fun `the picked default template survives process death and the templates load again`() {
+        val first = createSut()
+        first.uiState.value.onDefaultTemplateChange(COMIC.id)
+
+        val restored = createSut(restoredHandle())
+
+        assertEquals(COMIC.id, restored.uiState.value.defaultTemplateId)
+        assertEquals(listOf(CollectionEditStep.SET_DEFAULT_TEMPLATE), restored.uiState.value.changes)
+        assertEquals(2, templates.calls)
+        assertEquals(1, collections.calls.count { it.startsWith("get:") })
+    }
+
     private class Upload(val bytes: ByteArray, val mimeType: String)
 
     private class FakeCollectionsRepository : CollectionsRepository {
@@ -323,6 +416,11 @@ class EditCollectionViewModelTest {
             return deleteImageAnswer()
         }
 
+        override suspend fun setDefaultTemplate(id: String, templateId: String?): Result<Collection> {
+            calls += "setDefault:$id:$templateId"
+            return Result.success(NOVELS.copy(defaultTemplateId = templateId))
+        }
+
         override suspend fun getCollections(): Result<List<Collection>> = error("not used")
 
         override suspend fun getChildren(id: String): Result<List<Collection>> = error("not used")
@@ -332,6 +430,55 @@ class EditCollectionViewModelTest {
         override suspend fun createCollection(title: String, parentId: String?): Result<Collection> = error("not used")
 
         override suspend fun deleteCollection(id: String): Result<Unit> = error("not used")
+    }
+
+    /** Only the template list is read: [answer] is given at once to each read. */
+    private class FakeTemplatesRepository : TemplatesRepository {
+        var answer: Result<List<Template>> = Result.success(listOf(COMIC, BOOK, ALBUM))
+        var calls = 0
+
+        override suspend fun getTemplates(): Result<List<Template>> {
+            calls++
+            return answer
+        }
+
+        override suspend fun getTemplate(id: String): Result<Template> = error("not used")
+
+        override suspend fun createTemplate(name: String): Result<Template> = error("not used")
+
+        override suspend fun renameTemplate(id: String, name: String): Result<Template> = error("not used")
+
+        override suspend fun deleteTemplate(id: String): Result<Unit> = error("not used")
+
+        override suspend fun getFields(templateId: String): Result<List<TemplateField>> = error("not used")
+
+        override suspend fun createField(
+            templateId: String,
+            name: String,
+            position: Int,
+            type: String,
+            choiceListId: String?
+        ): Result<TemplateField> = error("not used")
+
+        override suspend fun editField(
+            id: String,
+            name: String?,
+            position: Int?,
+            type: String?,
+            choiceListId: String?
+        ): Result<TemplateField> = error("not used")
+
+        override suspend fun deleteField(id: String): Result<Unit> = error("not used")
+
+        override suspend fun getChoiceLists(): Result<List<ChoiceList>> = error("not used")
+
+        override suspend fun createChoiceList(name: String, choices: List<String>): Result<ChoiceList> =
+            error("not used")
+
+        override suspend fun editChoiceList(id: String, name: String, choices: List<String>): Result<ChoiceList> =
+            error("not used")
+
+        override suspend fun deleteChoiceList(id: String): Result<Unit> = error("not used")
     }
 
     /** A photo's bytes are `"<uri>@<rotation>"`, so a test can see which photo went where. */
@@ -355,5 +502,8 @@ class EditCollectionViewModelTest {
         const val IMAGE_URL = "https://koillection.test/uploads/novels.jpg"
         val NOVELS =
             Collection(id = "novels", title = "Novels", parentId = PARENT_ID, color = null, imageUrl = IMAGE_URL)
+        val ALBUM = Template("album", "album")
+        val BOOK = Template("book", "Book")
+        val COMIC = Template("comic", "Comic")
     }
 }
