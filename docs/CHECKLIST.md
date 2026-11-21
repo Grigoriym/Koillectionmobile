@@ -1,6 +1,6 @@
 # koillectionmobile checklist
 
-**Current step:** M9.1. M9 broken into steps 2026-11-19. M8 done 2026-11-19. M8.9 done 2026-11-19. M8.8 done 2026-11-19. M8.7 done 2026-11-19. M8.6 done 2026-11-18. M8.5 done 2026-11-18. M8.4 done 2026-11-18. M8.3 done 2026-11-17. M8.2 done 2026-11-17. M8.1 done 2026-11-17. M8 broken into steps 2026-11-17; the other areas became M9–M13 and the release moved to M14 (user, 2026-11-17). M7 done 2026-11-17. M7.7 done 2026-11-17. M7.6 done 2026-11-17. M7.5 done 2026-11-17. M7.4 done 2026-11-17. M7.3 done 2026-11-17. M7.2 done 2026-11-17. M7.1 done 2026-11-17. M7 broken into steps 2026-11-17. M6 done 2026-11-17. M6.6 done 2026-11-17. M6.5 done 2026-11-16. M6.4 done 2026-11-16. M6.3 done 2026-11-16. M6.2 done 2026-11-16. M6.1 done 2026-11-16. M6 broken into steps 2026-11-16. M5 done 2026-11-16. M5.7 done 2026-11-16. M5.6 done 2026-11-16. M5.5 done 2026-11-16. M5.4 done 2026-11-16. M5.3 done 2026-11-16. M5.2 done 2026-11-16. M5.1 done 2026-11-16. M5 broken into steps 2026-11-16. M4 done 2026-11-16. M4.4 done 2026-11-16. M4.3 done 2026-11-16. M4.2 done 2026-11-16. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6, 7, 8, 9, 10 and 11 are settled.
+**Current step:** M9.2. M9.1 done 2026-11-21. M9 broken into steps 2026-11-19. M8 done 2026-11-19. M8.9 done 2026-11-19. M8.8 done 2026-11-19. M8.7 done 2026-11-19. M8.6 done 2026-11-18. M8.5 done 2026-11-18. M8.4 done 2026-11-18. M8.3 done 2026-11-17. M8.2 done 2026-11-17. M8.1 done 2026-11-17. M8 broken into steps 2026-11-17; the other areas became M9–M13 and the release moved to M14 (user, 2026-11-17). M7 done 2026-11-17. M7.7 done 2026-11-17. M7.6 done 2026-11-17. M7.5 done 2026-11-17. M7.4 done 2026-11-17. M7.3 done 2026-11-17. M7.2 done 2026-11-17. M7.1 done 2026-11-17. M7 broken into steps 2026-11-17. M6 done 2026-11-17. M6.6 done 2026-11-17. M6.5 done 2026-11-16. M6.4 done 2026-11-16. M6.3 done 2026-11-16. M6.2 done 2026-11-16. M6.1 done 2026-11-16. M6 broken into steps 2026-11-16. M5 done 2026-11-16. M5.7 done 2026-11-16. M5.6 done 2026-11-16. M5.5 done 2026-11-16. M5.4 done 2026-11-16. M5.3 done 2026-11-16. M5.2 done 2026-11-16. M5.1 done 2026-11-16. M5 broken into steps 2026-11-16. M4 done 2026-11-16. M4.4 done 2026-11-16. M4.3 done 2026-11-16. M4.2 done 2026-11-16. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6, 7, 8, 9, 10 and 11 are settled.
 
 ## How to use this
 
@@ -44,7 +44,7 @@ plan §5 decision 12 (user, 2026-11-19). Every write goes to the local test inst
 (`docs/local-info.md`). The test copy has no wishlists and no wishes. Re-read `Wishlist.php` and
 `Wish.php` at the start of each step that touches the API. Model the code on `feature:collections`.
 
-- [ ] **M9.1** — Repository calls (new `feature:wishlists:{data,domain,dto,mapper}`, the
+- [x] **M9.1** — Repository calls (new `feature:wishlists:{data,domain,dto,mapper}`, the
   wallosmobile split). Wishlists: list (`GET /api/wishlists`, all pages), get, children
   (`/api/wishlists/{id}/children`), create (`name`, optional `parent` IRI), rename (`PATCH`,
   `{"name"}`), upload the image (`POST /api/wishlists/{id}/image`), remove the image (`PATCH` with
@@ -56,6 +56,10 @@ plan §5 decision 12 (user, 2026-11-19). Every write goes to the local test inst
   **Verify:** mock-engine tests per call (method, path, content type, body keys), with a
   root-path base URL case; `KoinGraphTest` resolves the new repository; mutation-check one body
   key and one path.
+  Note: one `WishlistsRepository` holds the wishlist and the wish calls. `editWish` takes a
+  `Map<WishField, String?>` and sends a JSON object of only those keys; a null value goes out as an
+  explicit `null`, ready for M9.2's answer. No `ui` module yet (M9.3). Mutations: the `price` key
+  and the wish image path, each caught.
 - [ ] **M9.2** — Live wishlist smoke against the local test instance (a task, as
   `smokeCollectionRun`): create a top-level wishlist and a child, rename the child, upload an
   image, replace it (the old file gives 404), remove it (`image` is null). Create a wish in the

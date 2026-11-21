@@ -30,6 +30,8 @@ kotlin {
             implementation(projects.feature.tags.mapper)
             implementation(projects.feature.templates.data)
             implementation(projects.feature.templates.mapper)
+            implementation(projects.feature.wishlists.data)
+            implementation(projects.feature.wishlists.mapper)
 
             // Coil finds this network fetcher through its service loader. Collection and item
             // images are public files under `uploads/`: they need no token.
@@ -41,12 +43,13 @@ kotlin {
             implementation(libs.koin.test)
             // `HttpClientEngine` in `KoinGraphTest`'s extra types.
             implementation(libs.ktor.core)
-            // The five repositories resolved in `KoinGraphTest`.
+            // The repositories resolved in `KoinGraphTest`.
             implementation(projects.feature.auth.domain)
             implementation(projects.feature.collections.domain)
             implementation(projects.feature.items.domain)
             implementation(projects.feature.tags.domain)
             implementation(projects.feature.templates.domain)
+            implementation(projects.feature.wishlists.domain)
         }
     }
 }

@@ -18,6 +18,8 @@ import com.grappim.koillectionmobile.feature.tags.ui.TagsUiModule
 import com.grappim.koillectionmobile.feature.templates.data.TemplatesDataModule
 import com.grappim.koillectionmobile.feature.templates.mapper.TemplatesMapperModule
 import com.grappim.koillectionmobile.feature.templates.ui.TemplatesUiModule
+import com.grappim.koillectionmobile.feature.wishlists.data.WishlistsDataModule
+import com.grappim.koillectionmobile.feature.wishlists.mapper.WishlistsMapperModule
 import org.koin.core.annotation.ComponentScan
 import org.koin.core.annotation.Configuration
 import org.koin.core.annotation.KoinApplication
@@ -50,6 +52,8 @@ import org.koin.core.annotation.Module
         TemplatesMapperModule::class,
         TemplatesDataModule::class,
         TemplatesUiModule::class,
+        WishlistsMapperModule::class,
+        WishlistsDataModule::class,
         SettingsUiModule::class
     ]
 )

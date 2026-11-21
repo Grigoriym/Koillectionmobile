@@ -13,6 +13,7 @@ import com.grappim.koillectionmobile.feature.templates.domain.ChoiceListChanges
 import com.grappim.koillectionmobile.feature.templates.domain.SaveTemplateUseCase
 import com.grappim.koillectionmobile.feature.templates.domain.TemplateChanges
 import com.grappim.koillectionmobile.feature.templates.domain.TemplatesRepository
+import com.grappim.koillectionmobile.feature.wishlists.domain.WishlistsRepository
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.HttpClientEngine
 import org.koin.core.context.stopKoin
@@ -42,7 +43,7 @@ class KoinGraphTest {
     /**
      * Covers the limit above for the provider chain `verify()` cannot see: `HttpClient` needs
      * `BaseUrlProvider`, `SessionStorage` and `CustomHeadersStorage`, all from provider functions.
-     * `AuthRepository`, `CollectionsRepository`, `ItemsRepository`, `TagsRepository` and `TemplatesRepository` (M8.1) are resolved, with the M8.4
+     * `AuthRepository`, `CollectionsRepository`, `ItemsRepository`, `TagsRepository`, `TemplatesRepository` (M8.1) and `WishlistsRepository` (M9.1) are resolved, with the M8.4
      * `SaveTemplateUseCase` and `TemplateChanges` and the M8.5 `ChoiceListChanges`,
      * too, and the M3.6 add-item bindings (`AddItemUseCase`, `ItemListChanges`, `PhotoFiles`), which
      * come from provider functions, and the M4.2 `CustomHeaderValidator`: `verify()` checks only what the graph defines, so a repository without its `@Single`
@@ -58,6 +59,7 @@ class KoinGraphTest {
             koin.get<ItemsRepository>()
             koin.get<TagsRepository>()
             koin.get<TemplatesRepository>()
+            koin.get<WishlistsRepository>()
             koin.get<SaveTemplateUseCase>()
             koin.get<TemplateChanges>()
             koin.get<ChoiceListChanges>()

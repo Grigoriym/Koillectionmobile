@@ -73,4 +73,10 @@ include(
     ":feature:templates:mapper",
     ":feature:templates:ui"
 )
+include(
+    ":feature:wishlists:data",
+    ":feature:wishlists:domain",
+    ":feature:wishlists:dto",
+    ":feature:wishlists:mapper"
+)
 include(":feature:settings:ui")
