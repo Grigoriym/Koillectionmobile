@@ -80,7 +80,15 @@ started. If it fails halfway, it still deletes what it made; look for a leftover
 <millis>` collection, template or choice list if a cleanup line reports an error. Its constants are
 in `LiveTemplateSmoke.kt`: the same rule applies.
 
-All five runs keep their session in `composeApp/build/smoke-home`. A run more than an hour after the
+`./gradlew :composeApp:smokeWishlistRun` writes (M9.2): it creates a top-level wishlist and a
+child, renames the child, and uploads, replaces and removes the child's image. It creates a wish in
+the child with every field, uploads and replaces its image, edits two fields and clears `url`. It
+sends a currency `EURO`, an empty name and a wish without `wishlist` (each 422). Last it deletes the
+parent and checks that the count of wishlists ends as it started. If it fails halfway, it still
+deletes the parent; look for a leftover `M9.2 smoke parent <millis>` wishlist if a cleanup line
+reports an error. Its constants are in `LiveWishlistSmoke.kt`: the same rule applies.
+
+All six runs keep their session in `composeApp/build/smoke-home`. A run more than an hour after the
 last one starts with an expired JWT. That is the path that hung in M3.1, so do not delete the
 directory to make a hang go away: find out why first.
 

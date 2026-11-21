@@ -127,3 +127,18 @@ tasks.register<JavaExec>("smokeTemplateRun") {
     systemProperty("user.home", smokeHome.get().asFile.absolutePath)
     javaLauncher.set(javaToolchains.launcherFor { languageVersion.set(JavaLanguageVersion.of(21)) })
 }
+
+// M9.2: live wishlist smoke run against the local test instance. It creates a wishlist, a child and
+// a wish with images, edits them and deletes the parent. Same setup as `smokeRun`; never point it at
+// the real server.
+tasks.register<JavaExec>("smokeWishlistRun") {
+    group = "verification"
+    description = "Creates, edits and deletes wishlists and a wish on the local test instance."
+    val jvmTestCompilation = kotlin.jvm().compilations.getByName("test")
+    dependsOn(jvmTestCompilation.compileAllTaskName)
+    classpath = files(jvmTestCompilation.output.allOutputs, jvmTestCompilation.runtimeDependencyFiles)
+    mainClass.set("com.grappim.koillectionmobile.composeapp.smoke.LiveWishlistSmokeKt")
+    val smokeHome = layout.buildDirectory.dir("smoke-home")
+    systemProperty("user.home", smokeHome.get().asFile.absolutePath)
+    javaLauncher.set(javaToolchains.launcherFor { languageVersion.set(JavaLanguageVersion.of(21)) })
+}

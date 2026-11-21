@@ -7,8 +7,8 @@ package com.grappim.koillectionmobile.feature.wishlists.domain
 interface WishlistsRepository {
 
     /**
-     * Every wishlist of the user, from all pages. Plan §2 records whether the server also lists
-     * the child wishlists (M9.2). A top-level wishlist has no `parentId`.
+     * Every wishlist of the user, from all pages, the child wishlists too (checked live in M9.2,
+     * plan §2). A top-level wishlist has no `parentId`.
      */
     suspend fun getWishlists(): Result<List<Wishlist>>
 
@@ -59,7 +59,7 @@ interface WishlistsRepository {
 
     /**
      * Changes the fields of wish [id] that [changes] names, and only those. A null value is sent
-     * as an explicit `null`. Returns the wish as the server sent it.
+     * as an explicit `null`, which clears the field (M9.2). Returns the wish as the server sent it.
      */
     suspend fun editWish(id: String, changes: Map<WishField, String?>): Result<Wish>
 

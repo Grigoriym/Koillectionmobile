@@ -1,6 +1,6 @@
 # koillectionmobile checklist
 
-**Current step:** M9.2. M9.1 done 2026-11-21. M9 broken into steps 2026-11-19. M8 done 2026-11-19. M8.9 done 2026-11-19. M8.8 done 2026-11-19. M8.7 done 2026-11-19. M8.6 done 2026-11-18. M8.5 done 2026-11-18. M8.4 done 2026-11-18. M8.3 done 2026-11-17. M8.2 done 2026-11-17. M8.1 done 2026-11-17. M8 broken into steps 2026-11-17; the other areas became M9–M13 and the release moved to M14 (user, 2026-11-17). M7 done 2026-11-17. M7.7 done 2026-11-17. M7.6 done 2026-11-17. M7.5 done 2026-11-17. M7.4 done 2026-11-17. M7.3 done 2026-11-17. M7.2 done 2026-11-17. M7.1 done 2026-11-17. M7 broken into steps 2026-11-17. M6 done 2026-11-17. M6.6 done 2026-11-17. M6.5 done 2026-11-16. M6.4 done 2026-11-16. M6.3 done 2026-11-16. M6.2 done 2026-11-16. M6.1 done 2026-11-16. M6 broken into steps 2026-11-16. M5 done 2026-11-16. M5.7 done 2026-11-16. M5.6 done 2026-11-16. M5.5 done 2026-11-16. M5.4 done 2026-11-16. M5.3 done 2026-11-16. M5.2 done 2026-11-16. M5.1 done 2026-11-16. M5 broken into steps 2026-11-16. M4 done 2026-11-16. M4.4 done 2026-11-16. M4.3 done 2026-11-16. M4.2 done 2026-11-16. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6, 7, 8, 9, 10 and 11 are settled.
+**Current step:** M9.3. M9.2 done 2026-11-21. M9.1 done 2026-11-21. M9 broken into steps 2026-11-19. M8 done 2026-11-19. M8.9 done 2026-11-19. M8.8 done 2026-11-19. M8.7 done 2026-11-19. M8.6 done 2026-11-18. M8.5 done 2026-11-18. M8.4 done 2026-11-18. M8.3 done 2026-11-17. M8.2 done 2026-11-17. M8.1 done 2026-11-17. M8 broken into steps 2026-11-17; the other areas became M9–M13 and the release moved to M14 (user, 2026-11-17). M7 done 2026-11-17. M7.7 done 2026-11-17. M7.6 done 2026-11-17. M7.5 done 2026-11-17. M7.4 done 2026-11-17. M7.3 done 2026-11-17. M7.2 done 2026-11-17. M7.1 done 2026-11-17. M7 broken into steps 2026-11-17. M6 done 2026-11-17. M6.6 done 2026-11-17. M6.5 done 2026-11-16. M6.4 done 2026-11-16. M6.3 done 2026-11-16. M6.2 done 2026-11-16. M6.1 done 2026-11-16. M6 broken into steps 2026-11-16. M5 done 2026-11-16. M5.7 done 2026-11-16. M5.6 done 2026-11-16. M5.5 done 2026-11-16. M5.4 done 2026-11-16. M5.3 done 2026-11-16. M5.2 done 2026-11-16. M5.1 done 2026-11-16. M5 broken into steps 2026-11-16. M4 done 2026-11-16. M4.4 done 2026-11-16. M4.3 done 2026-11-16. M4.2 done 2026-11-16. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6, 7, 8, 9, 10 and 11 are settled.
 
 ## How to use this
 
@@ -60,7 +60,7 @@ plan §5 decision 12 (user, 2026-11-19). Every write goes to the local test inst
   `Map<WishField, String?>` and sends a JSON object of only those keys; a null value goes out as an
   explicit `null`, ready for M9.2's answer. No `ui` module yet (M9.3). Mutations: the `price` key
   and the wish image path, each caught.
-- [ ] **M9.2** — Live wishlist smoke against the local test instance (a task, as
+- [x] **M9.2** — Live wishlist smoke against the local test instance (a task, as
   `smokeCollectionRun`): create a top-level wishlist and a child, rename the child, upload an
   image, replace it (the old file gives 404), remove it (`image` is null). Create a wish in the
   child with every M9.1 field, upload its image, replace it, edit two fields, and send an explicit
@@ -70,6 +70,9 @@ plan §5 decision 12 (user, 2026-11-19). Every write goes to the local test inst
   answer in plan §2.
   **Verify:** the run prints each step and passes; the test instance ends as it started; plan §2
   has the results.
+  Note: `./gradlew :composeApp:smokeWishlistRun` (`LiveWishlistSmoke.kt`). Every case answered as
+  expected. `GET /api/wishlists` lists the child too, and `"url": null` clears the URL. The create
+  without `wishlist` goes through the app's `HttpClient`: the repository always sends it.
 - [ ] **M9.3** — Overflow menu and wishlist browse (`feature:wishlists:ui`). The collection list
   top bar keeps the search icon; Tags, Templates, Wishlists, Settings and Log out move into a
   "More" menu (close the M8.3 entry in `docs/revisit.md`). The wishlist list shows the top-level

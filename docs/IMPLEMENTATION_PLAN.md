@@ -183,6 +183,25 @@ start of any step that touches the API. Facts that shape the design:
   was gone). After the template delete the same
   `DELETE` got 204. A create with `"choices": ["a","a"]` got 422 (`choices: This collection should
   contain only unique elements.`).
+- Wishlist and wish writes checked live 2026-11-21 (M9.2, `./gradlew :composeApp:smokeWishlistRun`,
+  JVM, local test instance at the root path), through the M9.1 repository calls. The test instance
+  had no wishlists and no wishes before and after.
+  - A top-level wishlist and a child (`parent` IRI) were created; the server picked a `color` for
+    each. The parent's `/children` listed the child. **`GET /api/wishlists` lists the child
+    wishlists too**, not only the top-level ones: a top-level list must filter on `parentId`.
+  - A rename was read back and kept the parent. A `jpeg` upload got a file; a second upload got a
+    new file name, and the old file gave 404. `PATCH` with `deleteImage` answered `image: null`,
+    and the file gave 404.
+  - A wish with `name`, `wishlist` IRI, `url`, `price` `"12.50"`, `currency` `EUR` and `comment`
+    was stored as sent; `/api/wishlists/{id}/wishes` listed it. A second image upload got a new
+    file name, and the old file gave 404.
+  - A `PATCH` of `price` and `comment` changed only those keys. **A `PATCH` with `"url": null`
+    clears `url`** (answer and read-back both null).
+  - 422 each: currency `EURO` (`currency: This value is not a valid currency.`), an empty name
+    (`name: This value should not be blank.`), and a create without `wishlist` (`wishlist: This
+    value should not be blank.`).
+  - A `DELETE` of the parent took the child and the wish with it: all three gave 404.
+  Not checked: a server behind a subpath.
 - Counting what a collection delete takes (M6.3, 1.8.5 source): the API has no counters.
   `Collection::$cachedValues` holds them but has no `Groups`, and `Item.php` has no `#[ApiFilter]`,
   so items cannot be counted for several collections in one call. The app reads all collections
