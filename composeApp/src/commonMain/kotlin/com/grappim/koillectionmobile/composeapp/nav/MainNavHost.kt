@@ -39,6 +39,10 @@ import com.grappim.koillectionmobile.feature.templates.ui.TemplateListRoute
 import com.grappim.koillectionmobile.feature.templates.ui.TemplateListScreen
 import com.grappim.koillectionmobile.feature.templates.ui.TemplateRoute
 import com.grappim.koillectionmobile.feature.templates.ui.TemplateScreen
+import com.grappim.koillectionmobile.feature.wishlists.ui.WishlistListRoute
+import com.grappim.koillectionmobile.feature.wishlists.ui.WishlistListScreen
+import com.grappim.koillectionmobile.feature.wishlists.ui.WishlistRoute
+import com.grappim.koillectionmobile.feature.wishlists.ui.WishlistScreen
 
 /**
  * The logged-in side: one back stack that starts at the collection list.
@@ -67,7 +71,21 @@ internal fun MainNavHost(modifier: Modifier = Modifier) {
                     onNewCollectionClick = { backStack.add(NewCollectionRoute()) },
                     onSearchClick = { backStack.add(ItemSearchRoute) },
                     onTagsClick = { backStack.add(TagListRoute) },
-                    onTemplatesClick = { backStack.add(TemplateListRoute) }
+                    onTemplatesClick = { backStack.add(TemplateListRoute) },
+                    onWishlistsClick = { backStack.add(WishlistListRoute) }
+                )
+            }
+            entry<WishlistListRoute> {
+                WishlistListScreen(
+                    onWishlistClick = { id -> backStack.add(WishlistRoute(id)) },
+                    onBack = { backStack.removeLastOrNull() }
+                )
+            }
+            entry<WishlistRoute> { route ->
+                WishlistScreen(
+                    wishlistId = route.wishlistId,
+                    onWishlistClick = { id -> backStack.add(WishlistRoute(id)) },
+                    onBack = { backStack.removeLastOrNull() }
                 )
             }
             entry<ItemSearchRoute> {

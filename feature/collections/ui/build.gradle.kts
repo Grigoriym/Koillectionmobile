@@ -12,7 +12,7 @@ kotlin {
             implementation(projects.feature.collections.domain)
             // The collection screen lists the collection's items too.
             implementation(projects.feature.items.domain)
-            // Log out sits in the collection list's top bar.
+            // Log out sits in the collection list's overflow menu.
             implementation(projects.feature.auth.domain)
             // The edit form picks the collection's default template.
             implementation(projects.feature.templates.domain)

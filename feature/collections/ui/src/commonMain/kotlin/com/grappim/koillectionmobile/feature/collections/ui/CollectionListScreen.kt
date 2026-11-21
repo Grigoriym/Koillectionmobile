@@ -12,9 +12,12 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -23,11 +26,13 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
@@ -36,6 +41,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.grappim.kit.uikit.NativeText
 import com.grappim.kit.uikit.asString
 import com.grappim.koillectionmobile.strings.RString
+import com.grappim.koillectionmobile.strings.generated.resources.collection_more
 import com.grappim.koillectionmobile.strings.generated.resources.collection_new
 import com.grappim.koillectionmobile.strings.generated.resources.collections_empty
 import com.grappim.koillectionmobile.strings.generated.resources.collections_log_out
@@ -45,6 +51,7 @@ import com.grappim.koillectionmobile.strings.generated.resources.collections_tit
 import com.grappim.koillectionmobile.strings.generated.resources.item_search_title
 import com.grappim.koillectionmobile.strings.generated.resources.tags_title
 import com.grappim.koillectionmobile.strings.generated.resources.templates_title
+import com.grappim.koillectionmobile.strings.generated.resources.wishlists_title
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -56,6 +63,7 @@ fun CollectionListScreen(
     onSearchClick: () -> Unit,
     onTagsClick: () -> Unit,
     onTemplatesClick: () -> Unit,
+    onWishlistsClick: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: CollectionListViewModel = koinViewModel()
 ) {
@@ -68,6 +76,7 @@ fun CollectionListScreen(
         onSearchClick = onSearchClick,
         onTagsClick = onTagsClick,
         onTemplatesClick = onTemplatesClick,
+        onWishlistsClick = onWishlistsClick,
         modifier = modifier
     )
 }
@@ -82,6 +91,7 @@ private fun CollectionListContent(
     onSearchClick: () -> Unit,
     onTagsClick: () -> Unit,
     onTemplatesClick: () -> Unit,
+    onWishlistsClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Scaffold(
@@ -96,18 +106,15 @@ private fun CollectionListContent(
                             contentDescription = stringResource(RString.item_search_title)
                         )
                     }
-                    TextButton(onClick = onTagsClick) {
-                        Text(stringResource(RString.tags_title))
-                    }
-                    TextButton(onClick = onTemplatesClick) {
-                        Text(stringResource(RString.templates_title))
-                    }
-                    TextButton(onClick = onSettingsClick) {
-                        Text(stringResource(RString.collections_settings))
-                    }
-                    TextButton(onClick = uiState.onLogOutClick) {
-                        Text(stringResource(RString.collections_log_out))
-                    }
+                    MoreMenu(
+                        listOf(
+                            stringResource(RString.tags_title) to onTagsClick,
+                            stringResource(RString.templates_title) to onTemplatesClick,
+                            stringResource(RString.wishlists_title) to onWishlistsClick,
+                            stringResource(RString.collections_settings) to onSettingsClick,
+                            stringResource(RString.collections_log_out) to uiState.onLogOutClick
+                        )
+                    )
                 }
             )
         },
@@ -196,6 +203,28 @@ private fun CollectionList(
                 headlineContent = { Text(collection.title) },
                 leadingContent = { Thumbnail(imageUrl = collection.imageUrl, title = collection.title) }
             )
+        }
+    }
+}
+
+/** The top bar's overflow menu: one entry per (label, action) pair, in order. */
+@Composable
+private fun MoreMenu(entries: List<Pair<String, () -> Unit>>) {
+    var isExpanded by remember { mutableStateOf(false) }
+    Box {
+        IconButton(onClick = { isExpanded = true }) {
+            Icon(imageVector = Icons.Filled.MoreVert, contentDescription = stringResource(RString.collection_more))
+        }
+        DropdownMenu(expanded = isExpanded, onDismissRequest = { isExpanded = false }) {
+            entries.forEach { (label, onClick) ->
+                DropdownMenuItem(
+                    text = { Text(label) },
+                    onClick = {
+                        isExpanded = false
+                        onClick()
+                    }
+                )
+            }
         }
     }
 }

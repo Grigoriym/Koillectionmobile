@@ -77,6 +77,7 @@ include(
     ":feature:wishlists:data",
     ":feature:wishlists:domain",
     ":feature:wishlists:dto",
-    ":feature:wishlists:mapper"
+    ":feature:wishlists:mapper",
+    ":feature:wishlists:ui"
 )
 include(":feature:settings:ui")

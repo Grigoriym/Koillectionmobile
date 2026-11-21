@@ -295,4 +295,15 @@
     <string name="custom_headers_error_reserved_name">The app sets this header itself.</string>
     <string name="custom_headers_error_duplicate_name">This header is already in the list.</string>
     <string name="custom_headers_error_invalid_value">Values can only contain plain ASCII characters.</string>
+
+    <string name="wishlists_title">Wishlists</string>
+    <string name="wishlists_empty">There are no wishlists yet.</string>
+    <string name="wishlists_retry">Try again</string>
+    <string name="wishlists_error_network">The server does not answer. Check the network connection.</string>
+    <string name="wishlists_error_http">The server answered with an error (HTTP %1$d).</string>
+    <string name="wishlists_error_unexpected">Loading the wishlists failed with an unexpected error.</string>
+    <string name="wishlist_error_unexpected">Loading the wishlist failed with an unexpected error.</string>
+    <string name="wishlist_empty">This wishlist has no wishlists and no wishes.</string>
+    <string name="wishlist_section_children">Wishlists</string>
+    <string name="wishlist_section_wishes">Wishes</string>
 </resources>

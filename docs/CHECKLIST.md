@@ -1,6 +1,6 @@
 # koillectionmobile checklist
 
-**Current step:** M9.3. M9.2 done 2026-11-21. M9.1 done 2026-11-21. M9 broken into steps 2026-11-19. M8 done 2026-11-19. M8.9 done 2026-11-19. M8.8 done 2026-11-19. M8.7 done 2026-11-19. M8.6 done 2026-11-18. M8.5 done 2026-11-18. M8.4 done 2026-11-18. M8.3 done 2026-11-17. M8.2 done 2026-11-17. M8.1 done 2026-11-17. M8 broken into steps 2026-11-17; the other areas became M9–M13 and the release moved to M14 (user, 2026-11-17). M7 done 2026-11-17. M7.7 done 2026-11-17. M7.6 done 2026-11-17. M7.5 done 2026-11-17. M7.4 done 2026-11-17. M7.3 done 2026-11-17. M7.2 done 2026-11-17. M7.1 done 2026-11-17. M7 broken into steps 2026-11-17. M6 done 2026-11-17. M6.6 done 2026-11-17. M6.5 done 2026-11-16. M6.4 done 2026-11-16. M6.3 done 2026-11-16. M6.2 done 2026-11-16. M6.1 done 2026-11-16. M6 broken into steps 2026-11-16. M5 done 2026-11-16. M5.7 done 2026-11-16. M5.6 done 2026-11-16. M5.5 done 2026-11-16. M5.4 done 2026-11-16. M5.3 done 2026-11-16. M5.2 done 2026-11-16. M5.1 done 2026-11-16. M5 broken into steps 2026-11-16. M4 done 2026-11-16. M4.4 done 2026-11-16. M4.3 done 2026-11-16. M4.2 done 2026-11-16. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6, 7, 8, 9, 10 and 11 are settled.
+**Current step:** M9.4. M9.3 done 2026-11-21. M9.2 done 2026-11-21. M9.1 done 2026-11-21. M9 broken into steps 2026-11-19. M8 done 2026-11-19. M8.9 done 2026-11-19. M8.8 done 2026-11-19. M8.7 done 2026-11-19. M8.6 done 2026-11-18. M8.5 done 2026-11-18. M8.4 done 2026-11-18. M8.3 done 2026-11-17. M8.2 done 2026-11-17. M8.1 done 2026-11-17. M8 broken into steps 2026-11-17; the other areas became M9–M13 and the release moved to M14 (user, 2026-11-17). M7 done 2026-11-17. M7.7 done 2026-11-17. M7.6 done 2026-11-17. M7.5 done 2026-11-17. M7.4 done 2026-11-17. M7.3 done 2026-11-17. M7.2 done 2026-11-17. M7.1 done 2026-11-17. M7 broken into steps 2026-11-17. M6 done 2026-11-17. M6.6 done 2026-11-17. M6.5 done 2026-11-16. M6.4 done 2026-11-16. M6.3 done 2026-11-16. M6.2 done 2026-11-16. M6.1 done 2026-11-16. M6 broken into steps 2026-11-16. M5 done 2026-11-16. M5.7 done 2026-11-16. M5.6 done 2026-11-16. M5.5 done 2026-11-16. M5.4 done 2026-11-16. M5.3 done 2026-11-16. M5.2 done 2026-11-16. M5.1 done 2026-11-16. M5 broken into steps 2026-11-16. M4 done 2026-11-16. M4.4 done 2026-11-16. M4.3 done 2026-11-16. M4.2 done 2026-11-16. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6, 7, 8, 9, 10 and 11 are settled.
 
 ## How to use this
 
@@ -73,13 +73,16 @@ plan §5 decision 12 (user, 2026-11-19). Every write goes to the local test inst
   Note: `./gradlew :composeApp:smokeWishlistRun` (`LiveWishlistSmoke.kt`). Every case answered as
   expected. `GET /api/wishlists` lists the child too, and `"url": null` clears the URL. The create
   without `wishlist` goes through the app's `HttpClient`: the repository always sends it.
-- [ ] **M9.3** — Overflow menu and wishlist browse (`feature:wishlists:ui`). The collection list
+- [x] **M9.3** — Overflow menu and wishlist browse (`feature:wishlists:ui`). The collection list
   top bar keeps the search icon; Tags, Templates, Wishlists, Settings and Log out move into a
   "More" menu (close the M8.3 entry in `docs/revisit.md`). The wishlist list shows the top-level
   wishlists; a tap opens the wishlist screen with its child wishlists and its wishes (name,
   thumbnail, price and currency). Loading, empty and error states with retry on both screens. New
   Koin module: add its `includes` line in `AppModule`.
   **Verify:** ViewModel tests (order, empty, failure and retry) for both screens.
+  Note: both screens sort by name ignoring case, as the web UI orders wishes; the API has no
+  order. A wish row shows `thumbnailUrl` and "price currency" (no line without a price). A tap on a
+  wish does nothing until M9.6. Mutation: the top-level filter dropped, caught.
 - [ ] **M9.4** — Wishlist form: create and edit. A "new wishlist" action on the wishlist list
   (top level) and on the wishlist screen (child). The form edits the name and the image (set,
   replace, remove; camera or picker from `core:photos`), saved with the progress view and retry.

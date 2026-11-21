@@ -20,6 +20,7 @@ import com.grappim.koillectionmobile.feature.templates.mapper.TemplatesMapperMod
 import com.grappim.koillectionmobile.feature.templates.ui.TemplatesUiModule
 import com.grappim.koillectionmobile.feature.wishlists.data.WishlistsDataModule
 import com.grappim.koillectionmobile.feature.wishlists.mapper.WishlistsMapperModule
+import com.grappim.koillectionmobile.feature.wishlists.ui.WishlistsUiModule
 import org.koin.core.annotation.ComponentScan
 import org.koin.core.annotation.Configuration
 import org.koin.core.annotation.KoinApplication
@@ -54,6 +55,7 @@ import org.koin.core.annotation.Module
         TemplatesUiModule::class,
         WishlistsMapperModule::class,
         WishlistsDataModule::class,
+        WishlistsUiModule::class,
         SettingsUiModule::class
     ]
 )

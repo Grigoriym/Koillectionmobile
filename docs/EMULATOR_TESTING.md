@@ -44,7 +44,9 @@ this app.
   fields (Title page, Spine) and 3 tags. To compare with the web UI from the host, log in with
   `curl` (a cookie jar, `GET /` for `_csrf_token`, then `POST /` with `_login`, `_password` and the
   token) and read `/items/<id>`.
-- Log out (M2.6) is the "Log out" text button in the collection list's top bar. After it the
+- The collection list's overflow menu (M9.3; `content-desc` "More actions") holds Tags, Templates,
+  Wishlists, Settings and Log out. Open it first, then tap the entry from a fresh dump.
+- Log out (M2.6) is "Log out" in the collection list's overflow menu. After it the
   login form shows only the server URL. A collection made through the API shows in the list after a
   pull to refresh: `input swipe 540 400 540 1800 800`. A 300 ms swipe from y 600 did not refresh
   (M7.7). To prove that a re-login loads fresh data and does not
@@ -132,7 +134,7 @@ this app.
   items") opens "Search items". Each row is the item name with its collection title below it. The
   field is the M7.1 field. After "Clear search" the list keeps the last match at the top (the lazy
   list keeps its scroll anchor by key), so the rows above it are off screen, not missing.
-- Tags (M7.5): a "Tags" text button in the collection list's top bar opens "Tags": one header per
+- Tags (M7.5): "Tags" in the collection list's overflow menu opens "Tags": one header per
   category (a colour dot and the label), the tag rows below it. A tap opens the tag's items, titled
   with the tag label. Compare with `GET /api/tags` and `/api/tag_categories` (bearer token, as in
   M3.4); "Fraktur" has 121 items over 5 pages, the last one "Brettspiel des Lebens". In airplane mode
@@ -146,7 +148,7 @@ this app.
   tags, created on save". To see that no tag exists before Save, count `GET /api/tags`
   (`totalItems`). The test instance has exactly 30 tags, one full page of `/api/tags`, so a new tag
   lands on page 2: read every page before a cleanup by label (M7.7 missed one).
-- Templates (M8.9): "Templates" in the collection list's top bar; "Choice lists" (`content-desc`)
+- Templates (M8.9): "Templates" in the collection list's overflow menu; "Choice lists" (`content-desc`)
   in its top bar. In the template form the field type is a chip with the type's name ("Text"):
   `ui.py tap Text <n>` opens the 17-type menu. A `choice-list` type adds "Pick a choice list". In
   the item forms the `checkbox` switch and the `choice-list` chips have no label in the dump: find
@@ -158,7 +160,7 @@ this app.
   `127.0.0.1` only: forward a host-only private address to it for the check, not the Wi-Fi LAN
   address (the address and the forwarder on a given machine are in `docs/machine.local.md`). The
   permission matters only on API 37+, and no API 37 AVD has worked here yet (`docs/revisit.md`).
-- Settings (M4.2): a "Settings" text button in the collection list top bar and under "Log in" on
+- Settings (M4.2): "Settings" in the collection list's overflow menu and a text button under "Log in" on
   the login form. The screen holds the custom headers ("Add header", "Header name", "Value",
   "Save"; Save is off until the rows differ from storage). The app writes no Ktor log on the
   device: to see the headers a request carries, point the server URL at a forwarder on the host

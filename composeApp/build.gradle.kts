@@ -21,6 +21,7 @@ kotlin {
             implementation(projects.feature.settings.ui)
             implementation(projects.feature.tags.ui)
             implementation(projects.feature.templates.ui)
+            implementation(projects.feature.wishlists.ui)
             implementation(projects.feature.auth.data)
             implementation(projects.feature.collections.data)
             implementation(projects.feature.collections.mapper)
