@@ -6,19 +6,31 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.grappim.koillectionmobile.feature.wishlists.domain.Wish
 import com.grappim.koillectionmobile.strings.RString
+import com.grappim.koillectionmobile.strings.generated.resources.wishlist_edit
 import com.grappim.koillectionmobile.strings.generated.resources.wishlist_empty
+import com.grappim.koillectionmobile.strings.generated.resources.wishlist_more
+import com.grappim.koillectionmobile.strings.generated.resources.wishlist_new
 import com.grappim.koillectionmobile.strings.generated.resources.wishlist_section_children
 import com.grappim.koillectionmobile.strings.generated.resources.wishlist_section_wishes
 import org.jetbrains.compose.resources.stringResource
@@ -30,24 +42,39 @@ import org.koin.core.parameter.parametersOf
 fun WishlistScreen(
     wishlistId: String,
     onWishlistClick: (String) -> Unit,
+    onNewWishlistClick: () -> Unit,
+    onEditClick: () -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: WishlistViewModel = koinViewModel { parametersOf(wishlistId) }
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    WishlistContent(uiState = uiState, onWishlistClick = onWishlistClick, onBack = onBack, modifier = modifier)
+    WishlistContent(
+        uiState = uiState,
+        onWishlistClick = onWishlistClick,
+        onNewWishlistClick = onNewWishlistClick,
+        onEditClick = onEditClick,
+        onBack = onBack,
+        modifier = modifier
+    )
 }
 
 @Composable
 private fun WishlistContent(
     uiState: WishlistUiState,
     onWishlistClick: (String) -> Unit,
+    onNewWishlistClick: () -> Unit,
+    onEditClick: () -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
-        topBar = { BackTopBar(title = uiState.name, onBack = onBack) }
+        topBar = {
+            BackTopBar(title = uiState.name, onBack = onBack) {
+                MoreMenu(onNewWishlistClick = onNewWishlistClick, onEditClick = onEditClick)
+            }
+        }
     ) { padding ->
         val contentModifier = Modifier
             .fillMaxSize()
@@ -97,6 +124,33 @@ private fun WishRow(wish: Wish, modifier: Modifier = Modifier) {
         },
         leadingContent = { Thumbnail(imageUrl = wish.thumbnailUrl, name = wish.name) }
     )
+}
+
+/** The top bar's overflow menu. */
+@Composable
+private fun MoreMenu(onNewWishlistClick: () -> Unit, onEditClick: () -> Unit) {
+    var isExpanded by remember { mutableStateOf(false) }
+    Box {
+        IconButton(onClick = { isExpanded = true }) {
+            Icon(imageVector = Icons.Filled.MoreVert, contentDescription = stringResource(RString.wishlist_more))
+        }
+        DropdownMenu(expanded = isExpanded, onDismissRequest = { isExpanded = false }) {
+            DropdownMenuItem(
+                text = { Text(stringResource(RString.wishlist_new)) },
+                onClick = {
+                    isExpanded = false
+                    onNewWishlistClick()
+                }
+            )
+            DropdownMenuItem(
+                text = { Text(stringResource(RString.wishlist_edit)) },
+                onClick = {
+                    isExpanded = false
+                    onEditClick()
+                }
+            )
+        }
+    }
 }
 
 @Composable

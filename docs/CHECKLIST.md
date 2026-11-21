@@ -1,6 +1,6 @@
 # koillectionmobile checklist
 
-**Current step:** M9.4. M9.3 done 2026-11-21. M9.2 done 2026-11-21. M9.1 done 2026-11-21. M9 broken into steps 2026-11-19. M8 done 2026-11-19. M8.9 done 2026-11-19. M8.8 done 2026-11-19. M8.7 done 2026-11-19. M8.6 done 2026-11-18. M8.5 done 2026-11-18. M8.4 done 2026-11-18. M8.3 done 2026-11-17. M8.2 done 2026-11-17. M8.1 done 2026-11-17. M8 broken into steps 2026-11-17; the other areas became M9–M13 and the release moved to M14 (user, 2026-11-17). M7 done 2026-11-17. M7.7 done 2026-11-17. M7.6 done 2026-11-17. M7.5 done 2026-11-17. M7.4 done 2026-11-17. M7.3 done 2026-11-17. M7.2 done 2026-11-17. M7.1 done 2026-11-17. M7 broken into steps 2026-11-17. M6 done 2026-11-17. M6.6 done 2026-11-17. M6.5 done 2026-11-16. M6.4 done 2026-11-16. M6.3 done 2026-11-16. M6.2 done 2026-11-16. M6.1 done 2026-11-16. M6 broken into steps 2026-11-16. M5 done 2026-11-16. M5.7 done 2026-11-16. M5.6 done 2026-11-16. M5.5 done 2026-11-16. M5.4 done 2026-11-16. M5.3 done 2026-11-16. M5.2 done 2026-11-16. M5.1 done 2026-11-16. M5 broken into steps 2026-11-16. M4 done 2026-11-16. M4.4 done 2026-11-16. M4.3 done 2026-11-16. M4.2 done 2026-11-16. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6, 7, 8, 9, 10 and 11 are settled.
+**Current step:** M9.5. M9.4 done 2026-11-21. M9.3 done 2026-11-21. M9.2 done 2026-11-21. M9.1 done 2026-11-21. M9 broken into steps 2026-11-19. M8 done 2026-11-19. M8.9 done 2026-11-19. M8.8 done 2026-11-19. M8.7 done 2026-11-19. M8.6 done 2026-11-18. M8.5 done 2026-11-18. M8.4 done 2026-11-18. M8.3 done 2026-11-17. M8.2 done 2026-11-17. M8.1 done 2026-11-17. M8 broken into steps 2026-11-17; the other areas became M9–M13 and the release moved to M14 (user, 2026-11-17). M7 done 2026-11-17. M7.7 done 2026-11-17. M7.6 done 2026-11-17. M7.5 done 2026-11-17. M7.4 done 2026-11-17. M7.3 done 2026-11-17. M7.2 done 2026-11-17. M7.1 done 2026-11-17. M7 broken into steps 2026-11-17. M6 done 2026-11-17. M6.6 done 2026-11-17. M6.5 done 2026-11-16. M6.4 done 2026-11-16. M6.3 done 2026-11-16. M6.2 done 2026-11-16. M6.1 done 2026-11-16. M6 broken into steps 2026-11-16. M5 done 2026-11-16. M5.7 done 2026-11-16. M5.6 done 2026-11-16. M5.5 done 2026-11-16. M5.4 done 2026-11-16. M5.3 done 2026-11-16. M5.2 done 2026-11-16. M5.1 done 2026-11-16. M5 broken into steps 2026-11-16. M4 done 2026-11-16. M4.4 done 2026-11-16. M4.3 done 2026-11-16. M4.2 done 2026-11-16. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6, 7, 8, 9, 10 and 11 are settled.
 
 ## How to use this
 
@@ -83,13 +83,19 @@ plan §5 decision 12 (user, 2026-11-19). Every write goes to the local test inst
   Note: both screens sort by name ignoring case, as the web UI orders wishes; the API has no
   order. A wish row shows `thumbnailUrl` and "price currency" (no line without a price). A tap on a
   wish does nothing until M9.6. Mutation: the top-level filter dropped, caught.
-- [ ] **M9.4** — Wishlist form: create and edit. A "new wishlist" action on the wishlist list
+- [x] **M9.4** — Wishlist form: create and edit. A "new wishlist" action on the wishlist list
   (top level) and on the wishlist screen (child). The form edits the name and the image (set,
   replace, remove; camera or picker from `core:photos`), saved with the progress view and retry.
   Edit opens prefilled and sends only what changed. On success the list or the parent reads
   again. The form survives rotation and process death.
   **Verify:** ViewModel tests (create, each change alone, no change sends no call, failure and
   retry); mutation-check one.
+  Note: two view models, as `feature:collections` (`NewWishlistViewModel`, `EditWishlistViewModel`),
+  with the form, frame and save view in `WishlistFormScreen.kt`. A new `WishlistChanges` signal
+  (wishlist id and parent) makes the list (null parent) and the wishlist screen (itself or a child)
+  read again. A saved new wishlist closes the form; it does not open the new wishlist. The list has
+  a FAB; the wishlist screen has a "More actions" menu with "New wishlist" and "Edit". Shared texts
+  reuse the `collection_form_*` strings. Mutation: the no-change guard in `canSave`, caught.
 - [ ] **M9.5** — Delete wishlist: a delete action on the wishlist screen. The confirm names the
   wishlist and counts the child wishlists (every level) and the wishes they hold, as M6.3 counts
   collections. On success the screen leaves the back stack and the list or the parent reads again.

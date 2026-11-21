@@ -39,6 +39,10 @@ import com.grappim.koillectionmobile.feature.templates.ui.TemplateListRoute
 import com.grappim.koillectionmobile.feature.templates.ui.TemplateListScreen
 import com.grappim.koillectionmobile.feature.templates.ui.TemplateRoute
 import com.grappim.koillectionmobile.feature.templates.ui.TemplateScreen
+import com.grappim.koillectionmobile.feature.wishlists.ui.EditWishlistRoute
+import com.grappim.koillectionmobile.feature.wishlists.ui.EditWishlistScreen
+import com.grappim.koillectionmobile.feature.wishlists.ui.NewWishlistRoute
+import com.grappim.koillectionmobile.feature.wishlists.ui.NewWishlistScreen
 import com.grappim.koillectionmobile.feature.wishlists.ui.WishlistListRoute
 import com.grappim.koillectionmobile.feature.wishlists.ui.WishlistListScreen
 import com.grappim.koillectionmobile.feature.wishlists.ui.WishlistRoute
@@ -78,6 +82,7 @@ internal fun MainNavHost(modifier: Modifier = Modifier) {
             entry<WishlistListRoute> {
                 WishlistListScreen(
                     onWishlistClick = { id -> backStack.add(WishlistRoute(id)) },
+                    onNewWishlistClick = { backStack.add(NewWishlistRoute()) },
                     onBack = { backStack.removeLastOrNull() }
                 )
             }
@@ -85,7 +90,25 @@ internal fun MainNavHost(modifier: Modifier = Modifier) {
                 WishlistScreen(
                     wishlistId = route.wishlistId,
                     onWishlistClick = { id -> backStack.add(WishlistRoute(id)) },
+                    onNewWishlistClick = { backStack.add(NewWishlistRoute(route.wishlistId)) },
+                    onEditClick = { backStack.add(EditWishlistRoute(route.wishlistId)) },
                     onBack = { backStack.removeLastOrNull() }
+                )
+            }
+            entry<NewWishlistRoute> { route ->
+                NewWishlistScreen(
+                    parentId = route.parentId,
+                    onBack = { backStack.removeLastOrNull() },
+                    // The list or the parent reads its list again (WishlistChanges).
+                    onClose = { backStack.remove(route) }
+                )
+            }
+            entry<EditWishlistRoute> { route ->
+                EditWishlistScreen(
+                    wishlistId = route.wishlistId,
+                    onBack = { backStack.removeLastOrNull() },
+                    // The wishlist screen and the list or the parent read again (WishlistChanges).
+                    onClose = { backStack.remove(route) }
                 )
             }
             entry<ItemSearchRoute> {

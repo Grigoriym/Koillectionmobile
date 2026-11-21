@@ -3,28 +3,36 @@ package com.grappim.koillectionmobile.feature.wishlists.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.grappim.kit.uikit.NativeText
+import com.grappim.koillectionmobile.feature.wishlists.domain.WishlistChanges
 import com.grappim.koillectionmobile.feature.wishlists.domain.WishlistsRepository
 import com.grappim.koillectionmobile.strings.RString
 import com.grappim.koillectionmobile.strings.generated.resources.wishlists_error_unexpected
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.core.annotation.KoinViewModel
 
 /**
  * The top-level wishlists. `GET /api/wishlists` lists the child wishlists too (M9.2), and the
- * server has no filter for the top level, so the list drops each child.
+ * server has no filter for the top level, so the list drops each child. A change to a top-level
+ * wishlist ([WishlistChanges] with a null parent) reads the list again, while the screen waits lower
+ * on the back stack.
  */
 @KoinViewModel
-class WishlistListViewModel(private val repository: WishlistsRepository) : ViewModel() {
+class WishlistListViewModel(private val repository: WishlistsRepository, private val wishlistChanges: WishlistChanges) :
+    ViewModel() {
 
     private val _uiState = MutableStateFlow(WishlistListUiState(onRetry = ::retry))
     val uiState: StateFlow<WishlistListUiState> = _uiState.asStateFlow()
 
     init {
         load()
+        viewModelScope.launch {
+            wishlistChanges.changed.filter { it.parentId == null }.collect { load() }
+        }
     }
 
     private fun retry() {

@@ -4,6 +4,7 @@ import com.grappim.kit.testing.MainDispatcherRule
 import com.grappim.kit.uikit.NativeText
 import com.grappim.koillectionmobile.core.domain.KoillectionError
 import com.grappim.koillectionmobile.feature.wishlists.domain.Wishlist
+import com.grappim.koillectionmobile.feature.wishlists.domain.WishlistChanges
 import com.grappim.koillectionmobile.strings.RString
 import com.grappim.koillectionmobile.strings.generated.resources.error_proxy_rejected
 import com.grappim.koillectionmobile.strings.generated.resources.wishlists_error_http
@@ -20,6 +21,7 @@ import kotlin.test.assertTrue
 class WishlistListViewModelTest {
 
     private val repository = FakeWishlistsRepository()
+    private val wishlistChanges = WishlistChanges()
     private val mainDispatcherRule = MainDispatcherRule()
 
     @BeforeTest
@@ -38,7 +40,7 @@ class WishlistListViewModelTest {
 
     private fun createSut(): WishlistListViewModel {
         queue()
-        return WishlistListViewModel(repository)
+        return WishlistListViewModel(repository, wishlistChanges)
     }
 
     private fun answer(result: Result<List<Wishlist>> = Result.success(listOf(travel, books, japan, art))) {
@@ -55,6 +57,22 @@ class WishlistListViewModelTest {
         assertFalse(sut.uiState.value.isLoading)
         assertTrue(sut.uiState.value.error.isEmpty())
         assertEquals(1, repository.wishlistsCalls)
+    }
+
+    @Test
+    fun `a change to a top-level wishlist reads the list again and a child change does not`() {
+        val sut = createSut()
+        answer()
+
+        wishlistChanges.notifyChanged(japan.id, parentId = travel.id)
+        assertEquals(1, repository.wishlistsCalls)
+
+        queue()
+        wishlistChanges.notifyChanged("new", parentId = null)
+        answer(Result.success(listOf(travel, wishlist(id = "new", name = "New"))))
+
+        assertEquals(2, repository.wishlistsCalls)
+        assertEquals(listOf("new", travel.id), sut.uiState.value.wishlists.map { it.id })
     }
 
     @Test

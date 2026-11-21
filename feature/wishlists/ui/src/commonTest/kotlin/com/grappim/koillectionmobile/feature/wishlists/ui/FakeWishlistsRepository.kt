@@ -6,7 +6,11 @@ import com.grappim.koillectionmobile.feature.wishlists.domain.Wishlist
 import com.grappim.koillectionmobile.feature.wishlists.domain.WishlistsRepository
 import kotlinx.coroutines.CompletableDeferred
 
-/** Each read takes the first queued response of its kind. Queue one before the call. */
+/**
+ * Each list read takes the first queued response of its kind. Queue one before the call. Each
+ * wishlist write is logged in [writes] (`"create:<name>:<parent>"`, `"rename:<id>:<name>"`,
+ * `"upload:<id>"`, `"deleteImage:<id>"`) and answers with its `...Answer`.
+ */
 class FakeWishlistsRepository : WishlistsRepository {
     val wishlists = ArrayDeque<CompletableDeferred<Result<List<Wishlist>>>>()
     val wishlist = ArrayDeque<CompletableDeferred<Result<Wishlist>>>()
@@ -38,18 +42,39 @@ class FakeWishlistsRepository : WishlistsRepository {
         return wishes.first().await()
     }
 
-    override suspend fun createWishlist(name: String, parentId: String?): Result<Wishlist> = error("not used")
+    val writes = mutableListOf<String>()
+    val uploads = mutableListOf<Upload>()
+    var createAnswer: suspend (name: String, parentId: String?) -> Result<Wishlist> =
+        { name, parentId -> Result.success(wishlist(id = CREATED_ID, name = name, parentId = parentId)) }
+    var renameAnswer: suspend () -> Result<Wishlist> = { Result.success(wishlist(id = "any", name = "any")) }
+    var uploadAnswer: suspend () -> Result<Wishlist> = { Result.success(wishlist(id = "any", name = "any")) }
+    var deleteImageAnswer: suspend () -> Result<Wishlist> = { Result.success(wishlist(id = "any", name = "any")) }
 
-    override suspend fun renameWishlist(id: String, name: String): Result<Wishlist> = error("not used")
+    override suspend fun createWishlist(name: String, parentId: String?): Result<Wishlist> {
+        writes += "create:$name:$parentId"
+        return createAnswer(name, parentId)
+    }
+
+    override suspend fun renameWishlist(id: String, name: String): Result<Wishlist> {
+        writes += "rename:$id:$name"
+        return renameAnswer()
+    }
 
     override suspend fun uploadWishlistImage(
         id: String,
         bytes: ByteArray,
         fileName: String,
         mimeType: String
-    ): Result<Wishlist> = error("not used")
+    ): Result<Wishlist> {
+        writes += "upload:$id"
+        uploads += Upload(bytes, mimeType)
+        return uploadAnswer()
+    }
 
-    override suspend fun deleteWishlistImage(id: String): Result<Wishlist> = error("not used")
+    override suspend fun deleteWishlistImage(id: String): Result<Wishlist> {
+        writes += "deleteImage:$id"
+        return deleteImageAnswer()
+    }
 
     override suspend fun deleteWishlist(id: String): Result<Unit> = error("not used")
 
@@ -75,6 +100,11 @@ class FakeWishlistsRepository : WishlistsRepository {
 
     override suspend fun deleteWish(id: String): Result<Unit> = error("not used")
 }
+
+class Upload(val bytes: ByteArray, val mimeType: String)
+
+/** The id of a wishlist the fake creates. */
+internal const val CREATED_ID = "created"
 
 internal fun wishlist(id: String, name: String, parentId: String? = null) =
     Wishlist(id = id, name = name, parentId = parentId, color = null, imageUrl = null)

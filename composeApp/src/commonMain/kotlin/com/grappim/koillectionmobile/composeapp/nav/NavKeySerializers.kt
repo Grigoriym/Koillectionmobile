@@ -18,6 +18,8 @@ import com.grappim.koillectionmobile.feature.templates.ui.ChoiceListListRoute
 import com.grappim.koillectionmobile.feature.templates.ui.TemplateFormRoute
 import com.grappim.koillectionmobile.feature.templates.ui.TemplateListRoute
 import com.grappim.koillectionmobile.feature.templates.ui.TemplateRoute
+import com.grappim.koillectionmobile.feature.wishlists.ui.EditWishlistRoute
+import com.grappim.koillectionmobile.feature.wishlists.ui.NewWishlistRoute
 import com.grappim.koillectionmobile.feature.wishlists.ui.WishlistListRoute
 import com.grappim.koillectionmobile.feature.wishlists.ui.WishlistRoute
 import kotlinx.serialization.modules.SerializersModule
@@ -49,6 +51,8 @@ private val navKeySerializersModule = SerializersModule {
         subclass(TemplateRoute::class)
         subclass(WishlistListRoute::class)
         subclass(WishlistRoute::class)
+        subclass(NewWishlistRoute::class)
+        subclass(EditWishlistRoute::class)
     }
 }
 

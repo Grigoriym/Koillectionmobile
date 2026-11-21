@@ -5,6 +5,7 @@ import com.grappim.kit.uikit.NativeText
 import com.grappim.koillectionmobile.core.domain.KoillectionError
 import com.grappim.koillectionmobile.feature.wishlists.domain.Wish
 import com.grappim.koillectionmobile.feature.wishlists.domain.Wishlist
+import com.grappim.koillectionmobile.feature.wishlists.domain.WishlistChanges
 import com.grappim.koillectionmobile.strings.RString
 import com.grappim.koillectionmobile.strings.generated.resources.wishlist_error_unexpected
 import com.grappim.koillectionmobile.strings.generated.resources.wishlists_error_network
@@ -19,6 +20,7 @@ import kotlin.test.assertTrue
 class WishlistViewModelTest {
 
     private val repository = FakeWishlistsRepository()
+    private val wishlistChanges = WishlistChanges()
     private val mainDispatcherRule = MainDispatcherRule()
 
     @BeforeTest
@@ -39,7 +41,7 @@ class WishlistViewModelTest {
 
     private fun createSut(): WishlistViewModel {
         queue()
-        return WishlistViewModel(TRAVEL.id, repository)
+        return WishlistViewModel(TRAVEL.id, repository, wishlistChanges)
     }
 
     private fun answer(
@@ -65,6 +67,27 @@ class WishlistViewModelTest {
         assertEquals(listOf(TRAVEL.id), repository.wishlistCalls)
         assertEquals(listOf(TRAVEL.id), repository.childrenCalls)
         assertEquals(listOf(TRAVEL.id), repository.wishesCalls)
+    }
+
+    @Test
+    fun `a change to this wishlist or to a child reads again and another change does not`() {
+        val sut = createSut()
+        answer()
+
+        wishlistChanges.notifyChanged("other", parentId = null)
+        assertEquals(1, repository.wishlistCalls.size)
+
+        queue()
+        wishlistChanges.notifyChanged(TRAVEL.id, parentId = null)
+        answer(wishlist = Result.success(TRAVEL.copy(name = "Trips")))
+        assertEquals("Trips", sut.uiState.value.name)
+
+        queue()
+        wishlistChanges.notifyChanged("new", parentId = TRAVEL.id)
+        answer()
+
+        assertEquals(3, repository.wishlistCalls.size)
+        assertEquals(3, repository.childrenCalls.size)
     }
 
     @Test

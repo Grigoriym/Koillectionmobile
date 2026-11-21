@@ -306,4 +306,14 @@
     <string name="wishlist_empty">This wishlist has no wishlists and no wishes.</string>
     <string name="wishlist_section_children">Wishlists</string>
     <string name="wishlist_section_wishes">Wishes</string>
+    <string name="wishlist_more">More actions</string>
+    <string name="wishlist_new">New wishlist</string>
+    <string name="wishlist_edit">Edit</string>
+    <string name="wishlist_form_new_title">New wishlist</string>
+    <string name="wishlist_form_edit_title">Edit wishlist</string>
+    <string name="wishlist_form_name_label">Name</string>
+    <string name="wishlist_form_save_partial">The wishlist is on the server, but without its image. Try again to send the image.</string>
+    <string name="wishlist_form_discard_title">Discard this wishlist?</string>
+    <string name="wishlist_form_discard_text">The name and the image on this form are lost.</string>
+    <string name="wishlist_form_edit_discard_text">The changes on this form are lost. The wishlist stays as it is on the server.</string>
 </resources>

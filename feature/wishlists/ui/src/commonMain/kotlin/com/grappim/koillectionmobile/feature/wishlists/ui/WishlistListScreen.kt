@@ -6,7 +6,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -16,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.grappim.koillectionmobile.strings.RString
+import com.grappim.koillectionmobile.strings.generated.resources.wishlist_new
 import com.grappim.koillectionmobile.strings.generated.resources.wishlists_empty
 import com.grappim.koillectionmobile.strings.generated.resources.wishlists_title
 import org.jetbrains.compose.resources.stringResource
@@ -24,24 +29,37 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun WishlistListScreen(
     onWishlistClick: (String) -> Unit,
+    onNewWishlistClick: () -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: WishlistListViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    WishlistListContent(uiState = uiState, onWishlistClick = onWishlistClick, onBack = onBack, modifier = modifier)
+    WishlistListContent(
+        uiState = uiState,
+        onWishlistClick = onWishlistClick,
+        onNewWishlistClick = onNewWishlistClick,
+        onBack = onBack,
+        modifier = modifier
+    )
 }
 
 @Composable
 private fun WishlistListContent(
     uiState: WishlistListUiState,
     onWishlistClick: (String) -> Unit,
+    onNewWishlistClick: () -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
-        topBar = { BackTopBar(title = stringResource(RString.wishlists_title), onBack = onBack) }
+        topBar = { BackTopBar(title = stringResource(RString.wishlists_title), onBack = onBack) },
+        floatingActionButton = {
+            FloatingActionButton(onClick = onNewWishlistClick) {
+                Icon(imageVector = Icons.Filled.Add, contentDescription = stringResource(RString.wishlist_new))
+            }
+        }
     ) { padding ->
         val contentModifier = Modifier
             .fillMaxSize()
