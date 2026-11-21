@@ -207,6 +207,11 @@ start of any step that touches the API. Facts that shape the design:
   so items cannot be counted for several collections in one call. The app reads all collections
   once, finds the descendants by `parentId`, and reads `totalItems` of the first page of
   `/api/collections/{id}/items` for each one. Checked on the device against the local test instance.
+- Counting what a wishlist delete takes (M9.5, 1.8.5 source): `Wishlist.php` has no wish counter
+  in `wishlist:read`, and `children` and `wishes` are `cascade: ['all']`. The app reads all
+  wishlists once, finds the descendants by `parentId`, and reads every page of
+  `/api/wishlists/{id}/wishes` for each one (no `totalItems` call was added: wishlists are small).
+  Not yet checked on the device (M9.8).
 - Writes checked live 2026-11-15 (M3.1, `./gradlew :composeApp:smokeWriteRun`, JVM, local test
   instance at the root path): through the app's repositories, an item in `Books`, two text fields
   (positions 1 and 2), an image field (position 3), a main image upload and a field image upload
