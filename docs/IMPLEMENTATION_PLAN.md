@@ -41,7 +41,10 @@ start of any step that touches the API. Facts that shape the design:
   its content type, so every call with a body sets one (`core:api`'s `ContentTypeLdJson`, or
   `ContentTypeMergePatchJson` for `PATCH`).
 - The server publishes OpenAPI 3.1 at `GET /api/docs` with `Accept:
-  application/vnd.openapi+json` (copy in `fixtures/koillection-1.8.5/openapi.json`).
+  application/vnd.openapi+json` (copy in `fixtures/koillection-1.8.5/openapi.json`). Its
+  `components.schemas` has one schema per entity and group (`Wish-wish.read`,
+  `Wish-wish.write.jsonMergePatch`): a quick cross-check of a DTO's keys against the entity's
+  `Groups` (M9.1).
 - **DTOs are hand-written** (decided M1.1, 2026-11-15). The OpenAPI doc is 3.1 (`type:
   ["string","null"]`, Hydra `allOf` wrappers), which Kotlin generators handle poorly, and the
   app reads a small subset of about six resources. Use the OpenAPI doc as the field
