@@ -29,8 +29,6 @@ entries get deleted — see /finalize.
   line held that text, and killed it (exit 144). Kill by PID from `pgrep`.
 - 2026-11-15 — `io.ktor.http.contentType(this, ...)` in a debug edit (M3.1) failed "Unresolved reference":
   it is an extension, as the `CLAUDE.md` gotcha says. Used `header("Content-Type", ...)`.
-- 2026-11-15 — `./gradlew :core:image:jvmTest --rerun -q | grep PASSED` (M3.2) printed nothing: `-q` hides the
-  test-logging events, so the run looked empty. Drop `-q` when the PASSED lines are the proof.
 - 2026-11-15 — A Python `str.replace` on `KoinGraphTest.kt` (M3.5) matched nothing and changed nothing, with no
   error; only `git diff --stat` (1 line, not 3) showed it. Assert the old text is in the file before replacing.
 - 2026-11-15 — `grep -rl <name> feature strings | xargs sed -i` (M3.6) also rewrote generated files under `build/`.
@@ -65,8 +63,6 @@ entries get deleted — see /finalize.
   after the class.
 - 2026-11-17 — `adb shell input text "m7.7%sedittag"` (M7.7) landed as "m76.7 edittag" in the
   new-tag dialog; the same call with "M7.7%sdevicetag" a minute earlier landed correctly.
-- 2026-11-17 — `./gradlew build | grep -E 'FAILED|error'` (M8.1) printed a page of PASSED tests whose
-  names hold "error". Redirect the run to a log and grep `BUILD (SUCC|FAIL)|What went wrong`.
 - 2026-11-18 — A lambda in a `MutableStateFlow(...)` initializer that used `_uiState` itself (M8.5)
   failed with "Type checking has run into a recursive problem", plus a false "needs opt-in" and "No
   parameter with name" error on the same line. A method reference (`::dismissActionError`) fixed it.

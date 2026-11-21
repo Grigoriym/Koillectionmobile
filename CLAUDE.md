@@ -125,6 +125,9 @@ first — it is often for a problem this toolchain doesn't have.
   does not stop at exactly one failure (M8.4 listed 9, M8.7 listed 4): the count is no measure.
   Run it without `-q`: `-q` hides the failing test names, and "BUILD FAILED" alone also fits a
   compile error (M6.1, M6.3, M6.5).
+- **Send a gate run to a log file, then grep the file** for `BUILD (SUCC|FAIL)|What went wrong`.
+  Piping Gradle straight into `grep` lost the proof three times: nothing under `-q` (M3.2), a page
+  of PASSED tests named "error" (M8.1), and a one-off failure whose cause was gone (M9.3).
 - **Force Gradle tests with `--rerun`** when the test is the proof. An `UP-TO-DATE` test task
   prints "BUILD SUCCESSFUL" without running anything. `--rerun` applies only to the task just
   before it: write `:a:jvmTest --rerun :b:jvmTest --rerun`, not one `--rerun` at the end (M7.3).
