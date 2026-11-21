@@ -74,3 +74,6 @@ entries get deleted — see /finalize.
   class is `AppliedTemplate` next to a top-level function. Second hit after detekt in M7.6; renamed.
 - 2026-11-19 — `GET /api/items?name=M89` ignored the filter and returned an unrelated `Books` item
   (`Item.php` has no `#[ApiFilter]`). Read `/api/collections/<id>/items` instead.
+- 2026-11-21 — Two smoke files in one package (M9.2) each declared `private class Created`; the
+  compile failed "Redeclaration": a private top-level class is still one JVM class per package.
+  Renamed to `WishlistRunCreated`.
