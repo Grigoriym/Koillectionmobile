@@ -73,3 +73,6 @@ entries get deleted — see /finalize.
 - 2026-11-21 — Two smoke files in one package (M9.2) each declared `private class Created`; the
   compile failed "Redeclaration": a private top-level class is still one JVM class per package.
   Renamed to `WishlistRunCreated`.
+- 2026-11-21 — Bash (M9.4): a `cd feature/wishlists && cat ...` read moved the session's working
+  directory again, against `CLAUDE.md` "Shell". Fifth hit; the M7.1 entry's hook proposal still waits
+  for the user.
