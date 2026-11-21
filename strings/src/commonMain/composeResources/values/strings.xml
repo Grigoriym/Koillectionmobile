@@ -316,4 +316,18 @@
     <string name="wishlist_form_discard_title">Discard this wishlist?</string>
     <string name="wishlist_form_discard_text">The name and the image on this form are lost.</string>
     <string name="wishlist_form_edit_discard_text">The changes on this form are lost. The wishlist stays as it is on the server.</string>
+    <string name="wishlist_delete">Delete wishlist</string>
+    <string name="wishlist_delete_title">Delete this wishlist?</string>
+    <string name="wishlist_delete_text">The server deletes "%1$s" and everything in it: %2$s and %3$s. You cannot undo this.</string>
+    <plurals name="wishlist_delete_children">
+        <item quantity="one">%1$d wishlist</item>
+        <item quantity="other">%1$d wishlists</item>
+    </plurals>
+    <plurals name="wishlist_delete_wishes">
+        <item quantity="one">%1$d wish</item>
+        <item quantity="other">%1$d wishes</item>
+    </plurals>
+    <string name="wishlist_delete_failed_title">The wishlist was not deleted</string>
+    <string name="wishlist_delete_count_error_unexpected">Counting the wishlists and wishes to delete failed with an unexpected error.</string>
+    <string name="wishlist_delete_error_unexpected">Deleting the wishlist failed with an unexpected error.</string>
 </resources>

@@ -7,15 +7,18 @@ import com.grappim.koillectionmobile.feature.wishlists.domain.WishlistsRepositor
 import kotlinx.coroutines.CompletableDeferred
 
 /**
- * Each list read takes the first queued response of its kind. Queue one before the call. Each
- * wishlist write is logged in [writes] (`"create:<name>:<parent>"`, `"rename:<id>:<name>"`,
- * `"upload:<id>"`, `"deleteImage:<id>"`) and answers with its `...Answer`.
+ * Each list read takes the first queued response of its kind. Queue one before the call. A wishes
+ * read for an id in [wishesOf] answers from there instead, for the parallel reads of a delete
+ * count. Each wishlist write is logged in [writes] (`"create:<name>:<parent>"`,
+ * `"rename:<id>:<name>"`, `"upload:<id>"`, `"deleteImage:<id>"`, `"delete:<id>"`) and answers with
+ * its `...Answer`.
  */
 class FakeWishlistsRepository : WishlistsRepository {
     val wishlists = ArrayDeque<CompletableDeferred<Result<List<Wishlist>>>>()
     val wishlist = ArrayDeque<CompletableDeferred<Result<Wishlist>>>()
     val children = ArrayDeque<CompletableDeferred<Result<List<Wishlist>>>>()
     val wishes = ArrayDeque<CompletableDeferred<Result<List<Wish>>>>()
+    val wishesOf = mutableMapOf<String, Result<List<Wish>>>()
 
     var wishlistsCalls = 0
     val wishlistCalls = mutableListOf<String>()
@@ -39,6 +42,7 @@ class FakeWishlistsRepository : WishlistsRepository {
 
     override suspend fun getWishes(wishlistId: String): Result<List<Wish>> {
         wishesCalls += wishlistId
+        wishesOf[wishlistId]?.let { return it }
         return wishes.first().await()
     }
 
@@ -49,6 +53,7 @@ class FakeWishlistsRepository : WishlistsRepository {
     var renameAnswer: suspend () -> Result<Wishlist> = { Result.success(wishlist(id = "any", name = "any")) }
     var uploadAnswer: suspend () -> Result<Wishlist> = { Result.success(wishlist(id = "any", name = "any")) }
     var deleteImageAnswer: suspend () -> Result<Wishlist> = { Result.success(wishlist(id = "any", name = "any")) }
+    var deleteAnswer: suspend () -> Result<Unit> = { Result.success(Unit) }
 
     override suspend fun createWishlist(name: String, parentId: String?): Result<Wishlist> {
         writes += "create:$name:$parentId"
@@ -76,7 +81,10 @@ class FakeWishlistsRepository : WishlistsRepository {
         return deleteImageAnswer()
     }
 
-    override suspend fun deleteWishlist(id: String): Result<Unit> = error("not used")
+    override suspend fun deleteWishlist(id: String): Result<Unit> {
+        writes += "delete:$id"
+        return deleteAnswer()
+    }
 
     override suspend fun getWish(id: String): Result<Wish> = error("not used")
 

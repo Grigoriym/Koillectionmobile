@@ -5,16 +5,24 @@ import com.grappim.kit.uikit.NativeText
 import com.grappim.koillectionmobile.core.domain.KoillectionError
 import com.grappim.koillectionmobile.feature.wishlists.domain.Wish
 import com.grappim.koillectionmobile.feature.wishlists.domain.Wishlist
+import com.grappim.koillectionmobile.feature.wishlists.domain.WishlistChange
 import com.grappim.koillectionmobile.feature.wishlists.domain.WishlistChanges
 import com.grappim.koillectionmobile.strings.RString
+import com.grappim.koillectionmobile.strings.generated.resources.wishlist_delete_count_error_unexpected
+import com.grappim.koillectionmobile.strings.generated.resources.wishlist_delete_error_unexpected
 import com.grappim.koillectionmobile.strings.generated.resources.wishlist_error_unexpected
 import com.grappim.koillectionmobile.strings.generated.resources.wishlists_error_network
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class WishlistViewModelTest {
@@ -170,6 +178,131 @@ class WishlistViewModelTest {
         assertEquals(1, repository.wishlistCalls.size)
     }
 
+    /**
+     * Travel holds Japan and asia; Japan holds Tokyo. "Other" is a top-level wishlist outside the
+     * tree. Travel has 3 wishes, Japan 2, asia none, Tokyo 1.
+     */
+    private fun answerTree() {
+        repository.wishlists.addLast(
+            CompletableDeferred(
+                Result.success(listOf(TRAVEL, japan, asia, tokyo, wishlist(id = "other", name = "Other")))
+            )
+        )
+        repository.wishesOf[TRAVEL.id] = Result.success(listOf(tent, backpack, map))
+        repository.wishesOf[japan.id] = Result.success(listOf(wish("rail", "Rail pass"), wish("yen", "Yen")))
+        repository.wishesOf[asia.id] = Result.success(emptyList())
+        repository.wishesOf[tokyo.id] = Result.success(listOf(wish("sushi", "Sushi")))
+    }
+
+    /** A view model whose first load has succeeded, so the delete is offered. */
+    private fun loadedSut(): WishlistViewModel = createSut().also { answer() }
+
+    @Test
+    fun `the delete counts the child wishlists at every level and the wishes in all of them`() {
+        val sut = loadedSut()
+        answerTree()
+
+        sut.uiState.value.onDeleteClick()
+
+        assertEquals(DeleteSummary(childCount = 3, wishCount = 6), sut.uiState.value.deleteSummary)
+        assertFalse(sut.uiState.value.isCountingDelete)
+        assertEquals(
+            setOf(TRAVEL.id, japan.id, asia.id, tokyo.id),
+            repository.wishesCalls.drop(1).toSet()
+        )
+        assertTrue(repository.writes.isEmpty())
+    }
+
+    @Test
+    fun `the delete is not offered while the wishlist loads`() {
+        val sut = createSut()
+
+        assertFalse(sut.uiState.value.canDelete)
+        sut.uiState.value.onDeleteClick()
+
+        assertEquals(0, repository.wishlistsCalls)
+    }
+
+    @Test
+    fun `a failed count shows the error and no confirm`() {
+        val sut = loadedSut()
+        answerTree()
+        repository.wishesOf[tokyo.id] = Result.failure(IllegalStateException("parse"))
+
+        sut.uiState.value.onDeleteClick()
+
+        assertNull(sut.uiState.value.deleteSummary)
+        assertEquals(
+            NativeText.Resource(RString.wishlist_delete_count_error_unexpected),
+            sut.uiState.value.deleteError
+        )
+        assertTrue(sut.uiState.value.canDelete)
+    }
+
+    @Test
+    fun `cancel on the confirm drops it and deletes nothing`() {
+        val sut = loadedSut()
+        answerTree()
+        sut.uiState.value.onDeleteClick()
+
+        sut.uiState.value.onDeleteDismiss()
+
+        assertNull(sut.uiState.value.deleteSummary)
+        assertTrue(sut.uiState.value.canDelete)
+        assertTrue(repository.writes.isEmpty())
+    }
+
+    @Test
+    fun `a confirmed delete deletes the wishlist then tells its parent`() {
+        val sut = createSut()
+        answer(wishlist = Result.success(TRAVEL.copy(parentId = "trips")))
+        answerTree()
+        sut.uiState.value.onDeleteClick()
+        val changes = mutableListOf<WishlistChange>()
+        val scope = CoroutineScope(Dispatchers.Main)
+        scope.launch { wishlistChanges.changed.collect { changes += it } }
+        val delete = CompletableDeferred<Result<Unit>>()
+        repository.deleteAnswer = { delete.await() }
+
+        sut.uiState.value.onDeleteConfirm()
+        assertTrue(sut.uiState.value.isDeleting)
+        assertNull(sut.uiState.value.deleteSummary)
+        assertFalse(sut.uiState.value.canDelete)
+        delete.complete(Result.success(Unit))
+
+        assertEquals(listOf("delete:${TRAVEL.id}"), repository.writes)
+        assertFalse(sut.uiState.value.isDeleting)
+        assertTrue(sut.uiState.value.isDeleted)
+        assertEquals(listOf(WishlistChange(TRAVEL.id, "trips")), changes)
+        // Its own signal does not read the deleted wishlist again.
+        assertEquals(1, repository.wishlistCalls.size)
+        scope.cancel()
+    }
+
+    @Test
+    fun `a failed delete shows the error keeps the screen and tells no screen`() {
+        val sut = loadedSut()
+        answerTree()
+        sut.uiState.value.onDeleteClick()
+        val changes = mutableListOf<WishlistChange>()
+        val scope = CoroutineScope(Dispatchers.Main)
+        scope.launch { wishlistChanges.changed.collect { changes += it } }
+        repository.deleteAnswer = { Result.failure(IllegalStateException("boom")) }
+
+        sut.uiState.value.onDeleteConfirm()
+
+        val state = sut.uiState.value
+        assertFalse(state.isDeleted)
+        assertFalse(state.isDeleting)
+        assertEquals(NativeText.Resource(RString.wishlist_delete_error_unexpected), state.deleteError)
+        assertEquals("Travel", state.name)
+        assertTrue(changes.isEmpty())
+
+        state.onDeleteErrorShown()
+        assertTrue(sut.uiState.value.deleteError.isEmpty())
+        scope.cancel()
+    }
+
     private fun assertFailedWith(sut: WishlistViewModel, error: NativeText) {
         val state = sut.uiState.value
         assertFalse(state.isLoading)
@@ -184,6 +317,7 @@ class WishlistViewModelTest {
     private val tent = wish(id = "tent", name = "Tent")
     private val backpack = wish(id = "backpack", name = "backpack")
     private val map = wish(id = "map", name = "Map")
+    private val tokyo = wishlist(id = "tokyo", name = "Tokyo", parentId = "japan")
 
     private companion object {
         val TRAVEL = wishlist(id = "travel", name = "Travel")

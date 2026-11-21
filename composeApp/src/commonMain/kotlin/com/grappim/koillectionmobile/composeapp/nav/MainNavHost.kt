@@ -92,7 +92,9 @@ internal fun MainNavHost(modifier: Modifier = Modifier) {
                     onWishlistClick = { id -> backStack.add(WishlistRoute(id)) },
                     onNewWishlistClick = { backStack.add(NewWishlistRoute(route.wishlistId)) },
                     onEditClick = { backStack.add(EditWishlistRoute(route.wishlistId)) },
-                    onBack = { backStack.removeLastOrNull() }
+                    onBack = { backStack.removeLastOrNull() },
+                    // The wishlist is gone; the list or the parent reads again (WishlistChanges).
+                    onClose = { backStack.remove(route) }
                 )
             }
             entry<NewWishlistRoute> { route ->
