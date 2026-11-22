@@ -84,6 +84,7 @@ include(
     ":feature:loans:data",
     ":feature:loans:domain",
     ":feature:loans:dto",
-    ":feature:loans:mapper"
+    ":feature:loans:mapper",
+    ":feature:loans:ui"
 )
 include(":feature:settings:ui")

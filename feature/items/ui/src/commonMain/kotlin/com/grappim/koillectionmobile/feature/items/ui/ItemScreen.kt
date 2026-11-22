@@ -67,7 +67,8 @@ import org.koin.core.parameter.parametersOf
 
 /**
  * [onClose] runs once the server deleted the item, to take the screen off the back stack.
- * [onEdit] opens the edit form.
+ * [onEdit] opens the edit form. [loans] is the loans section (`feature:loans:ui`), shown below the
+ * tags once the item is loaded. The shell passes it, so this module does not depend on the loans.
  */
 @Composable
 fun ItemScreen(
@@ -76,6 +77,7 @@ fun ItemScreen(
     onClose: () -> Unit,
     onEdit: () -> Unit,
     modifier: Modifier = Modifier,
+    loans: @Composable () -> Unit = {},
     viewModel: ItemViewModel = koinViewModel { parametersOf(itemId) }
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -83,12 +85,18 @@ fun ItemScreen(
     LaunchedEffect(uiState.isDeleted) {
         if (uiState.isDeleted) currentOnClose()
     }
-    ItemContent(uiState = uiState, onBack = onBack, onEdit = onEdit, modifier = modifier)
+    ItemContent(uiState = uiState, onBack = onBack, onEdit = onEdit, loans = loans, modifier = modifier)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ItemContent(uiState: ItemUiState, onBack: () -> Unit, onEdit: () -> Unit, modifier: Modifier = Modifier) {
+private fun ItemContent(
+    uiState: ItemUiState,
+    onBack: () -> Unit,
+    onEdit: () -> Unit,
+    loans: @Composable () -> Unit,
+    modifier: Modifier = Modifier
+) {
     // The full image on screen, or null. Kept across rotation.
     var fullImageUrl by rememberSaveable { mutableStateOf<String?>(null) }
     var isDeleteConfirmShown by rememberSaveable { mutableStateOf(false) }
@@ -153,6 +161,7 @@ private fun ItemContent(uiState: ItemUiState, onBack: () -> Unit, onEdit: () -> 
             else -> ItemDetails(
                 uiState = uiState,
                 onImageClick = { fullImageUrl = it },
+                loans = loans,
                 modifier = contentModifier
             )
         }
@@ -195,7 +204,12 @@ private fun DeleteDialog(name: String, onDelete: () -> Unit, onDismiss: () -> Un
 }
 
 @Composable
-private fun ItemDetails(uiState: ItemUiState, onImageClick: (String) -> Unit, modifier: Modifier = Modifier) {
+private fun ItemDetails(
+    uiState: ItemUiState,
+    onImageClick: (String) -> Unit,
+    loans: @Composable () -> Unit,
+    modifier: Modifier = Modifier
+) {
     LazyColumn(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(PADDING)
@@ -217,6 +231,9 @@ private fun ItemDetails(uiState: ItemUiState, onImageClick: (String) -> Unit, mo
                     }
                 }
             }
+        }
+        item(key = "loans") {
+            Box(modifier = Modifier.padding(horizontal = PADDING).padding(bottom = PADDING)) { loans() }
         }
     }
 }

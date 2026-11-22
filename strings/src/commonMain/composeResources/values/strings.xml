@@ -349,4 +349,14 @@
     <string name="wish_form_discard_title">Discard this wish?</string>
     <string name="wish_form_discard_text">The values and the image on this form are lost.</string>
     <string name="wish_form_edit_discard_text">The changes on this form are lost. The wish stays as it is on the server.</string>
+
+    <string name="loans_section">Loans</string>
+    <string name="loans_empty">This item has no loans.</string>
+    <string name="loans_retry">Try again</string>
+    <string name="loans_lent_at">Lent on %1$s</string>
+    <string name="loans_returned_at">Returned on %1$s</string>
+    <string name="loans_not_returned">Not returned</string>
+    <string name="loans_error_network">The server does not answer. Check the network connection.</string>
+    <string name="loans_error_http">The server answered with an error (HTTP %1$d).</string>
+    <string name="loans_error_unexpected">Loading the loans failed with an unexpected error.</string>
 </resources>

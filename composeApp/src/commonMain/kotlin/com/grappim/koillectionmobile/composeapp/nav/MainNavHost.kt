@@ -23,6 +23,7 @@ import com.grappim.koillectionmobile.feature.items.ui.EditItemRoute
 import com.grappim.koillectionmobile.feature.items.ui.EditItemScreen
 import com.grappim.koillectionmobile.feature.items.ui.ItemRoute
 import com.grappim.koillectionmobile.feature.items.ui.ItemScreen
+import com.grappim.koillectionmobile.feature.loans.ui.LoansSection
 import com.grappim.koillectionmobile.feature.settings.ui.SettingsRoute
 import com.grappim.koillectionmobile.feature.settings.ui.SettingsScreen
 import com.grappim.koillectionmobile.feature.tags.ui.TagItemsRoute
@@ -233,7 +234,8 @@ internal fun MainNavHost(modifier: Modifier = Modifier) {
                     onBack = { backStack.removeLastOrNull() },
                     // The item is gone; its collection reads its list again (ItemListChanges).
                     onClose = { backStack.remove(route) },
-                    onEdit = { backStack.add(EditItemRoute(route.itemId)) }
+                    onEdit = { backStack.add(EditItemRoute(route.itemId)) },
+                    loans = { LoansSection(itemId = route.itemId) }
                 )
             }
             entry<EditItemRoute> { route ->
