@@ -4,6 +4,7 @@ import com.grappim.kit.testing.MainDispatcherRule
 import com.grappim.kit.uikit.NativeText
 import com.grappim.koillectionmobile.core.domain.KoillectionError
 import com.grappim.koillectionmobile.feature.loans.domain.Loan
+import com.grappim.koillectionmobile.feature.loans.domain.LoanChanges
 import com.grappim.koillectionmobile.strings.RString
 import com.grappim.koillectionmobile.strings.generated.resources.error_proxy_rejected
 import com.grappim.koillectionmobile.strings.generated.resources.loans_error_http
@@ -21,6 +22,7 @@ import kotlin.test.assertTrue
 class LoansViewModelTest {
 
     private val repository = FakeLoansRepository()
+    private val loanChanges = LoanChanges()
     private val mainDispatcherRule = MainDispatcherRule()
 
     @BeforeTest
@@ -39,7 +41,7 @@ class LoansViewModelTest {
 
     private fun createSut(): LoansViewModel {
         queue()
-        return LoansViewModel(ITEM_ID, repository)
+        return LoansViewModel(ITEM_ID, repository, loanChanges)
     }
 
     private fun answer(result: Result<List<Loan>>) {
@@ -141,6 +143,32 @@ class LoansViewModelTest {
 
         sut.uiState.value.onRetry()
 
+        assertEquals(1, repository.loansCalls.size)
+    }
+
+    @Test
+    fun `a saved loan of this item reads the loans again`() {
+        val sut = createSut()
+        answer(Result.success(listOf(open2024)))
+
+        queue()
+        loanChanges.notifyChanged(ITEM_ID)
+
+        assertTrue(sut.uiState.value.isLoading)
+        answer(Result.success(listOf(open2024, open2026)))
+
+        assertEquals(listOf(open2026, open2024), sut.uiState.value.loans)
+        assertEquals(listOf(ITEM_ID, ITEM_ID), repository.loansCalls)
+    }
+
+    @Test
+    fun `a saved loan of another item reads nothing`() {
+        val sut = createSut()
+        answer(Result.success(listOf(open2024)))
+
+        loanChanges.notifyChanged("item-2")
+
+        assertFalse(sut.uiState.value.isLoading)
         assertEquals(1, repository.loansCalls.size)
     }
 

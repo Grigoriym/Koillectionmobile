@@ -1,5 +1,6 @@
 package com.grappim.koillectionmobile.feature.loans.ui
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,6 +19,7 @@ import com.grappim.koillectionmobile.feature.loans.domain.Loan
 import com.grappim.koillectionmobile.strings.RString
 import com.grappim.koillectionmobile.strings.generated.resources.loans_empty
 import com.grappim.koillectionmobile.strings.generated.resources.loans_lent_at
+import com.grappim.koillectionmobile.strings.generated.resources.loans_new
 import com.grappim.koillectionmobile.strings.generated.resources.loans_not_returned
 import com.grappim.koillectionmobile.strings.generated.resources.loans_retry
 import com.grappim.koillectionmobile.strings.generated.resources.loans_returned_at
@@ -28,20 +30,28 @@ import org.koin.core.parameter.parametersOf
 
 /**
  * The "Loans" section of the item screen. It loads on its own: a slow or failed read shows here
- * only. The dates show as `yyyy-MM-dd`.
+ * only. The dates show as `yyyy-MM-dd`. [onNewLoan] opens the new-loan form; [onLoanClick] opens
+ * the edit form of a loan, by id.
  */
 @Composable
 fun LoansSection(
     itemId: String,
+    onNewLoan: () -> Unit,
+    onLoanClick: (String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: LoansViewModel = koinViewModel { parametersOf(itemId) }
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    LoansContent(uiState = uiState, modifier = modifier)
+    LoansContent(uiState = uiState, onNewLoan = onNewLoan, onLoanClick = onLoanClick, modifier = modifier)
 }
 
 @Composable
-private fun LoansContent(uiState: LoansUiState, modifier: Modifier = Modifier) {
+private fun LoansContent(
+    uiState: LoansUiState,
+    onNewLoan: () -> Unit,
+    onLoanClick: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
     Column(modifier = modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(SPACING)) {
         Text(
             text = stringResource(RString.loans_section),
@@ -56,20 +66,28 @@ private fun LoansContent(uiState: LoansUiState, modifier: Modifier = Modifier) {
                 TextButton(onClick = uiState.onRetry) { Text(stringResource(RString.loans_retry)) }
             }
 
-            uiState.loans.isEmpty() -> Text(
-                text = stringResource(RString.loans_empty),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-
-            else -> uiState.loans.forEach { loan -> LoanRow(loan) }
+            else -> {
+                if (uiState.loans.isEmpty()) {
+                    Text(
+                        text = stringResource(RString.loans_empty),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                uiState.loans.forEach { loan -> LoanRow(loan, onClick = { onLoanClick(loan.id) }) }
+                TextButton(onClick = onNewLoan) { Text(stringResource(RString.loans_new)) }
+            }
         }
     }
 }
 
 @Composable
-private fun LoanRow(loan: Loan) {
-    Column(modifier = Modifier.fillMaxWidth()) {
+private fun LoanRow(loan: Loan, onClick: () -> Unit) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+    ) {
         Text(text = loan.lentTo, style = MaterialTheme.typography.bodyLarge)
         Text(
             text = stringResource(RString.loans_lent_at, loan.lentAt.toString()),

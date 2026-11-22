@@ -23,6 +23,8 @@ import com.grappim.koillectionmobile.feature.items.ui.EditItemRoute
 import com.grappim.koillectionmobile.feature.items.ui.EditItemScreen
 import com.grappim.koillectionmobile.feature.items.ui.ItemRoute
 import com.grappim.koillectionmobile.feature.items.ui.ItemScreen
+import com.grappim.koillectionmobile.feature.loans.ui.LoanFormRoute
+import com.grappim.koillectionmobile.feature.loans.ui.LoanFormScreen
 import com.grappim.koillectionmobile.feature.loans.ui.LoansSection
 import com.grappim.koillectionmobile.feature.settings.ui.SettingsRoute
 import com.grappim.koillectionmobile.feature.settings.ui.SettingsScreen
@@ -235,7 +237,21 @@ internal fun MainNavHost(modifier: Modifier = Modifier) {
                     // The item is gone; its collection reads its list again (ItemListChanges).
                     onClose = { backStack.remove(route) },
                     onEdit = { backStack.add(EditItemRoute(route.itemId)) },
-                    loans = { LoansSection(itemId = route.itemId) }
+                    loans = {
+                        LoansSection(
+                            itemId = route.itemId,
+                            onNewLoan = { backStack.add(LoanFormRoute(route.itemId)) },
+                            onLoanClick = { id -> backStack.add(LoanFormRoute(route.itemId, id)) }
+                        )
+                    }
+                )
+            }
+            entry<LoanFormRoute> { route ->
+                LoanFormScreen(
+                    route = route,
+                    onBack = { backStack.removeLastOrNull() },
+                    // The loans section reads again (LoanChanges).
+                    onClose = { backStack.remove(route) }
                 )
             }
             entry<EditItemRoute> { route ->

@@ -359,4 +359,19 @@
     <string name="loans_error_network">The server does not answer. Check the network connection.</string>
     <string name="loans_error_http">The server answered with an error (HTTP %1$d).</string>
     <string name="loans_error_unexpected">Loading the loans failed with an unexpected error.</string>
+    <string name="loans_new">New loan</string>
+    <string name="loan_form_new_title">New loan</string>
+    <string name="loan_form_edit_title">Edit loan</string>
+    <string name="loan_form_lent_to">Lent to</string>
+    <string name="loan_form_lent_at">Lent on</string>
+    <string name="loan_form_returned_at">Returned on</string>
+    <string name="loan_form_clear">Clear</string>
+    <string name="loan_form_pick_ok">OK</string>
+    <string name="loan_form_pick_cancel">Cancel</string>
+    <string name="loan_form_saving">Saving the loan.</string>
+    <string name="loan_form_not_found">This loan is no longer on the server.</string>
+    <string name="loan_form_save_error_unexpected">Saving the loan failed with an unexpected error.</string>
+    <string name="loan_form_discard_title">Discard this loan?</string>
+    <string name="loan_form_discard_text">The values on this form are lost.</string>
+    <string name="loan_form_edit_discard_text">The changes on this form are lost. The loan stays as it is on the server.</string>
 </resources>

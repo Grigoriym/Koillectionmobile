@@ -400,7 +400,8 @@ code without checking the licence terms are kept.
 13. **Loans** — *decided 2026-11-22 (start of M10)*: full CRUD of the loans of one item, on the
    item screen only. No global loans list, as the web `/loans` page has (user, 2026-11-22). The
    form edits `lentTo` (required), `lentAt` (required, default today) and `returnedAt`
-   (optional, can be cleared). Both dates are date only, with a date picker, as the web form
+   (optional, can be cleared). The new-loan form has no `returnedAt`, as the web `LoanType` has
+   none; the edit form has it (M10.4). Both dates are date only, with a date picker, as the web form
    edits `lentAt` (`LoanType`, `DateType`). A "mark returned" action sets `returnedAt` to today,
    as the web `app_loan_returned` route does. `Loan` has no image. Deleting an item deletes its
    loans on the server (`Item::$loans`, `cascade: ['remove']`). The web pages check the user's

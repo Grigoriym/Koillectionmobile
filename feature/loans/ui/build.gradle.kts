@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.koillectionmobile.kmp.library)
     alias(libs.plugins.koillectionmobile.kmp.library.compose)
     alias(libs.plugins.koillectionmobile.kmp.di)
+    // `LoanFormRoute` is a `@Serializable` `NavKey`, and the form keeps its values as JSON.
+    alias(libs.plugins.koillectionmobile.kmp.serialization)
 }
 
 kotlin {
