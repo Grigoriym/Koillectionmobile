@@ -117,7 +117,7 @@ first — it is often for a problem this toolchain doesn't have.
 - **Run `ktlintCheck` alongside `build`.** `build` skips the root project's
   `:ktlintKotlinScriptCheck`, so `settings.gradle.kts` and root `build.gradle.kts` are linted
   only by `ktlintCheck` (M0.4). After a script inserts imports, run `ktlintFormat` on the module:
-  a string-replace insert broke the import order four times (last M7.2).
+  a string-replace insert broke the import order five times (last M9.7).
 - **A mutation check copies the file to the scratchpad first and restores from the copy.**
   `git checkout --` fails on an untracked file (M1.8) and drops the step's own uncommitted edits
   (M5.6). `jvmTest` has `failFast = true` (`Quality.kt`): a run stops early, so its report

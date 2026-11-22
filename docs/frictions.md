@@ -82,5 +82,3 @@ entries get deleted — see /finalize.
 - 2026-11-22 — detekt (M9.7) failed `build` for a `@Composable` that emitted a `Text`, an image
   and a `Row` at its top level ("should only be emitting content ... from one source"). Wrapped it
   in a `Column`; `jvmTest` does not run detekt, so only `build` caught it.
-- 2026-11-22 — A Python import insert into `WishlistScreen.kt` (M9.7) broke the import order again,
-  as `CLAUDE.md` "Verification" warns; `ktlintCheck` caught it, `ktlintFormat` fixed it.
