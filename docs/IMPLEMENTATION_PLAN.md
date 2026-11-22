@@ -381,3 +381,11 @@ code without checking the licence terms are kept.
    (`Assert\Currency`, a 422). No move of a wish to another wishlist and no "transfer to
    collection": the latter is a web route only (`WishController`, `app_wish_transfer_to_collection`),
    not in the API (user, 2026-11-19).
+13. **Loans** — *decided 2026-11-22 (start of M10)*: full CRUD of the loans of one item, on the
+   item screen only. No global loans list, as the web `/loans` page has (user, 2026-11-22). The
+   form edits `lentTo` (required), `lentAt` (required, default today) and `returnedAt`
+   (optional, can be cleared). Both dates are date only, with a date picker, as the web form
+   edits `lentAt` (`LoanType`, `DateType`). A "mark returned" action sets `returnedAt` to today,
+   as the web `app_loan_returned` route does. `Loan` has no image. Deleting an item deletes its
+   loans on the server (`Item::$loans`, `cascade: ['remove']`). The web pages check the user's
+   `loansFeatureEnabled`; the app does not.

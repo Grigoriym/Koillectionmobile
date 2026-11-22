@@ -1,6 +1,6 @@
 # koillectionmobile checklist
 
-**Current step:** M10 (break into steps). M9 done 2026-11-22. M9.8 done 2026-11-22. M9.7 done 2026-11-22. M9.6 done 2026-11-22. M9.5 done 2026-11-21. M9.4 done 2026-11-21. M9.3 done 2026-11-21. M9.2 done 2026-11-21. M9.1 done 2026-11-21. M9 broken into steps 2026-11-19. M8 done 2026-11-19. M8.9 done 2026-11-19. M8.8 done 2026-11-19. M8.7 done 2026-11-19. M8.6 done 2026-11-18. M8.5 done 2026-11-18. M8.4 done 2026-11-18. M8.3 done 2026-11-17. M8.2 done 2026-11-17. M8.1 done 2026-11-17. M8 broken into steps 2026-11-17; the other areas became M9–M13 and the release moved to M14 (user, 2026-11-17). M7 done 2026-11-17. M7.7 done 2026-11-17. M7.6 done 2026-11-17. M7.5 done 2026-11-17. M7.4 done 2026-11-17. M7.3 done 2026-11-17. M7.2 done 2026-11-17. M7.1 done 2026-11-17. M7 broken into steps 2026-11-17. M6 done 2026-11-17. M6.6 done 2026-11-17. M6.5 done 2026-11-16. M6.4 done 2026-11-16. M6.3 done 2026-11-16. M6.2 done 2026-11-16. M6.1 done 2026-11-16. M6 broken into steps 2026-11-16. M5 done 2026-11-16. M5.7 done 2026-11-16. M5.6 done 2026-11-16. M5.5 done 2026-11-16. M5.4 done 2026-11-16. M5.3 done 2026-11-16. M5.2 done 2026-11-16. M5.1 done 2026-11-16. M5 broken into steps 2026-11-16. M4 done 2026-11-16. M4.4 done 2026-11-16. M4.3 done 2026-11-16. M4.2 done 2026-11-16. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6, 7, 8, 9, 10 and 11 are settled.
+**Current step:** M10.1. M10 broken into steps 2026-11-22. M9 done 2026-11-22. M9.8 done 2026-11-22. M9.7 done 2026-11-22. M9.6 done 2026-11-22. M9.5 done 2026-11-21. M9.4 done 2026-11-21. M9.3 done 2026-11-21. M9.2 done 2026-11-21. M9.1 done 2026-11-21. M9 broken into steps 2026-11-19. M8 done 2026-11-19. M8.9 done 2026-11-19. M8.8 done 2026-11-19. M8.7 done 2026-11-19. M8.6 done 2026-11-18. M8.5 done 2026-11-18. M8.4 done 2026-11-18. M8.3 done 2026-11-17. M8.2 done 2026-11-17. M8.1 done 2026-11-17. M8 broken into steps 2026-11-17; the other areas became M9–M13 and the release moved to M14 (user, 2026-11-17). M7 done 2026-11-17. M7.7 done 2026-11-17. M7.6 done 2026-11-17. M7.5 done 2026-11-17. M7.4 done 2026-11-17. M7.3 done 2026-11-17. M7.2 done 2026-11-17. M7.1 done 2026-11-17. M7 broken into steps 2026-11-17. M6 done 2026-11-17. M6.6 done 2026-11-17. M6.5 done 2026-11-16. M6.4 done 2026-11-16. M6.3 done 2026-11-16. M6.2 done 2026-11-16. M6.1 done 2026-11-16. M6 broken into steps 2026-11-16. M5 done 2026-11-16. M5.7 done 2026-11-16. M5.6 done 2026-11-16. M5.5 done 2026-11-16. M5.4 done 2026-11-16. M5.3 done 2026-11-16. M5.2 done 2026-11-16. M5.1 done 2026-11-16. M5 broken into steps 2026-11-16. M4 done 2026-11-16. M4.4 done 2026-11-16. M4.3 done 2026-11-16. M4.2 done 2026-11-16. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 12 and 13 are settled.
 
 ## How to use this
 
@@ -38,9 +38,55 @@ M7 (search and tags) is done; its steps and notes are in `docs/CHECKLIST_ARCHIVE
 M8 (templates) is done; its steps and notes are in `docs/CHECKLIST_ARCHIVE.md`.
 M9 (wishlists and wishes) is done; its steps and notes are in `docs/CHECKLIST_ARCHIVE.md`.
 
-## M10 — loans (rough scope)
+## M10 — loans
 
-Full CRUD of loans on an item (user, 2026-11-17). Break into steps at the start.
+Full CRUD of the loans of one item, on the item screen. Choices are plan §5 decision 13 (user,
+2026-11-22). Every write goes to the local test instance only (`docs/local-info.md`). The test
+copy has no loans. Re-read `Loan.php` at the start of each step that touches the API. Model the
+code on `feature:wishlists`.
+
+- [ ] **M10.1** — Repository calls (new `feature:loans:{data,domain,dto,mapper}`, the
+  wallosmobile split). The loans of an item (`GET /api/items/{id}/loans`, all pages), create
+  (`item` IRI, `lentTo`, `lentAt`), edit (`PATCH`, only the changed keys; a null `returnedAt`
+  goes out as an explicit `null`), delete (`DELETE /api/loans/{id}`). The domain dates are
+  `LocalDate`; the mapper takes the date part of the server's date-time. Take the keys from the
+  entity `Groups`, and copy the headers from `feature:wishlists:data`. Add the new Koin modules'
+  `includes` lines in `AppModule`.
+  **Verify:** mock-engine tests per call (method, path, content type, body keys), with a
+  root-path base URL case; mapper tests for the date part; `KoinGraphTest` resolves the new
+  repository; mutation-check one body key and one path.
+- [ ] **M10.2** — Live loan smoke against the local test instance (a task, as
+  `smokeWishlistRun`): on a throwaway item, create a loan with a date-only `lentAt` and record
+  the value the server gives back (time and offset). Edit `lentTo`, set `returnedAt`, clear it
+  with an explicit `null`. Send an empty `lentTo` and one without `lentAt` (expect 422 each).
+  List the item's loans. Delete one loan (404 after), then delete the item: its other loan gives
+  404. Record each answer in plan §2; if the date-only value shifts a day, fix M10.1's format in
+  this step.
+  **Verify:** the run prints each step and passes; the test instance ends as it started; plan §2
+  has the results.
+- [ ] **M10.3** — Loans on the item screen (`feature:loans:ui`). A "Loans" section lists the
+  item's loans: lent to, lent date, returned date or "not returned". Order: not returned first,
+  then by lent date, newest first. Loading, empty and error states with retry for the section; the
+  rest of the item screen does not wait for it. New Koin module: add its `includes` line in
+  `AppModule`.
+  **Verify:** ViewModel tests (order, empty, failure and retry).
+- [ ] **M10.4** — Loan form: create and edit. A "new loan" action in the Loans section; a tap on
+  a loan opens it in the form. Fields: lent to (required, trimmed), lent date (date picker,
+  default today), returned date (date picker, optional, a clear button). Edit opens prefilled and
+  sends only what changed; no change sends no call. Saved with the progress view and retry; on
+  success the section reads again. The form survives rotation and process death.
+  **Verify:** ViewModel tests (create, each change alone, cleared returned date, no change,
+  blank name blocked, failure and retry); mutation-check one.
+- [ ] **M10.5** — Mark returned and delete. Each loan that is not returned has a "mark returned"
+  action (sets today). Each loan has a delete action that asks first. On success the section
+  reads again; a failure shows the error and keeps the list.
+  **Verify:** ViewModel tests (mark returned sends today's date, delete success and failure).
+- [ ] **M10.6** — Device pass on the emulator (`emulator-testing` skill) against the local test
+  instance: on an item, add two loans, edit one, mark one returned, clear its returned date, then
+  delete both. Rotate on the open form once. Compare with the web UI's `/loans` page before the
+  delete.
+  **Verify:** each action works on the device; the web UI shows the same names and dates; the
+  instance ends as it started.
 
 ## M11 — albums and photos (rough scope)
 
