@@ -80,4 +80,10 @@ include(
     ":feature:wishlists:mapper",
     ":feature:wishlists:ui"
 )
+include(
+    ":feature:loans:data",
+    ":feature:loans:domain",
+    ":feature:loans:dto",
+    ":feature:loans:mapper"
+)
 include(":feature:settings:ui")
