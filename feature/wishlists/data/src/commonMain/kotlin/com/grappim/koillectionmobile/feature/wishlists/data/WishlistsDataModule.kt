@@ -1,5 +1,6 @@
 package com.grappim.koillectionmobile.feature.wishlists.data
 
+import com.grappim.koillectionmobile.feature.wishlists.domain.WishChanges
 import com.grappim.koillectionmobile.feature.wishlists.domain.WishlistChanges
 import org.koin.core.annotation.ComponentScan
 import org.koin.core.annotation.Configuration
@@ -14,4 +15,7 @@ class WishlistsDataModule {
 
     @Single
     fun provideWishlistChanges(): WishlistChanges = WishlistChanges()
+
+    @Single
+    fun provideWishChanges(): WishChanges = WishChanges()
 }

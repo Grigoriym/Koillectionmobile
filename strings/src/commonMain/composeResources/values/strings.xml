@@ -330,4 +330,13 @@
     <string name="wishlist_delete_failed_title">The wishlist was not deleted</string>
     <string name="wishlist_delete_count_error_unexpected">Counting the wishlists and wishes to delete failed with an unexpected error.</string>
     <string name="wishlist_delete_error_unexpected">Deleting the wishlist failed with an unexpected error.</string>
+    <string name="wish_error_unexpected">Loading the wish failed with an unexpected error.</string>
+    <string name="wish_label_url">Link</string>
+    <string name="wish_label_price">Price</string>
+    <string name="wish_label_comment">Comment</string>
+    <string name="wish_delete">Delete wish</string>
+    <string name="wish_delete_title">Delete this wish?</string>
+    <string name="wish_delete_text">The server deletes "%1$s". You cannot undo this.</string>
+    <string name="wish_delete_failed_title">The wish was not deleted</string>
+    <string name="wish_delete_error_unexpected">Deleting the wish failed with an unexpected error.</string>
 </resources>

@@ -24,3 +24,7 @@ data class NewWishlistRoute(val parentId: String? = null) : NavKey
 /** The edit form of wishlist [wishlistId]. */
 @Serializable
 data class EditWishlistRoute(val wishlistId: String) : NavKey
+
+/** The screen of wish [wishId]. */
+@Serializable
+data class WishRoute(val wishId: String) : NavKey

@@ -3,6 +3,7 @@ package com.grappim.koillectionmobile.feature.wishlists.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.grappim.kit.uikit.NativeText
+import com.grappim.koillectionmobile.feature.wishlists.domain.WishChanges
 import com.grappim.koillectionmobile.feature.wishlists.domain.Wishlist
 import com.grappim.koillectionmobile.feature.wishlists.domain.WishlistChanges
 import com.grappim.koillectionmobile.feature.wishlists.domain.WishlistsRepository
@@ -24,8 +25,8 @@ import org.koin.core.annotation.KoinViewModel
 
 /**
  * Reads the wishlist, its children and its wishes in parallel. A change to this wishlist or to one
- * of its children ([WishlistChanges]) reads everything again, while the screen waits lower on the
- * back stack.
+ * of its children ([WishlistChanges]), or to one of its wishes ([WishChanges]), reads everything
+ * again, while the screen waits lower on the back stack.
  *
  * Before the delete confirm, the screen counts what goes with the wishlist: the server deletes the
  * child wishlists at every level and their wishes (`cascade: ['all']` in `Wishlist.php`). A delete
@@ -38,7 +39,8 @@ import org.koin.core.annotation.KoinViewModel
 class WishlistViewModel(
     @InjectedParam private val wishlistId: String,
     private val repository: WishlistsRepository,
-    private val wishlistChanges: WishlistChanges
+    private val wishlistChanges: WishlistChanges,
+    private val wishChanges: WishChanges
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(
@@ -60,6 +62,11 @@ class WishlistViewModel(
         viewModelScope.launch {
             wishlistChanges.changed
                 .filter { !_uiState.value.isDeleted && (it.wishlistId == wishlistId || it.parentId == wishlistId) }
+                .collect { load() }
+        }
+        viewModelScope.launch {
+            wishChanges.changed
+                .filter { !_uiState.value.isDeleted && it.wishlistId == wishlistId }
                 .collect { load() }
         }
     }

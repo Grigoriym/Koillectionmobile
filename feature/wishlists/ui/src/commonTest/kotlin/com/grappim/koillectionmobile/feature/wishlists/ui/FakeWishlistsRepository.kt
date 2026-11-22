@@ -11,7 +11,8 @@ import kotlinx.coroutines.CompletableDeferred
  * read for an id in [wishesOf] answers from there instead, for the parallel reads of a delete
  * count. Each wishlist write is logged in [writes] (`"create:<name>:<parent>"`,
  * `"rename:<id>:<name>"`, `"upload:<id>"`, `"deleteImage:<id>"`, `"delete:<id>"`) and answers with
- * its `...Answer`.
+ * its `...Answer`. A wish read takes the first queued [wish] answer; a wish delete is logged as
+ * `"deleteWish:<id>"` and answers with [deleteWishAnswer].
  */
 class FakeWishlistsRepository : WishlistsRepository {
     val wishlists = ArrayDeque<CompletableDeferred<Result<List<Wishlist>>>>()
@@ -19,11 +20,13 @@ class FakeWishlistsRepository : WishlistsRepository {
     val children = ArrayDeque<CompletableDeferred<Result<List<Wishlist>>>>()
     val wishes = ArrayDeque<CompletableDeferred<Result<List<Wish>>>>()
     val wishesOf = mutableMapOf<String, Result<List<Wish>>>()
+    val wish = ArrayDeque<CompletableDeferred<Result<Wish>>>()
 
     var wishlistsCalls = 0
     val wishlistCalls = mutableListOf<String>()
     val childrenCalls = mutableListOf<String>()
     val wishesCalls = mutableListOf<String>()
+    val wishCalls = mutableListOf<String>()
 
     override suspend fun getWishlists(): Result<List<Wishlist>> {
         wishlistsCalls++
@@ -54,6 +57,7 @@ class FakeWishlistsRepository : WishlistsRepository {
     var uploadAnswer: suspend () -> Result<Wishlist> = { Result.success(wishlist(id = "any", name = "any")) }
     var deleteImageAnswer: suspend () -> Result<Wishlist> = { Result.success(wishlist(id = "any", name = "any")) }
     var deleteAnswer: suspend () -> Result<Unit> = { Result.success(Unit) }
+    var deleteWishAnswer: suspend () -> Result<Unit> = { Result.success(Unit) }
 
     override suspend fun createWishlist(name: String, parentId: String?): Result<Wishlist> {
         writes += "create:$name:$parentId"
@@ -86,7 +90,10 @@ class FakeWishlistsRepository : WishlistsRepository {
         return deleteAnswer()
     }
 
-    override suspend fun getWish(id: String): Result<Wish> = error("not used")
+    override suspend fun getWish(id: String): Result<Wish> {
+        wishCalls += id
+        return wish.first().await()
+    }
 
     override suspend fun createWish(
         wishlistId: String,
@@ -106,7 +113,10 @@ class FakeWishlistsRepository : WishlistsRepository {
         mimeType: String
     ): Result<Wish> = error("not used")
 
-    override suspend fun deleteWish(id: String): Result<Unit> = error("not used")
+    override suspend fun deleteWish(id: String): Result<Unit> {
+        writes += "deleteWish:$id"
+        return deleteWishAnswer()
+    }
 }
 
 class Upload(val bytes: ByteArray, val mimeType: String)

@@ -4,6 +4,7 @@ import com.grappim.kit.testing.MainDispatcherRule
 import com.grappim.kit.uikit.NativeText
 import com.grappim.koillectionmobile.core.domain.KoillectionError
 import com.grappim.koillectionmobile.feature.wishlists.domain.Wish
+import com.grappim.koillectionmobile.feature.wishlists.domain.WishChanges
 import com.grappim.koillectionmobile.feature.wishlists.domain.Wishlist
 import com.grappim.koillectionmobile.feature.wishlists.domain.WishlistChange
 import com.grappim.koillectionmobile.feature.wishlists.domain.WishlistChanges
@@ -29,6 +30,7 @@ class WishlistViewModelTest {
 
     private val repository = FakeWishlistsRepository()
     private val wishlistChanges = WishlistChanges()
+    private val wishChanges = WishChanges()
     private val mainDispatcherRule = MainDispatcherRule()
 
     @BeforeTest
@@ -49,7 +51,7 @@ class WishlistViewModelTest {
 
     private fun createSut(): WishlistViewModel {
         queue()
-        return WishlistViewModel(TRAVEL.id, repository, wishlistChanges)
+        return WishlistViewModel(TRAVEL.id, repository, wishlistChanges, wishChanges)
     }
 
     private fun answer(
@@ -96,6 +98,22 @@ class WishlistViewModelTest {
 
         assertEquals(3, repository.wishlistCalls.size)
         assertEquals(3, repository.childrenCalls.size)
+    }
+
+    @Test
+    fun `a change to a wish in this wishlist reads again and one in another wishlist does not`() {
+        val sut = createSut()
+        answer()
+
+        wishChanges.notifyChanged("rail", wishlistId = "japan")
+        assertEquals(1, repository.wishlistCalls.size)
+
+        queue()
+        wishChanges.notifyChanged(tent.id, wishlistId = TRAVEL.id)
+        answer(wishes = Result.success(listOf(backpack, map)))
+
+        assertEquals(listOf(backpack, map), sut.uiState.value.wishes)
+        assertEquals(2, repository.wishesCalls.size)
     }
 
     @Test

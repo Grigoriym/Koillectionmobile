@@ -56,14 +56,12 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
-/**
- * A tap on a wish does nothing yet: the wish screen comes in M9.6. [onClose] runs once the server
- * deleted the wishlist, to take the screen off the back stack.
- */
+/** [onClose] runs once the server deleted the wishlist, to take the screen off the back stack. */
 @Composable
 fun WishlistScreen(
     wishlistId: String,
     onWishlistClick: (String) -> Unit,
+    onWishClick: (String) -> Unit,
     onNewWishlistClick: () -> Unit,
     onEditClick: () -> Unit,
     onBack: () -> Unit,
@@ -79,6 +77,7 @@ fun WishlistScreen(
     WishlistContent(
         uiState = uiState,
         onWishlistClick = onWishlistClick,
+        onWishClick = onWishClick,
         onNewWishlistClick = onNewWishlistClick,
         onEditClick = onEditClick,
         onBack = onBack,
@@ -90,6 +89,7 @@ fun WishlistScreen(
 private fun WishlistContent(
     uiState: WishlistUiState,
     onWishlistClick: (String) -> Unit,
+    onWishClick: (String) -> Unit,
     onNewWishlistClick: () -> Unit,
     onEditClick: () -> Unit,
     onBack: () -> Unit,
@@ -141,7 +141,9 @@ private fun WishlistContent(
                 }
                 if (uiState.wishes.isNotEmpty()) {
                     item { SectionHeader(stringResource(RString.wishlist_section_wishes)) }
-                    items(uiState.wishes, key = { "wish-${it.id}" }) { wish -> WishRow(wish) }
+                    items(uiState.wishes, key = { "wish-${it.id}" }) { wish ->
+                        WishRow(wish = wish, modifier = Modifier.clickable { onWishClick(wish.id) })
+                    }
                 }
             }
         }
