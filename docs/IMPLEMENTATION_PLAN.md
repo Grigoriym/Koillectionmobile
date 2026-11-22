@@ -312,6 +312,9 @@ code without checking the licence terms are kept.
    collection form uses them too. `core:image` stays free of Compose.
    M3.3 (2026-11-15): `feature:items:domain` depends on `feature:tags:domain`, because
    `AddItemUseCase` sets the new item's tags.
+   M10.3 (2026-11-22): one `ui` module does not depend on another. The item screen shows the
+   loans through a composable slot (`ItemScreen(loans = ...)`); `:composeApp` fills it with
+   `LoansSection` from `feature:loans:ui`.
 5. **MVP scope** — *decided 2026-11-15 (start of M2)*: login, collection list, item list, item
    detail, and log out (M2); "add item with photos" into a chosen collection (M3). The user
    accepted the proposal as it was and added log out, so a user can change server without
