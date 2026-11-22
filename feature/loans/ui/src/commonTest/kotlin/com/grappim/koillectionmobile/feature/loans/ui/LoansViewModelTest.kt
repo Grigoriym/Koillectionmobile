@@ -4,9 +4,11 @@ import com.grappim.kit.testing.MainDispatcherRule
 import com.grappim.kit.uikit.NativeText
 import com.grappim.koillectionmobile.core.domain.KoillectionError
 import com.grappim.koillectionmobile.feature.loans.domain.Loan
+import com.grappim.koillectionmobile.feature.loans.domain.LoanChange
 import com.grappim.koillectionmobile.feature.loans.domain.LoanChanges
 import com.grappim.koillectionmobile.strings.RString
 import com.grappim.koillectionmobile.strings.generated.resources.error_proxy_rejected
+import com.grappim.koillectionmobile.strings.generated.resources.loans_delete_error_unexpected
 import com.grappim.koillectionmobile.strings.generated.resources.loans_error_http
 import com.grappim.koillectionmobile.strings.generated.resources.loans_error_network
 import com.grappim.koillectionmobile.strings.generated.resources.loans_error_unexpected
@@ -17,6 +19,7 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class LoansViewModelTest {
@@ -170,6 +173,122 @@ class LoansViewModelTest {
 
         assertFalse(sut.uiState.value.isLoading)
         assertEquals(1, repository.loansCalls.size)
+    }
+
+    @Test
+    fun `mark returned sends today as the returned date and reads again`() {
+        val sut = createSut()
+        answer(Result.success(listOf(open2024)))
+
+        repository.saves.addLast(CompletableDeferred())
+        sut.uiState.value.onMarkReturned(open2024.id)
+
+        assertEquals(open2024.id, sut.uiState.value.busyLoanId)
+        assertEquals(listOf(open2024.id to listOf<LoanChange>(LoanChange.ReturnedAt(today()))), repository.editCalls)
+
+        queue()
+        repository.saves.removeFirst().complete(Result.success(open2024.copy(returnedAt = today())))
+
+        assertNull(sut.uiState.value.busyLoanId)
+        assertTrue(sut.uiState.value.isLoading)
+        assertEquals(listOf(ITEM_ID, ITEM_ID), repository.loansCalls)
+    }
+
+    @Test
+    fun `mark returned on a returned loan sends nothing`() {
+        val sut = createSut()
+        answer(Result.success(listOf(returned2023)))
+
+        sut.uiState.value.onMarkReturned(returned2023.id)
+
+        assertTrue(repository.editCalls.isEmpty())
+    }
+
+    @Test
+    fun `a failed mark returned keeps the list and shows the error`() {
+        val sut = createSut()
+        answer(Result.success(listOf(open2024)))
+
+        repository.saves.addLast(CompletableDeferred())
+        sut.uiState.value.onMarkReturned(open2024.id)
+        repository.saves.removeFirst().complete(Result.failure(KoillectionError.Http(status = 500, message = null)))
+
+        assertNull(sut.uiState.value.busyLoanId)
+        assertEquals(listOf(open2024), sut.uiState.value.loans)
+        assertEquals(NativeText.Arguments(RString.loans_error_http, listOf(500)), sut.uiState.value.actionError)
+        assertEquals(1, repository.loansCalls.size)
+
+        sut.uiState.value.onActionErrorShown()
+
+        assertTrue(sut.uiState.value.actionError.isEmpty())
+    }
+
+    @Test
+    fun `delete asks first and sends nothing until confirmed`() {
+        val sut = createSut()
+        answer(Result.success(listOf(open2024, returned2023)))
+
+        sut.uiState.value.onDeleteClick(returned2023.id)
+
+        assertEquals(returned2023, sut.uiState.value.deleteConfirm)
+        assertTrue(repository.deleteCalls.isEmpty())
+
+        sut.uiState.value.onDeleteDismiss()
+
+        assertNull(sut.uiState.value.deleteConfirm)
+        assertTrue(repository.deleteCalls.isEmpty())
+    }
+
+    @Test
+    fun `a confirmed delete sends the delete and reads again`() {
+        val sut = createSut()
+        answer(Result.success(listOf(open2024, returned2023)))
+
+        sut.uiState.value.onDeleteClick(returned2023.id)
+        repository.deletes.addLast(CompletableDeferred())
+        sut.uiState.value.onDeleteConfirm()
+
+        assertNull(sut.uiState.value.deleteConfirm)
+        assertEquals(returned2023.id, sut.uiState.value.busyLoanId)
+        assertEquals(listOf(returned2023.id), repository.deleteCalls)
+
+        queue()
+        repository.deletes.removeFirst().complete(Result.success(Unit))
+        answer(Result.success(listOf(open2024)))
+
+        assertNull(sut.uiState.value.busyLoanId)
+        assertEquals(listOf(open2024), sut.uiState.value.loans)
+        assertEquals(listOf(ITEM_ID, ITEM_ID), repository.loansCalls)
+    }
+
+    @Test
+    fun `a failed delete keeps the list and shows the error`() {
+        val sut = createSut()
+        answer(Result.success(listOf(open2024, returned2023)))
+
+        sut.uiState.value.onDeleteClick(open2024.id)
+        repository.deletes.addLast(CompletableDeferred())
+        sut.uiState.value.onDeleteConfirm()
+        repository.deletes.removeFirst().complete(Result.failure(IllegalStateException("parse")))
+
+        assertNull(sut.uiState.value.busyLoanId)
+        assertEquals(listOf(open2024, returned2023), sut.uiState.value.loans)
+        assertEquals(NativeText.Resource(RString.loans_delete_error_unexpected), sut.uiState.value.actionError)
+        assertEquals(1, repository.loansCalls.size)
+    }
+
+    @Test
+    fun `no second action starts while one runs`() {
+        val sut = createSut()
+        answer(Result.success(listOf(open2024, open2026)))
+
+        repository.saves.addLast(CompletableDeferred())
+        sut.uiState.value.onMarkReturned(open2024.id)
+        sut.uiState.value.onMarkReturned(open2026.id)
+        sut.uiState.value.onDeleteClick(open2026.id)
+
+        assertEquals(1, repository.editCalls.size)
+        assertNull(sut.uiState.value.deleteConfirm)
     }
 
     private val open2024 = loan(id = "open2024", lentAt = LocalDate(2024, 3, 1))

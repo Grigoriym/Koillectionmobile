@@ -360,6 +360,16 @@
     <string name="loans_error_http">The server answered with an error (HTTP %1$d).</string>
     <string name="loans_error_unexpected">Loading the loans failed with an unexpected error.</string>
     <string name="loans_new">New loan</string>
+    <string name="loans_mark_returned">Mark returned</string>
+    <string name="loans_delete">Delete</string>
+    <string name="loans_delete_title">Delete this loan?</string>
+    <string name="loans_delete_text">The server deletes the loan to "%1$s", lent on %2$s. You cannot undo this.</string>
+    <string name="loans_delete_confirm">Delete</string>
+    <string name="loans_delete_cancel">Cancel</string>
+    <string name="loans_action_failed_title">The loan was not changed</string>
+    <string name="loans_action_failed_ok">OK</string>
+    <string name="loans_return_error_unexpected">Marking the loan as returned failed with an unexpected error.</string>
+    <string name="loans_delete_error_unexpected">Deleting the loan failed with an unexpected error.</string>
     <string name="loan_form_new_title">New loan</string>
     <string name="loan_form_edit_title">Edit loan</string>
     <string name="loan_form_lent_to">Lent to</string>
