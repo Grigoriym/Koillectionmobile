@@ -173,3 +173,10 @@ this app.
   `KEYCODE_MOVE_END`, a run of `KEYCODE_DEL`), save, and pull the list down to refresh.
 - Cleartext warning (M4.4): an `http://` server URL adds a red line under the URL field, which
   moves Username, Password and Log in down. Tap fields from a dump taken after the URL is typed.
+- Wishlists (M9.8): "Wishlists" in the overflow menu; the list's FAB is "New wishlist"
+  (`content-desc`). On a wishlist screen, "More actions" holds "New wishlist", "New wish" and
+  "Edit"; "Delete wishlist" is a top-bar icon. The wish screen has "Edit wish" and "Delete wish"
+  icons. The wishlist row's tap target is its name text. Photos pushed in the same minute share one
+  picker `content-desc` ("Photo taken on ..."), so tell them apart by a pixel of each thumbnail in
+  a screenshot; solid-colour test JPEGs make that and the server check one `getpixel` each. To
+  compare with the web UI, log in with `curl` as in M2.5 and read `/wishlists/<id>`.

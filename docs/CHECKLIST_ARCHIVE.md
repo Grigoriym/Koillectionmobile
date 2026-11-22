@@ -871,3 +871,107 @@ local test instance only (`docs/local-info.md`). Re-read `Template.php`, `Field.
   delete got 500, because the item's datum still used the list (plan §2); the app named that
   cause. After the collection delete in the app the choice list delete worked. The instance ended
   as it started. The item screen still shows the raw values (`docs/revisit.md`, M8.6).
+
+## M9 — wishlists and wishes
+
+Wishlists (nested, as collections) and wishes: create, edit, delete, with images. Choices are
+plan §5 decision 12 (user, 2026-11-19). Every write goes to the local test instance only
+(`docs/local-info.md`). The test copy has no wishlists and no wishes. Re-read `Wishlist.php` and
+`Wish.php` at the start of each step that touches the API. Model the code on `feature:collections`.
+
+- [x] **M9.1** — Repository calls (new `feature:wishlists:{data,domain,dto,mapper}`, the
+  wallosmobile split). Wishlists: list (`GET /api/wishlists`, all pages), get, children
+  (`/api/wishlists/{id}/children`), create (`name`, optional `parent` IRI), rename (`PATCH`,
+  `{"name"}`), upload the image (`POST /api/wishlists/{id}/image`), remove the image (`PATCH` with
+  `deleteImage`), delete. Wishes: `GET /api/wishlists/{id}/wishes` (all pages), get, create
+  (`name`, `wishlist` IRI, `url`, `price`, `currency`, `comment`), edit (`PATCH`, only the changed
+  keys), upload the image (`POST /api/wishes/{id}/image`), delete. Take the keys from the entity
+  `Groups`, and copy the multipart part name and headers from `feature:collections:data`. Add the
+  new Koin modules' `includes` lines in `AppModule`.
+  **Verify:** mock-engine tests per call (method, path, content type, body keys), with a
+  root-path base URL case; `KoinGraphTest` resolves the new repository; mutation-check one body
+  key and one path.
+  Note: one `WishlistsRepository` holds the wishlist and the wish calls. `editWish` takes a
+  `Map<WishField, String?>` and sends a JSON object of only those keys; a null value goes out as an
+  explicit `null`, ready for M9.2's answer. No `ui` module yet (M9.3). Mutations: the `price` key
+  and the wish image path, each caught.
+- [x] **M9.2** — Live wishlist smoke against the local test instance (a task, as
+  `smokeCollectionRun`): create a top-level wishlist and a child, rename the child, upload an
+  image, replace it (the old file gives 404), remove it (`image` is null). Create a wish in the
+  child with every M9.1 field, upload its image, replace it, edit two fields, and send an explicit
+  `null` for `url` (record whether it clears). Send a wish with currency `EURO` and one with an
+  empty name (expect 422), and one without `wishlist`. Record whether `GET /api/wishlists` lists
+  the child wishlists too. Delete the parent; the child and the wish give 404. Record each
+  answer in plan §2.
+  **Verify:** the run prints each step and passes; the test instance ends as it started; plan §2
+  has the results.
+  Note: `./gradlew :composeApp:smokeWishlistRun` (`LiveWishlistSmoke.kt`). Every case answered as
+  expected. `GET /api/wishlists` lists the child too, and `"url": null` clears the URL. The create
+  without `wishlist` goes through the app's `HttpClient`: the repository always sends it.
+- [x] **M9.3** — Overflow menu and wishlist browse (`feature:wishlists:ui`). The collection list
+  top bar keeps the search icon; Tags, Templates, Wishlists, Settings and Log out move into a
+  "More" menu (close the M8.3 entry in `docs/revisit.md`). The wishlist list shows the top-level
+  wishlists; a tap opens the wishlist screen with its child wishlists and its wishes (name,
+  thumbnail, price and currency). Loading, empty and error states with retry on both screens. New
+  Koin module: add its `includes` line in `AppModule`.
+  **Verify:** ViewModel tests (order, empty, failure and retry) for both screens.
+  Note: both screens sort by name ignoring case, as the web UI orders wishes; the API has no
+  order. A wish row shows `thumbnailUrl` and "price currency" (no line without a price). A tap on a
+  wish does nothing until M9.6. Mutation: the top-level filter dropped, caught.
+- [x] **M9.4** — Wishlist form: create and edit. A "new wishlist" action on the wishlist list
+  (top level) and on the wishlist screen (child). The form edits the name and the image (set,
+  replace, remove; camera or picker from `core:photos`), saved with the progress view and retry.
+  Edit opens prefilled and sends only what changed. On success the list or the parent reads
+  again. The form survives rotation and process death.
+  **Verify:** ViewModel tests (create, each change alone, no change sends no call, failure and
+  retry); mutation-check one.
+  Note: two view models, as `feature:collections` (`NewWishlistViewModel`, `EditWishlistViewModel`),
+  with the form, frame and save view in `WishlistFormScreen.kt`. A new `WishlistChanges` signal
+  (wishlist id and parent) makes the list (null parent) and the wishlist screen (itself or a child)
+  read again. A saved new wishlist closes the form; it does not open the new wishlist. The list has
+  a FAB; the wishlist screen has a "More actions" menu with "New wishlist" and "Edit". Shared texts
+  reuse the `collection_form_*` strings. Mutation: the no-change guard in `canSave`, caught.
+- [x] **M9.5** — Delete wishlist: a delete action on the wishlist screen. The confirm names the
+  wishlist and counts the child wishlists (every level) and the wishes they hold, as M6.3 counts
+  collections. On success the screen leaves the back stack and the list or the parent reads again.
+  A failure shows the error and keeps the screen.
+  **Verify:** ViewModel tests (counts, success, failure).
+  Note: the count is one `getWishlists()` (descendants by `parentId`) plus `getWishes` per
+  wishlist, all pages: `Wishlist.php` has no wish counter, and no new repository call was added. A
+  delete sends `WishlistChanges` (the wishlist id and its parent); the deleted screen ignores its
+  own signal. Delete icon in the top bar, as on the collection screen. Mutation: the descendant
+  walk cut to one level, caught.
+- [x] **M9.6** — Wish screen and delete. A tap on a wish opens its screen: image, name, URL,
+  price and currency, comment. A delete action asks first; on success the wishlist screen reads
+  again.
+  **Verify:** ViewModel tests (load, failure and retry, delete success and failure).
+  Note: a new `WishChanges` signal (wish id and wishlist id, bound in `feature:wishlists:data`);
+  the wishlist screen reads again on a change to one of its own wishes. M9.7's form can send it
+  too. The name is in the top bar; a field without a value has no line. The URL is selectable
+  text, not a link. Mutation: the signal after the delete dropped, caught.
+- [x] **M9.7** — Wish form: create and edit. A "new wish" action on the wishlist screen and an
+  "edit" action on the wish screen. Fields: name (required), URL, price, currency (upper-cased,
+  3 letters or empty), comment, image (set and replace; no remove, decision 12). Edit sends only
+  what changed; clearing a field follows the M9.2 answer for an explicit `null`. The form
+  survives rotation and process death.
+  **Verify:** ViewModel and use-case tests (create with and without image, each change alone,
+  cleared field, currency check, failure and retry); mutation-check the currency check.
+  Note: no use case. As the M9.4 wishlist form, the save stays in the two view models
+  (`NewWishViewModel`, `EditWishViewModel`). The diff and the currency check are pure functions in
+  `WishFormValues`, with their own `WishFormValuesTest`. An edit is one `PATCH` of the changed keys,
+  then the upload. A cleared field goes out as `null`. Values are trimmed; the currency is
+  upper-cased as the user types. The form frame, save view and new `FormImageSection` are shared
+  with `WishlistFormScreen.kt`; the wish form shows no remove button for the server image. The wish
+  screen has an Edit icon and reads again on a `WishChanges` signal for its own wish. Mutation: the
+  3-letter length rule dropped, caught.
+- [x] **M9.8** — Device pass on the emulator (`emulator-testing` skill) against the local test
+  instance: open Wishlists from the overflow menu, create a wishlist with an image and a child,
+  add a wish with an image and every field, edit it, replace both images, remove the wishlist
+  image, then delete the wish and the parent wishlist. Compare with the web UI before the delete.
+  **Verify:** each action works on the device; the web UI shows the same values; the instance
+  ends as it started.
+  Note: every action passed on `koil36` (API 36). The wish went into the parent wishlist, so the
+  parent delete counted 1 wishlist and 0 wishes once the wish was gone. Each replaced or removed
+  file gave 404; the web UI's wishlist page showed the child, the edited wish, "€15.00", the
+  comment, the link and the wish image. End state: 0 wishlists, 0 wishes, 6080 upload files, as
+  at the start.

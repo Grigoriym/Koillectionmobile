@@ -211,7 +211,8 @@ start of any step that touches the API. Facts that shape the design:
   in `wishlist:read`, and `children` and `wishes` are `cascade: ['all']`. The app reads all
   wishlists once, finds the descendants by `parentId`, and reads every page of
   `/api/wishlists/{id}/wishes` for each one (no `totalItems` call was added: wishlists are small).
-  Not yet checked on the device (M9.8).
+  Checked on the device (M9.8) with one child and no wishes left: the confirm read "1 wishlist
+  and 0 wishes". A non-zero wish count is covered by the ViewModel tests only.
 - Writes checked live 2026-11-15 (M3.1, `./gradlew :composeApp:smokeWriteRun`, JVM, local test
   instance at the root path): through the app's repositories, an item in `Books`, two text fields
   (positions 1 and 2), an image field (position 3), a main image upload and a field image upload
