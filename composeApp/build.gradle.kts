@@ -146,3 +146,18 @@ tasks.register<JavaExec>("smokeWishlistRun") {
     systemProperty("user.home", smokeHome.get().asFile.absolutePath)
     javaLauncher.set(javaToolchains.launcherFor { languageVersion.set(JavaLanguageVersion.of(21)) })
 }
+
+// M10.2: live loan smoke run against the local test instance. It creates an item with two loans,
+// edits one, sends two invalid creates and deletes them all. Same setup as `smokeRun`; never point
+// it at the real server.
+tasks.register<JavaExec>("smokeLoanRun") {
+    group = "verification"
+    description = "Creates, edits and deletes loans on a throwaway item on the local test instance."
+    val jvmTestCompilation = kotlin.jvm().compilations.getByName("test")
+    dependsOn(jvmTestCompilation.compileAllTaskName)
+    classpath = files(jvmTestCompilation.output.allOutputs, jvmTestCompilation.runtimeDependencyFiles)
+    mainClass.set("com.grappim.koillectionmobile.composeapp.smoke.LiveLoanSmokeKt")
+    val smokeHome = layout.buildDirectory.dir("smoke-home")
+    systemProperty("user.home", smokeHome.get().asFile.absolutePath)
+    javaLauncher.set(javaToolchains.launcherFor { languageVersion.set(JavaLanguageVersion.of(21)) })
+}

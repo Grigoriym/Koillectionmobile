@@ -6,9 +6,9 @@ import kotlinx.datetime.LocalDate
 import org.koin.core.annotation.Single
 
 /**
- * The server sends each date as a date-time with an offset (`2026-11-22T00:00:00+00:00`). The
- * app keeps the date part as the server wrote it, with no time zone conversion: the web form
- * edits the date only (`LoanType`, `DateType`).
+ * The server sends each date as midnight in its own time zone, with the offset
+ * (`2026-11-22T00:00:00+01:00`, M10.2). The app keeps the date part as the server wrote it, with
+ * no time zone conversion: the web form edits the date only (`LoanType`, `DateType`).
  */
 @Single
 class LoanMapper {

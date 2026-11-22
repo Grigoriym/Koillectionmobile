@@ -88,7 +88,14 @@ parent and checks that the count of wishlists ends as it started. If it fails ha
 deletes the parent; look for a leftover `M9.2 smoke parent <millis>` wishlist if a cleanup line
 reports an error. Its constants are in `LiveWishlistSmoke.kt`: the same rule applies.
 
-All six runs keep their session in `composeApp/build/smoke-home`. A run more than an hour after the
+`./gradlew :composeApp:smokeLoanRun` writes (M10.2): in `Books` it creates an item and two loans.
+It edits `lentTo`, sets and clears `returnedAt`, and sends an empty `lentTo` and a loan without
+`lentAt` (each 422). It deletes one loan, then the item, and checks that the counts of loans and of
+`Books` items end as they started. If it fails halfway, it still deletes the item (which takes its
+loans); look for a leftover `M10.2 smoke <millis>` item if a cleanup line reports an error. Its
+constants are in `LiveLoanSmoke.kt`: the same rule applies.
+
+All seven runs keep their session in `composeApp/build/smoke-home`. A run more than an hour after the
 last one starts with an expired JWT. That is the path that hung in M3.1, so do not delete the
 directory to make a hang go away: find out why first.
 

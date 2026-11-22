@@ -202,6 +202,19 @@ start of any step that touches the API. Facts that shape the design:
     value should not be blank.`).
   - A `DELETE` of the parent took the child and the wish with it: all three gave 404.
   Not checked: a server behind a subpath.
+- Loan writes checked live 2026-11-22 (M10.2, `./gradlew :composeApp:smokeLoanRun`, JVM, local
+  test instance at the root path), through the M10.1 repository calls, on a throwaway item in
+  `Books`. The test instance had no loans before and after.
+  - **A date-only `lentAt` keeps its day.** `"lentAt": "2026-11-20"` reads back as
+    `2026-11-20T00:00:00+01:00`: midnight in the server's own time zone. `returnedAt` behaves the
+    same. The M10.1 format (`yyyy-MM-dd`) stays.
+  - A `PATCH` of `lentTo` changed only that key. A `PATCH` with a date sets `returnedAt`; **a
+    `PATCH` with `"returnedAt": null` clears it** (answer and read-back both null).
+  - 422 each: an empty `lentTo` (`lentTo: This value should not be blank.`) and a create without
+    `lentAt` (`lentAt: This value should not be blank.`).
+  - `/api/items/{id}/loans` listed both loans. After `DELETE /api/loans/{id}` the loan gave 404.
+    **A `DELETE` of the item took its other loan with it** (404).
+  Not checked: a server behind a subpath, and a server in a time zone west of UTC.
 - Counting what a collection delete takes (M6.3, 1.8.5 source): the API has no counters.
   `Collection::$cachedValues` holds them but has no `Groups`, and `Item.php` has no `#[ApiFilter]`,
   so items cannot be counted for several collections in one call. The app reads all collections
