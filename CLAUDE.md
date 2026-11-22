@@ -15,8 +15,7 @@ the API.
 
 **A probe or setup script copies the API details from the app's code, not from memory.** Keys,
 multipart part names and `Accept` headers come from the `feature:*:data` repositories or
-`fixtures/capture.py`. Guessed ones failed three times (M5.2 `member`; M5.5 `fileImage`, and a
-plain-array answer to `Accept: application/json`), and a wrong part name answers 200 and stores nothing.
+`fixtures/capture.py`. Guessed ones have failed, and a wrong part name answers 200 and stores nothing.
 
 **Test against the local instance, never the user's real server.** The real one holds the
 working book catalogue. A local Koillection with a copy of it is in `docs/local-info.md`
@@ -36,7 +35,7 @@ rules are at the top of that file. Do exactly that step, run its Verify line, ti
 the banner.
 
 **Before starting a step:** read `docs/machine.local.md` (if present) before the first Gradle,
-source or container command; skipping it failed three times (M4.4, M5.3, M7.0). Then check `git status` and the current branch. A prior session can
+source or container command. Then check `git status` and the current branch. A prior session can
 leave uncommitted work behind. Commit stray work separately (or ask); don't fold it into the
 new step.
 
@@ -111,64 +110,52 @@ first — it is often for a problem this toolchain doesn't have.
 
 **"Done" means the relevant check ran and passed.** If it didn't run, say that instead.
 
-- **A narrow pass proves your change works, not that you broke nothing.** When a
-  failure shows up alongside your change, A/B it against a clean tree (`git stash -u`)
-  before assuming you caused it — or that you didn't.
-- **Run `ktlintCheck` alongside `build`.** `build` skips the root project's
-  `:ktlintKotlinScriptCheck`, so `settings.gradle.kts` and root `build.gradle.kts` are linted
-  only by `ktlintCheck` (M0.4). After a script inserts imports, run `ktlintFormat` on the module:
-  a string-replace insert broke the import order five times (last M9.7).
+- **A narrow pass proves your change works, not that you broke nothing.** When a failure shows
+  up alongside your change, A/B it against a clean tree (`git stash -u`).
+- **Run `ktlintCheck` alongside `build`.** `build` skips the root `:ktlintKotlinScriptCheck`.
+  After a script inserts imports, run `ktlintFormat` on the module: scripted inserts break the
+  import order.
 - **A mutation check copies the file to the scratchpad first and restores from the copy.**
-  `git checkout --` fails on an untracked file (M1.8) and drops the step's own uncommitted edits
-  (M5.6). `jvmTest` has `failFast = true` (`Quality.kt`): a run stops early, so its report
-  lists fewer tests than exist. That is the stop, not missing tests; run one mutation per run. It
-  does not stop at exactly one failure (M8.4 listed 9, M8.7 listed 4): the count is no measure.
-  Run it without `-q`: `-q` hides the failing test names, and "BUILD FAILED" alone also fits a
-  compile error (M6.1, M6.3, M6.5).
+  `git checkout --` fails on an untracked file and drops the step's own edits. Run one mutation
+  per run, without `-q`: `jvmTest` has `failFast = true` (`Quality.kt`), so the report lists
+  fewer tests than exist, and `-q` hides which test failed (or that it was a compile error).
 - **Send a gate run to a log file, then grep the file** for `BUILD (SUCC|FAIL)|What went wrong`.
-  Piping Gradle straight into `grep` lost the proof three times: nothing under `-q` (M3.2), a page
-  of PASSED tests named "error" (M8.1), and a one-off failure whose cause was gone (M9.3).
-- **Force Gradle tests with `--rerun`** when the test is the proof. An `UP-TO-DATE` test task
-  prints "BUILD SUCCESSFUL" without running anything. `--rerun` applies only to the task just
-  before it: write `:a:jvmTest --rerun :b:jvmTest --rerun`, not one `--rerun` at the end (M7.3).
+  Piping Gradle straight into `grep` has lost the proof.
+- **Force Gradle tests with `--rerun`** when the test is the proof: an `UP-TO-DATE` task prints
+  "BUILD SUCCESSFUL" without running. `--rerun` applies only to the task just before it:
+  `:a:jvmTest --rerun :b:jvmTest --rerun`.
 - **A new Koin module needs its `includes` line in `AppModule`** (`composeApp/.../di/Koin.kt`).
   Without it every JVM gate passes, `KoinGraphTest` too, and Android crashes with
-  `NoDefinitionFoundException` on the first screen that needs it. Only the device run caught it (M4.2).
-- **A URL check needs a root-path case.** `core:api`'s mock-engine tests use a `/sub` base URL.
-  At a root-path server Ktor's merged path has no leading `/` inside a plugin, which hid the M3.1
-  login deadlock until a live run.
-- **A check that looks the same whether the thing worked or not is not a check.**
-  Before trusting one, name what it would show if the change had done nothing.
-- **Before/after comparisons need equally fresh runs.** A baseline taken from a
-  partially cached build measures a different universe than the after-run. A moved
-  total is a signal the two runs aren't comparable, not a result.
-- **Confirm the baseline shows the pre-change value before trusting it**, and copy each
-  report to a distinct path immediately. Overwrite the "before" once and the diff comes
-  back showing nothing changed anywhere — which reads like a plausible result rather
-  than a mistake.
+  `NoDefinitionFoundException`. Only a device run catches it.
+- **A URL check needs a root-path case** next to `core:api`'s `/sub` base URL: at a root-path
+  server Ktor's merged path has no leading `/` inside a plugin.
+- **A check that looks the same whether the thing worked or not is not a check.** Name what it
+  would show if the change had done nothing.
+- **Before/after comparisons need equally fresh runs**, and a baseline confirmed to show the
+  pre-change value. Copy each report to its own path at once: an overwritten "before" makes the
+  diff show no change, which looks like a real result.
 
 ## Kotlin compile gotcha
 
 An "Unresolved reference" or a wrong-overload error on a library call often means a missing
 extension import. Ktor's `url.fullPath` and `url.encodedPath`, and kotlinx-serialization's reified
-`decodeFromJsonElement<T>()`, are extensions (hit in M1.3, M1.6, M1.7), and so is grappim-kit's
-`NativeText.asString()` (M2.5). Import them by name.
+`decodeFromJsonElement<T>()`, are extensions, and so is grappim-kit's
+`NativeText.asString()`. Import them by name.
 
 A `@Serializable` sealed subclass must not have a property named `type`: it clashes with the
-default class discriminator, and the encode throws at runtime, not at compile time (M8.6,
-`EditRow.Text`; that is why it says `datumType`).
+default class discriminator, and the encode throws at runtime, not at compile time
+(`EditRow.Text` says `datumType` for this reason).
 
 ## Shell
 
 Don't `cd` into a subfolder in a Bash call: the shell stays there, and the auto-mode classifier
-then gives no verdict on the next calls that start with `cd` to the repo root ("reviewed this
-call without its leading cd"). Hit in M5.5 and twice in M6.4. Run from the root with paths.
+then gives no verdict on the next calls that start with `cd` to the repo root. Run from the root
+with paths. A slip costs a call or two; it is not logged as a friction.
 
 ## Test names
 
 No comma in a backtick test name in `commonTest`. It passes `jvmTest` and fails
-`compileTestKotlinIosArm64` ("Name contains illegal characters"); only `build` catches it
-(hit in M1.4, M1.5, M2.3). `jvmTest` source sets do not compile for iOS, so commas are fine there.
+`compileTestKotlinIosArm64` ("Name contains illegal characters"); only `build` catches it. `jvmTest` source sets do not compile for iOS, so commas are fine there.
 
 ## Plain technical English
 
@@ -294,19 +281,7 @@ The rule above is for problems in the **code**. This one is for friction in the
 different quoting, a check that confidently returned the wrong answer. The reflex is to
 route around it and say nothing.
 
-Add a line to `docs/frictions.md` before moving on — **create the file if it isn't there**,
-that is not a decision worth pausing over:
-
-```markdown
-# Frictions
-
-Tooling friction hit during work, newest last. One line each. Promoted or fixed
-entries get deleted — see /finalize.
-
-- 2026-08-05 — `rg` with an unquoted `**` glob: zsh expanded it first and failed with
-  "no matches found" before rg ran. Quote the glob, or use `--files`.
-```
-
+Add a line to `docs/frictions.md` before moving on (create the file if it is missing).
 One line, past tense, naming the tool and the surprise. Don't stop working to write it
 and don't editorialise. **This is for what you routed around without mentioning** — not
 for failures you were going to report anyway.

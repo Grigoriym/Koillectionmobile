@@ -52,9 +52,6 @@ entries get deleted — see /finalize.
   auto-mode classifier ("Unauthorized Access"), as a package download. The user chose to skip it.
 - 2026-11-16 — `uiautomator dump` (M6.3) had the delete dialog's title and buttons but not its body text,
   which the screenshot showed. Read dialog body text from a screenshot.
-- 2026-11-17 — Bash (M7.1): a `cd` into a module's `src` folder in a compound read command moved the
-  session's working directory, against `CLAUDE.md` "Shell". Fourth hit of that rule: a prose rule is
-  not holding; a PreToolUse hook that rejects `cd` into a subfolder would (ask the user first).
 - 2026-11-17 — `ui.py list` (M7.1) did not print the "No item name contains "zzqx"." line, though the
   screenshot showed it. Second hit after M6.3; both missing texts hold a `"`. Untested guess: the
   quote breaks the dump or the parse.
@@ -73,12 +70,6 @@ entries get deleted — see /finalize.
 - 2026-11-21 — Two smoke files in one package (M9.2) each declared `private class Created`; the
   compile failed "Redeclaration": a private top-level class is still one JVM class per package.
   Renamed to `WishlistRunCreated`.
-- 2026-11-21 — Bash (M9.4): a `cd feature/wishlists && cat ...` read moved the session's working
-  directory again, against `CLAUDE.md` "Shell". Fifth hit; the M7.1 entry's hook proposal still waits
-  for the user.
-- 2026-11-22 — Bash (M9.7): a `cd feature/wishlists && cat ...` read moved the session's working
-  directory again, against `CLAUDE.md` "Shell". Sixth hit; the M7.1 entry's hook proposal still waits
-  for the user.
 - 2026-11-22 — detekt (M9.7) failed `build` for a `@Composable` that emitted a `Text`, an image
   and a `Row` at its top level ("should only be emitting content ... from one source"). Wrapped it
   in a `Column`; `jvmTest` does not run detekt, so only `build` caught it.
