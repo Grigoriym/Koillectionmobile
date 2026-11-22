@@ -146,6 +146,10 @@ A `@Serializable` sealed subclass must not have a property named `type`: it clas
 default class discriminator, and the encode throws at runtime, not at compile time
 (`EditRow.Text` says `datumType` for this reason).
 
+A file with one top-level class must carry that class's name. ktlint `standard:filename` and detekt
+`MatchingDeclarationName` fail `build` otherwise; a top-level function next to the class does not
+count (`LoanRoutes.kt` holding only `LoanFormRoute`, M10.4).
+
 ## Shell
 
 Don't `cd` into a subfolder in a Bash call: the shell stays there, and the auto-mode classifier

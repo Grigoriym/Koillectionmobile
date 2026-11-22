@@ -55,16 +55,11 @@ entries get deleted — see /finalize.
 - 2026-11-17 — `ui.py list` (M7.1) did not print the "No item name contains "zzqx"." line, though the
   screenshot showed it. Second hit after M6.3; both missing texts hold a `"`. Untested guess: the
   quote breaks the dump or the parse.
-- 2026-11-17 — detekt `MatchingDeclarationName` (M7.6) failed `build` for `NewTagLabel.kt`, whose one
-  top-level class is `TagChoice` (an extension function next to it does not count). Name the file
-  after the class.
 - 2026-11-17 — `adb shell input text "m7.7%sedittag"` (M7.7) landed as "m76.7 edittag" in the
   new-tag dialog; the same call with "M7.7%sdevicetag" a minute earlier landed correctly.
 - 2026-11-18 — A lambda in a `MutableStateFlow(...)` initializer that used `_uiState` itself (M8.5)
   failed with "Type checking has run into a recursive problem", plus a false "needs opt-in" and "No
   parameter with name" error on the same line. A method reference (`::dismissActionError`) fixed it.
-- 2026-11-19 — ktlint `standard:filename` (M8.7) failed `ktlintCheck` for `TemplateApply.kt`, whose one
-  class is `AppliedTemplate` next to a top-level function. Second hit after detekt in M7.6; renamed.
 - 2026-11-19 — `GET /api/items?name=M89` ignored the filter and returned an unrelated `Books` item
   (`Item.php` has no `#[ApiFilter]`). Read `/api/collections/<id>/items` instead.
 - 2026-11-21 — Two smoke files in one package (M9.2) each declared `private class Created`; the
