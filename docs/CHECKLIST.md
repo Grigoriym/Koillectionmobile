@@ -1,6 +1,6 @@
 # koillectionmobile checklist
 
-**Current step:** M9.7. M9.6 done 2026-11-22. M9.5 done 2026-11-21. M9.4 done 2026-11-21. M9.3 done 2026-11-21. M9.2 done 2026-11-21. M9.1 done 2026-11-21. M9 broken into steps 2026-11-19. M8 done 2026-11-19. M8.9 done 2026-11-19. M8.8 done 2026-11-19. M8.7 done 2026-11-19. M8.6 done 2026-11-18. M8.5 done 2026-11-18. M8.4 done 2026-11-18. M8.3 done 2026-11-17. M8.2 done 2026-11-17. M8.1 done 2026-11-17. M8 broken into steps 2026-11-17; the other areas became M9–M13 and the release moved to M14 (user, 2026-11-17). M7 done 2026-11-17. M7.7 done 2026-11-17. M7.6 done 2026-11-17. M7.5 done 2026-11-17. M7.4 done 2026-11-17. M7.3 done 2026-11-17. M7.2 done 2026-11-17. M7.1 done 2026-11-17. M7 broken into steps 2026-11-17. M6 done 2026-11-17. M6.6 done 2026-11-17. M6.5 done 2026-11-16. M6.4 done 2026-11-16. M6.3 done 2026-11-16. M6.2 done 2026-11-16. M6.1 done 2026-11-16. M6 broken into steps 2026-11-16. M5 done 2026-11-16. M5.7 done 2026-11-16. M5.6 done 2026-11-16. M5.5 done 2026-11-16. M5.4 done 2026-11-16. M5.3 done 2026-11-16. M5.2 done 2026-11-16. M5.1 done 2026-11-16. M5 broken into steps 2026-11-16. M4 done 2026-11-16. M4.4 done 2026-11-16. M4.3 done 2026-11-16. M4.2 done 2026-11-16. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6, 7, 8, 9, 10 and 11 are settled.
+**Current step:** M9.8. M9.7 done 2026-11-22. M9.6 done 2026-11-22. M9.5 done 2026-11-21. M9.4 done 2026-11-21. M9.3 done 2026-11-21. M9.2 done 2026-11-21. M9.1 done 2026-11-21. M9 broken into steps 2026-11-19. M8 done 2026-11-19. M8.9 done 2026-11-19. M8.8 done 2026-11-19. M8.7 done 2026-11-19. M8.6 done 2026-11-18. M8.5 done 2026-11-18. M8.4 done 2026-11-18. M8.3 done 2026-11-17. M8.2 done 2026-11-17. M8.1 done 2026-11-17. M8 broken into steps 2026-11-17; the other areas became M9–M13 and the release moved to M14 (user, 2026-11-17). M7 done 2026-11-17. M7.7 done 2026-11-17. M7.6 done 2026-11-17. M7.5 done 2026-11-17. M7.4 done 2026-11-17. M7.3 done 2026-11-17. M7.2 done 2026-11-17. M7.1 done 2026-11-17. M7 broken into steps 2026-11-17. M6 done 2026-11-17. M6.6 done 2026-11-17. M6.5 done 2026-11-16. M6.4 done 2026-11-16. M6.3 done 2026-11-16. M6.2 done 2026-11-16. M6.1 done 2026-11-16. M6 broken into steps 2026-11-16. M5 done 2026-11-16. M5.7 done 2026-11-16. M5.6 done 2026-11-16. M5.5 done 2026-11-16. M5.4 done 2026-11-16. M5.3 done 2026-11-16. M5.2 done 2026-11-16. M5.1 done 2026-11-16. M5 broken into steps 2026-11-16. M4 done 2026-11-16. M4.4 done 2026-11-16. M4.3 done 2026-11-16. M4.2 done 2026-11-16. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6, 7, 8, 9, 10 and 11 are settled.
 
 ## How to use this
 
@@ -114,13 +114,21 @@ plan §5 decision 12 (user, 2026-11-19). Every write goes to the local test inst
   the wishlist screen reads again on a change to one of its own wishes. M9.7's form can send it
   too. The name is in the top bar; a field without a value has no line. The URL is selectable
   text, not a link. Mutation: the signal after the delete dropped, caught.
-- [ ] **M9.7** — Wish form: create and edit. A "new wish" action on the wishlist screen and an
+- [x] **M9.7** — Wish form: create and edit. A "new wish" action on the wishlist screen and an
   "edit" action on the wish screen. Fields: name (required), URL, price, currency (upper-cased,
   3 letters or empty), comment, image (set and replace; no remove, decision 12). Edit sends only
   what changed; clearing a field follows the M9.2 answer for an explicit `null`. The form
   survives rotation and process death.
   **Verify:** ViewModel and use-case tests (create with and without image, each change alone,
   cleared field, currency check, failure and retry); mutation-check the currency check.
+  Note: no use case. As the M9.4 wishlist form, the save stays in the two view models
+  (`NewWishViewModel`, `EditWishViewModel`). The diff and the currency check are pure functions in
+  `WishFormValues`, with their own `WishFormValuesTest`. An edit is one `PATCH` of the changed keys,
+  then the upload. A cleared field goes out as `null`. Values are trimmed; the currency is
+  upper-cased as the user types. The form frame, save view and new `FormImageSection` are shared
+  with `WishlistFormScreen.kt`; the wish form shows no remove button for the server image. The wish
+  screen has an Edit icon and reads again on a `WishChanges` signal for its own wish. Mutation: the
+  3-letter length rule dropped, caught.
 - [ ] **M9.8** — Device pass on the emulator (`emulator-testing` skill) against the local test
   instance: open Wishlists from the overflow menu, create a wishlist with an image and a child,
   add a wish with an image and every field, edit it, replace both images, remove the wishlist

@@ -11,13 +11,15 @@ import com.grappim.koillectionmobile.strings.generated.resources.wish_error_unex
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.core.annotation.InjectedParam
 import org.koin.core.annotation.KoinViewModel
 
 /**
- * Reads the wish. A delete tells the wish's wishlist to read again ([WishChanges]).
+ * Reads the wish, and again when the edit form saved it ([WishChanges]). A delete tells the wish's
+ * wishlist to read again; this screen ignores that signal.
  *
  * [wishId] arrives through `parametersOf` at the call site. [InjectedParam] tells the Koin
  * compiler plugin not to look for a `String` definition in the graph.
@@ -36,6 +38,11 @@ class WishViewModel(
 
     init {
         load()
+        viewModelScope.launch {
+            wishChanges.changed
+                .filter { it.wishId == wishId && !_uiState.value.isDeleting && !_uiState.value.isDeleted }
+                .collect { load() }
+        }
     }
 
     private fun retry() {

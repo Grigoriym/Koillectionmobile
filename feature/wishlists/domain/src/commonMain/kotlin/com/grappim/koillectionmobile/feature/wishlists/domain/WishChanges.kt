@@ -5,8 +5,8 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 
 /**
- * Tells a screen that is still on the back stack that a wish changed in this process (a delete
- * removed it), so it reads again. One instance per app (bound in `feature:wishlists:data`). A screen
+ * Tells a screen that is still on the back stack that a wish changed in this process (a form
+ * saved it, or a delete removed it), so it reads again. One instance per app (bound in `feature:wishlists:data`). A screen
  * that is not collecting misses the signal; it reads when it starts anyway.
  */
 class WishChanges {
@@ -23,5 +23,5 @@ class WishChanges {
     }
 }
 
-/** Wish [wishId] in wishlist [wishlistId] changed: the screen of that wishlist reads again. */
+/** Wish [wishId] in wishlist [wishlistId] changed: the screen of that wish and of that wishlist read again. */
 data class WishChange(val wishId: String, val wishlistId: String)

@@ -159,6 +159,22 @@ class WishViewModelTest {
         assertTrue(sut.uiState.value.deleteError.isEmpty())
     }
 
+    @Test
+    fun `a change to this wish reads it again and a change to another wish does not`() {
+        val sut = loadedSut()
+
+        wishChanges.notifyChanged("other", TENT.wishlistId)
+        assertEquals(1, repository.wishCalls.size)
+
+        repository.wish.addLast(CompletableDeferred())
+        wishChanges.notifyChanged(TENT.id, TENT.wishlistId)
+        val edited = TENT.copy(name = "Big tent")
+        answer(Result.success(edited))
+
+        assertEquals(2, repository.wishCalls.size)
+        assertEquals(edited, sut.uiState.value.wish)
+    }
+
     private companion object {
         val TENT = wish(id = "tent", name = "Tent").copy(url = "https://example.com/tent", comment = "Two people")
     }

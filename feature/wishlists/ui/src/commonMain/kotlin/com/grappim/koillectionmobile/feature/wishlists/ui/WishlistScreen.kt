@@ -39,6 +39,7 @@ import com.grappim.koillectionmobile.strings.RString
 import com.grappim.koillectionmobile.strings.generated.resources.collection_delete_cancel
 import com.grappim.koillectionmobile.strings.generated.resources.collection_delete_confirm
 import com.grappim.koillectionmobile.strings.generated.resources.collection_delete_failed_ok
+import com.grappim.koillectionmobile.strings.generated.resources.wish_new
 import com.grappim.koillectionmobile.strings.generated.resources.wishlist_delete
 import com.grappim.koillectionmobile.strings.generated.resources.wishlist_delete_children
 import com.grappim.koillectionmobile.strings.generated.resources.wishlist_delete_failed_title
@@ -63,6 +64,7 @@ fun WishlistScreen(
     onWishlistClick: (String) -> Unit,
     onWishClick: (String) -> Unit,
     onNewWishlistClick: () -> Unit,
+    onNewWishClick: () -> Unit,
     onEditClick: () -> Unit,
     onBack: () -> Unit,
     onClose: () -> Unit,
@@ -79,6 +81,7 @@ fun WishlistScreen(
         onWishlistClick = onWishlistClick,
         onWishClick = onWishClick,
         onNewWishlistClick = onNewWishlistClick,
+        onNewWishClick = onNewWishClick,
         onEditClick = onEditClick,
         onBack = onBack,
         modifier = modifier
@@ -91,6 +94,7 @@ private fun WishlistContent(
     onWishlistClick: (String) -> Unit,
     onWishClick: (String) -> Unit,
     onNewWishlistClick: () -> Unit,
+    onNewWishClick: () -> Unit,
     onEditClick: () -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier
@@ -109,7 +113,11 @@ private fun WishlistContent(
                         )
                     }
                 }
-                MoreMenu(onNewWishlistClick = onNewWishlistClick, onEditClick = onEditClick)
+                MoreMenu(
+                    onNewWishlistClick = onNewWishlistClick,
+                    onNewWishClick = onNewWishClick,
+                    onEditClick = onEditClick
+                )
             }
         }
     ) { padding ->
@@ -206,7 +214,7 @@ private fun WishRow(wish: Wish, modifier: Modifier = Modifier) {
 
 /** The top bar's overflow menu. */
 @Composable
-private fun MoreMenu(onNewWishlistClick: () -> Unit, onEditClick: () -> Unit) {
+private fun MoreMenu(onNewWishlistClick: () -> Unit, onNewWishClick: () -> Unit, onEditClick: () -> Unit) {
     var isExpanded by remember { mutableStateOf(false) }
     Box {
         IconButton(onClick = { isExpanded = true }) {
@@ -218,6 +226,13 @@ private fun MoreMenu(onNewWishlistClick: () -> Unit, onEditClick: () -> Unit) {
                 onClick = {
                     isExpanded = false
                     onNewWishlistClick()
+                }
+            )
+            DropdownMenuItem(
+                text = { Text(stringResource(RString.wish_new)) },
+                onClick = {
+                    isExpanded = false
+                    onNewWishClick()
                 }
             )
             DropdownMenuItem(

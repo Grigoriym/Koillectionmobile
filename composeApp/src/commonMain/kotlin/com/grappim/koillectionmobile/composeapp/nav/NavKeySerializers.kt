@@ -18,7 +18,9 @@ import com.grappim.koillectionmobile.feature.templates.ui.ChoiceListListRoute
 import com.grappim.koillectionmobile.feature.templates.ui.TemplateFormRoute
 import com.grappim.koillectionmobile.feature.templates.ui.TemplateListRoute
 import com.grappim.koillectionmobile.feature.templates.ui.TemplateRoute
+import com.grappim.koillectionmobile.feature.wishlists.ui.EditWishRoute
 import com.grappim.koillectionmobile.feature.wishlists.ui.EditWishlistRoute
+import com.grappim.koillectionmobile.feature.wishlists.ui.NewWishRoute
 import com.grappim.koillectionmobile.feature.wishlists.ui.NewWishlistRoute
 import com.grappim.koillectionmobile.feature.wishlists.ui.WishRoute
 import com.grappim.koillectionmobile.feature.wishlists.ui.WishlistListRoute
@@ -55,6 +57,8 @@ private val navKeySerializersModule = SerializersModule {
         subclass(NewWishlistRoute::class)
         subclass(EditWishlistRoute::class)
         subclass(WishRoute::class)
+        subclass(NewWishRoute::class)
+        subclass(EditWishRoute::class)
     }
 }
 

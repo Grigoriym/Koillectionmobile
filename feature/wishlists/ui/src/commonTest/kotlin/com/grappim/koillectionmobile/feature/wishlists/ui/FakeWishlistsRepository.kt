@@ -11,8 +11,10 @@ import kotlinx.coroutines.CompletableDeferred
  * read for an id in [wishesOf] answers from there instead, for the parallel reads of a delete
  * count. Each wishlist write is logged in [writes] (`"create:<name>:<parent>"`,
  * `"rename:<id>:<name>"`, `"upload:<id>"`, `"deleteImage:<id>"`, `"delete:<id>"`) and answers with
- * its `...Answer`. A wish read takes the first queued [wish] answer; a wish delete is logged as
- * `"deleteWish:<id>"` and answers with [deleteWishAnswer].
+ * its `...Answer`. A wish read takes the first queued [wish] answer. Each wish write is logged in
+ * [writes] too (`"createWish:<wishlist>:<name>:<url>:<price>:<currency>:<comment>"`,
+ * `"editWish:<id>"` with its changes in [wishEdits], `"uploadWish:<id>"`, `"deleteWish:<id>"`) and
+ * answers with its `...Answer`.
  */
 class FakeWishlistsRepository : WishlistsRepository {
     val wishlists = ArrayDeque<CompletableDeferred<Result<List<Wishlist>>>>()
@@ -58,6 +60,12 @@ class FakeWishlistsRepository : WishlistsRepository {
     var deleteImageAnswer: suspend () -> Result<Wishlist> = { Result.success(wishlist(id = "any", name = "any")) }
     var deleteAnswer: suspend () -> Result<Unit> = { Result.success(Unit) }
     var deleteWishAnswer: suspend () -> Result<Unit> = { Result.success(Unit) }
+    var createWishAnswer: suspend () -> Result<Wish> = { Result.success(wish(id = CREATED_ID, name = "any")) }
+    var editWishAnswer: suspend () -> Result<Wish> = { Result.success(wish(id = "any", name = "any")) }
+    var uploadWishAnswer: suspend () -> Result<Wish> = { Result.success(wish(id = "any", name = "any")) }
+
+    /** The `changes` of each [editWish], in order. */
+    val wishEdits = mutableListOf<Map<WishField, String?>>()
 
     override suspend fun createWishlist(name: String, parentId: String?): Result<Wishlist> {
         writes += "create:$name:$parentId"
@@ -102,16 +110,27 @@ class FakeWishlistsRepository : WishlistsRepository {
         price: String?,
         currency: String?,
         comment: String?
-    ): Result<Wish> = error("not used")
+    ): Result<Wish> {
+        writes += "createWish:$wishlistId:$name:$url:$price:$currency:$comment"
+        return createWishAnswer()
+    }
 
-    override suspend fun editWish(id: String, changes: Map<WishField, String?>): Result<Wish> = error("not used")
+    override suspend fun editWish(id: String, changes: Map<WishField, String?>): Result<Wish> {
+        writes += "editWish:$id"
+        wishEdits += changes
+        return editWishAnswer()
+    }
 
     override suspend fun uploadWishImage(
         id: String,
         bytes: ByteArray,
         fileName: String,
         mimeType: String
-    ): Result<Wish> = error("not used")
+    ): Result<Wish> {
+        writes += "uploadWish:$id"
+        uploads += Upload(bytes, mimeType)
+        return uploadWishAnswer()
+    }
 
     override suspend fun deleteWish(id: String): Result<Unit> {
         writes += "deleteWish:$id"

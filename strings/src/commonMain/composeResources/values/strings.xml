@@ -339,4 +339,14 @@
     <string name="wish_delete_text">The server deletes "%1$s". You cannot undo this.</string>
     <string name="wish_delete_failed_title">The wish was not deleted</string>
     <string name="wish_delete_error_unexpected">Deleting the wish failed with an unexpected error.</string>
+    <string name="wish_new">New wish</string>
+    <string name="wish_edit">Edit wish</string>
+    <string name="wish_label_currency">Currency</string>
+    <string name="wish_form_new_title">New wish</string>
+    <string name="wish_form_edit_title">Edit wish</string>
+    <string name="wish_form_currency_error">Enter a code of 3 letters, such as EUR, or leave the field empty.</string>
+    <string name="wish_form_save_partial">The wish is on the server, but without its image. Try again to send the image.</string>
+    <string name="wish_form_discard_title">Discard this wish?</string>
+    <string name="wish_form_discard_text">The values and the image on this form are lost.</string>
+    <string name="wish_form_edit_discard_text">The changes on this form are lost. The wish stays as it is on the server.</string>
 </resources>

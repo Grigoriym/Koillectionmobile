@@ -76,3 +76,11 @@ entries get deleted — see /finalize.
 - 2026-11-21 — Bash (M9.4): a `cd feature/wishlists && cat ...` read moved the session's working
   directory again, against `CLAUDE.md` "Shell". Fifth hit; the M7.1 entry's hook proposal still waits
   for the user.
+- 2026-11-22 — Bash (M9.7): a `cd feature/wishlists && cat ...` read moved the session's working
+  directory again, against `CLAUDE.md` "Shell". Sixth hit; the M7.1 entry's hook proposal still waits
+  for the user.
+- 2026-11-22 — detekt (M9.7) failed `build` for a `@Composable` that emitted a `Text`, an image
+  and a `Row` at its top level ("should only be emitting content ... from one source"). Wrapped it
+  in a `Column`; `jvmTest` does not run detekt, so only `build` caught it.
+- 2026-11-22 — A Python import insert into `WishlistScreen.kt` (M9.7) broke the import order again,
+  as `CLAUDE.md` "Verification" warns; `ktlintCheck` caught it, `ktlintFormat` fixed it.

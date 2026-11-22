@@ -191,7 +191,7 @@ fun EditWishlistScreen(
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun WishlistFormScaffold(
+internal fun WishlistFormScaffold(
     topTitle: String,
     hasInput: Boolean,
     canSave: Boolean,
@@ -273,7 +273,6 @@ private fun WishlistForm(
     onPhotoRemove: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val photoSources = rememberPhotoSources(onPhotos = onPhotosAdd)
     Column(
         modifier = modifier
             .verticalScroll(rememberScrollState())
@@ -287,6 +286,34 @@ private fun WishlistForm(
             singleLine = true,
             modifier = Modifier.fillMaxWidth()
         )
+        FormImageSection(
+            photo = photo,
+            imageUrl = imageUrl,
+            isServerImageRemovable = true,
+            onPhotosAdd = onPhotosAdd,
+            onPhotoRotate = onPhotoRotate,
+            onPhotoRemove = onPhotoRemove
+        )
+    }
+}
+
+/**
+ * The image part of a form, in its own column with [PADDING] spacing. [photo] is a new photo on this
+ * device. Without one, [imageUrl] is the image on the server; it has a remove button only when
+ * [isServerImageRemovable] (a wish image cannot be removed, plan §5 decision 12).
+ */
+@Composable
+internal fun FormImageSection(
+    photo: FormPhoto?,
+    imageUrl: String?,
+    isServerImageRemovable: Boolean,
+    onPhotosAdd: (List<String>) -> Unit,
+    onPhotoRotate: () -> Unit,
+    onPhotoRemove: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val photoSources = rememberPhotoSources(onPhotos = onPhotosAdd)
+    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(PADDING)) {
         Text(
             text = stringResource(RString.collection_form_section_image),
             style = MaterialTheme.typography.titleSmall,
@@ -309,8 +336,10 @@ private fun WishlistForm(
                 modifier = Modifier.size(PREVIEW_SIZE),
                 contentScale = ContentScale.Fit
             )
-            OutlinedButton(onClick = onPhotoRemove) {
-                Text(stringResource(RString.collection_form_remove_photo))
+            if (isServerImageRemovable) {
+                OutlinedButton(onClick = onPhotoRemove) {
+                    Text(stringResource(RString.collection_form_remove_photo))
+                }
             }
         }
         if (photoSources != null) {
@@ -332,7 +361,7 @@ private fun WishlistForm(
  * [partialText] says what is on the server.
  */
 @Composable
-private fun WishlistSaveView(
+internal fun WishlistSaveView(
     status: WishlistSaveStatus,
     partialText: String,
     onRetry: () -> Unit,
