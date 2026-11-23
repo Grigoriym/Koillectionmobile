@@ -1050,3 +1050,93 @@ code on `feature:wishlists`.
   returned date. The dialog names the loan. End state: 0 loans, as at the start. After each action
   the item screen jumps up, because the section shows a spinner while it reads again
   (`docs/revisit.md`).
+
+## M11 — albums and photos
+
+Albums (nested, as collections) and photos: create, edit, delete, with images. Choices are plan §5
+decision 14 (user, 2026-11-23). Every write goes to the local test instance only
+(`docs/local-info.md`). The test copy has no albums and no photos. Re-read `Album.php` and
+`Photo.php` at the start of each step that touches the API. Model the code on `feature:wishlists`.
+
+- [x] **M11.1** — Repository calls (new `feature:albums:{data,domain,dto,mapper}`, the
+  wallosmobile split). Albums: list (`GET /api/albums`, all pages), get, children
+  (`/api/albums/{id}/children`), create (`title`, optional `parent` IRI), rename (`PATCH`,
+  `{"title"}`), upload the image (`POST /api/albums/{id}/image`), remove the image (`PATCH` with
+  `deleteImage`), delete. Photos: `GET /api/albums/{id}/photos` (all pages), get, create (`title`,
+  `album` IRI, `comment`, `place`), edit (`PATCH`, only the changed keys), upload the image
+  (`POST /api/photos/{id}/image`), delete. Take the keys from the entity `Groups`, and copy the
+  multipart part name and headers from `feature:wishlists:data`. Add the new Koin modules'
+  `includes` lines in `AppModule`.
+  **Verify:** mock-engine tests per call (method, path, content type, body keys), with a
+  root-path base URL case; `KoinGraphTest` resolves the new repository; mutation-check one body
+  key and one path.
+- [x] **M11.2** — Live album smoke against the local test instance (a task, as
+  `smokeWishlistRun`): create a top-level album and a child, rename the child, upload an image,
+  replace it (the old file gives 404), remove it (`image` is null). Create a photo in the child
+  with every M11.1 field, upload its image, replace it, edit two fields, and send an explicit
+  `null` for `comment` (record whether it clears). Record what `takenAt` and
+  `imageSmallThumbnail` hold after the upload. Send a photo with an empty title (expect 422) and
+  one without `album`. Record whether `GET /api/albums` lists the child albums too. Delete the
+  parent; the child and the photo give 404. Record each answer in plan §2.
+  **Verify:** the run prints each step and passes; the test instance ends as it started; plan §2
+  has the results.
+  Note: `./gradlew :composeApp:smokeAlbumRun` (`LiveAlbumSmoke.kt`). Every case answered as
+  expected. `GET /api/albums` lists child albums too; `"comment": null` clears; `takenAt` stays null
+  after an upload; `imageSmallThumbnail` equals `image` for an image 300 px wide or less.
+- [x] **M11.3** — Album browse (`feature:albums:ui`). An "Albums" entry in the collection list's
+  "More" menu. The album list shows the top-level albums; a tap opens the album screen with its
+  child albums and a grid of its photos (`imageSmallThumbnail`, title). Loading, empty and error
+  states with retry on both screens. New Koin module: add its `includes` line in `AppModule`.
+  **Verify:** ViewModel tests (order, empty, failure and retry) for both screens.
+  Note: the web UI lists photos in database order, which the API does not show, so the app sorts
+  photos by title ignoring case, as it sorts albums. A photo cell has no tap yet (M11.6).
+- [x] **M11.4** — Album form: create and edit. A "new album" action on the album list (top level)
+  and on the album screen (child). The form edits the title and the image (set, replace, remove;
+  camera or picker from `core:photos`), saved with the progress view and retry. Edit opens
+  prefilled and sends only what changed. On success the list or the parent reads again. The form
+  survives rotation and process death.
+  **Verify:** ViewModel tests (create, each change alone, no change sends no call, failure and
+  retry); mutation-check one.
+  Note: the album screen's "More" menu holds "New album" and "Edit"; the list has a "New album"
+  button. A save signals `AlbumChanges` (`feature:albums:domain`, bound in `:data`), which the list
+  and the album screen collect. Mutation: dropping `trim()` from the title diff fails one test.
+  No device run in this step (M11.8).
+- [x] **M11.5** — Delete album: a delete action on the album screen. The confirm names the album
+  and counts the child albums (every level) and the photos they hold, as M9.5 counts wishlists.
+  On success the screen leaves the back stack and the list or the parent reads again. A failure
+  shows the error and keeps the screen.
+  **Verify:** ViewModel tests (counts, success, failure).
+  Note: a copy of M9.5. The count is one `getAlbums()` (descendants by `parentId`) plus `getPhotos`
+  per album, all pages: `Album.php` has no photo counter. A delete sends `AlbumChanges` (the album
+  id and its parent); the deleted screen ignores its own signal. Delete icon in the top bar.
+  Mutation (not required): the descendant walk cut to one level fails two tests.
+- [x] **M11.6** — Photo screen and delete. A tap on a photo opens its screen: the image, title,
+  comment, place, taken date. A delete action asks first; on success the album screen reads
+  again.
+  **Verify:** ViewModel tests (load, failure and retry, delete success and failure).
+  Note: a copy of the wish screen (M9.6). A delete sends `PhotoChanges` (`feature:albums:domain`,
+  bound in `:data`; the photo id and its album), which the album screen collects. M11.7's edit can
+  send the same signal. The taken date shows as ISO text, as the loan dates. No device run (M11.8).
+- [x] **M11.7** — Photo form: create and edit. A "new photo" action on the album screen and an
+  "edit" action on the photo screen. Fields: title (required), comment, place, image (required
+  for a new photo; set and replace, no remove, decision 14). Edit sends only what changed;
+  clearing a field follows the M11.2 answer for an explicit `null`. The form survives rotation
+  and process death.
+  **Verify:** ViewModel tests (create, create without image blocked, each change alone, cleared
+  field, failure and retry); mutation-check the image rule.
+  Note: a copy of the wish form (M9.7) on the album form parts. "New photo" is in the album screen's
+  "More" menu; the edit icon is in the photo screen's top bar. A save sends `PhotoChanges`; the
+  photo screen now collects it for its own photo too. A cleared field goes out as `null` (M11.2).
+  Mutation: `canSave` without `photo != null` fails two tests. No device run (M11.8).
+- [x] **M11.8** — Device pass on the emulator (`emulator-testing` skill) against the local test
+  instance: open Albums from the "More" menu, create an album with an image and a child, add a
+  photo with every field, edit it, replace both images, remove the album image, then delete the
+  photo and the parent album. Compare with the web UI before the delete.
+  **Verify:** each action works on the device; the web UI shows the same values; the instance
+  ends as it started.
+  Note: every action passed on `koil36` (API 36). A new album from the list returns to the list; a
+  new child returns to the parent. The photo screen shows no taken date, as `takenAt` stays null
+  (M11.2). Clearing Place sent `null` (the API showed `"place": null`). Each replaced or removed file
+  gave 404. The web UI has no photo page: its child album page showed the photo with the blue file
+  and "Edited comment", and the parent page showed the child and no image. The delete dialog
+  counted 1 album and 0 photos. End state: 0 albums, 0 photos, 6080 upload files, as at the start.
