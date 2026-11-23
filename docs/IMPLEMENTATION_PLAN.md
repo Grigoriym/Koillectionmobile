@@ -443,3 +443,11 @@ code without checking the licence terms are kept.
    orientation applied (user, 2026-11-23). One photo per form; no batch add (user, 2026-11-23).
    `takenAt` is in `photo:read` only: the API cannot set it (only the web `PhotoType` can), so the
    app shows it and does not edit it. No move of a photo to another album, as wishes (decision 12).
+15. **Navigation drawer** — *decided 2026-11-23 (user, after the M11 review)*: a drawer replaces
+   the collection list's "More" menu, as a full port of wallosmobile's shell. That means
+   `grappim-kit-navigation` with one back stack per drawer section, a `DrawerDestination` enum, the
+   kit's `DrawerWidget`, and one top bar owned by the shell (`TopBar`, `LocalTopBarConfig`,
+   `RouteConfigProvider`) instead of a `TopAppBar` in each screen. The user chose it over a light
+   drawer around the single back stack (about 6 screens changed). The M2.1 note "no drawer
+   sections" no longer holds. Sections: Collections, Tags, Templates, Wishlists, Albums, Settings;
+   M12 and M13 add Inventories and Logs. Log out sits in the drawer as an action, not a section.

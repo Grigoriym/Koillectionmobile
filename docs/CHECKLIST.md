@@ -43,7 +43,8 @@ M11 (albums and photos) is done; its steps and notes are in `docs/CHECKLIST_ARCH
 ## M11 follow-up — fixes from the user's review
 
 The user's review of the app on 2026-11-23 found these. They run before M12, and the user checks
-the app again before M12 starts (user, 2026-11-23). Each step closes its `docs/revisit.md` entry.
+the app again before M12 starts (user, 2026-11-23). M11.9 and M11.10 each close a
+`docs/revisit.md` entry. M11.11–M11.14 are the drawer (plan §5 decision 15).
 
 - [x] **M11.9** — Show/hide toggle on the login password field (`feature:auth:ui`). Copy
   wallosmobile's `LoginScreen`: a "Show"/"Hide" text button as the `trailingIcon`
@@ -59,13 +60,31 @@ the app again before M12 starts (user, 2026-11-23). Each step closes its `docs/r
   `build ktlintCheck` pass.
   Note: `SearchField` got `bottom = PADDING / 2` (8 dp); both screens use it. On `koil36` a
   half-scrolled row is cut 8 dp below the field on `Books` and on "Search items".
-- [ ] **M11.11** — Navigation drawer instead of the collection list's "More" menu. Sections:
-  Collections, Tags, Templates, Wishlists, Albums, then Settings and Log out. Use
-  `grappim-kit-uikit`'s `DrawerWidget` (read `../grappim-kit/CONSUMING.md` first) and copy the
-  wiring from wallosmobile. The "More" menus on detail screens stay: they hold actions, not
-  sections. M12 and M13 add their sections to the drawer.
-  **Verify:** on the emulator each drawer entry opens its screen, back works, and Log out logs out;
-  `build ktlintCheck` and `KoinGraphTest` pass.
+- [ ] **M11.11** — Navigation shell (plan §5 decision 15). Add `grappim-kit-navigation` (read
+  `../grappim-kit/CONSUMING.md`, "navigation", first; use a version with the `goToTopLevel` fix).
+  Port wallosmobile's `MainAppState`, `AuthenticatedMainScreen`, `DrawerDestination`,
+  `DrawerItemsBuilder` and `RouteConfig` into `composeApp`. Sections: Collections (start),
+  Tags, Templates, Wishlists, Albums, Settings; Log out is a drawer action (the logic moves out of
+  `CollectionListViewModel`, with its test). Move the collection list and Settings onto the shell
+  top bar; the other screens keep their own `TopAppBar` for now, and the shell bar stays hidden
+  on them (`NavigationIconConfig.None`). Decide here how the "More" menus fit the kit `TopBar`,
+  which has only icon and text actions: a menu action in `grappim-kit` (a shared change, ask the
+  user first) or separate icons.
+  **Verify:** `build ktlintCheck` and `KoinGraphTest` pass; on the emulator each drawer entry
+  opens its section, each section keeps its own back stack, back at a section root goes to
+  Collections, Log out logs out, and the back stack survives process death.
+- [ ] **M11.12** — Shell top bar on Tags, Templates and choice lists (`feature:tags:ui`,
+  `feature:templates:ui`): each screen sets `LocalTopBarConfig` and drops its `TopAppBar`.
+  Section roots show the menu icon, the others Back.
+  **Verify:** `build ktlintCheck` pass; on the emulator every screen of both features shows one
+  top bar with the same title and actions as before.
+- [ ] **M11.13** — Shell top bar on Wishlists and Albums (`feature:wishlists:ui`,
+  `feature:albums:ui`), as M11.12.
+  **Verify:** as M11.12, for both features.
+- [ ] **M11.14** — Shell top bar on collections, items and loans (`feature:collections:ui`,
+  `feature:items:ui`, `feature:loans:ui`), as M11.12. Afterwards no screen has its own
+  `TopAppBar` (grep), and the shell bar is never hidden on the logged-in side.
+  **Verify:** as M11.12; the grep finds no `TopAppBar(` under `feature/`.
 
 ## M12 — inventories (rough scope)
 
