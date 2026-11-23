@@ -48,6 +48,13 @@ cold session can act on it. Delete an entry when it's fixed.
   list, item, add item); they share one string, `error_proxy_rejected`.
   M7.5 added a third `ui` copy of both: `toMessage` in `feature/tags/ui/.../TagListViewModel.kt`
   and `EmptyOrError` in `feature/tags/ui/.../TagScreenParts.kt` (with the `tags_*` strings).
+  M11.4 copied the name-and-image form a third time: `FormPhoto`, the save status, the form
+  scaffold, `FormImageSection` and `toSaveMessage` exist in `feature/collections/ui`,
+  `feature/wishlists/ui` (`WishlistFormScreen.kt`, `NewWishlistViewModel.kt`) and
+  `feature/albums/ui` (`AlbumFormScreen.kt`, `AlbumFormUiState.kt`, `AlbumMessages.kt`). Only the
+  strings and the repository calls differ. M11.7 (photo form) needs a fourth variant with a
+  non-removable image. Fix option: move the form parts to a shared UI module that `core:photos`
+  could host.
 - 2026-11-15 (M3.6) — Add-item photo files in `cacheDir/photos/` are deleted on photo remove, on
   save, and when the form leaves the back stack (`AddItemViewModel.onCleared`). A form that never
   comes back (the task swiped away, so the saved draft is gone and `onCleared` never runs) leaves
