@@ -126,7 +126,7 @@ first — it is often for a problem this toolchain doesn't have.
   per run, without `-q`: `jvmTest` has `failFast = true` (`Quality.kt`), so the report lists
   fewer tests than exist, and `-q` hides which test failed (or that it was a compile error).
 - **Send a gate run to a log file, then grep the file** for `BUILD (SUCC|FAIL)|What went wrong`.
-  Piping Gradle straight into `grep` has lost the proof.
+  Piping Gradle straight into `grep` has lost the proof. The exit code of such a call is grep's, not Gradle's.
 - **Force Gradle tests with `--rerun`** when the test is the proof: an `UP-TO-DATE` task prints
   "BUILD SUCCESSFUL" without running. `--rerun` applies only to the task just before it:
   `:a:jvmTest --rerun :b:jvmTest --rerun`.

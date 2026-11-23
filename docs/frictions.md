@@ -74,4 +74,6 @@ entries get deleted — see /finalize.
 - 2026-11-23 — `./gradlew build ktlintCheck` (M11.1) stopped at the first module's ktlint failure,
   so a second new module's violations showed only on the next run. `ktlintFormat` on every new
   module first, or `--continue`, shows them all in one run.
-- 2026-11-23 (M11.3): a background Bash running `gradlew build | grep` reported exit code 0 while the build had failed; the code was grep's. Read the log for BUILD FAILED, not the task status.
+- 2026-11-23 — A background Bash call (M11.3) that ran `gradlew build` into a log and then grepped it
+  reported exit code 0, though the build had failed: the code was grep's. Read the log for
+  `BUILD FAILED`.
