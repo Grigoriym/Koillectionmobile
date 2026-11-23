@@ -87,4 +87,10 @@ include(
     ":feature:loans:mapper",
     ":feature:loans:ui"
 )
+include(
+    ":feature:albums:data",
+    ":feature:albums:domain",
+    ":feature:albums:dto",
+    ":feature:albums:mapper"
+)
 include(":feature:settings:ui")

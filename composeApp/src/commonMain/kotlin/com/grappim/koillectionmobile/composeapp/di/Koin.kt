@@ -3,6 +3,8 @@ package com.grappim.koillectionmobile.composeapp.di
 import com.grappim.koillectionmobile.core.api.NetworkModule
 import com.grappim.koillectionmobile.core.photos.PlatformPhotoModule
 import com.grappim.koillectionmobile.core.storage.PlatformStorageModule
+import com.grappim.koillectionmobile.feature.albums.data.AlbumsDataModule
+import com.grappim.koillectionmobile.feature.albums.mapper.AlbumsMapperModule
 import com.grappim.koillectionmobile.feature.auth.data.AuthDataModule
 import com.grappim.koillectionmobile.feature.auth.ui.AuthUiModule
 import com.grappim.koillectionmobile.feature.collections.data.CollectionsDataModule
@@ -62,6 +64,8 @@ import org.koin.core.annotation.Module
         LoansMapperModule::class,
         LoansDataModule::class,
         LoansUiModule::class,
+        AlbumsMapperModule::class,
+        AlbumsDataModule::class,
         SettingsUiModule::class
     ]
 )

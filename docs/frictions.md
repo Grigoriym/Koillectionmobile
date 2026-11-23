@@ -71,3 +71,6 @@ entries get deleted — see /finalize.
 - 2026-11-22 — ktlint `compose:parameter-naming` and detekt `ParameterNaming` (M10.5) failed
   `build` for a `@Composable` lambda parameter in past tense (`onMarkReturned`). Renamed to
   `onMarkReturn`. A `UiState` field with the same name is fine; only composable parameters count.
+- 2026-11-23 — `./gradlew build ktlintCheck` (M11.1) stopped at the first module's ktlint failure,
+  so a second new module's violations showed only on the next run. `ktlintFormat` on every new
+  module first, or `--continue`, shows them all in one run.

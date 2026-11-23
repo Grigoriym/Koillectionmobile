@@ -3,6 +3,7 @@ package com.grappim.koillectionmobile.composeapp.di
 import androidx.lifecycle.SavedStateHandle
 import com.grappim.kit.customheaders.CustomHeaderValidator
 import com.grappim.koillectionmobile.core.photos.PhotoFiles
+import com.grappim.koillectionmobile.feature.albums.domain.AlbumsRepository
 import com.grappim.koillectionmobile.feature.auth.domain.AuthRepository
 import com.grappim.koillectionmobile.feature.collections.domain.CollectionsRepository
 import com.grappim.koillectionmobile.feature.items.domain.AddItemUseCase
@@ -46,7 +47,7 @@ class KoinGraphTest {
     /**
      * Covers the limit above for the provider chain `verify()` cannot see: `HttpClient` needs
      * `BaseUrlProvider`, `SessionStorage` and `CustomHeadersStorage`, all from provider functions.
-     * `AuthRepository`, `CollectionsRepository`, `ItemsRepository`, `TagsRepository`, `TemplatesRepository` (M8.1) and `WishlistsRepository` (M9.1) and `LoansRepository` (M10.1) are resolved, with the M8.4
+     * `AuthRepository`, `CollectionsRepository`, `ItemsRepository`, `TagsRepository`, `TemplatesRepository` (M8.1) and `WishlistsRepository` (M9.1) and `LoansRepository` (M10.1) and `AlbumsRepository` (M11.1) are resolved, with the M8.4
      * `SaveTemplateUseCase` and `TemplateChanges`, the M8.5 `ChoiceListChanges` and the M9.4 `WishlistChanges`, the M9.6 `WishChanges`,
      * too, and the M3.6 add-item bindings (`AddItemUseCase`, `ItemListChanges`, `PhotoFiles`), which
      * come from provider functions, and the M4.2 `CustomHeaderValidator`: `verify()` checks only what the graph defines, so a repository without its `@Single`
@@ -64,6 +65,7 @@ class KoinGraphTest {
             koin.get<TemplatesRepository>()
             koin.get<WishlistsRepository>()
             koin.get<LoansRepository>()
+            koin.get<AlbumsRepository>()
             koin.get<WishlistChanges>()
             koin.get<WishChanges>()
             koin.get<SaveTemplateUseCase>()
