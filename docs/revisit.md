@@ -125,3 +125,8 @@ cold session can act on it. Delete an entry when it's fixed.
   M8.6. Fix option: a checkmark (or yes/no) for `checkbox` and the picks joined by commas for
   `choice-list`, with `pickedChoices` from `FieldInput.kt`. Seen on the device in M8.9: "Read" showed
   `1`, then `0`, and "Genre" showed `["Novel","Poem"]`; the web item page shows a cross and a list.
+- 2026-11-23 (M10.6) — The item screen jumps up after each loan action (save, mark returned,
+  delete). While the section reads again, `LoansContent` shows only a spinner in place of the list
+  (`feature/loans/ui/.../LoansSection.kt:73`, `uiState.isLoading`). The page gets shorter, so
+  the scroll position moves up and the loan just changed is off screen. Fix option: keep the old
+  list on screen during a reload and show the spinner only when there is no list yet.

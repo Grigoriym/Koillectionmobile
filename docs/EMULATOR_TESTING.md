@@ -179,3 +179,10 @@ this app.
   icons. The wishlist row's tap target is its name text. Solid-colour test JPEGs (skill, Step 5)
   tell the picker thumbnails and the stored images apart. To compare with the web UI, log in with
   `curl` as in M2.5 and read `/wishlists/<id>`.
+- Loans (M10.6): a "Loans" section at the bottom of the item screen, with "New loan" under it. A
+  tap on the lender's name opens "Edit loan"; "Clear" sits next to the returned date. Each loan
+  has "Mark returned" and "Delete" text buttons, so tap them by index from a fresh `list`. After
+  each action the screen jumps up (the section reloads): scroll down and dump again. The delete
+  dialog's body names the loan, but only a screenshot shows it, as in M6.3. The date picker's days
+  are `text` nodes in `ui.py list` ("Tuesday, November 10, 2026"). Compare with the web UI's
+  `/loans` page (curl login as in M2.5): returned loans are in a second table.
