@@ -4,6 +4,7 @@ import com.grappim.kit.testing.MainDispatcherRule
 import com.grappim.kit.uikit.NativeText
 import com.grappim.koillectionmobile.core.domain.KoillectionError
 import com.grappim.koillectionmobile.feature.albums.domain.Album
+import com.grappim.koillectionmobile.feature.albums.domain.AlbumChanges
 import com.grappim.koillectionmobile.feature.albums.domain.Photo
 import com.grappim.koillectionmobile.strings.RString
 import com.grappim.koillectionmobile.strings.generated.resources.album_error_unexpected
@@ -19,6 +20,7 @@ import kotlin.test.assertTrue
 class AlbumViewModelTest {
 
     private val repository = FakeAlbumsRepository()
+    private val albumChanges = AlbumChanges()
     private val mainDispatcherRule = MainDispatcherRule()
 
     @BeforeTest
@@ -39,7 +41,7 @@ class AlbumViewModelTest {
 
     private fun createSut(): AlbumViewModel {
         queue()
-        return AlbumViewModel(TRIPS.id, repository)
+        return AlbumViewModel(TRIPS.id, repository, albumChanges)
     }
 
     private fun answer(
@@ -65,6 +67,27 @@ class AlbumViewModelTest {
         assertEquals(listOf(TRIPS.id), repository.albumCalls)
         assertEquals(listOf(TRIPS.id), repository.childrenCalls)
         assertEquals(listOf(TRIPS.id), repository.photosCalls)
+    }
+
+    @Test
+    fun `a change to this album or a child reads again and another change does not`() {
+        val sut = createSut()
+        answer()
+
+        albumChanges.notifyChanged("other", parentId = "elsewhere")
+        assertEquals(1, repository.albumCalls.size)
+
+        queue()
+        albumChanges.notifyChanged(TRIPS.id, parentId = null)
+        answer(album = Result.success(TRIPS.copy(title = "Travel")))
+        assertEquals("Travel", sut.uiState.value.title)
+
+        queue()
+        albumChanges.notifyChanged("new", parentId = TRIPS.id)
+        answer(children = Result.success(listOf(japan, asia, album(id = "new", title = "New", parentId = TRIPS.id))))
+
+        assertEquals(3, repository.albumCalls.size)
+        assertEquals(listOf("asia", "japan", "new"), sut.uiState.value.children.map { it.id })
     }
 
     @Test

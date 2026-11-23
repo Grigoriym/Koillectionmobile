@@ -360,6 +360,16 @@
     <string name="album_empty">This album has no albums and no photos.</string>
     <string name="album_section_children">Albums</string>
     <string name="album_section_photos">Photos</string>
+    <string name="album_more">More actions</string>
+    <string name="album_new">New album</string>
+    <string name="album_edit">Edit</string>
+    <string name="album_form_new_title">New album</string>
+    <string name="album_form_edit_title">Edit album</string>
+    <string name="album_form_title_label">Title</string>
+    <string name="album_form_save_partial">The album is on the server, but without its image. Try again to send the image.</string>
+    <string name="album_form_discard_title">Discard this album?</string>
+    <string name="album_form_discard_text">The title and the image on this form are lost.</string>
+    <string name="album_form_edit_discard_text">The changes on this form are lost. The album stays as it is on the server.</string>
 
     <string name="loans_section">Loans</string>
     <string name="loans_empty">This item has no loans.</string>

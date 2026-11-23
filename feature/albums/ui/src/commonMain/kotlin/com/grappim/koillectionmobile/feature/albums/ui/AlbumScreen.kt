@@ -14,13 +14,22 @@ import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridScope
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
@@ -28,7 +37,10 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.grappim.koillectionmobile.feature.albums.domain.Photo
 import com.grappim.koillectionmobile.strings.RString
+import com.grappim.koillectionmobile.strings.generated.resources.album_edit
 import com.grappim.koillectionmobile.strings.generated.resources.album_empty
+import com.grappim.koillectionmobile.strings.generated.resources.album_more
+import com.grappim.koillectionmobile.strings.generated.resources.album_new
 import com.grappim.koillectionmobile.strings.generated.resources.album_section_children
 import com.grappim.koillectionmobile.strings.generated.resources.album_section_photos
 import org.jetbrains.compose.resources.stringResource
@@ -39,12 +51,21 @@ import org.koin.core.parameter.parametersOf
 fun AlbumScreen(
     albumId: String,
     onAlbumClick: (String) -> Unit,
+    onNewAlbumClick: () -> Unit,
+    onEditClick: () -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: AlbumViewModel = koinViewModel { parametersOf(albumId) }
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    AlbumContent(uiState = uiState, onAlbumClick = onAlbumClick, onBack = onBack, modifier = modifier)
+    AlbumContent(
+        uiState = uiState,
+        onAlbumClick = onAlbumClick,
+        onNewAlbumClick = onNewAlbumClick,
+        onEditClick = onEditClick,
+        onBack = onBack,
+        modifier = modifier
+    )
 }
 
 /** The child albums as full-width rows, then the photos as a grid, in one scrolling list. */
@@ -52,12 +73,18 @@ fun AlbumScreen(
 private fun AlbumContent(
     uiState: AlbumUiState,
     onAlbumClick: (String) -> Unit,
+    onNewAlbumClick: () -> Unit,
+    onEditClick: () -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
-        topBar = { BackTopBar(title = uiState.title, onBack = onBack) }
+        topBar = {
+            BackTopBar(title = uiState.title, onBack = onBack) {
+                MoreMenu(onNewAlbumClick = onNewAlbumClick, onEditClick = onEditClick)
+            }
+        }
     ) { padding ->
         val contentModifier = Modifier
             .fillMaxSize()
@@ -125,6 +152,33 @@ private fun PhotoCell(photo: Photo, modifier: Modifier = Modifier) {
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )
+    }
+}
+
+/** The top bar's overflow menu. */
+@Composable
+private fun MoreMenu(onNewAlbumClick: () -> Unit, onEditClick: () -> Unit) {
+    var isExpanded by remember { mutableStateOf(false) }
+    Box {
+        IconButton(onClick = { isExpanded = true }) {
+            Icon(imageVector = Icons.Filled.MoreVert, contentDescription = stringResource(RString.album_more))
+        }
+        DropdownMenu(expanded = isExpanded, onDismissRequest = { isExpanded = false }) {
+            DropdownMenuItem(
+                text = { Text(stringResource(RString.album_new)) },
+                onClick = {
+                    isExpanded = false
+                    onNewAlbumClick()
+                }
+            )
+            DropdownMenuItem(
+                text = { Text(stringResource(RString.album_edit)) },
+                onClick = {
+                    isExpanded = false
+                    onEditClick()
+                }
+            )
+        }
     }
 }
 

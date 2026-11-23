@@ -4,6 +4,8 @@ import androidx.navigation3.runtime.NavKey
 import androidx.savedstate.serialization.SavedStateConfiguration
 import com.grappim.koillectionmobile.feature.albums.ui.AlbumListRoute
 import com.grappim.koillectionmobile.feature.albums.ui.AlbumRoute
+import com.grappim.koillectionmobile.feature.albums.ui.EditAlbumRoute
+import com.grappim.koillectionmobile.feature.albums.ui.NewAlbumRoute
 import com.grappim.koillectionmobile.feature.collections.ui.CollectionListRoute
 import com.grappim.koillectionmobile.feature.collections.ui.CollectionRoute
 import com.grappim.koillectionmobile.feature.collections.ui.EditCollectionRoute
@@ -65,6 +67,8 @@ private val navKeySerializersModule = SerializersModule {
         subclass(EditWishRoute::class)
         subclass(AlbumListRoute::class)
         subclass(AlbumRoute::class)
+        subclass(NewAlbumRoute::class)
+        subclass(EditAlbumRoute::class)
     }
 }
 

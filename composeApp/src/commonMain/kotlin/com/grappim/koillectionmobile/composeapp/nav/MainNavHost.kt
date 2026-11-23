@@ -11,6 +11,10 @@ import com.grappim.koillectionmobile.feature.albums.ui.AlbumListRoute
 import com.grappim.koillectionmobile.feature.albums.ui.AlbumListScreen
 import com.grappim.koillectionmobile.feature.albums.ui.AlbumRoute
 import com.grappim.koillectionmobile.feature.albums.ui.AlbumScreen
+import com.grappim.koillectionmobile.feature.albums.ui.EditAlbumRoute
+import com.grappim.koillectionmobile.feature.albums.ui.EditAlbumScreen
+import com.grappim.koillectionmobile.feature.albums.ui.NewAlbumRoute
+import com.grappim.koillectionmobile.feature.albums.ui.NewAlbumScreen
 import com.grappim.koillectionmobile.feature.collections.ui.CollectionListRoute
 import com.grappim.koillectionmobile.feature.collections.ui.CollectionListScreen
 import com.grappim.koillectionmobile.feature.collections.ui.CollectionRoute
@@ -96,6 +100,7 @@ internal fun MainNavHost(modifier: Modifier = Modifier) {
             entry<AlbumListRoute> {
                 AlbumListScreen(
                     onAlbumClick = { id -> backStack.add(AlbumRoute(id)) },
+                    onNewAlbumClick = { backStack.add(NewAlbumRoute()) },
                     onBack = { backStack.removeLastOrNull() }
                 )
             }
@@ -103,7 +108,25 @@ internal fun MainNavHost(modifier: Modifier = Modifier) {
                 AlbumScreen(
                     albumId = route.albumId,
                     onAlbumClick = { id -> backStack.add(AlbumRoute(id)) },
+                    onNewAlbumClick = { backStack.add(NewAlbumRoute(route.albumId)) },
+                    onEditClick = { backStack.add(EditAlbumRoute(route.albumId)) },
                     onBack = { backStack.removeLastOrNull() }
+                )
+            }
+            entry<NewAlbumRoute> { route ->
+                NewAlbumScreen(
+                    parentId = route.parentId,
+                    onBack = { backStack.removeLastOrNull() },
+                    // The list or the parent reads its list again (AlbumChanges).
+                    onClose = { backStack.remove(route) }
+                )
+            }
+            entry<EditAlbumRoute> { route ->
+                EditAlbumScreen(
+                    albumId = route.albumId,
+                    onBack = { backStack.removeLastOrNull() },
+                    // The album screen and the list or the parent read again (AlbumChanges).
+                    onClose = { backStack.remove(route) }
                 )
             }
             entry<WishlistListRoute> {

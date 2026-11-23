@@ -4,6 +4,7 @@ import com.grappim.kit.testing.MainDispatcherRule
 import com.grappim.kit.uikit.NativeText
 import com.grappim.koillectionmobile.core.domain.KoillectionError
 import com.grappim.koillectionmobile.feature.albums.domain.Album
+import com.grappim.koillectionmobile.feature.albums.domain.AlbumChanges
 import com.grappim.koillectionmobile.strings.RString
 import com.grappim.koillectionmobile.strings.generated.resources.albums_error_http
 import com.grappim.koillectionmobile.strings.generated.resources.albums_error_network
@@ -20,6 +21,7 @@ import kotlin.test.assertTrue
 class AlbumListViewModelTest {
 
     private val repository = FakeAlbumsRepository()
+    private val albumChanges = AlbumChanges()
     private val mainDispatcherRule = MainDispatcherRule()
 
     @BeforeTest
@@ -38,7 +40,7 @@ class AlbumListViewModelTest {
 
     private fun createSut(): AlbumListViewModel {
         queue()
-        return AlbumListViewModel(repository)
+        return AlbumListViewModel(repository, albumChanges)
     }
 
     private fun answer(result: Result<List<Album>> = Result.success(listOf(trips, books, japan, art))) {
@@ -55,6 +57,22 @@ class AlbumListViewModelTest {
         assertFalse(sut.uiState.value.isLoading)
         assertTrue(sut.uiState.value.error.isEmpty())
         assertEquals(1, repository.albumsCalls)
+    }
+
+    @Test
+    fun `a change to a top-level album reads the list again and a child change does not`() {
+        val sut = createSut()
+        answer()
+
+        albumChanges.notifyChanged(japan.id, parentId = trips.id)
+        assertEquals(1, repository.albumsCalls)
+
+        queue()
+        albumChanges.notifyChanged("new", parentId = null)
+        answer(Result.success(listOf(trips, album(id = "new", title = "New"))))
+
+        assertEquals(2, repository.albumsCalls)
+        assertEquals(listOf("new", trips.id), sut.uiState.value.albums.map { it.id })
     }
 
     @Test
