@@ -215,6 +215,30 @@ start of any step that touches the API. Facts that shape the design:
   - `/api/items/{id}/loans` listed both loans. After `DELETE /api/loans/{id}` the loan gave 404.
     **A `DELETE` of the item took its other loan with it** (404).
   Not checked: a server behind a subpath, and a server in a time zone west of UTC.
+- Album and photo writes checked live 2026-11-23 (M11.2, `./gradlew :composeApp:smokeAlbumRun`,
+  JVM, local test instance at the root path), through the M11.1 repository calls. The test instance
+  had no albums and no photos before and after.
+  - A top-level album and a child (`parent` IRI) were created; the server picked a `color` for
+    each. The parent's `/children` listed the child. **`GET /api/albums` lists the child albums
+    too**, not only the top-level ones: a top-level list must filter on `parentId`.
+  - A rename was read back and kept the parent. A `jpeg` upload got a file; a second upload got a
+    new file name, and the old file gave 404. `PATCH` with `deleteImage` answered `image: null`,
+    and the file gave 404.
+  - A photo with `title`, `album` IRI, `comment` and `place` was stored as sent;
+    `/api/albums/{id}/photos` listed it. A second image upload got a new file name, and the old
+    file gave 404.
+  - **`takenAt` stays null after an upload.** Only the 1.8.5 web form sets it (`setTakenAt` has no
+    other caller in `src/`).
+  - **`imageSmallThumbnail` equals `image` for a 64 px upload.** `ThumbnailGenerator` makes a
+    300 px wide `_small` file only when the image is wider than 300 px. For a narrower image it
+    returns early and `ImageHandler` stores the image path as the thumbnail. A wider upload was not
+    sent.
+  - A `PATCH` of `title` and `place` changed only those keys. **A `PATCH` with `"comment": null`
+    clears `comment`** (answer and read-back both null).
+  - 422 each: an empty title (`title: This value should not be blank.`) and a create without
+    `album` (`album: This value should not be blank.`).
+  - A `DELETE` of the parent took the child and the photo with it: all three gave 404.
+  Not checked: a server behind a subpath.
 - Counting what a collection delete takes (M6.3, 1.8.5 source): the API has no counters.
   `Collection::$cachedValues` holds them but has no `Groups`, and `Item.php` has no `#[ApiFilter]`,
   so items cannot be counted for several collections in one call. The app reads all collections

@@ -165,3 +165,18 @@ tasks.register<JavaExec>("smokeLoanRun") {
     systemProperty("user.home", smokeHome.get().asFile.absolutePath)
     javaLauncher.set(javaToolchains.launcherFor { languageVersion.set(JavaLanguageVersion.of(21)) })
 }
+
+// M11.2: live album smoke run against the local test instance. It creates an album, a child and a
+// photo with images, edits them and deletes the parent. Same setup as `smokeRun`; never point it at
+// the real server.
+tasks.register<JavaExec>("smokeAlbumRun") {
+    group = "verification"
+    description = "Creates, edits and deletes albums and a photo on the local test instance."
+    val jvmTestCompilation = kotlin.jvm().compilations.getByName("test")
+    dependsOn(jvmTestCompilation.compileAllTaskName)
+    classpath = files(jvmTestCompilation.output.allOutputs, jvmTestCompilation.runtimeDependencyFiles)
+    mainClass.set("com.grappim.koillectionmobile.composeapp.smoke.LiveAlbumSmokeKt")
+    val smokeHome = layout.buildDirectory.dir("smoke-home")
+    systemProperty("user.home", smokeHome.get().asFile.absolutePath)
+    javaLauncher.set(javaToolchains.launcherFor { languageVersion.set(JavaLanguageVersion.of(21)) })
+}

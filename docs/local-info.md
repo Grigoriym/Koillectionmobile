@@ -95,7 +95,15 @@ It edits `lentTo`, sets and clears `returnedAt`, and sends an empty `lentTo` and
 loans); look for a leftover `M10.2 smoke <millis>` item if a cleanup line reports an error. Its
 constants are in `LiveLoanSmoke.kt`: the same rule applies.
 
-All seven runs keep their session in `composeApp/build/smoke-home`. A run more than an hour after the
+`./gradlew :composeApp:smokeAlbumRun` writes (M11.2): it creates a top-level album and a child,
+renames the child, and uploads, replaces and removes the child's image. It creates a photo in the
+child with every field, uploads and replaces its image, edits two fields and clears `comment`. It
+sends an empty title and a photo without `album` (each 422). Last it deletes the parent and checks
+that the count of albums ends as it started. If it fails halfway, it still deletes the parent; look
+for a leftover `M11.2 smoke parent <millis>` album if a cleanup line reports an error. Its constants
+are in `LiveAlbumSmoke.kt`: the same rule applies.
+
+All eight runs keep their session in `composeApp/build/smoke-home`. A run more than an hour after the
 last one starts with an expired JWT. That is the path that hung in M3.1, so do not delete the
 directory to make a hang go away: find out why first.
 
