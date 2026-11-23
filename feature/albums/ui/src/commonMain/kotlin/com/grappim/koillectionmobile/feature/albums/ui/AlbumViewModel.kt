@@ -6,6 +6,7 @@ import com.grappim.kit.uikit.NativeText
 import com.grappim.koillectionmobile.feature.albums.domain.Album
 import com.grappim.koillectionmobile.feature.albums.domain.AlbumChanges
 import com.grappim.koillectionmobile.feature.albums.domain.AlbumsRepository
+import com.grappim.koillectionmobile.feature.albums.domain.PhotoChanges
 import com.grappim.koillectionmobile.strings.RString
 import com.grappim.koillectionmobile.strings.generated.resources.album_delete_count_error_unexpected
 import com.grappim.koillectionmobile.strings.generated.resources.album_delete_error_unexpected
@@ -24,7 +25,8 @@ import org.koin.core.annotation.KoinViewModel
 
 /**
  * Reads the album, its children and its photos in parallel. A change to this album or to one of its
- * children ([AlbumChanges]) reads everything again, while the screen waits lower on the back stack.
+ * children ([AlbumChanges]), or to one of its photos ([PhotoChanges]), reads everything again,
+ * while the screen waits lower on the back stack.
  *
  * Before the delete confirm, the screen counts what goes with the album: the server deletes the
  * child albums at every level and their photos (`cascade: ['all']` in `Album.php`). A delete then
@@ -37,7 +39,8 @@ import org.koin.core.annotation.KoinViewModel
 class AlbumViewModel(
     @InjectedParam private val albumId: String,
     private val repository: AlbumsRepository,
-    private val albumChanges: AlbumChanges
+    private val albumChanges: AlbumChanges,
+    private val photoChanges: PhotoChanges
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(
@@ -59,6 +62,11 @@ class AlbumViewModel(
         viewModelScope.launch {
             albumChanges.changed
                 .filter { !_uiState.value.isDeleted && (it.albumId == albumId || it.parentId == albumId) }
+                .collect { load() }
+        }
+        viewModelScope.launch {
+            photoChanges.changed
+                .filter { !_uiState.value.isDeleted && it.albumId == albumId }
                 .collect { load() }
         }
     }

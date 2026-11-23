@@ -7,6 +7,7 @@ import com.grappim.koillectionmobile.feature.albums.domain.Album
 import com.grappim.koillectionmobile.feature.albums.domain.AlbumChange
 import com.grappim.koillectionmobile.feature.albums.domain.AlbumChanges
 import com.grappim.koillectionmobile.feature.albums.domain.Photo
+import com.grappim.koillectionmobile.feature.albums.domain.PhotoChanges
 import com.grappim.koillectionmobile.strings.RString
 import com.grappim.koillectionmobile.strings.generated.resources.album_delete_count_error_unexpected
 import com.grappim.koillectionmobile.strings.generated.resources.album_delete_error_unexpected
@@ -29,6 +30,7 @@ class AlbumViewModelTest {
 
     private val repository = FakeAlbumsRepository()
     private val albumChanges = AlbumChanges()
+    private val photoChanges = PhotoChanges()
     private val mainDispatcherRule = MainDispatcherRule()
 
     @BeforeTest
@@ -49,7 +51,7 @@ class AlbumViewModelTest {
 
     private fun createSut(): AlbumViewModel {
         queue()
-        return AlbumViewModel(TRIPS.id, repository, albumChanges)
+        return AlbumViewModel(TRIPS.id, repository, albumChanges, photoChanges)
     }
 
     private fun answer(
@@ -96,6 +98,22 @@ class AlbumViewModelTest {
 
         assertEquals(3, repository.albumCalls.size)
         assertEquals(listOf("asia", "japan", "new"), sut.uiState.value.children.map { it.id })
+    }
+
+    @Test
+    fun `a change to a photo of this album reads again and one in another album does not`() {
+        val sut = createSut()
+        answer()
+
+        photoChanges.notifyChanged(tent.id, albumId = "elsewhere")
+        assertEquals(1, repository.photosCalls.size)
+
+        queue()
+        photoChanges.notifyChanged(tent.id, albumId = TRIPS.id)
+        answer(photos = Result.success(listOf(beach, map)))
+
+        assertEquals(2, repository.photosCalls.size)
+        assertEquals(listOf(beach, map), sut.uiState.value.photos)
     }
 
     @Test

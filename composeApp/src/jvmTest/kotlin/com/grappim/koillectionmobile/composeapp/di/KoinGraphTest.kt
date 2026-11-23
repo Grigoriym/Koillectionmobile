@@ -5,6 +5,7 @@ import com.grappim.kit.customheaders.CustomHeaderValidator
 import com.grappim.koillectionmobile.core.photos.PhotoFiles
 import com.grappim.koillectionmobile.feature.albums.domain.AlbumChanges
 import com.grappim.koillectionmobile.feature.albums.domain.AlbumsRepository
+import com.grappim.koillectionmobile.feature.albums.domain.PhotoChanges
 import com.grappim.koillectionmobile.feature.auth.domain.AuthRepository
 import com.grappim.koillectionmobile.feature.collections.domain.CollectionsRepository
 import com.grappim.koillectionmobile.feature.items.domain.AddItemUseCase
@@ -49,7 +50,7 @@ class KoinGraphTest {
      * Covers the limit above for the provider chain `verify()` cannot see: `HttpClient` needs
      * `BaseUrlProvider`, `SessionStorage` and `CustomHeadersStorage`, all from provider functions.
      * `AuthRepository`, `CollectionsRepository`, `ItemsRepository`, `TagsRepository`, `TemplatesRepository` (M8.1) and `WishlistsRepository` (M9.1) and `LoansRepository` (M10.1) and `AlbumsRepository` (M11.1) are resolved, with the M8.4
-     * `SaveTemplateUseCase` and `TemplateChanges`, the M8.5 `ChoiceListChanges` and the M9.4 `WishlistChanges`, the M9.6 `WishChanges`, the M11.4 `AlbumChanges`,
+     * `SaveTemplateUseCase` and `TemplateChanges`, the M8.5 `ChoiceListChanges` and the M9.4 `WishlistChanges`, the M9.6 `WishChanges`, the M11.4 `AlbumChanges`, the M11.6 `PhotoChanges`,
      * too, and the M3.6 add-item bindings (`AddItemUseCase`, `ItemListChanges`, `PhotoFiles`), which
      * come from provider functions, and the M4.2 `CustomHeaderValidator`: `verify()` checks only what the graph defines, so a repository without its `@Single`
      * would not fail it (mutation-checked in M1.5). A missing `includes` line still passes here, as in M1.3.
@@ -70,6 +71,7 @@ class KoinGraphTest {
             koin.get<WishlistChanges>()
             koin.get<WishChanges>()
             koin.get<AlbumChanges>()
+            koin.get<PhotoChanges>()
             koin.get<SaveTemplateUseCase>()
             koin.get<TemplateChanges>()
             koin.get<ChoiceListChanges>()

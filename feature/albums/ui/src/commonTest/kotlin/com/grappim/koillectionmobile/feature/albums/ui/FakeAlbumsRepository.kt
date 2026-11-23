@@ -10,8 +10,8 @@ import kotlinx.coroutines.CompletableDeferred
  * Each read takes the first queued response of its kind. Queue one before the call. A [photosOf] entry
  * answers the photos of that album instead of the queue. Each album write is logged in [writes]
  * (`"create:<title>:<parent>"`, `"rename:<id>:<title>"`, `"upload:<id>"`, `"deleteImage:<id>"`,
- * `"delete:<id>"`) and answers with its `...Answer`. No screen sends the other writes yet, so each
- * of them fails the test.
+ * `"delete:<id>"`, `"deletePhoto:<id>"`) and answers with its `...Answer`. No screen sends the other
+ * writes yet, so each of them fails the test.
  */
 class FakeAlbumsRepository : AlbumsRepository {
     val albums = ArrayDeque<CompletableDeferred<Result<List<Album>>>>()
@@ -19,11 +19,13 @@ class FakeAlbumsRepository : AlbumsRepository {
     val children = ArrayDeque<CompletableDeferred<Result<List<Album>>>>()
     val photos = ArrayDeque<CompletableDeferred<Result<List<Photo>>>>()
     val photosOf = mutableMapOf<String, Result<List<Photo>>>()
+    val photo = ArrayDeque<CompletableDeferred<Result<Photo>>>()
 
     var albumsCalls = 0
     val albumCalls = mutableListOf<String>()
     val childrenCalls = mutableListOf<String>()
     val photosCalls = mutableListOf<String>()
+    val photoCalls = mutableListOf<String>()
 
     override suspend fun getAlbums(): Result<List<Album>> {
         albumsCalls++
@@ -54,6 +56,7 @@ class FakeAlbumsRepository : AlbumsRepository {
     var uploadAnswer: suspend () -> Result<Album> = { Result.success(album(id = "any", title = "any")) }
     var deleteImageAnswer: suspend () -> Result<Album> = { Result.success(album(id = "any", title = "any")) }
     var deleteAnswer: suspend () -> Result<Unit> = { Result.success(Unit) }
+    var deletePhotoAnswer: suspend () -> Result<Unit> = { Result.success(Unit) }
 
     override suspend fun createAlbum(title: String, parentId: String?): Result<Album> {
         writes += "create:$title:$parentId"
@@ -86,7 +89,10 @@ class FakeAlbumsRepository : AlbumsRepository {
         return deleteAnswer()
     }
 
-    override suspend fun getPhoto(id: String): Result<Photo> = unexpected()
+    override suspend fun getPhoto(id: String): Result<Photo> {
+        photoCalls += id
+        return photo.first().await()
+    }
 
     override suspend fun createPhoto(albumId: String, title: String, comment: String?, place: String?): Result<Photo> =
         unexpected()
@@ -100,7 +106,10 @@ class FakeAlbumsRepository : AlbumsRepository {
         mimeType: String
     ): Result<Photo> = unexpected()
 
-    override suspend fun deletePhoto(id: String): Result<Unit> = unexpected()
+    override suspend fun deletePhoto(id: String): Result<Unit> {
+        writes += "deletePhoto:$id"
+        return deletePhotoAnswer()
+    }
 
     private fun unexpected(): Nothing = error("No screen sends this write yet")
 }

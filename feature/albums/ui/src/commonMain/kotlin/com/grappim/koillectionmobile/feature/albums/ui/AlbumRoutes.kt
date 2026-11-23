@@ -21,3 +21,7 @@ data class NewAlbumRoute(val parentId: String? = null) : NavKey
 /** The edit form of album [albumId]. */
 @Serializable
 data class EditAlbumRoute(val albumId: String) : NavKey
+
+/** The screen of photo [photoId]. */
+@Serializable
+data class PhotoRoute(val photoId: String) : NavKey

@@ -70,6 +70,7 @@ import org.koin.core.parameter.parametersOf
 fun AlbumScreen(
     albumId: String,
     onAlbumClick: (String) -> Unit,
+    onPhotoClick: (String) -> Unit,
     onNewAlbumClick: () -> Unit,
     onEditClick: () -> Unit,
     onBack: () -> Unit,
@@ -85,6 +86,7 @@ fun AlbumScreen(
     AlbumContent(
         uiState = uiState,
         onAlbumClick = onAlbumClick,
+        onPhotoClick = onPhotoClick,
         onNewAlbumClick = onNewAlbumClick,
         onEditClick = onEditClick,
         onBack = onBack,
@@ -97,6 +99,7 @@ fun AlbumScreen(
 private fun AlbumContent(
     uiState: AlbumUiState,
     onAlbumClick: (String) -> Unit,
+    onPhotoClick: (String) -> Unit,
     onNewAlbumClick: () -> Unit,
     onEditClick: () -> Unit,
     onBack: () -> Unit,
@@ -157,7 +160,12 @@ private fun AlbumContent(
                 if (uiState.photos.isNotEmpty()) {
                     fullWidth("photos-header") { SectionHeader(stringResource(RString.album_section_photos)) }
                     items(uiState.photos, key = { "photo-${it.id}" }) { photo ->
-                        PhotoCell(photo = photo, modifier = Modifier.padding(horizontal = GRID_SPACING))
+                        PhotoCell(
+                            photo = photo,
+                            modifier = Modifier
+                                .clickable { onPhotoClick(photo.id) }
+                                .padding(horizontal = GRID_SPACING)
+                        )
                     }
                 }
             }

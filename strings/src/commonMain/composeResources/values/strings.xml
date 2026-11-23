@@ -384,6 +384,15 @@
     <string name="album_delete_failed_title">The album was not deleted</string>
     <string name="album_delete_count_error_unexpected">Counting the albums and photos to delete failed with an unexpected error.</string>
     <string name="album_delete_error_unexpected">Deleting the album failed with an unexpected error.</string>
+    <string name="photo_error_unexpected">Loading the photo failed with an unexpected error.</string>
+    <string name="photo_label_comment">Comment</string>
+    <string name="photo_label_place">Place</string>
+    <string name="photo_label_taken_at">Taken on</string>
+    <string name="photo_delete">Delete photo</string>
+    <string name="photo_delete_title">Delete this photo?</string>
+    <string name="photo_delete_text">The server deletes "%1$s". You cannot undo this.</string>
+    <string name="photo_delete_failed_title">The photo was not deleted</string>
+    <string name="photo_delete_error_unexpected">Deleting the photo failed with an unexpected error.</string>
 
     <string name="loans_section">Loans</string>
     <string name="loans_empty">This item has no loans.</string>

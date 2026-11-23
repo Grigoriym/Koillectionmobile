@@ -6,6 +6,7 @@ import com.grappim.koillectionmobile.feature.albums.ui.AlbumListRoute
 import com.grappim.koillectionmobile.feature.albums.ui.AlbumRoute
 import com.grappim.koillectionmobile.feature.albums.ui.EditAlbumRoute
 import com.grappim.koillectionmobile.feature.albums.ui.NewAlbumRoute
+import com.grappim.koillectionmobile.feature.albums.ui.PhotoRoute
 import com.grappim.koillectionmobile.feature.collections.ui.CollectionListRoute
 import com.grappim.koillectionmobile.feature.collections.ui.CollectionRoute
 import com.grappim.koillectionmobile.feature.collections.ui.EditCollectionRoute
@@ -69,6 +70,7 @@ private val navKeySerializersModule = SerializersModule {
         subclass(AlbumRoute::class)
         subclass(NewAlbumRoute::class)
         subclass(EditAlbumRoute::class)
+        subclass(PhotoRoute::class)
     }
 }
 
