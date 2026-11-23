@@ -91,6 +91,7 @@ include(
     ":feature:albums:data",
     ":feature:albums:domain",
     ":feature:albums:dto",
-    ":feature:albums:mapper"
+    ":feature:albums:mapper",
+    ":feature:albums:ui"
 )
 include(":feature:settings:ui")

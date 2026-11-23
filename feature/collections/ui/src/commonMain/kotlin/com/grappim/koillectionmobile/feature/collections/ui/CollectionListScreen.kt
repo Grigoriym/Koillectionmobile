@@ -41,6 +41,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.grappim.kit.uikit.NativeText
 import com.grappim.kit.uikit.asString
 import com.grappim.koillectionmobile.strings.RString
+import com.grappim.koillectionmobile.strings.generated.resources.albums_title
 import com.grappim.koillectionmobile.strings.generated.resources.collection_more
 import com.grappim.koillectionmobile.strings.generated.resources.collection_new
 import com.grappim.koillectionmobile.strings.generated.resources.collections_empty
@@ -64,6 +65,7 @@ fun CollectionListScreen(
     onTagsClick: () -> Unit,
     onTemplatesClick: () -> Unit,
     onWishlistsClick: () -> Unit,
+    onAlbumsClick: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: CollectionListViewModel = koinViewModel()
 ) {
@@ -77,6 +79,7 @@ fun CollectionListScreen(
         onTagsClick = onTagsClick,
         onTemplatesClick = onTemplatesClick,
         onWishlistsClick = onWishlistsClick,
+        onAlbumsClick = onAlbumsClick,
         modifier = modifier
     )
 }
@@ -92,6 +95,7 @@ private fun CollectionListContent(
     onTagsClick: () -> Unit,
     onTemplatesClick: () -> Unit,
     onWishlistsClick: () -> Unit,
+    onAlbumsClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Scaffold(
@@ -111,6 +115,7 @@ private fun CollectionListContent(
                             stringResource(RString.tags_title) to onTagsClick,
                             stringResource(RString.templates_title) to onTemplatesClick,
                             stringResource(RString.wishlists_title) to onWishlistsClick,
+                            stringResource(RString.albums_title) to onAlbumsClick,
                             stringResource(RString.collections_settings) to onSettingsClick,
                             stringResource(RString.collections_log_out) to uiState.onLogOutClick
                         )

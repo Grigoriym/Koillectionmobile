@@ -7,6 +7,10 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
+import com.grappim.koillectionmobile.feature.albums.ui.AlbumListRoute
+import com.grappim.koillectionmobile.feature.albums.ui.AlbumListScreen
+import com.grappim.koillectionmobile.feature.albums.ui.AlbumRoute
+import com.grappim.koillectionmobile.feature.albums.ui.AlbumScreen
 import com.grappim.koillectionmobile.feature.collections.ui.CollectionListRoute
 import com.grappim.koillectionmobile.feature.collections.ui.CollectionListScreen
 import com.grappim.koillectionmobile.feature.collections.ui.CollectionRoute
@@ -85,7 +89,21 @@ internal fun MainNavHost(modifier: Modifier = Modifier) {
                     onSearchClick = { backStack.add(ItemSearchRoute) },
                     onTagsClick = { backStack.add(TagListRoute) },
                     onTemplatesClick = { backStack.add(TemplateListRoute) },
-                    onWishlistsClick = { backStack.add(WishlistListRoute) }
+                    onWishlistsClick = { backStack.add(WishlistListRoute) },
+                    onAlbumsClick = { backStack.add(AlbumListRoute) }
+                )
+            }
+            entry<AlbumListRoute> {
+                AlbumListScreen(
+                    onAlbumClick = { id -> backStack.add(AlbumRoute(id)) },
+                    onBack = { backStack.removeLastOrNull() }
+                )
+            }
+            entry<AlbumRoute> { route ->
+                AlbumScreen(
+                    albumId = route.albumId,
+                    onAlbumClick = { id -> backStack.add(AlbumRoute(id)) },
+                    onBack = { backStack.removeLastOrNull() }
                 )
             }
             entry<WishlistListRoute> {

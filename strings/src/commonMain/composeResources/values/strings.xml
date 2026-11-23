@@ -350,6 +350,17 @@
     <string name="wish_form_discard_text">The values and the image on this form are lost.</string>
     <string name="wish_form_edit_discard_text">The changes on this form are lost. The wish stays as it is on the server.</string>
 
+    <string name="albums_title">Albums</string>
+    <string name="albums_empty">There are no albums yet.</string>
+    <string name="albums_retry">Try again</string>
+    <string name="albums_error_network">The server does not answer. Check the network connection.</string>
+    <string name="albums_error_http">The server answered with an error (HTTP %1$d).</string>
+    <string name="albums_error_unexpected">Loading the albums failed with an unexpected error.</string>
+    <string name="album_error_unexpected">Loading the album failed with an unexpected error.</string>
+    <string name="album_empty">This album has no albums and no photos.</string>
+    <string name="album_section_children">Albums</string>
+    <string name="album_section_photos">Photos</string>
+
     <string name="loans_section">Loans</string>
     <string name="loans_empty">This item has no loans.</string>
     <string name="loans_retry">Try again</string>
