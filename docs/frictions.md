@@ -77,3 +77,4 @@ entries get deleted — see /finalize.
 - 2026-11-23 — A background Bash call (M11.3) that ran `gradlew build` into a log and then grepped it
   reported exit code 0, though the build had failed: the code was grep's. Read the log for
   `BUILD FAILED`.
+- 2026-11-23 — `adb shell am broadcast -q` (M11.8) failed with "Unknown option: -q" on API 36: `am broadcast` has no quiet flag; drop it and tail the output.

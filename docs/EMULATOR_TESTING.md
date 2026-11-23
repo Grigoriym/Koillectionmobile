@@ -45,7 +45,7 @@ this app.
   `curl` (a cookie jar, `GET /` for `_csrf_token`, then `POST /` with `_login`, `_password` and the
   token) and read `/items/<id>`.
 - The collection list's overflow menu (M9.3; `content-desc` "More actions") holds Tags, Templates,
-  Wishlists, Settings and Log out. Open it first, then tap the entry from a fresh dump.
+  Wishlists, Albums, Settings and Log out (Albums since M11.3). Open it first, then tap the entry from a fresh dump.
 - Log out (M2.6) is "Log out" in the collection list's overflow menu. After it the
   login form shows only the server URL. A collection made through the API shows in the list after a
   pull to refresh: `input swipe 540 400 540 1800 800`. A 300 ms swipe from y 600 did not refresh
@@ -186,3 +186,9 @@ this app.
   dialog's body names the loan, but only a screenshot shows it, as in M6.3. The date picker's days
   are `text` nodes in `ui.py list` ("Tuesday, November 10, 2026"). Compare with the web UI's
   `/loans` page (curl login as in M2.5): returned loans are in a second table.
+- Albums (M11.8): "Albums" in the overflow menu; the list's FAB is "New album" (`content-desc`). On
+  an album screen, "More actions" holds "New album", "New photo" and "Edit"; "Delete album" is a
+  top-bar icon. The photo screen has "Edit photo" and "Delete photo" icons. A photo cell's tap
+  target is its title text. The album form's save returns to the screen it came from, not to the
+  new album. The web UI has no photo page (`/photos/<id>` gives 404): read the photo from its album
+  page, `/albums/<id>`.
