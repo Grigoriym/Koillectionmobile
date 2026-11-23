@@ -143,10 +143,3 @@ cold session can act on it. Delete an entry when it's fixed.
   (`feature/loans/ui/.../LoansSection.kt:73`, `uiState.isLoading`). The page gets shorter, so
   the scroll position moves up and the loan just changed is off screen. Fix option: keep the old
   list on screen during a reload and show the spinner only when there is no list yet.
-- 2026-11-23 (user) — On a collection screen (`Books`) the item list starts right under the search
-  field, with no gap, so a scrolled row slides up against the field's bottom edge. `SearchField`
-  has only horizontal padding (`feature/collections/ui/.../CollectionScreen.kt:189`), and the
-  `Column` at `CollectionScreen.kt:168` puts `CollectionList` straight after it. The item search
-  screen uses the same `SearchField` (`ItemSearchScreen.kt:85`), so check it there too. Fix
-  option: bottom padding on `SearchField` (for example `PADDING / 2`), or a `Spacer` between the
-  field and the list.

@@ -186,7 +186,7 @@ internal fun SearchField(query: String, onQueryChange: (String) -> Unit, modifie
     OutlinedTextField(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = PADDING),
+            .padding(start = PADDING, end = PADDING, bottom = PADDING / 2),
         value = query,
         onValueChange = onQueryChange,
         singleLine = true,
