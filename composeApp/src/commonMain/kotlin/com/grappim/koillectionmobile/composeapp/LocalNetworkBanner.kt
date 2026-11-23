@@ -45,7 +45,8 @@ import org.koin.compose.koinInject
  * as unreachable. A session from before the permission existed never passes through Log in, so this
  * also asks once per run (wallosmobile's `LocalNetworkBanner`, its plan §4.5c).
  *
- * The banner takes the top inset, so the screens below it do not add a second status bar gap.
+ * The banner takes the top inset that is left, so the screens below it do not add a second status
+ * bar gap. In the shell the top bar has taken it already.
  */
 @Composable
 internal fun LocalNetworkBanner(

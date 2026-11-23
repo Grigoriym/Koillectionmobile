@@ -1,6 +1,6 @@
 # koillectionmobile checklist
 
-**Current step:** M11.11 (M11 follow-up, user 2026-11-23; then the user checks the app before M12). M11.10 done 2026-11-23. M11.9 done 2026-11-23. M11 done 2026-11-23. M11.8 done 2026-11-23. M11.7 done 2026-11-23. M11.6 done 2026-11-23. M11.5 done 2026-11-23. M11.4 done 2026-11-23. M11.3 done 2026-11-23. M11.2 done 2026-11-23. M11.1 done 2026-11-23. M11 broken into steps 2026-11-23. M10 done 2026-11-23. M10.6 done 2026-11-23. M10.5 done 2026-11-22. M10.4 done 2026-11-22. M10.3 done 2026-11-22. M10.2 done 2026-11-22. M10.1 done 2026-11-22. M10 broken into steps 2026-11-22. M9 done 2026-11-22. M9.8 done 2026-11-22. M9.7 done 2026-11-22. M9.6 done 2026-11-22. M9.5 done 2026-11-21. M9.4 done 2026-11-21. M9.3 done 2026-11-21. M9.2 done 2026-11-21. M9.1 done 2026-11-21. M9 broken into steps 2026-11-19. M8 done 2026-11-19. M8.9 done 2026-11-19. M8.8 done 2026-11-19. M8.7 done 2026-11-19. M8.6 done 2026-11-18. M8.5 done 2026-11-18. M8.4 done 2026-11-18. M8.3 done 2026-11-17. M8.2 done 2026-11-17. M8.1 done 2026-11-17. M8 broken into steps 2026-11-17; the other areas became M9–M13 and the release moved to M14 (user, 2026-11-17). M7 done 2026-11-17. M7.7 done 2026-11-17. M7.6 done 2026-11-17. M7.5 done 2026-11-17. M7.4 done 2026-11-17. M7.3 done 2026-11-17. M7.2 done 2026-11-17. M7.1 done 2026-11-17. M7 broken into steps 2026-11-17. M6 done 2026-11-17. M6.6 done 2026-11-17. M6.5 done 2026-11-16. M6.4 done 2026-11-16. M6.3 done 2026-11-16. M6.2 done 2026-11-16. M6.1 done 2026-11-16. M6 broken into steps 2026-11-16. M5 done 2026-11-16. M5.7 done 2026-11-16. M5.6 done 2026-11-16. M5.5 done 2026-11-16. M5.4 done 2026-11-16. M5.3 done 2026-11-16. M5.2 done 2026-11-16. M5.1 done 2026-11-16. M5 broken into steps 2026-11-16. M4 done 2026-11-16. M4.4 done 2026-11-16. M4.3 done 2026-11-16. M4.2 done 2026-11-16. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 and 14 are settled.
+**Current step:** M11.12 (M11 follow-up, user 2026-11-23; then the user checks the app before M12). M11.11 done 2026-11-23. M11.10 done 2026-11-23. M11.9 done 2026-11-23. M11 done 2026-11-23. M11.8 done 2026-11-23. M11.7 done 2026-11-23. M11.6 done 2026-11-23. M11.5 done 2026-11-23. M11.4 done 2026-11-23. M11.3 done 2026-11-23. M11.2 done 2026-11-23. M11.1 done 2026-11-23. M11 broken into steps 2026-11-23. M10 done 2026-11-23. M10.6 done 2026-11-23. M10.5 done 2026-11-22. M10.4 done 2026-11-22. M10.3 done 2026-11-22. M10.2 done 2026-11-22. M10.1 done 2026-11-22. M10 broken into steps 2026-11-22. M9 done 2026-11-22. M9.8 done 2026-11-22. M9.7 done 2026-11-22. M9.6 done 2026-11-22. M9.5 done 2026-11-21. M9.4 done 2026-11-21. M9.3 done 2026-11-21. M9.2 done 2026-11-21. M9.1 done 2026-11-21. M9 broken into steps 2026-11-19. M8 done 2026-11-19. M8.9 done 2026-11-19. M8.8 done 2026-11-19. M8.7 done 2026-11-19. M8.6 done 2026-11-18. M8.5 done 2026-11-18. M8.4 done 2026-11-18. M8.3 done 2026-11-17. M8.2 done 2026-11-17. M8.1 done 2026-11-17. M8 broken into steps 2026-11-17; the other areas became M9–M13 and the release moved to M14 (user, 2026-11-17). M7 done 2026-11-17. M7.7 done 2026-11-17. M7.6 done 2026-11-17. M7.5 done 2026-11-17. M7.4 done 2026-11-17. M7.3 done 2026-11-17. M7.2 done 2026-11-17. M7.1 done 2026-11-17. M7 broken into steps 2026-11-17. M6 done 2026-11-17. M6.6 done 2026-11-17. M6.5 done 2026-11-16. M6.4 done 2026-11-16. M6.3 done 2026-11-16. M6.2 done 2026-11-16. M6.1 done 2026-11-16. M6 broken into steps 2026-11-16. M5 done 2026-11-16. M5.7 done 2026-11-16. M5.6 done 2026-11-16. M5.5 done 2026-11-16. M5.4 done 2026-11-16. M5.3 done 2026-11-16. M5.2 done 2026-11-16. M5.1 done 2026-11-16. M5 broken into steps 2026-11-16. M4 done 2026-11-16. M4.4 done 2026-11-16. M4.3 done 2026-11-16. M4.2 done 2026-11-16. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 and 14 are settled.
 
 ## How to use this
 
@@ -60,7 +60,7 @@ the app again before M12 starts (user, 2026-11-23). M11.9 and M11.10 each close 
   `build ktlintCheck` pass.
   Note: `SearchField` got `bottom = PADDING / 2` (8 dp); both screens use it. On `koil36` a
   half-scrolled row is cut 8 dp below the field on `Books` and on "Search items".
-- [ ] **M11.11** — Navigation shell (plan §5 decision 15). Add `grappim-kit-navigation` (read
+- [x] **M11.11** — Navigation shell (plan §5 decision 15). Add `grappim-kit-navigation` (read
   `../grappim-kit/CONSUMING.md`, "navigation", first; use a version with the `goToTopLevel` fix).
   Port wallosmobile's `MainAppState`, `AuthenticatedMainScreen`, `DrawerDestination`,
   `DrawerItemsBuilder` and `RouteConfig` into `composeApp`. Sections: Collections (start),
@@ -73,6 +73,15 @@ the app again before M12 starts (user, 2026-11-23). M11.9 and M11.10 each close 
   **Verify:** `build ktlintCheck` and `KoinGraphTest` pass; on the emulator each drawer entry
   opens its section, each section keeps its own back stack, back at a section root goes to
   Collections, Log out logs out, and the back stack survives process death.
+  Note: "More" menus: a menu action in the kit `TopBar` (user; plan §5 decision 15), so M11.13 and
+  M11.14 wait on a kit release for the collection, wishlist and album screens. The kit's `goBack`
+  exits at a non-start section root, so the app adds `goBackOrToStart`. `RouteConfig.hasShellTopBar`
+  hides the shell bar on screens that still draw their own; it goes in M11.14. On `koil36` all five
+  other sections opened from the drawer, system back at each root went to Collections, Log out
+  went to login and the login-side Settings had its Back bar, and the Tags → "Children's book"
+  stack came back after `am kill` (pid empty). Not checked on the device: that a section keeps
+  its stack across a switch. The drawer is reachable only on the collection list and Settings
+  until M11.14, so no deep screen can switch; `NavigatorExtTest` covers it.
 - [ ] **M11.12** — Shell top bar on Tags, Templates and choice lists (`feature:tags:ui`,
   `feature:templates:ui`): each screen sets `LocalTopBarConfig` and drops its `TopAppBar`.
   Section roots show the menu icon, the others Back.

@@ -12,8 +12,6 @@ kotlin {
             implementation(projects.feature.collections.domain)
             // The collection screen lists the collection's items too.
             implementation(projects.feature.items.domain)
-            // Log out sits in the collection list's overflow menu.
-            implementation(projects.feature.auth.domain)
             // The edit form picks the collection's default template.
             implementation(projects.feature.templates.domain)
             // `KoillectionError`, to pick the error message.
@@ -22,6 +20,8 @@ kotlin {
             implementation(projects.core.photos)
             implementation(projects.strings)
             implementation(libs.grappim.kit.uikit)
+            // `persistentListOf` for the shell top bar's actions.
+            implementation(libs.kotlinx.collections)
             // `AsyncImage`. The network fetcher is wired in `:composeApp`.
             implementation(libs.coil.compose)
         }

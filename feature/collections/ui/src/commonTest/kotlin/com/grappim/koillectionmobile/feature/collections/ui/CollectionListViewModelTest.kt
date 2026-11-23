@@ -3,8 +3,6 @@ package com.grappim.koillectionmobile.feature.collections.ui
 import com.grappim.kit.testing.MainDispatcherRule
 import com.grappim.kit.uikit.NativeText
 import com.grappim.koillectionmobile.core.domain.KoillectionError
-import com.grappim.koillectionmobile.feature.auth.domain.AuthRepository
-import com.grappim.koillectionmobile.feature.auth.domain.LoginResult
 import com.grappim.koillectionmobile.feature.collections.domain.Collection
 import com.grappim.koillectionmobile.feature.collections.domain.CollectionListChanges
 import com.grappim.koillectionmobile.feature.collections.domain.CollectionsRepository
@@ -24,7 +22,6 @@ import kotlin.test.assertTrue
 class CollectionListViewModelTest {
 
     private val repository = FakeCollectionsRepository()
-    private val authRepository = FakeAuthRepository()
     private val collectionListChanges = CollectionListChanges()
     private val mainDispatcherRule = MainDispatcherRule()
 
@@ -40,14 +37,14 @@ class CollectionListViewModelTest {
 
     private fun errorFor(error: Throwable): NativeText {
         repository.next().complete(Result.failure(error))
-        val sut = CollectionListViewModel(repository, authRepository, collectionListChanges)
+        val sut = CollectionListViewModel(repository, collectionListChanges)
         return sut.uiState.value.error
     }
 
     @Test
     fun `the first load shows loading until the repository answers`() {
         val response = repository.next()
-        val sut = CollectionListViewModel(repository, authRepository, collectionListChanges)
+        val sut = CollectionListViewModel(repository, collectionListChanges)
         assertTrue(sut.uiState.value.isLoading)
 
         response.complete(Result.success(listOf(BOOKS)))
@@ -60,7 +57,7 @@ class CollectionListViewModelTest {
     fun `the list keeps only the top-level collections in server order`() {
         repository.next().complete(Result.success(listOf(BOOKS, NOVELS, GAMES)))
 
-        val sut = CollectionListViewModel(repository, authRepository, collectionListChanges)
+        val sut = CollectionListViewModel(repository, collectionListChanges)
 
         assertEquals(listOf(BOOKS, GAMES), sut.uiState.value.collections)
     }
@@ -69,7 +66,7 @@ class CollectionListViewModelTest {
     fun `no collections is an empty list with no error`() {
         repository.next().complete(Result.success(emptyList()))
 
-        val sut = CollectionListViewModel(repository, authRepository, collectionListChanges)
+        val sut = CollectionListViewModel(repository, collectionListChanges)
 
         assertFalse(sut.uiState.value.isLoading)
         assertTrue(sut.uiState.value.collections.isEmpty())
@@ -115,7 +112,7 @@ class CollectionListViewModelTest {
     @Test
     fun `refresh loads again and replaces the list`() {
         repository.next().complete(Result.success(listOf(BOOKS)))
-        val sut = CollectionListViewModel(repository, authRepository, collectionListChanges)
+        val sut = CollectionListViewModel(repository, collectionListChanges)
         val response = repository.next()
 
         sut.uiState.value.onRefresh()
@@ -132,7 +129,7 @@ class CollectionListViewModelTest {
     @Test
     fun `a failed refresh keeps the old list and shows the error`() {
         repository.next().complete(Result.success(listOf(BOOKS)))
-        val sut = CollectionListViewModel(repository, authRepository, collectionListChanges)
+        val sut = CollectionListViewModel(repository, collectionListChanges)
         repository.next().complete(Result.failure(KoillectionError.Network(IllegalStateException("offline"))))
 
         sut.uiState.value.onRefresh()
@@ -145,7 +142,7 @@ class CollectionListViewModelTest {
     @Test
     fun `a refresh after an error clears the error on success`() {
         repository.next().complete(Result.failure(KoillectionError.Network(IllegalStateException("offline"))))
-        val sut = CollectionListViewModel(repository, authRepository, collectionListChanges)
+        val sut = CollectionListViewModel(repository, collectionListChanges)
         repository.next().complete(Result.success(listOf(BOOKS)))
 
         sut.uiState.value.onRefresh()
@@ -157,7 +154,7 @@ class CollectionListViewModelTest {
     @Test
     fun `refresh while a load runs sends no second request`() {
         repository.next()
-        val sut = CollectionListViewModel(repository, authRepository, collectionListChanges)
+        val sut = CollectionListViewModel(repository, collectionListChanges)
 
         sut.uiState.value.onRefresh()
 
@@ -165,19 +162,9 @@ class CollectionListViewModelTest {
     }
 
     @Test
-    fun `log out clears the session through the auth repository`() {
-        repository.next().complete(Result.success(listOf(BOOKS)))
-        val sut = CollectionListViewModel(repository, authRepository, collectionListChanges)
-
-        sut.uiState.value.onLogOutClick()
-
-        assertEquals(1, authRepository.logOutCalls)
-    }
-
-    @Test
     fun `a change to the top-level list loads the list again`() {
         repository.next().complete(Result.success(listOf(BOOKS, GAMES)))
-        val sut = CollectionListViewModel(repository, authRepository, collectionListChanges)
+        val sut = CollectionListViewModel(repository, collectionListChanges)
         repository.next().complete(Result.success(listOf(GAMES)))
 
         collectionListChanges.notifyChanged(null)
@@ -189,24 +176,11 @@ class CollectionListViewModelTest {
     @Test
     fun `a change to a child list loads nothing`() {
         repository.next().complete(Result.success(listOf(BOOKS)))
-        CollectionListViewModel(repository, authRepository, collectionListChanges)
+        CollectionListViewModel(repository, collectionListChanges)
 
         collectionListChanges.notifyChanged(BOOKS.id)
 
         assertEquals(1, repository.calls)
-    }
-
-    private class FakeAuthRepository : AuthRepository {
-        var logOutCalls = 0
-
-        override suspend fun logIn(serverUrl: String, username: String, password: String): LoginResult =
-            error("not used")
-
-        override suspend fun logOut() {
-            logOutCalls++
-        }
-
-        override fun storedServerUrl(): String = error("not used")
     }
 
     /** Each call takes the next queued response. Queue one with [next] before the call. */

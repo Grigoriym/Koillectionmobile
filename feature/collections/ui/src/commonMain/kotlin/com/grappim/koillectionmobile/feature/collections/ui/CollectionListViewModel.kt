@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.grappim.kit.uikit.NativeText
 import com.grappim.koillectionmobile.core.domain.KoillectionError
-import com.grappim.koillectionmobile.feature.auth.domain.AuthRepository
 import com.grappim.koillectionmobile.feature.collections.domain.CollectionListChanges
 import com.grappim.koillectionmobile.feature.collections.domain.CollectionsRepository
 import com.grappim.koillectionmobile.strings.RString
@@ -25,19 +24,15 @@ import org.koin.core.annotation.KoinViewModel
  * The top-level collections: the server has no filter for them, so the list drops each child.
  * A change to the top-level list ([CollectionListChanges] with a null parent) reads it again,
  * while the screen waits lower on the back stack.
- *
- * Log out does not navigate: clearing the session turns `SessionStorage.isLoggedIn` `false`, and
- * the app shell swaps to the login screen.
  */
 @KoinViewModel
 class CollectionListViewModel(
     private val repository: CollectionsRepository,
-    private val authRepository: AuthRepository,
     private val collectionListChanges: CollectionListChanges
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(
-        CollectionListUiState(onRefresh = ::refresh, onLogOutClick = ::logOut)
+        CollectionListUiState(onRefresh = ::refresh)
     )
     val uiState: StateFlow<CollectionListUiState> = _uiState.asStateFlow()
 
@@ -53,10 +48,6 @@ class CollectionListViewModel(
         if (state.isLoading || state.isRefreshing) return
         _uiState.update { it.copy(isRefreshing = true) }
         load()
-    }
-
-    private fun logOut() {
-        viewModelScope.launch { authRepository.logOut() }
     }
 
     private fun load() {

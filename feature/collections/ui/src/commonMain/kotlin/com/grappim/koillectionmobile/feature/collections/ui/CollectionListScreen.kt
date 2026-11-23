@@ -12,27 +12,20 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
@@ -40,89 +33,70 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.grappim.kit.uikit.NativeText
 import com.grappim.kit.uikit.asString
+import com.grappim.kit.uikit.widgets.topbar.LocalTopBarConfig
+import com.grappim.kit.uikit.widgets.topbar.NavigationIconConfig
+import com.grappim.kit.uikit.widgets.topbar.TopBarActionVectorButton
+import com.grappim.kit.uikit.widgets.topbar.TopBarConfig
 import com.grappim.koillectionmobile.strings.RString
-import com.grappim.koillectionmobile.strings.generated.resources.albums_title
-import com.grappim.koillectionmobile.strings.generated.resources.collection_more
 import com.grappim.koillectionmobile.strings.generated.resources.collection_new
 import com.grappim.koillectionmobile.strings.generated.resources.collections_empty
-import com.grappim.koillectionmobile.strings.generated.resources.collections_log_out
 import com.grappim.koillectionmobile.strings.generated.resources.collections_retry
-import com.grappim.koillectionmobile.strings.generated.resources.collections_settings
 import com.grappim.koillectionmobile.strings.generated.resources.collections_title
 import com.grappim.koillectionmobile.strings.generated.resources.item_search_title
-import com.grappim.koillectionmobile.strings.generated.resources.tags_title
-import com.grappim.koillectionmobile.strings.generated.resources.templates_title
-import com.grappim.koillectionmobile.strings.generated.resources.wishlists_title
+import kotlinx.collections.immutable.persistentListOf
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
+/**
+ * The start section of the drawer. The top bar is the shell's: this screen sets its title and the
+ * search action.
+ */
 @Composable
 fun CollectionListScreen(
     onCollectionClick: (String) -> Unit,
-    onSettingsClick: () -> Unit,
     onNewCollectionClick: () -> Unit,
     onSearchClick: () -> Unit,
-    onTagsClick: () -> Unit,
-    onTemplatesClick: () -> Unit,
-    onWishlistsClick: () -> Unit,
-    onAlbumsClick: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: CollectionListViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val topBarController = LocalTopBarConfig.current
+    val searchLabel = stringResource(RString.item_search_title)
+    val currentOnSearchClick by rememberUpdatedState(onSearchClick)
+
+    LaunchedEffect(searchLabel) {
+        topBarController.update(
+            TopBarConfig(
+                title = NativeText.Resource(RString.collections_title),
+                navigationIcon = NavigationIconConfig.Menu,
+                actions = persistentListOf(
+                    TopBarActionVectorButton(
+                        imageVector = Icons.Filled.Search,
+                        contentDescription = searchLabel,
+                        onClick = { currentOnSearchClick() }
+                    )
+                )
+            )
+        )
+    }
+
     CollectionListContent(
         uiState = uiState,
         onCollectionClick = onCollectionClick,
-        onSettingsClick = onSettingsClick,
         onNewCollectionClick = onNewCollectionClick,
-        onSearchClick = onSearchClick,
-        onTagsClick = onTagsClick,
-        onTemplatesClick = onTemplatesClick,
-        onWishlistsClick = onWishlistsClick,
-        onAlbumsClick = onAlbumsClick,
         modifier = modifier
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun CollectionListContent(
     uiState: CollectionListUiState,
     onCollectionClick: (String) -> Unit,
-    onSettingsClick: () -> Unit,
     onNewCollectionClick: () -> Unit,
-    onSearchClick: () -> Unit,
-    onTagsClick: () -> Unit,
-    onTemplatesClick: () -> Unit,
-    onWishlistsClick: () -> Unit,
-    onAlbumsClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
-        topBar = {
-            TopAppBar(
-                title = { Text(stringResource(RString.collections_title)) },
-                actions = {
-                    IconButton(onClick = onSearchClick) {
-                        Icon(
-                            imageVector = Icons.Filled.Search,
-                            contentDescription = stringResource(RString.item_search_title)
-                        )
-                    }
-                    MoreMenu(
-                        listOf(
-                            stringResource(RString.tags_title) to onTagsClick,
-                            stringResource(RString.templates_title) to onTemplatesClick,
-                            stringResource(RString.wishlists_title) to onWishlistsClick,
-                            stringResource(RString.albums_title) to onAlbumsClick,
-                            stringResource(RString.collections_settings) to onSettingsClick,
-                            stringResource(RString.collections_log_out) to uiState.onLogOutClick
-                        )
-                    )
-                }
-            )
-        },
         floatingActionButton = {
             FloatingActionButton(onClick = onNewCollectionClick) {
                 Icon(imageVector = Icons.Filled.Add, contentDescription = stringResource(RString.collection_new))
@@ -208,28 +182,6 @@ private fun CollectionList(
                 headlineContent = { Text(collection.title) },
                 leadingContent = { Thumbnail(imageUrl = collection.imageUrl, title = collection.title) }
             )
-        }
-    }
-}
-
-/** The top bar's overflow menu: one entry per (label, action) pair, in order. */
-@Composable
-private fun MoreMenu(entries: List<Pair<String, () -> Unit>>) {
-    var isExpanded by remember { mutableStateOf(false) }
-    Box {
-        IconButton(onClick = { isExpanded = true }) {
-            Icon(imageVector = Icons.Filled.MoreVert, contentDescription = stringResource(RString.collection_more))
-        }
-        DropdownMenu(expanded = isExpanded, onDismissRequest = { isExpanded = false }) {
-            entries.forEach { (label, onClick) ->
-                DropdownMenuItem(
-                    text = { Text(label) },
-                    onClick = {
-                        isExpanded = false
-                        onClick()
-                    }
-                )
-            }
         }
     }
 }

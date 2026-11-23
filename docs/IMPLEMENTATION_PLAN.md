@@ -451,3 +451,10 @@ code without checking the licence terms are kept.
    drawer around the single back stack (about 6 screens changed). The M2.1 note "no drawer
    sections" no longer holds. Sections: Collections, Tags, Templates, Wishlists, Albums, Settings;
    M12 and M13 add Inventories and Logs. Log out sits in the drawer as an action, not a section.
+   Built in M11.11: back at the root of a section other than Collections goes to Collections
+   (`goBackOrToStart` in `composeApp/.../nav/NavigatorExt.kt`). The kit's `goBack` leaves it to the
+   system there, and the app would close. Log out is `DrawerDestination.LogOut` with no route.
+   The "More" menus on the collection, wishlist and album screens become a menu action in
+   `grappim-kit-uikit`'s `TopBar` (user, 2026-11-23), not separate icons. That is a shared kit
+   change, and a kit session is already at work: the user says when to tell it. Until the kit
+   ships it, M11.13 and M11.14 wait on it for those three screens.

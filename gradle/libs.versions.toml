@@ -86,6 +86,7 @@ jetbrains-androidx-savedstate = { module = "org.jetbrains.androidx.savedstate:sa
 
 grappim-kit-logger = { module = "io.github.grigoriym:grappim-kit-logger", version.ref = "grappimKit" }
 grappim-kit-uikit = { module = "io.github.grigoriym:grappim-kit-uikit", version.ref = "grappimKit" }
+grappim-kit-navigation = { module = "io.github.grigoriym:grappim-kit-navigation", version.ref = "grappimKit" }
 grappim-kit-testing = { module = "io.github.grigoriym:grappim-kit-testing", version.ref = "grappimKit" }
 grappim-kit-coroutines = { module = "io.github.grigoriym:grappim-kit-coroutines", version.ref = "grappimKit" }
 grappim-kit-domain = { module = "io.github.grigoriym:grappim-kit-domain", version.ref = "grappimKit" }

@@ -15,6 +15,12 @@ kotlin {
             // The local network banner's text.
             implementation(projects.strings)
             implementation(libs.grappim.kit.uikit)
+            // The drawer shell: one back stack per drawer section.
+            implementation(libs.grappim.kit.navigation)
+            // `persistentListOf` for the drawer items.
+            implementation(libs.kotlinx.collections)
+            // Log out is a drawer action (`DrawerViewModel`).
+            implementation(projects.feature.auth.domain)
             implementation(projects.feature.auth.ui)
             implementation(projects.feature.collections.ui)
             implementation(projects.feature.items.ui)
@@ -50,8 +56,9 @@ kotlin {
             implementation(libs.koin.test)
             // `HttpClientEngine` in `KoinGraphTest`'s extra types.
             implementation(libs.ktor.core)
+            // `MainDispatcherRule` in `DrawerViewModelTest`.
+            implementation(libs.grappim.kit.testing)
             // The repositories resolved in `KoinGraphTest`.
-            implementation(projects.feature.auth.domain)
             implementation(projects.feature.collections.domain)
             implementation(projects.feature.items.domain)
             implementation(projects.feature.tags.domain)

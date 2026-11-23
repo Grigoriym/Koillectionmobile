@@ -10,27 +10,28 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.grappim.kit.customheaders.CustomHeaderError
+import com.grappim.kit.uikit.NativeText
+import com.grappim.kit.uikit.widgets.topbar.LocalTopBarConfig
+import com.grappim.kit.uikit.widgets.topbar.NavigationIconConfig
+import com.grappim.kit.uikit.widgets.topbar.TopBarConfig
 import com.grappim.koillectionmobile.strings.RString
 import com.grappim.koillectionmobile.strings.generated.resources.custom_headers_add
 import com.grappim.koillectionmobile.strings.generated.resources.custom_headers_description
@@ -46,54 +47,38 @@ import com.grappim.koillectionmobile.strings.generated.resources.custom_headers_
 import com.grappim.koillectionmobile.strings.generated.resources.custom_headers_title
 import com.grappim.koillectionmobile.strings.generated.resources.custom_headers_value_hint
 import com.grappim.koillectionmobile.strings.generated.resources.custom_headers_value_label
-import com.grappim.koillectionmobile.strings.generated.resources.settings_back
 import com.grappim.koillectionmobile.strings.generated.resources.settings_title
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 /**
- * Today Settings holds one section: the custom headers. The app opens it as [SettingsRoute]; the
- * login screen opens it as state. Both get the same screen.
+ * Today Settings holds one section: the custom headers. The app opens it as [SettingsRoute], a
+ * drawer section, with [NavigationIconConfig.Menu]. The login screen opens it as state, with
+ * [NavigationIconConfig.Back]. The top bar is the caller's: this screen sets its title and
+ * [navigationIcon] through `LocalTopBarConfig`.
  */
 @Composable
 fun SettingsScreen(
-    onBack: () -> Unit,
+    navigationIcon: NavigationIconConfig,
     modifier: Modifier = Modifier,
     viewModel: CustomHeadersViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    SettingsContent(uiState = uiState, onBack = onBack, modifier = modifier)
-}
+    val topBarController = LocalTopBarConfig.current
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun SettingsContent(uiState: CustomHeadersUiState, onBack: () -> Unit, modifier: Modifier = Modifier) {
-    Scaffold(
-        modifier = modifier
-            .fillMaxSize()
-            .imePadding(),
-        topBar = {
-            TopAppBar(
-                title = { Text(stringResource(RString.settings_title)) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(RString.settings_back)
-                        )
-                    }
-                }
-            )
-        }
-    ) { padding ->
-        CustomHeadersSection(
-            uiState = uiState,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
+    LaunchedEffect(Unit) {
+        topBarController.update(
+            TopBarConfig(title = NativeText.Resource(RString.settings_title), navigationIcon = navigationIcon)
         )
     }
+
+    CustomHeadersSection(
+        uiState = uiState,
+        modifier = modifier
+            .fillMaxSize()
+            .imePadding()
+    )
 }
 
 @Composable

@@ -14,7 +14,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.grappim.kit.uikit.KitTheme
-import com.grappim.koillectionmobile.composeapp.nav.MainNavHost
 import com.grappim.koillectionmobile.core.storage.SessionStorage
 import org.koin.compose.koinInject
 
@@ -29,7 +28,7 @@ import org.koin.compose.koinInject
 fun KoillectionAppContent(modifier: Modifier = Modifier, sessionStorage: SessionStorage = koinInject()) {
     /*
      * The saved seed is load-bearing. `isLoggedIn` is a DataStore flow with no value for the first
-     * frame. Without the seed, `MainNavHost` composes in a later pass, and `rememberNavBackStack`
+     * frame. Without the seed, the shell composes in a later pass, and `rememberNavBackStack`
      * reads its restored state only in the first pass: after process death the back stack is lost.
      */
     var lastKnownLoggedIn by rememberSaveable { mutableStateOf<Boolean?>(null) }
@@ -49,7 +48,7 @@ fun KoillectionAppContent(modifier: Modifier = Modifier, sessionStorage: Session
             // a frame, so it is blank and not a progress indicator.
             null -> Box(modifier = modifier.fillMaxSize())
 
-            true -> LocalNetworkBanner(modifier = modifier) { MainNavHost() }
+            true -> AuthenticatedMainScreen(appState = rememberMainAppState(), modifier = modifier)
 
             false -> LoginBranch(modifier = modifier)
         }

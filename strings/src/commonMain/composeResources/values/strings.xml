@@ -26,11 +26,13 @@
     <string name="local_network_banner_message">Local network access is off. The app cannot reach the server without it.</string>
     <string name="local_network_banner_open_settings">Open settings</string>
 
+    <string name="top_bar_back">Back</string>
+    <string name="top_bar_menu">Open the menu</string>
+    <string name="drawer_log_out">Log out</string>
+
     <string name="collections_title">Collections</string>
     <string name="collections_empty">There are no collections yet.</string>
     <string name="collections_retry">Try again</string>
-    <string name="collections_log_out">Log out</string>
-    <string name="collections_settings">Settings</string>
     <string name="collections_error_network">The server does not answer. Check the network connection.</string>
     <string name="collections_error_http">The server answered with an error (HTTP %1$d).</string>
     <string name="collections_error_unexpected">Loading the collections failed with an unexpected error.</string>
@@ -282,7 +284,6 @@
     <string name="edit_item_save_error_duplicate_label">Saving stopped: two fields would have the label "%1$s". Nothing was sent in this try.</string>
 
     <string name="settings_title">Settings</string>
-    <string name="settings_back">Back</string>
     <string name="custom_headers_title">Custom headers</string>
     <string name="custom_headers_description">Sent with every request to this server. Add them when a reverse proxy in front of Koillection asks for authentication. The app sends its own Authorization header, so the proxy must read another header.</string>
     <string name="custom_headers_name_label">Header name</string>
