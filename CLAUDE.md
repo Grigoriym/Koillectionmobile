@@ -89,6 +89,12 @@ At the end of each checklist step (and any other non-trivial task), without bein
 3. One commit per checklist step, subject `M<n>.<m>: <what>`; the `/finalize` doc updates go
    in a second commit, `docs: M<n>.<m> finalize (...)`. Push — the branch rule is in the
    ground rules of `docs/CHECKLIST.md`.
+4. **After the switch to PRs** (see Settled decisions): a PR that changes UI carries
+   before/after screenshots in its body. Follow Step 5c of the shared `emulator-testing` skill.
+   Here the base branch is `main`, and the image branch is `pr-assets` (never delete it). The
+   repo is public: photograph the login screen and any screen with the server URL, username
+   or token against the local instance only, never the real server. Until the switch, skip
+   this step (user, 2026-11-23).
 
 ## Changing a check means saying so
 
