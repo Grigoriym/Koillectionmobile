@@ -11,13 +11,15 @@ import com.grappim.koillectionmobile.strings.generated.resources.photo_error_une
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.core.annotation.InjectedParam
 import org.koin.core.annotation.KoinViewModel
 
 /**
- * Reads the photo. A delete tells the photo's album to read again ([PhotoChanges]).
+ * Reads the photo, and again after an edit form saved it ([PhotoChanges]). A delete tells the
+ * photo's album to read again.
  *
  * [photoId] arrives through `parametersOf` at the call site. [InjectedParam] tells the Koin
  * compiler plugin not to look for a `String` definition in the graph.
@@ -36,6 +38,11 @@ class PhotoViewModel(
 
     init {
         load()
+        viewModelScope.launch {
+            photoChanges.changed
+                .filter { !_uiState.value.isDeleted && it.photoId == photoId }
+                .collect { load() }
+        }
     }
 
     private fun retry() {

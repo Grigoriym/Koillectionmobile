@@ -52,9 +52,11 @@ cold session can act on it. Delete an entry when it's fixed.
   scaffold, `FormImageSection` and `toSaveMessage` exist in `feature/collections/ui`,
   `feature/wishlists/ui` (`WishlistFormScreen.kt`, `NewWishlistViewModel.kt`) and
   `feature/albums/ui` (`AlbumFormScreen.kt`, `AlbumFormUiState.kt`, `AlbumMessages.kt`). Only the
-  strings and the repository calls differ. M11.7 (photo form) needs a fourth variant with a
-  non-removable image. Fix option: move the form parts to a shared UI module that `core:photos`
-  could host.
+  strings and the repository calls differ. M11.7 (photo form) reused the album form parts inside
+  `feature/albums/ui` (made `internal`; `FormImageSection` got `isServerImageRemovable`, as in
+  `feature/wishlists/ui`), but `NewPhotoViewModel` and `EditPhotoViewModel` copy
+  `NewWishViewModel` and `EditWishViewModel`, and `PhotoFormValues` copies `WishFormValues`.
+  Fix option: move the form parts to a shared UI module that `core:photos` could host.
   M11.5 copied the nested-delete parts from `feature/wishlists/ui` (M9.5): `descendantIds`,
   the count, `DeleteSummary` and `DeleteDialogs` in `AlbumViewModel.kt`, `AlbumUiState.kt` and
   `AlbumScreen.kt` differ only in types and strings. `descendantIds` could take `(id, parentId)`

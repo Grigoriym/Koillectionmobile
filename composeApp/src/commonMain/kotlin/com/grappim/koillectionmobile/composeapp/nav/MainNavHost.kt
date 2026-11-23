@@ -13,8 +13,12 @@ import com.grappim.koillectionmobile.feature.albums.ui.AlbumRoute
 import com.grappim.koillectionmobile.feature.albums.ui.AlbumScreen
 import com.grappim.koillectionmobile.feature.albums.ui.EditAlbumRoute
 import com.grappim.koillectionmobile.feature.albums.ui.EditAlbumScreen
+import com.grappim.koillectionmobile.feature.albums.ui.EditPhotoRoute
+import com.grappim.koillectionmobile.feature.albums.ui.EditPhotoScreen
 import com.grappim.koillectionmobile.feature.albums.ui.NewAlbumRoute
 import com.grappim.koillectionmobile.feature.albums.ui.NewAlbumScreen
+import com.grappim.koillectionmobile.feature.albums.ui.NewPhotoRoute
+import com.grappim.koillectionmobile.feature.albums.ui.NewPhotoScreen
 import com.grappim.koillectionmobile.feature.albums.ui.PhotoRoute
 import com.grappim.koillectionmobile.feature.albums.ui.PhotoScreen
 import com.grappim.koillectionmobile.feature.collections.ui.CollectionListRoute
@@ -112,6 +116,7 @@ internal fun MainNavHost(modifier: Modifier = Modifier) {
                     onAlbumClick = { id -> backStack.add(AlbumRoute(id)) },
                     onPhotoClick = { id -> backStack.add(PhotoRoute(id)) },
                     onNewAlbumClick = { backStack.add(NewAlbumRoute(route.albumId)) },
+                    onNewPhotoClick = { backStack.add(NewPhotoRoute(route.albumId)) },
                     onEditClick = { backStack.add(EditAlbumRoute(route.albumId)) },
                     onBack = { backStack.removeLastOrNull() },
                     // The album is gone; the list or the parent reads again (AlbumChanges).
@@ -121,8 +126,25 @@ internal fun MainNavHost(modifier: Modifier = Modifier) {
             entry<PhotoRoute> { route ->
                 PhotoScreen(
                     photoId = route.photoId,
+                    onEditClick = { backStack.add(EditPhotoRoute(route.photoId)) },
                     onBack = { backStack.removeLastOrNull() },
                     // The photo is gone; its album reads again (PhotoChanges).
+                    onClose = { backStack.remove(route) }
+                )
+            }
+            entry<NewPhotoRoute> { route ->
+                NewPhotoScreen(
+                    albumId = route.albumId,
+                    onBack = { backStack.removeLastOrNull() },
+                    // The album screen reads again (PhotoChanges).
+                    onClose = { backStack.remove(route) }
+                )
+            }
+            entry<EditPhotoRoute> { route ->
+                EditPhotoScreen(
+                    photoId = route.photoId,
+                    onBack = { backStack.removeLastOrNull() },
+                    // The photo screen and its album screen read again (PhotoChanges).
                     onClose = { backStack.remove(route) }
                 )
             }

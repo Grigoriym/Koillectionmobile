@@ -160,6 +160,22 @@ class PhotoViewModelTest {
         assertTrue(sut.uiState.value.deleteError.isEmpty())
     }
 
+    @Test
+    fun `a change to this photo reads it again and a change to another photo does not`() {
+        val sut = loadedSut()
+
+        photoChanges.notifyChanged("other", BEACH.albumId)
+        assertEquals(1, repository.photoCalls.size)
+
+        repository.photo.addLast(CompletableDeferred())
+        photoChanges.notifyChanged(BEACH.id, BEACH.albumId)
+        val edited = BEACH.copy(title = "Beach at noon")
+        answer(Result.success(edited))
+
+        assertEquals(2, repository.photoCalls.size)
+        assertEquals(edited, sut.uiState.value.photo)
+    }
+
     private companion object {
         val BEACH = photo(id = "beach", title = "Beach").copy(
             comment = "Low tide",

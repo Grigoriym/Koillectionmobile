@@ -12,6 +12,7 @@ import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -43,6 +44,7 @@ import com.grappim.koillectionmobile.strings.generated.resources.photo_delete
 import com.grappim.koillectionmobile.strings.generated.resources.photo_delete_failed_title
 import com.grappim.koillectionmobile.strings.generated.resources.photo_delete_text
 import com.grappim.koillectionmobile.strings.generated.resources.photo_delete_title
+import com.grappim.koillectionmobile.strings.generated.resources.photo_edit
 import com.grappim.koillectionmobile.strings.generated.resources.photo_label_comment
 import com.grappim.koillectionmobile.strings.generated.resources.photo_label_place
 import com.grappim.koillectionmobile.strings.generated.resources.photo_label_taken_at
@@ -54,6 +56,7 @@ import org.koin.core.parameter.parametersOf
 @Composable
 fun PhotoScreen(
     photoId: String,
+    onEditClick: () -> Unit,
     onBack: () -> Unit,
     onClose: () -> Unit,
     modifier: Modifier = Modifier,
@@ -64,11 +67,16 @@ fun PhotoScreen(
     LaunchedEffect(uiState.isDeleted) {
         if (uiState.isDeleted) currentOnClose()
     }
-    PhotoContent(uiState = uiState, onBack = onBack, modifier = modifier)
+    PhotoContent(uiState = uiState, onEditClick = onEditClick, onBack = onBack, modifier = modifier)
 }
 
 @Composable
-private fun PhotoContent(uiState: PhotoUiState, onBack: () -> Unit, modifier: Modifier = Modifier) {
+private fun PhotoContent(
+    uiState: PhotoUiState,
+    onEditClick: () -> Unit,
+    onBack: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     var isDeleteConfirmShown by rememberSaveable { mutableStateOf(false) }
 
     Scaffold(
@@ -78,6 +86,9 @@ private fun PhotoContent(uiState: PhotoUiState, onBack: () -> Unit, modifier: Mo
                 if (uiState.isDeleting) {
                     CircularProgressIndicator(modifier = Modifier.padding(PADDING / 2).size(PROGRESS_SIZE))
                 } else if (uiState.canDelete) {
+                    IconButton(onClick = onEditClick) {
+                        Icon(imageVector = Icons.Filled.Edit, contentDescription = stringResource(RString.photo_edit))
+                    }
                     IconButton(onClick = { isDeleteConfirmShown = true }) {
                         Icon(
                             imageVector = Icons.Filled.Delete,

@@ -185,13 +185,13 @@ fun EditAlbumScreen(
 }
 
 /**
- * The frame of the new and the edit album form: the top bar with Save, and the discard confirm.
+ * The frame of the album and the photo forms, new and edit: the top bar with Save, and the discard confirm.
  * While [hasInput], one back tap must not lose the form: the arrow and the system back ask first.
  * [content] gets the modifier of the area under the top bar.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun AlbumFormScaffold(
+internal fun AlbumFormScaffold(
     topTitle: String,
     hasInput: Boolean,
     canSave: Boolean,
@@ -289,6 +289,7 @@ private fun AlbumForm(
         FormImageSection(
             photo = photo,
             imageUrl = imageUrl,
+            isServerImageRemovable = true,
             onPhotosAdd = onPhotosAdd,
             onPhotoRotate = onPhotoRotate,
             onPhotoRemove = onPhotoRemove
@@ -298,12 +299,14 @@ private fun AlbumForm(
 
 /**
  * The image part of the form, in its own column with [PADDING] spacing. [photo] is a new photo on
- * this device. Without one, [imageUrl] is the image on the server, with a remove button.
+ * this device. Without one, [imageUrl] is the image on the server, with a remove button only when
+ * [isServerImageRemovable] (a photo image cannot be removed, plan §5 decision 14).
  */
 @Composable
-private fun FormImageSection(
+internal fun FormImageSection(
     photo: FormPhoto?,
     imageUrl: String?,
+    isServerImageRemovable: Boolean,
     onPhotosAdd: (List<String>) -> Unit,
     onPhotoRotate: () -> Unit,
     onPhotoRemove: () -> Unit,
@@ -333,8 +336,10 @@ private fun FormImageSection(
                 modifier = Modifier.size(PREVIEW_SIZE),
                 contentScale = ContentScale.Fit
             )
-            OutlinedButton(onClick = onPhotoRemove) {
-                Text(stringResource(RString.collection_form_remove_photo))
+            if (isServerImageRemovable) {
+                OutlinedButton(onClick = onPhotoRemove) {
+                    Text(stringResource(RString.collection_form_remove_photo))
+                }
             }
         }
         if (photoSources != null) {
@@ -356,7 +361,7 @@ private fun FormImageSection(
  * [partialText] says what is on the server.
  */
 @Composable
-private fun AlbumSaveView(
+internal fun AlbumSaveView(
     status: AlbumSaveStatus,
     partialText: String,
     onRetry: () -> Unit,

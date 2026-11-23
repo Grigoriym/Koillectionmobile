@@ -5,8 +5,8 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 
 /**
- * Tells a screen that is still on the back stack that a photo changed in this process (a delete
- * removed it), so it reads again. One instance per app (bound in `feature:albums:data`). A screen
+ * Tells a screen that is still on the back stack that a photo changed in this process (a form
+ * created or edited it, or a delete removed it), so it reads again. One instance per app (bound in `feature:albums:data`). A screen
  * that is not collecting misses the signal; it reads when it starts anyway.
  */
 class PhotoChanges {

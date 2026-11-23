@@ -8,10 +8,11 @@ import kotlinx.coroutines.CompletableDeferred
 
 /**
  * Each read takes the first queued response of its kind. Queue one before the call. A [photosOf] entry
- * answers the photos of that album instead of the queue. Each album write is logged in [writes]
+ * answers the photos of that album instead of the queue. Each write is logged in [writes]
  * (`"create:<title>:<parent>"`, `"rename:<id>:<title>"`, `"upload:<id>"`, `"deleteImage:<id>"`,
- * `"delete:<id>"`, `"deletePhoto:<id>"`) and answers with its `...Answer`. No screen sends the other
- * writes yet, so each of them fails the test.
+ * `"delete:<id>"`, `"createPhoto:<album>:<title>:<comment>:<place>"`, `"editPhoto:<id>"`,
+ * `"uploadPhoto:<id>"`, `"deletePhoto:<id>"`) and answers with its `...Answer`. [photoEdits] holds
+ * each `editPhoto` map.
  */
 class FakeAlbumsRepository : AlbumsRepository {
     val albums = ArrayDeque<CompletableDeferred<Result<List<Album>>>>()
@@ -94,24 +95,38 @@ class FakeAlbumsRepository : AlbumsRepository {
         return photo.first().await()
     }
 
-    override suspend fun createPhoto(albumId: String, title: String, comment: String?, place: String?): Result<Photo> =
-        unexpected()
+    val photoEdits = mutableListOf<Map<PhotoField, String?>>()
+    var createPhotoAnswer: suspend (albumId: String, title: String) -> Result<Photo> =
+        { albumId, title -> Result.success(photo(id = CREATED_ID, title = title, albumId = albumId)) }
+    var editPhotoAnswer: suspend () -> Result<Photo> = { Result.success(photo(id = "any", title = "any")) }
+    var uploadPhotoAnswer: suspend () -> Result<Photo> = { Result.success(photo(id = "any", title = "any")) }
 
-    override suspend fun editPhoto(id: String, changes: Map<PhotoField, String?>): Result<Photo> = unexpected()
+    override suspend fun createPhoto(albumId: String, title: String, comment: String?, place: String?): Result<Photo> {
+        writes += "createPhoto:$albumId:$title:$comment:$place"
+        return createPhotoAnswer(albumId, title)
+    }
+
+    override suspend fun editPhoto(id: String, changes: Map<PhotoField, String?>): Result<Photo> {
+        writes += "editPhoto:$id"
+        photoEdits += changes
+        return editPhotoAnswer()
+    }
 
     override suspend fun uploadPhotoImage(
         id: String,
         bytes: ByteArray,
         fileName: String,
         mimeType: String
-    ): Result<Photo> = unexpected()
+    ): Result<Photo> {
+        writes += "uploadPhoto:$id"
+        uploads += Upload(bytes, mimeType)
+        return uploadPhotoAnswer()
+    }
 
     override suspend fun deletePhoto(id: String): Result<Unit> {
         writes += "deletePhoto:$id"
         return deletePhotoAnswer()
     }
-
-    private fun unexpected(): Nothing = error("No screen sends this write yet")
 }
 
 class Upload(val bytes: ByteArray, val mimeType: String)

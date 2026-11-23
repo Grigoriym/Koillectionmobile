@@ -5,7 +5,9 @@ import androidx.savedstate.serialization.SavedStateConfiguration
 import com.grappim.koillectionmobile.feature.albums.ui.AlbumListRoute
 import com.grappim.koillectionmobile.feature.albums.ui.AlbumRoute
 import com.grappim.koillectionmobile.feature.albums.ui.EditAlbumRoute
+import com.grappim.koillectionmobile.feature.albums.ui.EditPhotoRoute
 import com.grappim.koillectionmobile.feature.albums.ui.NewAlbumRoute
+import com.grappim.koillectionmobile.feature.albums.ui.NewPhotoRoute
 import com.grappim.koillectionmobile.feature.albums.ui.PhotoRoute
 import com.grappim.koillectionmobile.feature.collections.ui.CollectionListRoute
 import com.grappim.koillectionmobile.feature.collections.ui.CollectionRoute
@@ -71,6 +73,8 @@ private val navKeySerializersModule = SerializersModule {
         subclass(NewAlbumRoute::class)
         subclass(EditAlbumRoute::class)
         subclass(PhotoRoute::class)
+        subclass(NewPhotoRoute::class)
+        subclass(EditPhotoRoute::class)
     }
 }
 

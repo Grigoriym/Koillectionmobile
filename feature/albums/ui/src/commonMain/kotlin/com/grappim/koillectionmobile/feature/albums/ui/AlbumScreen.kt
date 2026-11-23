@@ -60,6 +60,7 @@ import com.grappim.koillectionmobile.strings.generated.resources.album_section_p
 import com.grappim.koillectionmobile.strings.generated.resources.collection_delete_cancel
 import com.grappim.koillectionmobile.strings.generated.resources.collection_delete_confirm
 import com.grappim.koillectionmobile.strings.generated.resources.collection_delete_failed_ok
+import com.grappim.koillectionmobile.strings.generated.resources.photo_new
 import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -72,6 +73,7 @@ fun AlbumScreen(
     onAlbumClick: (String) -> Unit,
     onPhotoClick: (String) -> Unit,
     onNewAlbumClick: () -> Unit,
+    onNewPhotoClick: () -> Unit,
     onEditClick: () -> Unit,
     onBack: () -> Unit,
     onClose: () -> Unit,
@@ -88,6 +90,7 @@ fun AlbumScreen(
         onAlbumClick = onAlbumClick,
         onPhotoClick = onPhotoClick,
         onNewAlbumClick = onNewAlbumClick,
+        onNewPhotoClick = onNewPhotoClick,
         onEditClick = onEditClick,
         onBack = onBack,
         modifier = modifier
@@ -101,6 +104,7 @@ private fun AlbumContent(
     onAlbumClick: (String) -> Unit,
     onPhotoClick: (String) -> Unit,
     onNewAlbumClick: () -> Unit,
+    onNewPhotoClick: () -> Unit,
     onEditClick: () -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier
@@ -119,7 +123,11 @@ private fun AlbumContent(
                         )
                     }
                 }
-                MoreMenu(onNewAlbumClick = onNewAlbumClick, onEditClick = onEditClick)
+                MoreMenu(
+                    onNewAlbumClick = onNewAlbumClick,
+                    onNewPhotoClick = onNewPhotoClick,
+                    onEditClick = onEditClick
+                )
             }
         }
     ) { padding ->
@@ -239,7 +247,7 @@ private fun PhotoCell(photo: Photo, modifier: Modifier = Modifier) {
 
 /** The top bar's overflow menu. */
 @Composable
-private fun MoreMenu(onNewAlbumClick: () -> Unit, onEditClick: () -> Unit) {
+private fun MoreMenu(onNewAlbumClick: () -> Unit, onNewPhotoClick: () -> Unit, onEditClick: () -> Unit) {
     var isExpanded by remember { mutableStateOf(false) }
     Box {
         IconButton(onClick = { isExpanded = true }) {
@@ -251,6 +259,13 @@ private fun MoreMenu(onNewAlbumClick: () -> Unit, onEditClick: () -> Unit) {
                 onClick = {
                     isExpanded = false
                     onNewAlbumClick()
+                }
+            )
+            DropdownMenuItem(
+                text = { Text(stringResource(RString.photo_new)) },
+                onClick = {
+                    isExpanded = false
+                    onNewPhotoClick()
                 }
             )
             DropdownMenuItem(

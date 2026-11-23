@@ -393,6 +393,16 @@
     <string name="photo_delete_text">The server deletes "%1$s". You cannot undo this.</string>
     <string name="photo_delete_failed_title">The photo was not deleted</string>
     <string name="photo_delete_error_unexpected">Deleting the photo failed with an unexpected error.</string>
+    <string name="photo_new">New photo</string>
+    <string name="photo_edit">Edit photo</string>
+    <string name="photo_label_title">Title</string>
+    <string name="photo_form_new_title">New photo</string>
+    <string name="photo_form_edit_title">Edit photo</string>
+    <string name="photo_form_image_required">A new photo needs an image. Take or pick one.</string>
+    <string name="photo_form_save_partial">The photo is on the server, but without its image. Try again to send the image.</string>
+    <string name="photo_form_discard_title">Discard this photo?</string>
+    <string name="photo_form_discard_text">The values and the image on this form are lost.</string>
+    <string name="photo_form_edit_discard_text">The changes on this form are lost. The photo stays as it is on the server.</string>
 
     <string name="loans_section">Loans</string>
     <string name="loans_empty">This item has no loans.</string>
