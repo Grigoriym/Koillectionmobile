@@ -370,6 +370,20 @@
     <string name="album_form_discard_title">Discard this album?</string>
     <string name="album_form_discard_text">The title and the image on this form are lost.</string>
     <string name="album_form_edit_discard_text">The changes on this form are lost. The album stays as it is on the server.</string>
+    <string name="album_delete">Delete album</string>
+    <string name="album_delete_title">Delete this album?</string>
+    <string name="album_delete_text">The server deletes "%1$s" and everything in it: %2$s and %3$s. You cannot undo this.</string>
+    <plurals name="album_delete_children">
+        <item quantity="one">%1$d album</item>
+        <item quantity="other">%1$d albums</item>
+    </plurals>
+    <plurals name="album_delete_photos">
+        <item quantity="one">%1$d photo</item>
+        <item quantity="other">%1$d photos</item>
+    </plurals>
+    <string name="album_delete_failed_title">The album was not deleted</string>
+    <string name="album_delete_count_error_unexpected">Counting the albums and photos to delete failed with an unexpected error.</string>
+    <string name="album_delete_error_unexpected">Deleting the album failed with an unexpected error.</string>
 
     <string name="loans_section">Loans</string>
     <string name="loans_empty">This item has no loans.</string>

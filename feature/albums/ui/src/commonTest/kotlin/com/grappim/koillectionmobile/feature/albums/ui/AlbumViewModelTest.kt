@@ -4,17 +4,25 @@ import com.grappim.kit.testing.MainDispatcherRule
 import com.grappim.kit.uikit.NativeText
 import com.grappim.koillectionmobile.core.domain.KoillectionError
 import com.grappim.koillectionmobile.feature.albums.domain.Album
+import com.grappim.koillectionmobile.feature.albums.domain.AlbumChange
 import com.grappim.koillectionmobile.feature.albums.domain.AlbumChanges
 import com.grappim.koillectionmobile.feature.albums.domain.Photo
 import com.grappim.koillectionmobile.strings.RString
+import com.grappim.koillectionmobile.strings.generated.resources.album_delete_count_error_unexpected
+import com.grappim.koillectionmobile.strings.generated.resources.album_delete_error_unexpected
 import com.grappim.koillectionmobile.strings.generated.resources.album_error_unexpected
 import com.grappim.koillectionmobile.strings.generated.resources.albums_error_network
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class AlbumViewModelTest {
@@ -170,6 +178,129 @@ class AlbumViewModelTest {
         assertEquals(1, repository.albumCalls.size)
     }
 
+    /**
+     * Trips holds Japan and asia; Japan holds Tokyo. "Other" is a top-level album outside the tree.
+     * Trips has 3 photos, Japan 2, asia none, Tokyo 1.
+     */
+    private fun answerTree() {
+        repository.albums.addLast(
+            CompletableDeferred(Result.success(listOf(TRIPS, japan, asia, tokyo, album(id = "other", title = "Other"))))
+        )
+        repository.photosOf[TRIPS.id] = Result.success(listOf(tent, beach, map))
+        repository.photosOf[japan.id] = Result.success(listOf(photo("temple", "Temple"), photo("fuji", "Fuji")))
+        repository.photosOf[asia.id] = Result.success(emptyList())
+        repository.photosOf[tokyo.id] = Result.success(listOf(photo("tower", "Tower")))
+    }
+
+    /** A view model whose first load has succeeded, so the delete is offered. */
+    private fun loadedSut(): AlbumViewModel = createSut().also { answer() }
+
+    @Test
+    fun `the delete counts the child albums at every level and the photos in all of them`() {
+        val sut = loadedSut()
+        answerTree()
+
+        sut.uiState.value.onDeleteClick()
+
+        assertEquals(DeleteSummary(childCount = 3, photoCount = 6), sut.uiState.value.deleteSummary)
+        assertFalse(sut.uiState.value.isCountingDelete)
+        assertEquals(
+            setOf(TRIPS.id, japan.id, asia.id, tokyo.id),
+            repository.photosCalls.drop(1).toSet()
+        )
+        assertTrue(repository.writes.isEmpty())
+    }
+
+    @Test
+    fun `the delete is not offered while the album loads`() {
+        val sut = createSut()
+
+        assertFalse(sut.uiState.value.canDelete)
+        sut.uiState.value.onDeleteClick()
+
+        assertEquals(0, repository.albumsCalls)
+    }
+
+    @Test
+    fun `a failed count shows the error and no confirm`() {
+        val sut = loadedSut()
+        answerTree()
+        repository.photosOf[tokyo.id] = Result.failure(IllegalStateException("parse"))
+
+        sut.uiState.value.onDeleteClick()
+
+        assertNull(sut.uiState.value.deleteSummary)
+        assertEquals(
+            NativeText.Resource(RString.album_delete_count_error_unexpected),
+            sut.uiState.value.deleteError
+        )
+        assertTrue(sut.uiState.value.canDelete)
+    }
+
+    @Test
+    fun `cancel on the confirm drops it and deletes nothing`() {
+        val sut = loadedSut()
+        answerTree()
+        sut.uiState.value.onDeleteClick()
+
+        sut.uiState.value.onDeleteDismiss()
+
+        assertNull(sut.uiState.value.deleteSummary)
+        assertTrue(sut.uiState.value.canDelete)
+        assertTrue(repository.writes.isEmpty())
+    }
+
+    @Test
+    fun `a confirmed delete deletes the album then tells its parent`() {
+        val sut = createSut()
+        answer(album = Result.success(TRIPS.copy(parentId = "travel")))
+        answerTree()
+        sut.uiState.value.onDeleteClick()
+        val changes = mutableListOf<AlbumChange>()
+        val scope = CoroutineScope(Dispatchers.Main)
+        scope.launch { albumChanges.changed.collect { changes += it } }
+        val delete = CompletableDeferred<Result<Unit>>()
+        repository.deleteAnswer = { delete.await() }
+
+        sut.uiState.value.onDeleteConfirm()
+        assertTrue(sut.uiState.value.isDeleting)
+        assertNull(sut.uiState.value.deleteSummary)
+        assertFalse(sut.uiState.value.canDelete)
+        delete.complete(Result.success(Unit))
+
+        assertEquals(listOf("delete:${TRIPS.id}"), repository.writes)
+        assertFalse(sut.uiState.value.isDeleting)
+        assertTrue(sut.uiState.value.isDeleted)
+        assertEquals(listOf(AlbumChange(TRIPS.id, "travel")), changes)
+        // Its own signal does not read the deleted album again.
+        assertEquals(1, repository.albumCalls.size)
+        scope.cancel()
+    }
+
+    @Test
+    fun `a failed delete shows the error keeps the screen and tells no screen`() {
+        val sut = loadedSut()
+        answerTree()
+        sut.uiState.value.onDeleteClick()
+        val changes = mutableListOf<AlbumChange>()
+        val scope = CoroutineScope(Dispatchers.Main)
+        scope.launch { albumChanges.changed.collect { changes += it } }
+        repository.deleteAnswer = { Result.failure(IllegalStateException("boom")) }
+
+        sut.uiState.value.onDeleteConfirm()
+
+        val state = sut.uiState.value
+        assertFalse(state.isDeleted)
+        assertFalse(state.isDeleting)
+        assertEquals(NativeText.Resource(RString.album_delete_error_unexpected), state.deleteError)
+        assertEquals("Trips", state.title)
+        assertTrue(changes.isEmpty())
+
+        state.onDeleteErrorShown()
+        assertTrue(sut.uiState.value.deleteError.isEmpty())
+        scope.cancel()
+    }
+
     private fun assertFailedWith(sut: AlbumViewModel, error: NativeText) {
         val state = sut.uiState.value
         assertFalse(state.isLoading)
@@ -184,6 +315,7 @@ class AlbumViewModelTest {
     private val tent = photo(id = "tent", title = "Tent")
     private val beach = photo(id = "beach", title = "beach")
     private val map = photo(id = "map", title = "Map")
+    private val tokyo = album(id = "tokyo", title = "Tokyo", parentId = "japan")
 
     private companion object {
         val TRIPS = album(id = "trips", title = "Trips")

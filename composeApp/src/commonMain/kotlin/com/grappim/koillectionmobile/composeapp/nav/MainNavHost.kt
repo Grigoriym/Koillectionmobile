@@ -110,7 +110,9 @@ internal fun MainNavHost(modifier: Modifier = Modifier) {
                     onAlbumClick = { id -> backStack.add(AlbumRoute(id)) },
                     onNewAlbumClick = { backStack.add(NewAlbumRoute(route.albumId)) },
                     onEditClick = { backStack.add(EditAlbumRoute(route.albumId)) },
-                    onBack = { backStack.removeLastOrNull() }
+                    onBack = { backStack.removeLastOrNull() },
+                    // The album is gone; the list or the parent reads again (AlbumChanges).
+                    onClose = { backStack.remove(route) }
                 )
             }
             entry<NewAlbumRoute> { route ->

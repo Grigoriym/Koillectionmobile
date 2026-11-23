@@ -7,16 +7,18 @@ import com.grappim.koillectionmobile.feature.albums.domain.PhotoField
 import kotlinx.coroutines.CompletableDeferred
 
 /**
- * Each read takes the first queued response of its kind. Queue one before the call. Each album write
- * is logged in [writes] (`"create:<title>:<parent>"`, `"rename:<id>:<title>"`, `"upload:<id>"`,
- * `"deleteImage:<id>"`) and answers with its `...Answer`. No screen sends the other writes yet, so
- * each of them fails the test.
+ * Each read takes the first queued response of its kind. Queue one before the call. A [photosOf] entry
+ * answers the photos of that album instead of the queue. Each album write is logged in [writes]
+ * (`"create:<title>:<parent>"`, `"rename:<id>:<title>"`, `"upload:<id>"`, `"deleteImage:<id>"`,
+ * `"delete:<id>"`) and answers with its `...Answer`. No screen sends the other writes yet, so each
+ * of them fails the test.
  */
 class FakeAlbumsRepository : AlbumsRepository {
     val albums = ArrayDeque<CompletableDeferred<Result<List<Album>>>>()
     val album = ArrayDeque<CompletableDeferred<Result<Album>>>()
     val children = ArrayDeque<CompletableDeferred<Result<List<Album>>>>()
     val photos = ArrayDeque<CompletableDeferred<Result<List<Photo>>>>()
+    val photosOf = mutableMapOf<String, Result<List<Photo>>>()
 
     var albumsCalls = 0
     val albumCalls = mutableListOf<String>()
@@ -40,6 +42,7 @@ class FakeAlbumsRepository : AlbumsRepository {
 
     override suspend fun getPhotos(albumId: String): Result<List<Photo>> {
         photosCalls += albumId
+        photosOf[albumId]?.let { return it }
         return photos.first().await()
     }
 
@@ -50,6 +53,7 @@ class FakeAlbumsRepository : AlbumsRepository {
     var renameAnswer: suspend () -> Result<Album> = { Result.success(album(id = "any", title = "any")) }
     var uploadAnswer: suspend () -> Result<Album> = { Result.success(album(id = "any", title = "any")) }
     var deleteImageAnswer: suspend () -> Result<Album> = { Result.success(album(id = "any", title = "any")) }
+    var deleteAnswer: suspend () -> Result<Unit> = { Result.success(Unit) }
 
     override suspend fun createAlbum(title: String, parentId: String?): Result<Album> {
         writes += "create:$title:$parentId"
@@ -77,7 +81,10 @@ class FakeAlbumsRepository : AlbumsRepository {
         return deleteImageAnswer()
     }
 
-    override suspend fun deleteAlbum(id: String): Result<Unit> = unexpected()
+    override suspend fun deleteAlbum(id: String): Result<Unit> {
+        writes += "delete:$id"
+        return deleteAnswer()
+    }
 
     override suspend fun getPhoto(id: String): Result<Photo> = unexpected()
 
