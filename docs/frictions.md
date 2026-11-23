@@ -78,3 +78,10 @@ entries get deleted — see /finalize.
   reported exit code 0, though the build had failed: the code was grep's. Read the log for
   `BUILD FAILED`.
 - 2026-11-23 — `adb shell am broadcast -q` (M11.8) failed with "Unknown option: -q" on API 36: `am broadcast` has no quiet flag; drop it and tail the output.
+- 2026-11-23 — `../wallosmobile` (M11.11, named in `CLAUDE.md` and plan §4) did not exist: the
+  checkout is `../Wallosmobile`, and the path is case-sensitive on Linux.
+- 2026-11-23 — ktlint `compose:lambda-param-in-effect` (M11.11) failed `ktlintFormat` for a
+  lambda parameter used inside `LaunchedEffect(Unit)` that sets `LocalTopBarConfig`. Fixed with
+  `rememberUpdatedState`. Every screen M11.12–M11.14 moves onto the shell bar hits the same rule.
+- 2026-11-23 — `am kill` (M11.11) right after `KEYCODE_HOME` left the process alive (`pidof`
+  still printed a pid), as the skill warns. A 5 s wait before `am kill` worked.

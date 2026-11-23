@@ -458,3 +458,7 @@ code without checking the licence terms are kept.
    `grappim-kit-uikit`'s `TopBar` (user, 2026-11-23), not separate icons. That is a shared kit
    change, and a kit session is already at work: the user says when to tell it. Until the kit
    ships it, M11.13 and M11.14 wait on it for those three screens.
+   A screen on the shell bar calls `LocalTopBarConfig.current.update(...)` in a `LaunchedEffect`
+   (`CollectionListScreen`). A lambda parameter used there goes through `rememberUpdatedState`,
+   or ktlint `compose:lambda-param-in-effect` fails. The kit `Navigator.navigate` is single-top:
+   a route already on the section's stack moves to the top, where `backStack.add` added a copy.
