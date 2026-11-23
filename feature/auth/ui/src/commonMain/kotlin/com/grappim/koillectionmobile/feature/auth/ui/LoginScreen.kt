@@ -20,6 +20,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.autofill.ContentType
@@ -30,6 +33,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.grappim.kit.uikit.asString
@@ -37,7 +41,9 @@ import com.grappim.koillectionmobile.feature.auth.ui.permission.rememberLocalNet
 import com.grappim.koillectionmobile.strings.RString
 import com.grappim.koillectionmobile.strings.generated.resources.login_button
 import com.grappim.koillectionmobile.strings.generated.resources.login_cleartext_warning
+import com.grappim.koillectionmobile.strings.generated.resources.login_password_hide
 import com.grappim.koillectionmobile.strings.generated.resources.login_password_label
+import com.grappim.koillectionmobile.strings.generated.resources.login_password_show
 import com.grappim.koillectionmobile.strings.generated.resources.login_server_url_label
 import com.grappim.koillectionmobile.strings.generated.resources.login_server_url_placeholder
 import com.grappim.koillectionmobile.strings.generated.resources.login_settings
@@ -77,6 +83,7 @@ fun LoginScreen(
 private fun LoginContent(uiState: LoginUiState, onSettingsClick: () -> Unit, modifier: Modifier = Modifier) {
     val focusManager = LocalFocusManager.current
     val isEnabled = !uiState.isLoading
+    var isPasswordVisible by rememberSaveable { mutableStateOf(false) }
 
     Surface(modifier = modifier.fillMaxSize()) {
         Column(
@@ -131,10 +138,24 @@ private fun LoginContent(uiState: LoginUiState, onSettingsClick: () -> Unit, mod
                 onValueChange = uiState.onPasswordChange,
                 label = { Text(stringResource(RString.login_password_label)) },
                 singleLine = true,
-                visualTransformation = PasswordVisualTransformation(),
+                visualTransformation = if (isPasswordVisible) {
+                    VisualTransformation.None
+                } else {
+                    PasswordVisualTransformation()
+                },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
                 keyboardActions = KeyboardActions(onDone = { uiState.onLogInClick() }),
-                enabled = isEnabled
+                enabled = isEnabled,
+                // `material-icons-core` has no eye icon, so a text button, as in wallosmobile.
+                trailingIcon = {
+                    TextButton(onClick = { isPasswordVisible = !isPasswordVisible }) {
+                        Text(
+                            stringResource(
+                                if (isPasswordVisible) RString.login_password_hide else RString.login_password_show
+                            )
+                        )
+                    }
+                }
             )
 
             if (uiState.error.isNotEmpty()) {

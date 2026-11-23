@@ -143,11 +143,6 @@ cold session can act on it. Delete an entry when it's fixed.
   (`feature/loans/ui/.../LoansSection.kt:73`, `uiState.isLoading`). The page gets shorter, so
   the scroll position moves up and the loan just changed is off screen. Fix option: keep the old
   list on screen during a reload and show the spinner only when there is no list yet.
-- 2026-11-23 (user) — The login form's password field has no show/hide toggle: it always masks the
-  text (`feature/auth/ui/.../LoginScreen.kt:134`, a fixed `PasswordVisualTransformation()`). A
-  typo in the password cannot be seen before "Log in". Fix option: a `trailingIcon` eye button
-  that switches between `PasswordVisualTransformation()` and `VisualTransformation.None`, with a
-  `content-desc` "Show password" / "Hide password".
 - 2026-11-23 (user) — On a collection screen (`Books`) the item list starts right under the search
   field, with no gap, so a scrolled row slides up against the field's bottom edge. `SearchField`
   has only horizontal padding (`feature/collections/ui/.../CollectionScreen.kt:189`), and the
