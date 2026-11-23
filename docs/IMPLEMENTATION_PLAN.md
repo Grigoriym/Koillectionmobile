@@ -406,3 +406,16 @@ code without checking the licence terms are kept.
    as the web `app_loan_returned` route does. `Loan` has no image. Deleting an item deletes its
    loans on the server (`Item::$loans`, `cascade: ['remove']`). The web pages check the user's
    `loansFeatureEnabled`; the app does not.
+14. **Albums and photos** — *decided 2026-11-23 (start of M11)*: full CRUD of albums (nested, as
+   collections) and photos, with images. The album list opens from the collection list's "More"
+   menu, next to Wishlists (user, 2026-11-23). The album form edits the title and the image, as
+   the wishlist form does (decision 12): the server picks the color, and visibility and parent stay
+   as they are. The album image can be set, replaced and removed (`Album` has `deleteImage`). A
+   delete removes the child albums and their photos too (`cascade: ['all']` on `children` and
+   `photos` in `Album.php`). The photo form edits title (required), comment, place and the image.
+   A new photo needs an image before Save (user, 2026-11-23), although the API accepts one without.
+   The photo image can be replaced but not removed: `Photo` has no `deleteProperty` in Koillection
+   1.8.5, as `Item` (decision 8). Uploads use `core:image` as items do: 2400px JPEG q85, EXIF
+   orientation applied (user, 2026-11-23). One photo per form; no batch add (user, 2026-11-23).
+   `takenAt` is in `photo:read` only: the API cannot set it (only the web `PhotoType` can), so the
+   app shows it and does not edit it. No move of a photo to another album, as wishes (decision 12).
