@@ -55,6 +55,10 @@ cold session can act on it. Delete an entry when it's fixed.
   strings and the repository calls differ. M11.7 (photo form) needs a fourth variant with a
   non-removable image. Fix option: move the form parts to a shared UI module that `core:photos`
   could host.
+  M11.5 copied the nested-delete parts from `feature/wishlists/ui` (M9.5): `descendantIds`,
+  the count, `DeleteSummary` and `DeleteDialogs` in `AlbumViewModel.kt`, `AlbumUiState.kt` and
+  `AlbumScreen.kt` differ only in types and strings. `descendantIds` could take `(id, parentId)`
+  pairs and live in a shared module.
 - 2026-11-15 (M3.6) — Add-item photo files in `cacheDir/photos/` are deleted on photo remove, on
   save, and when the form leaves the back stack (`AddItemViewModel.onCleared`). A form that never
   comes back (the task swiped away, so the saved draft is gone and `onCleared` never runs) leaves
