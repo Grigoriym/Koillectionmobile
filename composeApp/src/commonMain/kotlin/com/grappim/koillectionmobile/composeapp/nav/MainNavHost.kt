@@ -225,16 +225,14 @@ internal fun MainNavHost(navigationState: NavigationState, navigator: Navigator,
                 }
                 entry<TagListRoute> {
                     TagListScreen(
-                        onTagClick = { tag -> navigator.navigate(TagItemsRoute(tagId = tag.id, label = tag.label)) },
-                        onBack = { navigator.goBackOrToStart() }
+                        onTagClick = { tag -> navigator.navigate(TagItemsRoute(tagId = tag.id, label = tag.label)) }
                     )
                 }
                 entry<TagItemsRoute> { route ->
                     TagItemsScreen(
                         tagId = route.tagId,
                         label = route.label,
-                        onItemClick = { id -> navigator.navigate(ItemRoute(id)) },
-                        onBack = { navigator.goBackOrToStart() }
+                        onItemClick = { id -> navigator.navigate(ItemRoute(id)) }
                     )
                 }
                 entry<TemplateListRoute> {
@@ -243,15 +241,13 @@ internal fun MainNavHost(navigationState: NavigationState, navigator: Navigator,
                             navigator.navigate(TemplateRoute(templateId = template.id, name = template.name))
                         },
                         onNewTemplateClick = { navigator.navigate(TemplateFormRoute()) },
-                        onChoiceListsClick = { navigator.navigate(ChoiceListListRoute) },
-                        onBack = { navigator.goBackOrToStart() }
+                        onChoiceListsClick = { navigator.navigate(ChoiceListListRoute) }
                     )
                 }
                 entry<TemplateRoute> { route ->
                     TemplateScreen(
                         templateId = route.templateId,
                         name = route.name,
-                        onBack = { navigator.goBackOrToStart() },
                         onEdit = { navigator.navigate(TemplateFormRoute(route.templateId)) },
                         // The template is gone; the list reads its list again (TemplateChanges).
                         onClose = { navigator.close(route) }
@@ -273,14 +269,12 @@ internal fun MainNavHost(navigationState: NavigationState, navigator: Navigator,
                 entry<ChoiceListListRoute> {
                     ChoiceListListScreen(
                         onChoiceListClick = { id -> navigator.navigate(ChoiceListFormRoute(id)) },
-                        onNewChoiceListClick = { navigator.navigate(ChoiceListFormRoute()) },
-                        onBack = { navigator.goBackOrToStart() }
+                        onNewChoiceListClick = { navigator.navigate(ChoiceListFormRoute()) }
                     )
                 }
                 entry<ChoiceListFormRoute> { route ->
                     ChoiceListFormScreen(
                         choiceListId = route.choiceListId,
-                        onBack = { navigator.goBackOrToStart() },
                         // The screens below read the choice lists again (ChoiceListChanges).
                         onDone = { navigator.close(route) }
                     )

@@ -85,3 +85,7 @@ entries get deleted — see /finalize.
   `rememberUpdatedState`. Every screen M11.12–M11.14 moves onto the shell bar hits the same rule.
 - 2026-11-23 — `am kill` (M11.11) right after `KEYCODE_HOME` left the process alive (`pidof`
   still printed a pid), as the skill warns. A 5 s wait before `am kill` worked.
+- 2026-11-24 — `koil36` (M11.12), started from the sandboxed Bash and resumed from its snapshot,
+  reached the internet but not `10.0.2.2:8290` (`nc` timed out from shell and app UID; the host
+  `curl` answered 200). The first screens had loaded. A cold start (`-no-snapshot-load`) with the
+  sandbox off fixed it.

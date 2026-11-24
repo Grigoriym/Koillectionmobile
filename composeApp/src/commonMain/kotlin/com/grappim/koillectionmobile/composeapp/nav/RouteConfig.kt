@@ -4,8 +4,13 @@ import androidx.navigation3.runtime.NavKey
 import com.grappim.koillectionmobile.feature.albums.ui.AlbumListRoute
 import com.grappim.koillectionmobile.feature.collections.ui.CollectionListRoute
 import com.grappim.koillectionmobile.feature.settings.ui.SettingsRoute
+import com.grappim.koillectionmobile.feature.tags.ui.TagItemsRoute
 import com.grappim.koillectionmobile.feature.tags.ui.TagListRoute
+import com.grappim.koillectionmobile.feature.templates.ui.ChoiceListFormRoute
+import com.grappim.koillectionmobile.feature.templates.ui.ChoiceListListRoute
+import com.grappim.koillectionmobile.feature.templates.ui.TemplateFormRoute
 import com.grappim.koillectionmobile.feature.templates.ui.TemplateListRoute
+import com.grappim.koillectionmobile.feature.templates.ui.TemplateRoute
 import com.grappim.koillectionmobile.feature.wishlists.ui.WishlistListRoute
 
 /** How the drawer behaves on a given route. */
@@ -31,10 +36,13 @@ data class RouteConfig(
 object RouteConfigProvider {
 
     fun getConfig(route: NavKey): RouteConfig = when (route) {
-        CollectionListRoute, SettingsRoute -> RouteConfig(drawerConfig = DrawerConfig.Enabled, hasShellTopBar = true)
+        CollectionListRoute, SettingsRoute, TagListRoute, TemplateListRoute ->
+            RouteConfig(drawerConfig = DrawerConfig.Enabled, hasShellTopBar = true)
 
-        TagListRoute, TemplateListRoute, WishlistListRoute, AlbumListRoute ->
-            RouteConfig(drawerConfig = DrawerConfig.Enabled)
+        WishlistListRoute, AlbumListRoute -> RouteConfig(drawerConfig = DrawerConfig.Enabled)
+
+        is TagItemsRoute, is TemplateRoute, is TemplateFormRoute, ChoiceListListRoute, is ChoiceListFormRoute ->
+            RouteConfig(hasShellTopBar = true)
 
         else -> RouteConfig()
     }

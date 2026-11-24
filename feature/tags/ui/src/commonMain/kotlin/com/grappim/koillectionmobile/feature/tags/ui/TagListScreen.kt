@@ -17,12 +17,17 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.grappim.kit.uikit.NativeText
+import com.grappim.kit.uikit.widgets.topbar.LocalTopBarConfig
+import com.grappim.kit.uikit.widgets.topbar.NavigationIconConfig
+import com.grappim.kit.uikit.widgets.topbar.TopBarConfig
 import com.grappim.koillectionmobile.feature.tags.domain.Tag
 import com.grappim.koillectionmobile.feature.tags.domain.TagGroup
 import com.grappim.koillectionmobile.strings.RString
@@ -35,25 +40,22 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun TagListScreen(
     onTagClick: (Tag) -> Unit,
-    onBack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: TagListViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    TagListContent(uiState = uiState, onTagClick = onTagClick, onBack = onBack, modifier = modifier)
+    val topBarController = LocalTopBarConfig.current
+    LaunchedEffect(Unit) {
+        topBarController.update(
+            TopBarConfig(title = NativeText.Resource(RString.tags_title), navigationIcon = NavigationIconConfig.Menu)
+        )
+    }
+    TagListContent(uiState = uiState, onTagClick = onTagClick, modifier = modifier)
 }
 
 @Composable
-private fun TagListContent(
-    uiState: TagListUiState,
-    onTagClick: (Tag) -> Unit,
-    onBack: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Scaffold(
-        modifier = modifier.fillMaxSize(),
-        topBar = { BackTopBar(title = stringResource(RString.tags_title), onBack = onBack) }
-    ) { padding ->
+private fun TagListContent(uiState: TagListUiState, onTagClick: (Tag) -> Unit, modifier: Modifier = Modifier) {
+    Scaffold(modifier = modifier.fillMaxSize()) { padding ->
         val contentModifier = Modifier
             .fillMaxSize()
             .padding(padding)

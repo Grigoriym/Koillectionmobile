@@ -12,21 +12,28 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.grappim.kit.uikit.NativeText
+import com.grappim.kit.uikit.widgets.topbar.LocalTopBarConfig
+import com.grappim.kit.uikit.widgets.topbar.NavigationIconConfig
+import com.grappim.kit.uikit.widgets.topbar.TopBarActionVectorButton
+import com.grappim.kit.uikit.widgets.topbar.TopBarConfig
 import com.grappim.koillectionmobile.feature.templates.domain.Template
 import com.grappim.koillectionmobile.strings.RString
 import com.grappim.koillectionmobile.strings.generated.resources.choice_lists_title
 import com.grappim.koillectionmobile.strings.generated.resources.templates_empty
 import com.grappim.koillectionmobile.strings.generated.resources.templates_new
 import com.grappim.koillectionmobile.strings.generated.resources.templates_title
+import kotlinx.collections.immutable.persistentListOf
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -35,17 +42,32 @@ fun TemplateListScreen(
     onTemplateClick: (Template) -> Unit,
     onNewTemplateClick: () -> Unit,
     onChoiceListsClick: () -> Unit,
-    onBack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: TemplateListViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val topBarController = LocalTopBarConfig.current
+    val choiceListsLabel = stringResource(RString.choice_lists_title)
+    val currentOnChoiceListsClick by rememberUpdatedState(onChoiceListsClick)
+    LaunchedEffect(choiceListsLabel) {
+        topBarController.update(
+            TopBarConfig(
+                title = NativeText.Resource(RString.templates_title),
+                navigationIcon = NavigationIconConfig.Menu,
+                actions = persistentListOf(
+                    TopBarActionVectorButton(
+                        imageVector = Icons.AutoMirrored.Filled.List,
+                        contentDescription = choiceListsLabel,
+                        onClick = { currentOnChoiceListsClick() }
+                    )
+                )
+            )
+        )
+    }
     TemplateListContent(
         uiState = uiState,
         onTemplateClick = onTemplateClick,
         onNewTemplateClick = onNewTemplateClick,
-        onChoiceListsClick = onChoiceListsClick,
-        onBack = onBack,
         modifier = modifier
     )
 }
@@ -55,22 +77,10 @@ private fun TemplateListContent(
     uiState: TemplateListUiState,
     onTemplateClick: (Template) -> Unit,
     onNewTemplateClick: () -> Unit,
-    onChoiceListsClick: () -> Unit,
-    onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
-        topBar = {
-            BackTopBar(title = stringResource(RString.templates_title), onBack = onBack) {
-                IconButton(onClick = onChoiceListsClick) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.List,
-                        contentDescription = stringResource(RString.choice_lists_title)
-                    )
-                }
-            }
-        },
         floatingActionButton = {
             FloatingActionButton(onClick = onNewTemplateClick) {
                 Icon(imageVector = Icons.Filled.Add, contentDescription = stringResource(RString.templates_new))

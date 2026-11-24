@@ -7,11 +7,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
@@ -19,16 +17,15 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -38,9 +35,14 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.grappim.kit.uikit.NativeText
 import com.grappim.kit.uikit.asString
+import com.grappim.kit.uikit.widgets.topbar.LocalTopBarConfig
+import com.grappim.kit.uikit.widgets.topbar.NavigationIconConfig
+import com.grappim.kit.uikit.widgets.topbar.TopBarActionTextButton
+import com.grappim.kit.uikit.widgets.topbar.TopBarActionVectorButton
+import com.grappim.kit.uikit.widgets.topbar.TopBarConfig
 import com.grappim.koillectionmobile.strings.RString
 import com.grappim.koillectionmobile.strings.generated.resources.choice_list_delete
 import com.grappim.koillectionmobile.strings.generated.resources.choice_list_delete_text
@@ -54,13 +56,14 @@ import com.grappim.koillectionmobile.strings.generated.resources.choice_list_for
 import com.grappim.koillectionmobile.strings.generated.resources.choice_list_form_new_title
 import com.grappim.koillectionmobile.strings.generated.resources.choice_list_form_remove_choice
 import com.grappim.koillectionmobile.strings.generated.resources.choice_list_form_section_choices
-import com.grappim.koillectionmobile.strings.generated.resources.collection_form_back
 import com.grappim.koillectionmobile.strings.generated.resources.collection_form_save
 import com.grappim.koillectionmobile.strings.generated.resources.template_delete_cancel
 import com.grappim.koillectionmobile.strings.generated.resources.template_delete_confirm
 import com.grappim.koillectionmobile.strings.generated.resources.template_delete_failed_ok
 import com.grappim.koillectionmobile.strings.generated.resources.template_form_move_down
 import com.grappim.koillectionmobile.strings.generated.resources.template_form_move_up
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toPersistentList
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -70,11 +73,9 @@ import org.koin.core.parameter.parametersOf
  * also deletes the list. [onDone] runs once the save or the delete went through, to take the form
  * off the back stack.
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChoiceListFormScreen(
     choiceListId: String?,
-    onBack: () -> Unit,
     onDone: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ChoiceListFormViewModel = koinViewModel { parametersOf(choiceListId) }
@@ -85,44 +86,44 @@ fun ChoiceListFormScreen(
         if (uiState.isDone) currentOnDone()
     }
     var isDeleteAsked by rememberSaveable { mutableStateOf(false) }
+    val topBarController = LocalTopBarConfig.current
+    val deleteLabel = stringResource(RString.choice_list_delete)
+    val currentOnSave by rememberUpdatedState(uiState.onSave)
+    val hasDraft = uiState.draft != null
+    // The kit bar has no progress slot: while a call runs, the actions stay, disabled, and the
+    // progress shows under the bar.
+    LaunchedEffect(uiState.isNew, hasDraft, uiState.canDelete, uiState.canSave, uiState.isBusy, deleteLabel) {
+        val isBusy = uiState.isBusy
+        topBarController.update(
+            TopBarConfig(
+                title = NativeText.Resource(
+                    if (uiState.isNew) RString.choice_list_form_new_title else RString.choice_list_form_edit_title
+                ),
+                navigationIcon = NavigationIconConfig.Back(),
+                actions = if (hasDraft) {
+                    listOfNotNull(
+                        TopBarActionVectorButton(
+                            imageVector = Icons.Filled.Delete,
+                            contentDescription = deleteLabel,
+                            enabled = !isBusy,
+                            onClick = { isDeleteAsked = true }
+                        ).takeIf { uiState.canDelete },
+                        TopBarActionTextButton(
+                            text = NativeText.Resource(RString.collection_form_save),
+                            enabled = uiState.canSave && !isBusy,
+                            onClick = { currentOnSave() }
+                        )
+                    ).toPersistentList()
+                } else {
+                    persistentListOf()
+                }
+            )
+        )
+    }
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
-            TopAppBar(
-                title = {
-                    val title = if (uiState.isNew) {
-                        RString.choice_list_form_new_title
-                    } else {
-                        RString.choice_list_form_edit_title
-                    }
-                    Text(stringResource(title))
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(RString.collection_form_back)
-                        )
-                    }
-                },
-                actions = {
-                    if (uiState.isBusy) {
-                        CircularProgressIndicator(modifier = Modifier.padding(PADDING / 2).size(PROGRESS_SIZE))
-                    } else if (uiState.draft != null) {
-                        if (uiState.canDelete) {
-                            IconButton(onClick = { isDeleteAsked = true }) {
-                                Icon(
-                                    Icons.Filled.Delete,
-                                    contentDescription = stringResource(RString.choice_list_delete)
-                                )
-                            }
-                        }
-                        TextButton(onClick = uiState.onSave, enabled = uiState.canSave) {
-                            Text(stringResource(RString.collection_form_save))
-                        }
-                    }
-                }
-            )
+            if (uiState.isBusy) LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
         }
     ) { padding ->
         val contentModifier = Modifier
@@ -247,5 +248,3 @@ private fun ChoiceListForm(draft: ChoiceListDraft, uiState: ChoiceListFormUiStat
         }
     }
 }
-
-private val PROGRESS_SIZE = 24.dp

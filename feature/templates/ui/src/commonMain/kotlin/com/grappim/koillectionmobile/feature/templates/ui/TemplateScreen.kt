@@ -2,24 +2,20 @@ package com.grappim.koillectionmobile.feature.templates.ui
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -29,11 +25,14 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.grappim.kit.uikit.NativeText
 import com.grappim.kit.uikit.asString
+import com.grappim.kit.uikit.widgets.topbar.LocalTopBarConfig
+import com.grappim.kit.uikit.widgets.topbar.NavigationIconConfig
+import com.grappim.kit.uikit.widgets.topbar.TopBarActionVectorButton
+import com.grappim.kit.uikit.widgets.topbar.TopBarConfig
 import com.grappim.koillectionmobile.strings.RString
-import com.grappim.koillectionmobile.strings.generated.resources.collection_back
 import com.grappim.koillectionmobile.strings.generated.resources.template_delete
 import com.grappim.koillectionmobile.strings.generated.resources.template_delete_cancel
 import com.grappim.koillectionmobile.strings.generated.resources.template_delete_confirm
@@ -44,6 +43,7 @@ import com.grappim.koillectionmobile.strings.generated.resources.template_delete
 import com.grappim.koillectionmobile.strings.generated.resources.template_edit
 import com.grappim.koillectionmobile.strings.generated.resources.template_empty
 import com.grappim.koillectionmobile.strings.generated.resources.template_field_choice_list
+import kotlinx.collections.immutable.persistentListOf
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -57,7 +57,6 @@ import org.koin.core.parameter.parametersOf
 fun TemplateScreen(
     templateId: String,
     name: String,
-    onBack: () -> Unit,
     onEdit: () -> Unit,
     onClose: () -> Unit,
     modifier: Modifier = Modifier,
@@ -68,52 +67,50 @@ fun TemplateScreen(
     LaunchedEffect(uiState.isDeleted) {
         if (uiState.isDeleted) currentOnClose()
     }
-    TemplateContent(uiState = uiState, name = name, onBack = onBack, onEdit = onEdit, modifier = modifier)
+    TemplateContent(uiState = uiState, name = name, onEdit = onEdit, modifier = modifier)
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun TemplateContent(
-    uiState: TemplateUiState,
-    name: String,
-    onBack: () -> Unit,
-    onEdit: () -> Unit,
-    modifier: Modifier = Modifier
-) {
+private fun TemplateContent(uiState: TemplateUiState, name: String, onEdit: () -> Unit, modifier: Modifier = Modifier) {
     var isDeleteAsked by rememberSaveable { mutableStateOf(false) }
     val title = uiState.name ?: name
+    val topBarController = LocalTopBarConfig.current
+    val editLabel = stringResource(RString.template_edit)
+    val deleteLabel = stringResource(RString.template_delete)
+    val currentOnEdit by rememberUpdatedState(onEdit)
+    // The kit bar has no progress slot: while the delete runs, the actions stay, disabled, and the
+    // progress shows under the bar.
+    val hasActions = uiState.canChange || uiState.isDeleting
+    LaunchedEffect(title, hasActions, uiState.isDeleting, editLabel, deleteLabel) {
+        topBarController.update(
+            TopBarConfig(
+                title = NativeText.Simple(title),
+                navigationIcon = NavigationIconConfig.Back(),
+                actions = if (hasActions) {
+                    persistentListOf(
+                        TopBarActionVectorButton(
+                            imageVector = Icons.Filled.Edit,
+                            contentDescription = editLabel,
+                            enabled = !uiState.isDeleting,
+                            onClick = { currentOnEdit() }
+                        ),
+                        TopBarActionVectorButton(
+                            imageVector = Icons.Filled.Delete,
+                            contentDescription = deleteLabel,
+                            enabled = !uiState.isDeleting,
+                            onClick = { isDeleteAsked = true }
+                        )
+                    )
+                } else {
+                    persistentListOf()
+                }
+            )
+        )
+    }
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
-            TopAppBar(
-                title = { Text(title) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(RString.collection_back)
-                        )
-                    }
-                },
-                actions = {
-                    if (uiState.isDeleting) {
-                        CircularProgressIndicator(modifier = Modifier.padding(PADDING / 2).size(PROGRESS_SIZE))
-                    } else if (uiState.canChange) {
-                        IconButton(onClick = onEdit) {
-                            Icon(
-                                imageVector = Icons.Filled.Edit,
-                                contentDescription = stringResource(RString.template_edit)
-                            )
-                        }
-                        IconButton(onClick = { isDeleteAsked = true }) {
-                            Icon(
-                                imageVector = Icons.Filled.Delete,
-                                contentDescription = stringResource(RString.template_delete)
-                            )
-                        }
-                    }
-                }
-            )
+            if (uiState.isDeleting) LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
         }
     ) { padding ->
         val contentModifier = Modifier
@@ -180,5 +177,3 @@ private fun TemplateContent(
         )
     }
 }
-
-private val PROGRESS_SIZE = 24.dp

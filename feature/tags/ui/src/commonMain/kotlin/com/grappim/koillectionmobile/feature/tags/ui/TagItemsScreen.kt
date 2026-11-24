@@ -11,10 +11,15 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.grappim.kit.uikit.NativeText
+import com.grappim.kit.uikit.widgets.topbar.LocalTopBarConfig
+import com.grappim.kit.uikit.widgets.topbar.NavigationIconConfig
+import com.grappim.kit.uikit.widgets.topbar.TopBarConfig
 import com.grappim.koillectionmobile.strings.RString
 import com.grappim.koillectionmobile.strings.generated.resources.tag_items_empty
 import org.jetbrains.compose.resources.stringResource
@@ -26,26 +31,22 @@ fun TagItemsScreen(
     tagId: String,
     label: String,
     onItemClick: (String) -> Unit,
-    onBack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: TagItemsViewModel = koinViewModel { parametersOf(tagId) }
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    TagItemsContent(uiState = uiState, label = label, onItemClick = onItemClick, onBack = onBack, modifier = modifier)
+    val topBarController = LocalTopBarConfig.current
+    LaunchedEffect(label) {
+        topBarController.update(
+            TopBarConfig(title = NativeText.Simple(label), navigationIcon = NavigationIconConfig.Back())
+        )
+    }
+    TagItemsContent(uiState = uiState, onItemClick = onItemClick, modifier = modifier)
 }
 
 @Composable
-private fun TagItemsContent(
-    uiState: TagItemsUiState,
-    label: String,
-    onItemClick: (String) -> Unit,
-    onBack: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Scaffold(
-        modifier = modifier.fillMaxSize(),
-        topBar = { BackTopBar(title = label, onBack = onBack) }
-    ) { padding ->
+private fun TagItemsContent(uiState: TagItemsUiState, onItemClick: (String) -> Unit, modifier: Modifier = Modifier) {
+    Scaffold(modifier = modifier.fillMaxSize()) { padding ->
         val contentModifier = Modifier
             .fillMaxSize()
             .padding(padding)

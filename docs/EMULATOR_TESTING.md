@@ -46,8 +46,8 @@ this app.
   token) and read `/items/<id>`.
 - The drawer (M11.11) holds Collections, Tags, Templates, Wishlists, Albums, Settings and Log out.
   Open it with "Open the menu" (`content-desc`) on the collection list or Settings. Each label is
-  two nodes (the icon's `content-desc` and the `text`), so tap the text: `ui.py tap Tags 1`. Until
-  M11.14 only those two screens have the menu button; the other section roots show their own Back.
+  two nodes (the icon's `content-desc` and the `text`), so tap the text: `ui.py tap Tags 1`. Tags and
+  Templates have it too (M11.12); until M11.14 the Wishlists and Albums roots show their own Back.
   An edge swipe is the system back on this AVD (gesture navigation), not a drawer swipe. Back at
   the root of any other section goes to Collections; back at the Collections root leaves the app.
 - Log out (M2.6) is "Log out" in the drawer. After it the

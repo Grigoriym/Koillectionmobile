@@ -15,11 +15,16 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.grappim.kit.uikit.NativeText
+import com.grappim.kit.uikit.widgets.topbar.LocalTopBarConfig
+import com.grappim.kit.uikit.widgets.topbar.NavigationIconConfig
+import com.grappim.kit.uikit.widgets.topbar.TopBarConfig
 import com.grappim.koillectionmobile.strings.RString
 import com.grappim.koillectionmobile.strings.generated.resources.choice_lists_empty
 import com.grappim.koillectionmobile.strings.generated.resources.choice_lists_new
@@ -32,14 +37,21 @@ import org.koin.compose.viewmodel.koinViewModel
 fun ChoiceListListScreen(
     onChoiceListClick: (String) -> Unit,
     onNewChoiceListClick: () -> Unit,
-    onBack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ChoiceListListViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val topBarController = LocalTopBarConfig.current
+    LaunchedEffect(Unit) {
+        topBarController.update(
+            TopBarConfig(
+                title = NativeText.Resource(RString.choice_lists_title),
+                navigationIcon = NavigationIconConfig.Back()
+            )
+        )
+    }
     Scaffold(
         modifier = modifier.fillMaxSize(),
-        topBar = { BackTopBar(title = stringResource(RString.choice_lists_title), onBack = onBack) },
         floatingActionButton = {
             FloatingActionButton(onClick = onNewChoiceListClick) {
                 Icon(imageVector = Icons.Filled.Add, contentDescription = stringResource(RString.choice_lists_new))
