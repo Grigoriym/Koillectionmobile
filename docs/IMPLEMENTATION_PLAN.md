@@ -456,8 +456,11 @@ code without checking the licence terms are kept.
    system there, and the app would close. Log out is `DrawerDestination.LogOut` with no route.
    The "More" menus on the collection, wishlist and album screens become a menu action in
    `grappim-kit-uikit`'s `TopBar` (user, 2026-11-23), not separate icons. That is a shared kit
-   change, and a kit session is already at work: the user says when to tell it. Until the kit
-   ships it, M11.13 and M11.14 wait on it for those three screens.
+   change; the user had the kit session build it. It shipped in grappim-kit 0.1.9 (2026-11-24) as
+   `TopBarActionMenu(imageVector, contentDescription, items, enabled)` with
+   `TopBarMenuItem(text: NativeText, enabled, onClick)`. `onClick` moved off the `TopBarAction`
+   interface onto the button variants (kit `CONSUMING.md`, uikit). M11.13 and M11.14 bump
+   `grappimKit` to 0.1.9 for those three screens; this app still pins 0.1.8.
    A screen on the shell bar calls `LocalTopBarConfig.current.update(...)` in a `LaunchedEffect`
    (`CollectionListScreen`). A lambda parameter used there goes through `rememberUpdatedState`,
    or ktlint `compose:lambda-param-in-effect` fails. The kit `Navigator.navigate` is single-top:
