@@ -15,10 +15,15 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.grappim.kit.uikit.NativeText
+import com.grappim.kit.uikit.widgets.topbar.LocalTopBarConfig
+import com.grappim.kit.uikit.widgets.topbar.NavigationIconConfig
+import com.grappim.kit.uikit.widgets.topbar.TopBarConfig
 import com.grappim.koillectionmobile.strings.RString
 import com.grappim.koillectionmobile.strings.generated.resources.album_new
 import com.grappim.koillectionmobile.strings.generated.resources.albums_empty
@@ -30,16 +35,23 @@ import org.koin.compose.viewmodel.koinViewModel
 fun AlbumListScreen(
     onAlbumClick: (String) -> Unit,
     onNewAlbumClick: () -> Unit,
-    onBack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: AlbumListViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val topBarController = LocalTopBarConfig.current
+    LaunchedEffect(Unit) {
+        topBarController.update(
+            TopBarConfig(
+                title = NativeText.Resource(RString.albums_title),
+                navigationIcon = NavigationIconConfig.Menu
+            )
+        )
+    }
     AlbumListContent(
         uiState = uiState,
         onAlbumClick = onAlbumClick,
         onNewAlbumClick = onNewAlbumClick,
-        onBack = onBack,
         modifier = modifier
     )
 }
@@ -49,12 +61,10 @@ private fun AlbumListContent(
     uiState: AlbumListUiState,
     onAlbumClick: (String) -> Unit,
     onNewAlbumClick: () -> Unit,
-    onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
-        topBar = { BackTopBar(title = stringResource(RString.albums_title), onBack = onBack) },
         floatingActionButton = {
             FloatingActionButton(onClick = onNewAlbumClick) {
                 Icon(imageVector = Icons.Filled.Add, contentDescription = stringResource(RString.album_new))

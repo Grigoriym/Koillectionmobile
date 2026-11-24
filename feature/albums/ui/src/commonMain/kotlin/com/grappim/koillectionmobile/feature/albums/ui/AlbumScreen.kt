@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridScope
@@ -20,10 +19,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -32,16 +28,20 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.grappim.kit.uikit.NativeText
 import com.grappim.kit.uikit.asString
+import com.grappim.kit.uikit.widgets.topbar.LocalTopBarConfig
+import com.grappim.kit.uikit.widgets.topbar.NavigationIconConfig
+import com.grappim.kit.uikit.widgets.topbar.TopBarActionMenu
+import com.grappim.kit.uikit.widgets.topbar.TopBarActionVectorButton
+import com.grappim.kit.uikit.widgets.topbar.TopBarConfig
+import com.grappim.kit.uikit.widgets.topbar.TopBarMenuItem
 import com.grappim.koillectionmobile.feature.albums.domain.Photo
 import com.grappim.koillectionmobile.strings.RPlurals
 import com.grappim.koillectionmobile.strings.RString
@@ -61,6 +61,7 @@ import com.grappim.koillectionmobile.strings.generated.resources.collection_dele
 import com.grappim.koillectionmobile.strings.generated.resources.collection_delete_confirm
 import com.grappim.koillectionmobile.strings.generated.resources.collection_delete_failed_ok
 import com.grappim.koillectionmobile.strings.generated.resources.photo_new
+import kotlinx.collections.immutable.persistentListOf
 import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -75,7 +76,6 @@ fun AlbumScreen(
     onNewAlbumClick: () -> Unit,
     onNewPhotoClick: () -> Unit,
     onEditClick: () -> Unit,
-    onBack: () -> Unit,
     onClose: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: AlbumViewModel = koinViewModel { parametersOf(albumId) }
@@ -92,7 +92,6 @@ fun AlbumScreen(
         onNewAlbumClick = onNewAlbumClick,
         onNewPhotoClick = onNewPhotoClick,
         onEditClick = onEditClick,
-        onBack = onBack,
         modifier = modifier
     )
 }
@@ -106,29 +105,62 @@ private fun AlbumContent(
     onNewAlbumClick: () -> Unit,
     onNewPhotoClick: () -> Unit,
     onEditClick: () -> Unit,
-    onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val topBarController = LocalTopBarConfig.current
+    val deleteLabel = stringResource(RString.album_delete)
+    val moreLabel = stringResource(RString.album_more)
+    val currentOnDeleteClick by rememberUpdatedState(uiState.onDeleteClick)
+    val currentOnNewAlbumClick by rememberUpdatedState(onNewAlbumClick)
+    val currentOnNewPhotoClick by rememberUpdatedState(onNewPhotoClick)
+    val currentOnEditClick by rememberUpdatedState(onEditClick)
+    // The kit bar has no progress slot: while the delete runs, Delete stays, disabled, and the
+    // progress shows under the bar.
+    val isBusy = uiState.isCountingDelete || uiState.isDeleting
+    val hasDelete = uiState.canDelete || isBusy
+    LaunchedEffect(uiState.title, hasDelete, isBusy, deleteLabel, moreLabel) {
+        val menu = TopBarActionMenu(
+            imageVector = Icons.Filled.MoreVert,
+            contentDescription = moreLabel,
+            items = persistentListOf(
+                TopBarMenuItem(
+                    text = NativeText.Resource(RString.album_new),
+                    onClick = { currentOnNewAlbumClick() }
+                ),
+                TopBarMenuItem(
+                    text = NativeText.Resource(RString.photo_new),
+                    onClick = { currentOnNewPhotoClick() }
+                ),
+                TopBarMenuItem(
+                    text = NativeText.Resource(RString.album_edit),
+                    onClick = { currentOnEditClick() }
+                )
+            )
+        )
+        topBarController.update(
+            TopBarConfig(
+                title = NativeText.Simple(uiState.title),
+                navigationIcon = NavigationIconConfig.Back(),
+                actions = if (hasDelete) {
+                    persistentListOf(
+                        TopBarActionVectorButton(
+                            imageVector = Icons.Filled.Delete,
+                            contentDescription = deleteLabel,
+                            enabled = !isBusy,
+                            onClick = { currentOnDeleteClick() }
+                        ),
+                        menu
+                    )
+                } else {
+                    persistentListOf(menu)
+                }
+            )
+        )
+    }
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
-            BackTopBar(title = uiState.title, onBack = onBack) {
-                if (uiState.isCountingDelete || uiState.isDeleting) {
-                    CircularProgressIndicator(modifier = Modifier.padding(PADDING / 2).size(PROGRESS_SIZE))
-                } else if (uiState.canDelete) {
-                    IconButton(onClick = uiState.onDeleteClick) {
-                        Icon(
-                            imageVector = Icons.Filled.Delete,
-                            contentDescription = stringResource(RString.album_delete)
-                        )
-                    }
-                }
-                MoreMenu(
-                    onNewAlbumClick = onNewAlbumClick,
-                    onNewPhotoClick = onNewPhotoClick,
-                    onEditClick = onEditClick
-                )
-            }
+            if (isBusy) LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
         }
     ) { padding ->
         val contentModifier = Modifier
@@ -245,40 +277,6 @@ private fun PhotoCell(photo: Photo, modifier: Modifier = Modifier) {
     }
 }
 
-/** The top bar's overflow menu. */
-@Composable
-private fun MoreMenu(onNewAlbumClick: () -> Unit, onNewPhotoClick: () -> Unit, onEditClick: () -> Unit) {
-    var isExpanded by remember { mutableStateOf(false) }
-    Box {
-        IconButton(onClick = { isExpanded = true }) {
-            Icon(imageVector = Icons.Filled.MoreVert, contentDescription = stringResource(RString.album_more))
-        }
-        DropdownMenu(expanded = isExpanded, onDismissRequest = { isExpanded = false }) {
-            DropdownMenuItem(
-                text = { Text(stringResource(RString.album_new)) },
-                onClick = {
-                    isExpanded = false
-                    onNewAlbumClick()
-                }
-            )
-            DropdownMenuItem(
-                text = { Text(stringResource(RString.photo_new)) },
-                onClick = {
-                    isExpanded = false
-                    onNewPhotoClick()
-                }
-            )
-            DropdownMenuItem(
-                text = { Text(stringResource(RString.album_edit)) },
-                onClick = {
-                    isExpanded = false
-                    onEditClick()
-                }
-            )
-        }
-    }
-}
-
 @Composable
 private fun SectionHeader(text: String, modifier: Modifier = Modifier) {
     Text(
@@ -291,4 +289,3 @@ private fun SectionHeader(text: String, modifier: Modifier = Modifier) {
 
 private val PHOTO_MIN_SIZE = 112.dp
 private val GRID_SPACING = 4.dp
-private val PROGRESS_SIZE = 24.dp

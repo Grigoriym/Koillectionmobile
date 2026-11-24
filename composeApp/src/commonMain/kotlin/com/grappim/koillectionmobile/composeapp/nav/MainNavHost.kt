@@ -98,8 +98,7 @@ internal fun MainNavHost(navigationState: NavigationState, navigator: Navigator,
                 entry<AlbumListRoute> {
                     AlbumListScreen(
                         onAlbumClick = { id -> navigator.navigate(AlbumRoute(id)) },
-                        onNewAlbumClick = { navigator.navigate(NewAlbumRoute()) },
-                        onBack = { navigator.goBackOrToStart() }
+                        onNewAlbumClick = { navigator.navigate(NewAlbumRoute()) }
                     )
                 }
                 entry<AlbumRoute> { route ->
@@ -110,7 +109,6 @@ internal fun MainNavHost(navigationState: NavigationState, navigator: Navigator,
                         onNewAlbumClick = { navigator.navigate(NewAlbumRoute(route.albumId)) },
                         onNewPhotoClick = { navigator.navigate(NewPhotoRoute(route.albumId)) },
                         onEditClick = { navigator.navigate(EditAlbumRoute(route.albumId)) },
-                        onBack = { navigator.goBackOrToStart() },
                         // The album is gone; the list or the parent reads again (AlbumChanges).
                         onClose = { navigator.close(route) }
                     )
@@ -119,7 +117,6 @@ internal fun MainNavHost(navigationState: NavigationState, navigator: Navigator,
                     PhotoScreen(
                         photoId = route.photoId,
                         onEditClick = { navigator.navigate(EditPhotoRoute(route.photoId)) },
-                        onBack = { navigator.goBackOrToStart() },
                         // The photo is gone; its album reads again (PhotoChanges).
                         onClose = { navigator.close(route) }
                     )
@@ -159,8 +156,7 @@ internal fun MainNavHost(navigationState: NavigationState, navigator: Navigator,
                 entry<WishlistListRoute> {
                     WishlistListScreen(
                         onWishlistClick = { id -> navigator.navigate(WishlistRoute(id)) },
-                        onNewWishlistClick = { navigator.navigate(NewWishlistRoute()) },
-                        onBack = { navigator.goBackOrToStart() }
+                        onNewWishlistClick = { navigator.navigate(NewWishlistRoute()) }
                     )
                 }
                 entry<WishlistRoute> { route ->
@@ -171,7 +167,6 @@ internal fun MainNavHost(navigationState: NavigationState, navigator: Navigator,
                         onNewWishlistClick = { navigator.navigate(NewWishlistRoute(route.wishlistId)) },
                         onNewWishClick = { navigator.navigate(NewWishRoute(route.wishlistId)) },
                         onEditClick = { navigator.navigate(EditWishlistRoute(route.wishlistId)) },
-                        onBack = { navigator.goBackOrToStart() },
                         // The wishlist is gone; the list or the parent reads again (WishlistChanges).
                         onClose = { navigator.close(route) }
                     )
@@ -180,7 +175,6 @@ internal fun MainNavHost(navigationState: NavigationState, navigator: Navigator,
                     WishScreen(
                         wishId = route.wishId,
                         onEditClick = { navigator.navigate(EditWishRoute(route.wishId)) },
-                        onBack = { navigator.goBackOrToStart() },
                         // The wish is gone; its wishlist reads again (WishChanges).
                         onClose = { navigator.close(route) }
                     )

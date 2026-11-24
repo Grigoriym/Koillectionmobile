@@ -10,14 +10,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -25,7 +20,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -42,11 +36,15 @@ import androidx.navigationevent.NavigationEventInfo
 import androidx.navigationevent.compose.NavigationBackHandler
 import androidx.navigationevent.compose.rememberNavigationEventState
 import coil3.compose.AsyncImage
+import com.grappim.kit.uikit.NativeText
 import com.grappim.kit.uikit.asString
+import com.grappim.kit.uikit.widgets.topbar.LocalTopBarConfig
+import com.grappim.kit.uikit.widgets.topbar.NavigationIconConfig
+import com.grappim.kit.uikit.widgets.topbar.TopBarActionTextButton
+import com.grappim.kit.uikit.widgets.topbar.TopBarConfig
 import com.grappim.koillectionmobile.core.photos.PhotoPreview
 import com.grappim.koillectionmobile.core.photos.rememberPhotoSources
 import com.grappim.koillectionmobile.strings.RString
-import com.grappim.koillectionmobile.strings.generated.resources.collection_form_back
 import com.grappim.koillectionmobile.strings.generated.resources.collection_form_discard
 import com.grappim.koillectionmobile.strings.generated.resources.collection_form_edit_discard_title
 import com.grappim.koillectionmobile.strings.generated.resources.collection_form_edit_form
@@ -68,6 +66,7 @@ import com.grappim.koillectionmobile.strings.generated.resources.wishlist_form_e
 import com.grappim.koillectionmobile.strings.generated.resources.wishlist_form_name_label
 import com.grappim.koillectionmobile.strings.generated.resources.wishlist_form_new_title
 import com.grappim.koillectionmobile.strings.generated.resources.wishlist_form_save_partial
+import kotlinx.collections.immutable.persistentListOf
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -189,7 +188,6 @@ fun EditWishlistScreen(
  * While [hasInput], one back tap must not lose the form: the arrow and the system back ask first.
  * [content] gets the modifier of the area under the top bar.
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun WishlistFormScaffold(
     topTitle: String,
@@ -227,29 +225,31 @@ internal fun WishlistFormScaffold(
             }
         )
     }
-    Scaffold(
-        modifier = modifier.fillMaxSize(),
-        topBar = {
-            TopAppBar(
-                title = { Text(topTitle) },
-                navigationIcon = {
-                    IconButton(onClick = { if (hasInput) isDiscardShown = true else onBack() }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(RString.collection_form_back)
+    val topBarController = LocalTopBarConfig.current
+    val currentOnBack by rememberUpdatedState(onBack)
+    val currentOnSave by rememberUpdatedState(onSave)
+    LaunchedEffect(topTitle, hasInput, isSaveShown, canSave) {
+        topBarController.update(
+            TopBarConfig(
+                title = NativeText.Simple(topTitle),
+                navigationIcon = NavigationIconConfig.Back(
+                    onBackClick = { if (hasInput) isDiscardShown = true else currentOnBack() }
+                ),
+                actions = if (isSaveShown) {
+                    persistentListOf(
+                        TopBarActionTextButton(
+                            text = NativeText.Resource(RString.collection_form_save),
+                            enabled = canSave,
+                            onClick = { currentOnSave() }
                         )
-                    }
-                },
-                actions = {
-                    if (isSaveShown) {
-                        TextButton(onClick = onSave, enabled = canSave) {
-                            Text(stringResource(RString.collection_form_save))
-                        }
-                    }
+                    )
+                } else {
+                    persistentListOf()
                 }
             )
-        }
-    ) { padding ->
+        )
+    }
+    Scaffold(modifier = modifier.fillMaxSize()) { padding ->
         content(
             Modifier
                 .fillMaxSize()

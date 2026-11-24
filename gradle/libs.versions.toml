@@ -63,7 +63,7 @@ timber = "5.0.1"
 # https://github.com/coil-kt/coil/releases
 coil = "3.6.3"
 # https://github.com/Grigoriym/grappim-kit — one shared VERSION_NAME for every wired module
-grappimKit = "0.1.8"
+grappimKit = "0.1.9"
 
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activity-compose" }

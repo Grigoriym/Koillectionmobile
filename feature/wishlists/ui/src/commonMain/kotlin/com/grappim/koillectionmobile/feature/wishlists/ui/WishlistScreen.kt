@@ -3,8 +3,8 @@ package com.grappim.koillectionmobile.feature.wishlists.ui
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -12,10 +12,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -24,15 +21,18 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.grappim.kit.uikit.NativeText
 import com.grappim.kit.uikit.asString
+import com.grappim.kit.uikit.widgets.topbar.LocalTopBarConfig
+import com.grappim.kit.uikit.widgets.topbar.NavigationIconConfig
+import com.grappim.kit.uikit.widgets.topbar.TopBarActionMenu
+import com.grappim.kit.uikit.widgets.topbar.TopBarActionVectorButton
+import com.grappim.kit.uikit.widgets.topbar.TopBarConfig
+import com.grappim.kit.uikit.widgets.topbar.TopBarMenuItem
 import com.grappim.koillectionmobile.feature.wishlists.domain.Wish
 import com.grappim.koillectionmobile.strings.RPlurals
 import com.grappim.koillectionmobile.strings.RString
@@ -52,6 +52,7 @@ import com.grappim.koillectionmobile.strings.generated.resources.wishlist_more
 import com.grappim.koillectionmobile.strings.generated.resources.wishlist_new
 import com.grappim.koillectionmobile.strings.generated.resources.wishlist_section_children
 import com.grappim.koillectionmobile.strings.generated.resources.wishlist_section_wishes
+import kotlinx.collections.immutable.persistentListOf
 import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -66,7 +67,6 @@ fun WishlistScreen(
     onNewWishlistClick: () -> Unit,
     onNewWishClick: () -> Unit,
     onEditClick: () -> Unit,
-    onBack: () -> Unit,
     onClose: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: WishlistViewModel = koinViewModel { parametersOf(wishlistId) }
@@ -83,7 +83,6 @@ fun WishlistScreen(
         onNewWishlistClick = onNewWishlistClick,
         onNewWishClick = onNewWishClick,
         onEditClick = onEditClick,
-        onBack = onBack,
         modifier = modifier
     )
 }
@@ -96,29 +95,62 @@ private fun WishlistContent(
     onNewWishlistClick: () -> Unit,
     onNewWishClick: () -> Unit,
     onEditClick: () -> Unit,
-    onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val topBarController = LocalTopBarConfig.current
+    val deleteLabel = stringResource(RString.wishlist_delete)
+    val moreLabel = stringResource(RString.wishlist_more)
+    val currentOnDeleteClick by rememberUpdatedState(uiState.onDeleteClick)
+    val currentOnNewWishlistClick by rememberUpdatedState(onNewWishlistClick)
+    val currentOnNewWishClick by rememberUpdatedState(onNewWishClick)
+    val currentOnEditClick by rememberUpdatedState(onEditClick)
+    // The kit bar has no progress slot: while the delete runs, Delete stays, disabled, and the
+    // progress shows under the bar.
+    val isBusy = uiState.isCountingDelete || uiState.isDeleting
+    val hasDelete = uiState.canDelete || isBusy
+    LaunchedEffect(uiState.name, hasDelete, isBusy, deleteLabel, moreLabel) {
+        val menu = TopBarActionMenu(
+            imageVector = Icons.Filled.MoreVert,
+            contentDescription = moreLabel,
+            items = persistentListOf(
+                TopBarMenuItem(
+                    text = NativeText.Resource(RString.wishlist_new),
+                    onClick = { currentOnNewWishlistClick() }
+                ),
+                TopBarMenuItem(
+                    text = NativeText.Resource(RString.wish_new),
+                    onClick = { currentOnNewWishClick() }
+                ),
+                TopBarMenuItem(
+                    text = NativeText.Resource(RString.wishlist_edit),
+                    onClick = { currentOnEditClick() }
+                )
+            )
+        )
+        topBarController.update(
+            TopBarConfig(
+                title = NativeText.Simple(uiState.name),
+                navigationIcon = NavigationIconConfig.Back(),
+                actions = if (hasDelete) {
+                    persistentListOf(
+                        TopBarActionVectorButton(
+                            imageVector = Icons.Filled.Delete,
+                            contentDescription = deleteLabel,
+                            enabled = !isBusy,
+                            onClick = { currentOnDeleteClick() }
+                        ),
+                        menu
+                    )
+                } else {
+                    persistentListOf(menu)
+                }
+            )
+        )
+    }
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
-            BackTopBar(title = uiState.name, onBack = onBack) {
-                if (uiState.isCountingDelete || uiState.isDeleting) {
-                    CircularProgressIndicator(modifier = Modifier.padding(PADDING / 2).size(PROGRESS_SIZE))
-                } else if (uiState.canDelete) {
-                    IconButton(onClick = uiState.onDeleteClick) {
-                        Icon(
-                            imageVector = Icons.Filled.Delete,
-                            contentDescription = stringResource(RString.wishlist_delete)
-                        )
-                    }
-                }
-                MoreMenu(
-                    onNewWishlistClick = onNewWishlistClick,
-                    onNewWishClick = onNewWishClick,
-                    onEditClick = onEditClick
-                )
-            }
+            if (isBusy) LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
         }
     ) { padding ->
         val contentModifier = Modifier
@@ -212,40 +244,6 @@ private fun WishRow(wish: Wish, modifier: Modifier = Modifier) {
     )
 }
 
-/** The top bar's overflow menu. */
-@Composable
-private fun MoreMenu(onNewWishlistClick: () -> Unit, onNewWishClick: () -> Unit, onEditClick: () -> Unit) {
-    var isExpanded by remember { mutableStateOf(false) }
-    Box {
-        IconButton(onClick = { isExpanded = true }) {
-            Icon(imageVector = Icons.Filled.MoreVert, contentDescription = stringResource(RString.wishlist_more))
-        }
-        DropdownMenu(expanded = isExpanded, onDismissRequest = { isExpanded = false }) {
-            DropdownMenuItem(
-                text = { Text(stringResource(RString.wishlist_new)) },
-                onClick = {
-                    isExpanded = false
-                    onNewWishlistClick()
-                }
-            )
-            DropdownMenuItem(
-                text = { Text(stringResource(RString.wish_new)) },
-                onClick = {
-                    isExpanded = false
-                    onNewWishClick()
-                }
-            )
-            DropdownMenuItem(
-                text = { Text(stringResource(RString.wishlist_edit)) },
-                onClick = {
-                    isExpanded = false
-                    onEditClick()
-                }
-            )
-        }
-    }
-}
-
 @Composable
 private fun SectionHeader(text: String, modifier: Modifier = Modifier) {
     Text(
@@ -255,5 +253,3 @@ private fun SectionHeader(text: String, modifier: Modifier = Modifier) {
         color = MaterialTheme.colorScheme.primary
     )
 }
-
-private val PROGRESS_SIZE = 24.dp

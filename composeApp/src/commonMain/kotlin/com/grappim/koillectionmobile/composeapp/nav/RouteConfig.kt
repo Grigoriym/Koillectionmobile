@@ -2,6 +2,12 @@ package com.grappim.koillectionmobile.composeapp.nav
 
 import androidx.navigation3.runtime.NavKey
 import com.grappim.koillectionmobile.feature.albums.ui.AlbumListRoute
+import com.grappim.koillectionmobile.feature.albums.ui.AlbumRoute
+import com.grappim.koillectionmobile.feature.albums.ui.EditAlbumRoute
+import com.grappim.koillectionmobile.feature.albums.ui.EditPhotoRoute
+import com.grappim.koillectionmobile.feature.albums.ui.NewAlbumRoute
+import com.grappim.koillectionmobile.feature.albums.ui.NewPhotoRoute
+import com.grappim.koillectionmobile.feature.albums.ui.PhotoRoute
 import com.grappim.koillectionmobile.feature.collections.ui.CollectionListRoute
 import com.grappim.koillectionmobile.feature.settings.ui.SettingsRoute
 import com.grappim.koillectionmobile.feature.tags.ui.TagItemsRoute
@@ -11,7 +17,13 @@ import com.grappim.koillectionmobile.feature.templates.ui.ChoiceListListRoute
 import com.grappim.koillectionmobile.feature.templates.ui.TemplateFormRoute
 import com.grappim.koillectionmobile.feature.templates.ui.TemplateListRoute
 import com.grappim.koillectionmobile.feature.templates.ui.TemplateRoute
+import com.grappim.koillectionmobile.feature.wishlists.ui.EditWishRoute
+import com.grappim.koillectionmobile.feature.wishlists.ui.EditWishlistRoute
+import com.grappim.koillectionmobile.feature.wishlists.ui.NewWishRoute
+import com.grappim.koillectionmobile.feature.wishlists.ui.NewWishlistRoute
+import com.grappim.koillectionmobile.feature.wishlists.ui.WishRoute
 import com.grappim.koillectionmobile.feature.wishlists.ui.WishlistListRoute
+import com.grappim.koillectionmobile.feature.wishlists.ui.WishlistRoute
 
 /** How the drawer behaves on a given route. */
 sealed interface DrawerConfig {
@@ -36,12 +48,12 @@ data class RouteConfig(
 object RouteConfigProvider {
 
     fun getConfig(route: NavKey): RouteConfig = when (route) {
-        CollectionListRoute, SettingsRoute, TagListRoute, TemplateListRoute ->
+        CollectionListRoute, SettingsRoute, TagListRoute, TemplateListRoute, WishlistListRoute, AlbumListRoute ->
             RouteConfig(drawerConfig = DrawerConfig.Enabled, hasShellTopBar = true)
 
-        WishlistListRoute, AlbumListRoute -> RouteConfig(drawerConfig = DrawerConfig.Enabled)
-
-        is TagItemsRoute, is TemplateRoute, is TemplateFormRoute, ChoiceListListRoute, is ChoiceListFormRoute ->
+        is TagItemsRoute, is TemplateRoute, is TemplateFormRoute, ChoiceListListRoute, is ChoiceListFormRoute,
+        is WishlistRoute, is NewWishlistRoute, is EditWishlistRoute, is WishRoute, is NewWishRoute, is EditWishRoute,
+        is AlbumRoute, is NewAlbumRoute, is EditAlbumRoute, is PhotoRoute, is NewPhotoRoute, is EditPhotoRoute ->
             RouteConfig(hasShellTopBar = true)
 
         else -> RouteConfig()
