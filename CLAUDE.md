@@ -120,7 +120,8 @@ first — it is often for a problem this toolchain doesn't have.
   up alongside your change, A/B it against a clean tree (`git stash -u`).
 - **Run `ktlintCheck` alongside `build`.** `build` skips the root `:ktlintKotlinScriptCheck`.
   After a script inserts imports, run `ktlintFormat` on the module: scripted inserts break the
-  import order.
+  import order. It does not remove unused imports: drop those yourself, and keep `getValue` /
+  `setValue`, which `by` delegation needs without naming them.
 - **A mutation check copies the file to the scratchpad first and restores from the copy.**
   `git checkout --` fails on an untracked file and drops the step's own edits. Run one mutation
   per run, without `-q`: `jvmTest` has `failFast = true` (`Quality.kt`), so the report lists

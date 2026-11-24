@@ -459,8 +459,9 @@ code without checking the licence terms are kept.
    change; the user had the kit session build it. It shipped in grappim-kit 0.1.9 (2026-11-24) as
    `TopBarActionMenu(imageVector, contentDescription, items, enabled)` with
    `TopBarMenuItem(text: NativeText, enabled, onClick)`. `onClick` moved off the `TopBarAction`
-   interface onto the button variants (kit `CONSUMING.md`, uikit). M11.13 and M11.14 bump
-   `grappimKit` to 0.1.9 for those three screens; this app still pins 0.1.8.
+   interface onto the button variants (kit `CONSUMING.md`, uikit). M11.13 bumped
+   `grappimKit` to 0.1.9 and moved the wishlist and album menus onto it; the collection menu
+   follows in M11.14.
    A screen on the shell bar calls `LocalTopBarConfig.current.update(...)` in a `LaunchedEffect`
    (`CollectionListScreen`). A lambda parameter used there goes through `rememberUpdatedState`,
    or ktlint `compose:lambda-param-in-effect` fails. Key the effect on every state value the

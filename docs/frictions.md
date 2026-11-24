@@ -89,3 +89,6 @@ entries get deleted — see /finalize.
   reached the internet but not `10.0.2.2:8290` (`nc` timed out from shell and app UID; the host
   `curl` answered 200). The first screens had loaded. A cold start (`-no-snapshot-load`) with the
   sandbox off fixed it.
+- 2026-11-24 — `ktlintFormat` (M11.13) did not remove imports that a scripted edit left unused
+  (`DropdownMenu`, `IconButton`, `TopAppBar`); a name-match script did, but it also dropped
+  `getValue`/`setValue`, which `by` delegation needs without naming them. Put those two back.

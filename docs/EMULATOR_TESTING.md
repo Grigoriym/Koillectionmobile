@@ -47,7 +47,7 @@ this app.
 - The drawer (M11.11) holds Collections, Tags, Templates, Wishlists, Albums, Settings and Log out.
   Open it with "Open the menu" (`content-desc`) on the collection list or Settings. Each label is
   two nodes (the icon's `content-desc` and the `text`), so tap the text: `ui.py tap Tags 1`. Tags and
-  Templates have it too (M11.12); until M11.14 the Wishlists and Albums roots show their own Back.
+  Templates, Wishlists and Albums have it too (M11.12, M11.13).
   An edge swipe is the system back on this AVD (gesture navigation), not a drawer swipe. Back at
   the root of any other section goes to Collections; back at the Collections root leaves the app.
 - Log out (M2.6) is "Log out" in the drawer. After it the
@@ -193,6 +193,7 @@ this app.
 - Albums (M11.8): "Albums" in the drawer; the list's FAB is "New album" (`content-desc`). On
   an album screen, "More actions" holds "New album", "New photo" and "Edit"; "Delete album" is a
   top-bar icon. The photo screen has "Edit photo" and "Delete photo" icons. A photo cell's tap
-  target is its title text. The album form's save returns to the screen it came from, not to the
+  target is its title text. A new photo cannot be saved without an image ("A new photo needs an
+  image."): pick a solid-colour test JPEG (skill, Step 5). The album form's save returns to the screen it came from, not to the
   new album. The web UI has no photo page (`/photos/<id>` gives 404): read the photo from its album
   page, `/albums/<id>`.
