@@ -463,5 +463,12 @@ code without checking the licence terms are kept.
    `grappimKit` to 0.1.9 for those three screens; this app still pins 0.1.8.
    A screen on the shell bar calls `LocalTopBarConfig.current.update(...)` in a `LaunchedEffect`
    (`CollectionListScreen`). A lambda parameter used there goes through `rememberUpdatedState`,
-   or ktlint `compose:lambda-param-in-effect` fails. The kit `Navigator.navigate` is single-top:
+   or ktlint `compose:lambda-param-in-effect` fails. Key the effect on every state value the
+   config reads (title, `enabled`, which actions show); M11.12 keyed `TemplateScreen` on the loaded
+   name, which replaces the route's empty one after a new template is saved. The kit bar has no
+   progress slot: while a call runs, keep the actions disabled and put a `LinearProgressIndicator`
+   in the screen's own `Scaffold` `topBar` slot (`TemplateScreen`, `ChoiceListFormScreen`). A form
+   whose Back asks before it drops changes passes `NavigationIconConfig.Back(onBackClick = ...)` and
+   keeps its `NavigationBackHandler` for the system back (`TemplateFormScreen`); every other screen
+   uses `Back()`, which the shell maps to `goBackOrToStart`. The kit `Navigator.navigate` is single-top:
    a route already on the section's stack moves to the top, where `backStack.add` added a copy.
