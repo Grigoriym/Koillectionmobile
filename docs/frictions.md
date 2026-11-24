@@ -95,3 +95,4 @@ entries get deleted — see /finalize.
 - 2026-11-24 — `find ~/.gradle/caches -name "grappim-kit-uikit*0.1.9*sources*.jar"` (M11.14) found
   nothing, so the `unzip` after it failed. The kit source was readable in the local
   `../grappim-kit` checkout instead (`uikit/src/commonMain/.../topbar/`).
+- 2026-11-24 — `GET /api/items?name=...` (seed check) returned an empty `member`: the items endpoint has no name filter in 1.8.5. Read the item from its collection's `/items` instead.

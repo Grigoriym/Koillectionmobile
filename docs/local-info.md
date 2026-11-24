@@ -39,6 +39,24 @@ and raise its upload quota. A dump copy keeps the real IDs.
 An older machine made its copy with an API script (`copy_from_real.py`) instead. That copy had
 its own IDs, and the fixtures in `fixtures/koillection-1.8.5/` came from it.
 
+## Sample data
+
+`fixtures/seed.py` adds sample data for every feature the app shows, next to the copy of the
+catalogue (2026-11-24). The copy has no choice lists, wishes, albums, photos or loans of its own.
+
+- `Comics` (default template `Comic book`, every typed field type) with the children
+  `Superheroes` and `Franco-Belgian`: 5 items with a main image, a `Back cover` image field,
+  typed values and tags. `Board games`: 3 items with simple fields.
+- 2 choice lists (`Condition`, `Format`) and the tag `Comics` (page 2 of `/api/tags`).
+- 4 loans: on "Night Watch #1" one open and one returned, one open on "Les Voyageurs, tome 1", one
+  returned on "River Traders".
+- The wishlist `Books to find` with the child `Gift ideas` (5 wishes), and the album `Library
+  shelves` with the child `Book fairs` (5 photos). The images are generated coloured JPEGs.
+- No inventory: Koillection 1.8.5 has no API `Post` for `Inventory`.
+
+`python3 -I fixtures/seed.py` refuses to run twice. `--clean` deletes the seed by its root names;
+after it the counts match the unseeded copy, except the log count. Run it again after a reset.
+
 ## Fixtures
 
 `fixtures/capture.py` writes the JSON fixtures in `fixtures/koillection-1.8.5/` from this
