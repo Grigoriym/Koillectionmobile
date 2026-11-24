@@ -460,8 +460,9 @@ code without checking the licence terms are kept.
    `TopBarActionMenu(imageVector, contentDescription, items, enabled)` with
    `TopBarMenuItem(text: NativeText, enabled, onClick)`. `onClick` moved off the `TopBarAction`
    interface onto the button variants (kit `CONSUMING.md`, uikit). M11.13 bumped
-   `grappimKit` to 0.1.9 and moved the wishlist and album menus onto it; the collection menu
-   follows in M11.14.
+   `grappimKit` to 0.1.9 and moved the wishlist and album menus onto it; M11.14 moved the
+   collection menu. Since M11.14 every logged-in screen is on the shell bar, and the M11.11
+   `RouteConfig.hasShellTopBar` flag is gone.
    A screen on the shell bar calls `LocalTopBarConfig.current.update(...)` in a `LaunchedEffect`
    (`CollectionListScreen`). A lambda parameter used there goes through `rememberUpdatedState`,
    or ktlint `compose:lambda-param-in-effect` fails. Key the effect on every state value the

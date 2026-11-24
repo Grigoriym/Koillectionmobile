@@ -6,11 +6,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Delete
@@ -18,35 +16,34 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.grappim.kit.uikit.NativeText
 import com.grappim.kit.uikit.asString
+import com.grappim.kit.uikit.widgets.topbar.LocalTopBarConfig
+import com.grappim.kit.uikit.widgets.topbar.NavigationIconConfig
+import com.grappim.kit.uikit.widgets.topbar.TopBarActionMenu
+import com.grappim.kit.uikit.widgets.topbar.TopBarActionVectorButton
+import com.grappim.kit.uikit.widgets.topbar.TopBarConfig
+import com.grappim.kit.uikit.widgets.topbar.TopBarMenuItem
 import com.grappim.koillectionmobile.strings.RPlurals
 import com.grappim.koillectionmobile.strings.RString
 import com.grappim.koillectionmobile.strings.generated.resources.collection_add_item
-import com.grappim.koillectionmobile.strings.generated.resources.collection_back
 import com.grappim.koillectionmobile.strings.generated.resources.collection_delete
 import com.grappim.koillectionmobile.strings.generated.resources.collection_delete_cancel
 import com.grappim.koillectionmobile.strings.generated.resources.collection_delete_children
@@ -65,6 +62,8 @@ import com.grappim.koillectionmobile.strings.generated.resources.collection_sear
 import com.grappim.koillectionmobile.strings.generated.resources.collection_search_no_match
 import com.grappim.koillectionmobile.strings.generated.resources.collection_section_children
 import com.grappim.koillectionmobile.strings.generated.resources.collection_section_items
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toPersistentList
 import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -79,7 +78,6 @@ fun CollectionScreen(
     onAddItemClick: () -> Unit,
     onNewCollectionClick: () -> Unit,
     onEditClick: () -> Unit,
-    onBack: () -> Unit,
     onClose: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: CollectionViewModel = koinViewModel { parametersOf(collectionId) }
@@ -96,12 +94,10 @@ fun CollectionScreen(
         onAddItemClick = onAddItemClick,
         onNewCollectionClick = onNewCollectionClick,
         onEditClick = onEditClick,
-        onBack = onBack,
         modifier = modifier
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun CollectionContent(
     uiState: CollectionUiState,
@@ -110,38 +106,52 @@ private fun CollectionContent(
     onAddItemClick: () -> Unit,
     onNewCollectionClick: () -> Unit,
     onEditClick: () -> Unit,
-    onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val topBarController = LocalTopBarConfig.current
+    val deleteLabel = stringResource(RString.collection_delete)
+    val moreLabel = stringResource(RString.collection_more)
+    val currentOnDeleteClick by rememberUpdatedState(uiState.onDeleteClick)
+    val currentOnNewCollectionClick by rememberUpdatedState(onNewCollectionClick)
+    val currentOnEditClick by rememberUpdatedState(onEditClick)
+    // The kit bar has no progress slot: while the delete runs, Delete stays, disabled, and the
+    // progress shows under the bar.
+    val isBusy = uiState.isCountingDelete || uiState.isDeleting
+    val hasDelete = uiState.canDelete || isBusy
+    val hasMenu = !uiState.isLoading && uiState.error.isEmpty() && !uiState.isDeleted
+    LaunchedEffect(uiState.title, hasDelete, isBusy, hasMenu, deleteLabel, moreLabel) {
+        val delete = TopBarActionVectorButton(
+            imageVector = Icons.Filled.Delete,
+            contentDescription = deleteLabel,
+            enabled = !isBusy,
+            onClick = { currentOnDeleteClick() }
+        )
+        val menu = TopBarActionMenu(
+            imageVector = Icons.Filled.MoreVert,
+            contentDescription = moreLabel,
+            items = persistentListOf(
+                TopBarMenuItem(
+                    text = NativeText.Resource(RString.collection_new),
+                    onClick = { currentOnNewCollectionClick() }
+                ),
+                TopBarMenuItem(
+                    text = NativeText.Resource(RString.collection_edit),
+                    onClick = { currentOnEditClick() }
+                )
+            )
+        )
+        topBarController.update(
+            TopBarConfig(
+                title = NativeText.Simple(uiState.title),
+                navigationIcon = NavigationIconConfig.Back(),
+                actions = listOfNotNull(delete.takeIf { hasDelete }, menu.takeIf { hasMenu }).toPersistentList()
+            )
+        )
+    }
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
-            TopAppBar(
-                title = { Text(uiState.title) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(RString.collection_back)
-                        )
-                    }
-                },
-                actions = {
-                    if (uiState.isCountingDelete || uiState.isDeleting) {
-                        CircularProgressIndicator(modifier = Modifier.padding(PADDING / 2).size(PROGRESS_SIZE))
-                    } else if (uiState.canDelete) {
-                        IconButton(onClick = uiState.onDeleteClick) {
-                            Icon(
-                                imageVector = Icons.Filled.Delete,
-                                contentDescription = stringResource(RString.collection_delete)
-                            )
-                        }
-                    }
-                    if (!uiState.isLoading && uiState.error.isEmpty() && !uiState.isDeleted) {
-                        MoreMenu(onNewCollectionClick = onNewCollectionClick, onEditClick = onEditClick)
-                    }
-                }
-            )
+            if (isBusy) LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
         },
         floatingActionButton = {
             FloatingActionButton(onClick = onAddItemClick) {
@@ -287,33 +297,6 @@ private fun DeleteDialogs(uiState: CollectionUiState) {
     }
 }
 
-/** The top bar's overflow menu. */
-@Composable
-private fun MoreMenu(onNewCollectionClick: () -> Unit, onEditClick: () -> Unit) {
-    var isExpanded by remember { mutableStateOf(false) }
-    Box {
-        IconButton(onClick = { isExpanded = true }) {
-            Icon(imageVector = Icons.Filled.MoreVert, contentDescription = stringResource(RString.collection_more))
-        }
-        DropdownMenu(expanded = isExpanded, onDismissRequest = { isExpanded = false }) {
-            DropdownMenuItem(
-                text = { Text(stringResource(RString.collection_new)) },
-                onClick = {
-                    isExpanded = false
-                    onNewCollectionClick()
-                }
-            )
-            DropdownMenuItem(
-                text = { Text(stringResource(RString.collection_edit)) },
-                onClick = {
-                    isExpanded = false
-                    onEditClick()
-                }
-            )
-        }
-    }
-}
-
 @Composable
 private fun SectionHeader(text: String, modifier: Modifier = Modifier) {
     Text(
@@ -323,5 +306,3 @@ private fun SectionHeader(text: String, modifier: Modifier = Modifier) {
         color = MaterialTheme.colorScheme.primary
     )
 }
-
-private val PROGRESS_SIZE = 24.dp

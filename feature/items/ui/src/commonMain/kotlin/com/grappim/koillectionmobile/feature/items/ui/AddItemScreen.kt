@@ -11,12 +11,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -25,7 +23,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -40,13 +37,17 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigationevent.NavigationEventInfo
 import androidx.navigationevent.compose.NavigationBackHandler
 import androidx.navigationevent.compose.rememberNavigationEventState
+import com.grappim.kit.uikit.NativeText
 import com.grappim.kit.uikit.asString
+import com.grappim.kit.uikit.widgets.topbar.LocalTopBarConfig
+import com.grappim.kit.uikit.widgets.topbar.NavigationIconConfig
+import com.grappim.kit.uikit.widgets.topbar.TopBarActionTextButton
+import com.grappim.kit.uikit.widgets.topbar.TopBarConfig
 import com.grappim.koillectionmobile.core.photos.PhotoPreview
 import com.grappim.koillectionmobile.core.photos.rememberPhotoSources
 import com.grappim.koillectionmobile.strings.RString
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_add_field
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_apply_template
-import com.grappim.koillectionmobile.strings.generated.resources.add_item_back
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_discard_text
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_discard_title
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_main_image
@@ -62,6 +63,7 @@ import com.grappim.koillectionmobile.strings.generated.resources.add_item_save_p
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_section_photos
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_take_photo
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_title
+import kotlinx.collections.immutable.persistentListOf
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -84,7 +86,6 @@ fun AddItemScreen(
     AddItemContent(uiState = uiState, onBack = onBack, modifier = modifier)
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun AddItemContent(uiState: AddItemUiState, onBack: () -> Unit, modifier: Modifier = Modifier) {
     // One back tap must not lose a filled form (M3.7): the arrow and the system back ask first.
@@ -113,29 +114,34 @@ private fun AddItemContent(uiState: AddItemUiState, onBack: () -> Unit, modifier
             onDismiss = { isDiscardShown = false }
         )
     }
-    Scaffold(
-        modifier = modifier.fillMaxSize(),
-        topBar = {
-            TopAppBar(
-                title = { Text(stringResource(RString.add_item_title)) },
-                navigationIcon = {
-                    IconButton(onClick = { if (uiState.hasInput) isDiscardShown = true else onBack() }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(RString.add_item_back)
+    val topBarController = LocalTopBarConfig.current
+    val currentOnBack by rememberUpdatedState(onBack)
+    val currentOnSave by rememberUpdatedState(uiState.onSave)
+    val hasInput = uiState.hasInput
+    val isSaveShown = uiState.save == null
+    val canSave = uiState.canSave
+    LaunchedEffect(hasInput, isSaveShown, canSave) {
+        topBarController.update(
+            TopBarConfig(
+                title = NativeText.Resource(RString.add_item_title),
+                navigationIcon = NavigationIconConfig.Back(
+                    onBackClick = { if (hasInput) isDiscardShown = true else currentOnBack() }
+                ),
+                actions = if (isSaveShown) {
+                    persistentListOf(
+                        TopBarActionTextButton(
+                            text = NativeText.Resource(RString.add_item_save),
+                            enabled = canSave,
+                            onClick = { currentOnSave() }
                         )
-                    }
-                },
-                actions = {
-                    if (uiState.save == null) {
-                        TextButton(onClick = uiState.onSave, enabled = uiState.canSave) {
-                            Text(stringResource(RString.add_item_save))
-                        }
-                    }
+                    )
+                } else {
+                    persistentListOf()
                 }
             )
-        }
-    ) { padding ->
+        )
+    }
+    Scaffold(modifier = modifier.fillMaxSize()) { padding ->
         val save = uiState.save
         if (save != null) {
             SaveView(

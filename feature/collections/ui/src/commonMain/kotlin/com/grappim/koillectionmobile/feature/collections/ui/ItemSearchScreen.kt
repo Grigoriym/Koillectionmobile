@@ -7,23 +7,21 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.grappim.kit.uikit.NativeText
+import com.grappim.kit.uikit.widgets.topbar.LocalTopBarConfig
+import com.grappim.kit.uikit.widgets.topbar.NavigationIconConfig
+import com.grappim.kit.uikit.widgets.topbar.TopBarConfig
 import com.grappim.koillectionmobile.strings.RString
-import com.grappim.koillectionmobile.strings.generated.resources.collection_back
 import com.grappim.koillectionmobile.strings.generated.resources.collection_search_no_match
 import com.grappim.koillectionmobile.strings.generated.resources.item_search_empty
 import com.grappim.koillectionmobile.strings.generated.resources.item_search_title
@@ -33,37 +31,30 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun ItemSearchScreen(
     onItemClick: (String) -> Unit,
-    onBack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ItemSearchViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    ItemSearchContent(uiState = uiState, onItemClick = onItemClick, onBack = onBack, modifier = modifier)
+    ItemSearchContent(uiState = uiState, onItemClick = onItemClick, modifier = modifier)
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ItemSearchContent(
     uiState: ItemSearchUiState,
     onItemClick: (String) -> Unit,
-    onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Scaffold(
-        modifier = modifier.fillMaxSize(),
-        topBar = {
-            TopAppBar(
-                title = { Text(stringResource(RString.item_search_title)) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(RString.collection_back)
-                        )
-                    }
-                }
+    val topBarController = LocalTopBarConfig.current
+    LaunchedEffect(Unit) {
+        topBarController.update(
+            TopBarConfig(
+                title = NativeText.Resource(RString.item_search_title),
+                navigationIcon = NavigationIconConfig.Back()
             )
-        }
+        )
+    }
+    Scaffold(
+        modifier = modifier.fillMaxSize()
     ) { padding ->
         val contentModifier = Modifier
             .fillMaxSize()

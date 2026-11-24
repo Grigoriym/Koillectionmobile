@@ -14,6 +14,8 @@ kotlin {
             implementation(projects.core.domain)
             implementation(projects.strings)
             implementation(libs.grappim.kit.uikit)
+            // `persistentListOf` for the shell top bar's actions.
+            implementation(libs.kotlinx.collections)
         }
         commonTest.dependencies {
             implementation(kotlin("test"))

@@ -79,8 +79,7 @@ private fun MainScaffold(
         modifier = modifier.imePadding(),
         topBar = {
             TopBar(
-                isVisible = appState.currentRouteConfig.hasShellTopBar &&
-                    topBarController.config.navigationIcon !is NavigationIconConfig.None,
+                isVisible = topBarController.config.navigationIcon !is NavigationIconConfig.None,
                 drawerState = appState.drawerState,
                 topBarConfig = topBarController.config,
                 defaultGoBack = { navigator.goBackOrToStart() },
@@ -89,7 +88,7 @@ private fun MainScaffold(
             )
         }
     ) { innerPadding ->
-        // Consumed, so a screen that still draws its own top bar adds no second status bar gap.
+        // Consumed, so a screen's own Scaffold adds no second status bar gap.
         LocalNetworkBanner(
             modifier = Modifier
                 .padding(innerPadding)

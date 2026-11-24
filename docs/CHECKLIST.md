@@ -1,6 +1,6 @@
 # koillectionmobile checklist
 
-**Current step:** M11.14 (M11 follow-up, user 2026-11-23; then the user checks the app before M12). M11.13 done 2026-11-24. M11.12 done 2026-11-24. M11.11 done 2026-11-23. M11.10 done 2026-11-23. M11.9 done 2026-11-23. M11 done 2026-11-23. M11.8 done 2026-11-23. M11.7 done 2026-11-23. M11.6 done 2026-11-23. M11.5 done 2026-11-23. M11.4 done 2026-11-23. M11.3 done 2026-11-23. M11.2 done 2026-11-23. M11.1 done 2026-11-23. M11 broken into steps 2026-11-23. M10 done 2026-11-23. M10.6 done 2026-11-23. M10.5 done 2026-11-22. M10.4 done 2026-11-22. M10.3 done 2026-11-22. M10.2 done 2026-11-22. M10.1 done 2026-11-22. M10 broken into steps 2026-11-22. M9 done 2026-11-22. M9.8 done 2026-11-22. M9.7 done 2026-11-22. M9.6 done 2026-11-22. M9.5 done 2026-11-21. M9.4 done 2026-11-21. M9.3 done 2026-11-21. M9.2 done 2026-11-21. M9.1 done 2026-11-21. M9 broken into steps 2026-11-19. M8 done 2026-11-19. M8.9 done 2026-11-19. M8.8 done 2026-11-19. M8.7 done 2026-11-19. M8.6 done 2026-11-18. M8.5 done 2026-11-18. M8.4 done 2026-11-18. M8.3 done 2026-11-17. M8.2 done 2026-11-17. M8.1 done 2026-11-17. M8 broken into steps 2026-11-17; the other areas became M9–M13 and the release moved to M14 (user, 2026-11-17). M7 done 2026-11-17. M7.7 done 2026-11-17. M7.6 done 2026-11-17. M7.5 done 2026-11-17. M7.4 done 2026-11-17. M7.3 done 2026-11-17. M7.2 done 2026-11-17. M7.1 done 2026-11-17. M7 broken into steps 2026-11-17. M6 done 2026-11-17. M6.6 done 2026-11-17. M6.5 done 2026-11-16. M6.4 done 2026-11-16. M6.3 done 2026-11-16. M6.2 done 2026-11-16. M6.1 done 2026-11-16. M6 broken into steps 2026-11-16. M5 done 2026-11-16. M5.7 done 2026-11-16. M5.6 done 2026-11-16. M5.5 done 2026-11-16. M5.4 done 2026-11-16. M5.3 done 2026-11-16. M5.2 done 2026-11-16. M5.1 done 2026-11-16. M5 broken into steps 2026-11-16. M4 done 2026-11-16. M4.4 done 2026-11-16. M4.3 done 2026-11-16. M4.2 done 2026-11-16. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 and 14 are settled.
+**Current step:** the user checks the app before M12 (user, 2026-11-23); then M12 (break it into steps). M11.14 done 2026-11-24. M11.13 done 2026-11-24. M11.12 done 2026-11-24. M11.11 done 2026-11-23. M11.10 done 2026-11-23. M11.9 done 2026-11-23. M11 done 2026-11-23. M11.8 done 2026-11-23. M11.7 done 2026-11-23. M11.6 done 2026-11-23. M11.5 done 2026-11-23. M11.4 done 2026-11-23. M11.3 done 2026-11-23. M11.2 done 2026-11-23. M11.1 done 2026-11-23. M11 broken into steps 2026-11-23. M10 done 2026-11-23. M10.6 done 2026-11-23. M10.5 done 2026-11-22. M10.4 done 2026-11-22. M10.3 done 2026-11-22. M10.2 done 2026-11-22. M10.1 done 2026-11-22. M10 broken into steps 2026-11-22. M9 done 2026-11-22. M9.8 done 2026-11-22. M9.7 done 2026-11-22. M9.6 done 2026-11-22. M9.5 done 2026-11-21. M9.4 done 2026-11-21. M9.3 done 2026-11-21. M9.2 done 2026-11-21. M9.1 done 2026-11-21. M9 broken into steps 2026-11-19. M8 done 2026-11-19. M8.9 done 2026-11-19. M8.8 done 2026-11-19. M8.7 done 2026-11-19. M8.6 done 2026-11-18. M8.5 done 2026-11-18. M8.4 done 2026-11-18. M8.3 done 2026-11-17. M8.2 done 2026-11-17. M8.1 done 2026-11-17. M8 broken into steps 2026-11-17; the other areas became M9–M13 and the release moved to M14 (user, 2026-11-17). M7 done 2026-11-17. M7.7 done 2026-11-17. M7.6 done 2026-11-17. M7.5 done 2026-11-17. M7.4 done 2026-11-17. M7.3 done 2026-11-17. M7.2 done 2026-11-17. M7.1 done 2026-11-17. M7 broken into steps 2026-11-17. M6 done 2026-11-17. M6.6 done 2026-11-17. M6.5 done 2026-11-16. M6.4 done 2026-11-16. M6.3 done 2026-11-16. M6.2 done 2026-11-16. M6.1 done 2026-11-16. M6 broken into steps 2026-11-16. M5 done 2026-11-16. M5.7 done 2026-11-16. M5.6 done 2026-11-16. M5.5 done 2026-11-16. M5.4 done 2026-11-16. M5.3 done 2026-11-16. M5.2 done 2026-11-16. M5.1 done 2026-11-16. M5 broken into steps 2026-11-16. M4 done 2026-11-16. M4.4 done 2026-11-16. M4.3 done 2026-11-16. M4.2 done 2026-11-16. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 and 14 are settled.
 
 ## How to use this
 
@@ -39,75 +39,7 @@ M8 (templates) is done; its steps and notes are in `docs/CHECKLIST_ARCHIVE.md`.
 M9 (wishlists and wishes) is done; its steps and notes are in `docs/CHECKLIST_ARCHIVE.md`.
 M10 (loans) is done; its steps and notes are in `docs/CHECKLIST_ARCHIVE.md`.
 M11 (albums and photos) is done; its steps and notes are in `docs/CHECKLIST_ARCHIVE.md`.
-
-## M11 follow-up — fixes from the user's review
-
-The user's review of the app on 2026-11-23 found these. They run before M12, and the user checks
-the app again before M12 starts (user, 2026-11-23). M11.9 and M11.10 each close a
-`docs/revisit.md` entry. M11.11–M11.14 are the drawer (plan §5 decision 15).
-
-- [x] **M11.9** — Show/hide toggle on the login password field (`feature:auth:ui`). Copy
-  wallosmobile's `LoginScreen`: a "Show"/"Hide" text button as the `trailingIcon`
-  (`material-icons-core` has no eye icon).
-  **Verify:** on the emulator the button shows and hides the typed password; `build ktlintCheck`
-  pass.
-  Note: the visible flag is `rememberSaveable` in `LoginContent`, not in the ViewModel: it is
-  screen state only. On `koil36` "Show" showed `koillection-test`, "Hide" masked it again, and the
-  login went through.
-- [x] **M11.10** — Gap under the search field on the collection screen and on "Search items"
-  (`feature:collections:ui`, `SearchField`).
-  **Verify:** on the emulator a scrolled list stops below the field with a gap on both screens;
-  `build ktlintCheck` pass.
-  Note: `SearchField` got `bottom = PADDING / 2` (8 dp); both screens use it. On `koil36` a
-  half-scrolled row is cut 8 dp below the field on `Books` and on "Search items".
-- [x] **M11.11** — Navigation shell (plan §5 decision 15). Add `grappim-kit-navigation` (read
-  `../grappim-kit/CONSUMING.md`, "navigation", first; use a version with the `goToTopLevel` fix).
-  Port wallosmobile's `MainAppState`, `AuthenticatedMainScreen`, `DrawerDestination`,
-  `DrawerItemsBuilder` and `RouteConfig` into `composeApp`. Sections: Collections (start),
-  Tags, Templates, Wishlists, Albums, Settings; Log out is a drawer action (the logic moves out of
-  `CollectionListViewModel`, with its test). Move the collection list and Settings onto the shell
-  top bar; the other screens keep their own `TopAppBar` for now, and the shell bar stays hidden
-  on them (`NavigationIconConfig.None`). Decide here how the "More" menus fit the kit `TopBar`,
-  which has only icon and text actions: a menu action in `grappim-kit` (a shared change, ask the
-  user first) or separate icons.
-  **Verify:** `build ktlintCheck` and `KoinGraphTest` pass; on the emulator each drawer entry
-  opens its section, each section keeps its own back stack, back at a section root goes to
-  Collections, Log out logs out, and the back stack survives process death.
-  Note: "More" menus: a menu action in the kit `TopBar` (user; plan §5 decision 15), so M11.13 and
-  M11.14 wait on a kit release for the collection, wishlist and album screens. The kit's `goBack`
-  exits at a non-start section root, so the app adds `goBackOrToStart`. `RouteConfig.hasShellTopBar`
-  hides the shell bar on screens that still draw their own; it goes in M11.14. On `koil36` all five
-  other sections opened from the drawer, system back at each root went to Collections, Log out
-  went to login and the login-side Settings had its Back bar, and the Tags → "Children's book"
-  stack came back after `am kill` (pid empty). Not checked on the device: that a section keeps
-  its stack across a switch. The drawer is reachable only on the collection list and Settings
-  until M11.14, so no deep screen can switch; `NavigatorExtTest` covers it.
-- [x] **M11.12** — Shell top bar on Tags, Templates and choice lists (`feature:tags:ui`,
-  `feature:templates:ui`): each screen sets `LocalTopBarConfig` and drops its `TopAppBar`.
-  Section roots show the menu icon, the others Back.
-  **Verify:** `build ktlintCheck` pass; on the emulator every screen of both features shows one
-  top bar with the same title and actions as before.
-  Note: the kit bar has no progress slot, so while a template or choice-list delete or save runs,
-  the actions stay (disabled) and a `LinearProgressIndicator` shows under the bar; before, a
-  spinner replaced the actions. The title is now centred (kit `CenterAlignedTopAppBar`). The
-  screens' `onBack` parameters went, except `TemplateFormScreen`'s (its Back asks first). On
-  `koil36` all 7 screens showed one bar with the old title and actions; the template form's Back
-  opened "Discard this template?"; a temporary choice list and template were created, deleted
-  from the bar, and are gone. The busy state was not caught on screen: offline, the call fails at
-  once.
-- [x] **M11.13** — Shell top bar on Wishlists and Albums (`feature:wishlists:ui`,
-  `feature:albums:ui`), as M11.12.
-  **Verify:** as M11.12, for both features.
-  Note: `grappimKit` went to 0.1.9; the "More actions" menus are the kit's `TopBarActionMenu`. The
-  wishlist and album screens show the delete progress under the bar, as M11.12. The form screens
-  keep `onBack` (Back asks first). On `koil36` all 10 screens showed one bar with the old title and
-  actions; the menu opened New wishlist/New wish/Edit (New album/New photo/Edit); a form's Back with
-  input opened the discard dialog. A temporary wish, child wishlist, album and photo were created
-  and deleted from the bar. The busy state was not caught on screen, as in M11.12.
-- [ ] **M11.14** — Shell top bar on collections, items and loans (`feature:collections:ui`,
-  `feature:items:ui`, `feature:loans:ui`), as M11.12. Afterwards no screen has its own
-  `TopAppBar` (grep), and the shell bar is never hidden on the logged-in side.
-  **Verify:** as M11.12; the grep finds no `TopAppBar(` under `feature/`.
+The M11 follow-up (M11.9–M11.14, fixes from the user's review) is done; its steps and notes are in `docs/CHECKLIST_ARCHIVE.md`.
 
 ## M12 — inventories (rough scope)
 

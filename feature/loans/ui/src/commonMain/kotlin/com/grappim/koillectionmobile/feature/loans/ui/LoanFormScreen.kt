@@ -10,23 +10,18 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -43,9 +38,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigationevent.NavigationEventInfo
 import androidx.navigationevent.compose.NavigationBackHandler
 import androidx.navigationevent.compose.rememberNavigationEventState
+import com.grappim.kit.uikit.NativeText
 import com.grappim.kit.uikit.asString
+import com.grappim.kit.uikit.widgets.topbar.LocalTopBarConfig
+import com.grappim.kit.uikit.widgets.topbar.NavigationIconConfig
+import com.grappim.kit.uikit.widgets.topbar.TopBarActionTextButton
+import com.grappim.kit.uikit.widgets.topbar.TopBarConfig
 import com.grappim.koillectionmobile.strings.RString
-import com.grappim.koillectionmobile.strings.generated.resources.collection_form_back
 import com.grappim.koillectionmobile.strings.generated.resources.collection_form_discard
 import com.grappim.koillectionmobile.strings.generated.resources.collection_form_edit_discard_title
 import com.grappim.koillectionmobile.strings.generated.resources.collection_form_edit_form
@@ -66,6 +65,7 @@ import com.grappim.koillectionmobile.strings.generated.resources.loan_form_retur
 import com.grappim.koillectionmobile.strings.generated.resources.loan_form_saving
 import com.grappim.koillectionmobile.strings.generated.resources.loans_not_returned
 import com.grappim.koillectionmobile.strings.generated.resources.loans_retry
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
@@ -79,7 +79,6 @@ import kotlin.time.Instant
  * The loan form of [route]. While the user changed something, the back arrow and the system back
  * ask first. [onClose] runs once the loan is saved, to take the form off the back stack.
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoanFormScreen(
     route: LoanFormRoute,
@@ -105,35 +104,36 @@ fun LoanFormScreen(
             onBack()
         })
     }
-    Scaffold(
-        modifier = modifier.fillMaxSize(),
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        stringResource(
-                            if (uiState.isEdit) RString.loan_form_edit_title else RString.loan_form_new_title
+    val topBarController = LocalTopBarConfig.current
+    val currentOnBack by rememberUpdatedState(onBack)
+    val currentOnSave by rememberUpdatedState(uiState.onSave)
+    val hasInput = uiState.hasInput
+    val isSaveShown = uiState.values != null && uiState.save == null
+    val canSave = uiState.canSave
+    LaunchedEffect(uiState.isEdit, hasInput, isSaveShown, canSave) {
+        topBarController.update(
+            TopBarConfig(
+                title = NativeText.Resource(
+                    if (uiState.isEdit) RString.loan_form_edit_title else RString.loan_form_new_title
+                ),
+                navigationIcon = NavigationIconConfig.Back(
+                    onBackClick = { if (hasInput) isDiscardShown = true else currentOnBack() }
+                ),
+                actions = if (isSaveShown) {
+                    persistentListOf(
+                        TopBarActionTextButton(
+                            text = NativeText.Resource(RString.collection_form_save),
+                            enabled = canSave,
+                            onClick = { currentOnSave() }
                         )
                     )
-                },
-                navigationIcon = {
-                    IconButton(onClick = { if (uiState.hasInput) isDiscardShown = true else onBack() }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(RString.collection_form_back)
-                        )
-                    }
-                },
-                actions = {
-                    if (uiState.values != null && uiState.save == null) {
-                        TextButton(onClick = uiState.onSave, enabled = uiState.canSave) {
-                            Text(stringResource(RString.collection_form_save))
-                        }
-                    }
+                } else {
+                    persistentListOf()
                 }
             )
-        }
-    ) { padding ->
+        )
+    }
+    Scaffold(modifier = modifier.fillMaxSize()) { padding ->
         val contentModifier = Modifier
             .fillMaxSize()
             .padding(padding)

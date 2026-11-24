@@ -212,10 +212,7 @@ internal fun MainNavHost(navigationState: NavigationState, navigator: Navigator,
                     )
                 }
                 entry<ItemSearchRoute> {
-                    ItemSearchScreen(
-                        onItemClick = { id -> navigator.navigate(ItemRoute(id)) },
-                        onBack = { navigator.goBackOrToStart() }
-                    )
+                    ItemSearchScreen(onItemClick = { id -> navigator.navigate(ItemRoute(id)) })
                 }
                 entry<TagListRoute> {
                     TagListScreen(
@@ -281,7 +278,6 @@ internal fun MainNavHost(navigationState: NavigationState, navigator: Navigator,
                         onAddItemClick = { navigator.navigate(AddItemRoute(route.collectionId)) },
                         onNewCollectionClick = { navigator.navigate(NewCollectionRoute(route.collectionId)) },
                         onEditClick = { navigator.navigate(EditCollectionRoute(route.collectionId)) },
-                        onBack = { navigator.goBackOrToStart() },
                         // The collection is gone; the list or the parent reads it again (CollectionListChanges).
                         onClose = { navigator.close(route) }
                     )
@@ -289,7 +285,6 @@ internal fun MainNavHost(navigationState: NavigationState, navigator: Navigator,
                 entry<ItemRoute> { route ->
                     ItemScreen(
                         itemId = route.itemId,
-                        onBack = { navigator.goBackOrToStart() },
                         // The item is gone; its collection reads its list again (ItemListChanges).
                         onClose = { navigator.close(route) },
                         onEdit = { navigator.navigate(EditItemRoute(route.itemId)) },

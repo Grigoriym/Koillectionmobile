@@ -1140,3 +1140,80 @@ decision 14 (user, 2026-11-23). Every write goes to the local test instance only
   gave 404. The web UI has no photo page: its child album page showed the photo with the blue file
   and "Edited comment", and the parent page showed the child and no image. The delete dialog
   counted 1 album and 0 photos. End state: 0 albums, 0 photos, 6080 upload files, as at the start.
+
+## M11 follow-up — fixes from the user's review
+
+The user's review of the app on 2026-11-23 found these. They run before M12, and the user checks
+the app again before M12 starts (user, 2026-11-23). M11.9 and M11.10 each close a
+`docs/revisit.md` entry. M11.11–M11.14 are the drawer (plan §5 decision 15).
+
+- [x] **M11.9** — Show/hide toggle on the login password field (`feature:auth:ui`). Copy
+  wallosmobile's `LoginScreen`: a "Show"/"Hide" text button as the `trailingIcon`
+  (`material-icons-core` has no eye icon).
+  **Verify:** on the emulator the button shows and hides the typed password; `build ktlintCheck`
+  pass.
+  Note: the visible flag is `rememberSaveable` in `LoginContent`, not in the ViewModel: it is
+  screen state only. On `koil36` "Show" showed `koillection-test`, "Hide" masked it again, and the
+  login went through.
+- [x] **M11.10** — Gap under the search field on the collection screen and on "Search items"
+  (`feature:collections:ui`, `SearchField`).
+  **Verify:** on the emulator a scrolled list stops below the field with a gap on both screens;
+  `build ktlintCheck` pass.
+  Note: `SearchField` got `bottom = PADDING / 2` (8 dp); both screens use it. On `koil36` a
+  half-scrolled row is cut 8 dp below the field on `Books` and on "Search items".
+- [x] **M11.11** — Navigation shell (plan §5 decision 15). Add `grappim-kit-navigation` (read
+  `../grappim-kit/CONSUMING.md`, "navigation", first; use a version with the `goToTopLevel` fix).
+  Port wallosmobile's `MainAppState`, `AuthenticatedMainScreen`, `DrawerDestination`,
+  `DrawerItemsBuilder` and `RouteConfig` into `composeApp`. Sections: Collections (start),
+  Tags, Templates, Wishlists, Albums, Settings; Log out is a drawer action (the logic moves out of
+  `CollectionListViewModel`, with its test). Move the collection list and Settings onto the shell
+  top bar; the other screens keep their own `TopAppBar` for now, and the shell bar stays hidden
+  on them (`NavigationIconConfig.None`). Decide here how the "More" menus fit the kit `TopBar`,
+  which has only icon and text actions: a menu action in `grappim-kit` (a shared change, ask the
+  user first) or separate icons.
+  **Verify:** `build ktlintCheck` and `KoinGraphTest` pass; on the emulator each drawer entry
+  opens its section, each section keeps its own back stack, back at a section root goes to
+  Collections, Log out logs out, and the back stack survives process death.
+  Note: "More" menus: a menu action in the kit `TopBar` (user; plan §5 decision 15), so M11.13 and
+  M11.14 wait on a kit release for the collection, wishlist and album screens. The kit's `goBack`
+  exits at a non-start section root, so the app adds `goBackOrToStart`. `RouteConfig.hasShellTopBar`
+  hides the shell bar on screens that still draw their own; it goes in M11.14. On `koil36` all five
+  other sections opened from the drawer, system back at each root went to Collections, Log out
+  went to login and the login-side Settings had its Back bar, and the Tags → "Children's book"
+  stack came back after `am kill` (pid empty). Not checked on the device: that a section keeps
+  its stack across a switch. The drawer is reachable only on the collection list and Settings
+  until M11.14, so no deep screen can switch; `NavigatorExtTest` covers it.
+- [x] **M11.12** — Shell top bar on Tags, Templates and choice lists (`feature:tags:ui`,
+  `feature:templates:ui`): each screen sets `LocalTopBarConfig` and drops its `TopAppBar`.
+  Section roots show the menu icon, the others Back.
+  **Verify:** `build ktlintCheck` pass; on the emulator every screen of both features shows one
+  top bar with the same title and actions as before.
+  Note: the kit bar has no progress slot, so while a template or choice-list delete or save runs,
+  the actions stay (disabled) and a `LinearProgressIndicator` shows under the bar; before, a
+  spinner replaced the actions. The title is now centred (kit `CenterAlignedTopAppBar`). The
+  screens' `onBack` parameters went, except `TemplateFormScreen`'s (its Back asks first). On
+  `koil36` all 7 screens showed one bar with the old title and actions; the template form's Back
+  opened "Discard this template?"; a temporary choice list and template were created, deleted
+  from the bar, and are gone. The busy state was not caught on screen: offline, the call fails at
+  once.
+- [x] **M11.13** — Shell top bar on Wishlists and Albums (`feature:wishlists:ui`,
+  `feature:albums:ui`), as M11.12.
+  **Verify:** as M11.12, for both features.
+  Note: `grappimKit` went to 0.1.9; the "More actions" menus are the kit's `TopBarActionMenu`. The
+  wishlist and album screens show the delete progress under the bar, as M11.12. The form screens
+  keep `onBack` (Back asks first). On `koil36` all 10 screens showed one bar with the old title and
+  actions; the menu opened New wishlist/New wish/Edit (New album/New photo/Edit); a form's Back with
+  input opened the discard dialog. A temporary wish, child wishlist, album and photo were created
+  and deleted from the bar. The busy state was not caught on screen, as in M11.12.
+- [x] **M11.14** — Shell top bar on collections, items and loans (`feature:collections:ui`,
+  `feature:items:ui`, `feature:loans:ui`), as M11.12. Afterwards no screen has its own
+  `TopAppBar` (grep), and the shell bar is never hidden on the logged-in side.
+  **Verify:** as M11.12; the grep finds no `TopAppBar(` under `feature/`.
+  Note: `RouteConfig.hasShellTopBar` and its two tests are gone; the shell bar hides only before
+  a screen's first config (`NavigationIconConfig.None`). The collection screen's "More actions" is
+  the kit's `TopBarActionMenu`; its and the item screen's delete progress shows under the bar, as
+  M11.12. The form screens keep `onBack` (Back asks first); `ItemSearchScreen`, `CollectionScreen`
+  and `ItemScreen` lost theirs. On `koil36` all 8 screens showed one bar with the old title and
+  actions; Back with input on the edit-item, add-item and loan forms opened the discard dialog. A
+  temporary child collection was created from "More actions", opened in Edit collection, and
+  deleted from the bar. After `am kill` (pid empty) the item screen came back with its bar.

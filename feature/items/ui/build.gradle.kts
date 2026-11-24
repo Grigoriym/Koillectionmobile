@@ -24,6 +24,8 @@ kotlin {
             implementation(projects.core.photos)
             implementation(projects.strings)
             implementation(libs.grappim.kit.uikit)
+            // `persistentListOf` for the shell top bar's actions.
+            implementation(libs.kotlinx.collections)
             // `AsyncImage`. The network fetcher is wired in `:composeApp`.
             implementation(libs.coil.compose)
         }
