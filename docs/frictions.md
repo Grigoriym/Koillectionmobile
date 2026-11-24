@@ -92,3 +92,6 @@ entries get deleted — see /finalize.
 - 2026-11-24 — `ktlintFormat` (M11.13) did not remove imports that a scripted edit left unused
   (`DropdownMenu`, `IconButton`, `TopAppBar`); a name-match script did, but it also dropped
   `getValue`/`setValue`, which `by` delegation needs without naming them. Put those two back.
+- 2026-11-24 — `find ~/.gradle/caches -name "grappim-kit-uikit*0.1.9*sources*.jar"` (M11.14) found
+  nothing, so the `unzip` after it failed. The kit source was readable in the local
+  `../grappim-kit` checkout instead (`uikit/src/commonMain/.../topbar/`).
