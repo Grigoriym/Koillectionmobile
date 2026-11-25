@@ -205,3 +205,12 @@ this app.
   shows it, as in M6.3. To compare with the web UI, log in with `curl` as in M2.5 and read
   `/inventories/<id>`. The app has no way to make an inventory: rerun the seed after the deletes
   (`--clean`, then a plain run), and read the new tick counts from the API.
+- Logs (M13.4): "Logs" in the drawer. Each row is three text nodes: "<Type> created/deleted", the
+  label, then `yyyy-MM-dd HH:mm`. To check paging, compare each dump's labels with the API pages
+  read from `view.last` backwards. Scroll with slow swipes (`input swipe 540 1900 540 1100 1500`): a
+  400 ms swipe flings, and a row can pass between two dumps, which looks like a gap that is not
+  there. The seed made the same labels twice (a run, `--clean`, a run), so a label run can match
+  two places in the API list: take the match after the previous one. The web `/history` page shows
+  nothing without its filter: send every `search_history[classes][]` and both
+  `search_history[types][]` values. To make an item through the web form with `curl`, send
+  `item[tags]=[]` and `item[relatedItems]=[]`; without them the server answers 500.

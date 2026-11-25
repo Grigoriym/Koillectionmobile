@@ -144,7 +144,8 @@ server checks expiry before the signature (checked 2026-11-15):
 
 The cause of an empty 500: the app container's log has the PHP exception as one JSON line per
 request (`docker logs --since 5m <instance container> 2>&1 | grep -i exception`). It named the
-duplicate-label bug in M5.2 (plan §2).
+duplicate-label bug in M5.2 (plan §2). A 500 from a web form (M13.4) was not in `docker logs`: read
+the newest file in `/app/public/var/log/` inside the container and grep it for `CRITICAL`.
 
 ## Proxy front
 
