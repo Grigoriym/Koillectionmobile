@@ -98,7 +98,7 @@ private fun MainScaffold(
             MainNavHost(navigationState = appState.navigationState, navigator = navigator)
         }
 
-        // Back at the root of Tags, Templates, Wishlists, Albums or Settings goes to Collections.
+        // Back at the root of Tags, Templates, Wishlists, Albums, Inventories or Settings goes to Collections.
         NavigationBackHandler(
             state = rememberNavigationEventState(NavigationEventInfo.None),
             isBackEnabled = appState.isAtOtherSectionRoot,

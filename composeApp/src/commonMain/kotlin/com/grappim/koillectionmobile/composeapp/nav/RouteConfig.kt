@@ -3,6 +3,7 @@ package com.grappim.koillectionmobile.composeapp.nav
 import androidx.navigation3.runtime.NavKey
 import com.grappim.koillectionmobile.feature.albums.ui.AlbumListRoute
 import com.grappim.koillectionmobile.feature.collections.ui.CollectionListRoute
+import com.grappim.koillectionmobile.feature.inventories.ui.InventoryListRoute
 import com.grappim.koillectionmobile.feature.settings.ui.SettingsRoute
 import com.grappim.koillectionmobile.feature.tags.ui.TagListRoute
 import com.grappim.koillectionmobile.feature.templates.ui.TemplateListRoute
@@ -23,7 +24,8 @@ data class RouteConfig(val drawerConfig: DrawerConfig = DrawerConfig.GesturesDis
 object RouteConfigProvider {
 
     fun getConfig(route: NavKey): RouteConfig = when (route) {
-        CollectionListRoute, SettingsRoute, TagListRoute, TemplateListRoute, WishlistListRoute, AlbumListRoute ->
+        CollectionListRoute, SettingsRoute, TagListRoute, TemplateListRoute, WishlistListRoute, AlbumListRoute,
+        InventoryListRoute ->
             RouteConfig(drawerConfig = DrawerConfig.Enabled)
 
         else -> RouteConfig()

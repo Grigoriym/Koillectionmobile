@@ -30,6 +30,7 @@ kotlin {
             implementation(projects.feature.wishlists.ui)
             implementation(projects.feature.loans.ui)
             implementation(projects.feature.albums.ui)
+            implementation(projects.feature.inventories.ui)
             implementation(projects.feature.auth.data)
             implementation(projects.feature.collections.data)
             implementation(projects.feature.collections.mapper)

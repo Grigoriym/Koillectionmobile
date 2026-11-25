@@ -2,6 +2,7 @@ package com.grappim.koillectionmobile.composeapp.nav
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Favorite
@@ -15,6 +16,7 @@ import com.grappim.koillectionmobile.strings.RString
 import com.grappim.koillectionmobile.strings.generated.resources.albums_title
 import com.grappim.koillectionmobile.strings.generated.resources.collections_title
 import com.grappim.koillectionmobile.strings.generated.resources.drawer_log_out
+import com.grappim.koillectionmobile.strings.generated.resources.inventories_title
 import com.grappim.koillectionmobile.strings.generated.resources.settings_title
 import com.grappim.koillectionmobile.strings.generated.resources.tags_title
 import com.grappim.koillectionmobile.strings.generated.resources.templates_title
@@ -38,6 +40,11 @@ class DrawerItemsBuilder {
         item(DrawerDestination.Templates, RString.templates_title, IconSource.Vector(Icons.Filled.Create)),
         item(DrawerDestination.Wishlists, RString.wishlists_title, IconSource.Vector(Icons.Filled.Favorite)),
         item(DrawerDestination.Albums, RString.albums_title, IconSource.Vector(Icons.Filled.AccountBox)),
+        item(
+            DrawerDestination.Inventories,
+            RString.inventories_title,
+            IconSource.Vector(Icons.AutoMirrored.Filled.List)
+        ),
         item(DrawerDestination.Settings, RString.settings_title, IconSource.Vector(Icons.Filled.Settings)),
         DrawerItem.Divider,
         item(

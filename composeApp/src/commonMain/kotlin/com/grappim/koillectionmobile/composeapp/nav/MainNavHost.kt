@@ -32,6 +32,8 @@ import com.grappim.koillectionmobile.feature.collections.ui.ItemSearchRoute
 import com.grappim.koillectionmobile.feature.collections.ui.ItemSearchScreen
 import com.grappim.koillectionmobile.feature.collections.ui.NewCollectionRoute
 import com.grappim.koillectionmobile.feature.collections.ui.NewCollectionScreen
+import com.grappim.koillectionmobile.feature.inventories.ui.InventoryListRoute
+import com.grappim.koillectionmobile.feature.inventories.ui.InventoryListScreen
 import com.grappim.koillectionmobile.feature.items.ui.AddItemRoute
 import com.grappim.koillectionmobile.feature.items.ui.AddItemScreen
 import com.grappim.koillectionmobile.feature.items.ui.EditItemRoute
@@ -152,6 +154,9 @@ internal fun MainNavHost(navigationState: NavigationState, navigator: Navigator,
                         // The album screen and the list or the parent read again (AlbumChanges).
                         onClose = { navigator.close(route) }
                     )
+                }
+                entry<InventoryListRoute> {
+                    InventoryListScreen()
                 }
                 entry<WishlistListRoute> {
                     WishlistListScreen(

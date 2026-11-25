@@ -98,6 +98,7 @@ include(
     ":feature:inventories:data",
     ":feature:inventories:domain",
     ":feature:inventories:dto",
-    ":feature:inventories:mapper"
+    ":feature:inventories:mapper",
+    ":feature:inventories:ui"
 )
 include(":feature:settings:ui")

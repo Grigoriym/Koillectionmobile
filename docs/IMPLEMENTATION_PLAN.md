@@ -467,8 +467,8 @@ code without checking the licence terms are kept.
    kit's `DrawerWidget`, and one top bar owned by the shell (`TopBar`, `LocalTopBarConfig`,
    `RouteConfigProvider`) instead of a `TopAppBar` in each screen. The user chose it over a light
    drawer around the single back stack (about 6 screens changed). The M2.1 note "no drawer
-   sections" no longer holds. Sections: Collections, Tags, Templates, Wishlists, Albums, Settings;
-   M12 and M13 add Inventories and Logs. Log out sits in the drawer as an action, not a section.
+   sections" no longer holds. Sections: Collections, Tags, Templates, Wishlists, Albums, Inventories
+   (M12.3), Settings; M13 adds Logs. Log out sits in the drawer as an action, not a section.
    Built in M11.11: back at the root of a section other than Collections goes to Collections
    (`goBackOrToStart` in `composeApp/.../nav/NavigatorExt.kt`). The kit's `goBack` leaves it to the
    system there, and the app would close. Log out is `DrawerDestination.LogOut` with no route.

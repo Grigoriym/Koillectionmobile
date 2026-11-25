@@ -443,4 +443,21 @@
     <string name="loan_form_discard_title">Discard this loan?</string>
     <string name="loan_form_discard_text">The values on this form are lost.</string>
     <string name="loan_form_edit_discard_text">The changes on this form are lost. The loan stays as it is on the server.</string>
+
+    <string name="inventories_title">Inventories</string>
+    <string name="inventories_empty">There are no inventories yet. Make one in the Koillection web UI.</string>
+    <string name="inventories_retry">Try again</string>
+    <string name="inventories_created_at">Created on %1$s</string>
+    <string name="inventories_checked">%1$d of %2$d items checked</string>
+    <string name="inventories_error_network">The server does not answer. Check the network connection.</string>
+    <string name="inventories_error_http">The server answered with an error (HTTP %1$d).</string>
+    <string name="inventories_error_unexpected">Loading the inventories failed with an unexpected error.</string>
+    <string name="inventories_delete">Delete inventory</string>
+    <string name="inventories_delete_title">Delete this inventory?</string>
+    <string name="inventories_delete_text">The server deletes the inventory "%1$s". The collections and items stay. You cannot undo this.</string>
+    <string name="inventories_delete_confirm">Delete</string>
+    <string name="inventories_delete_cancel">Cancel</string>
+    <string name="inventories_delete_failed_title">The inventory was not deleted</string>
+    <string name="inventories_delete_failed_ok">OK</string>
+    <string name="inventories_delete_error_unexpected">Deleting the inventory failed with an unexpected error.</string>
 </resources>

@@ -44,7 +44,7 @@ this app.
   fields (Title page, Spine) and 3 tags. To compare with the web UI from the host, log in with
   `curl` (a cookie jar, `GET /` for `_csrf_token`, then `POST /` with `_login`, `_password` and the
   token) and read `/items/<id>`.
-- The drawer (M11.11) holds Collections, Tags, Templates, Wishlists, Albums, Settings and Log out.
+- The drawer (M11.11) holds Collections, Tags, Templates, Wishlists, Albums, Inventories (M12.3), Settings and Log out.
   Open it with "Open the menu" (`content-desc`) on the collection list or Settings. Each label is
   two nodes (the icon's `content-desc` and the `text`), so tap the text: `ui.py tap Tags 1`. Tags and
   Templates, Wishlists and Albums have it too (M11.12, M11.13).
