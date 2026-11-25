@@ -4,6 +4,7 @@ import com.grappim.kit.testing.FakeCustomHeadersStorage
 import com.grappim.koillectionmobile.core.api.BaseUrlProvider
 import com.grappim.koillectionmobile.core.api.configureKoillectionClient
 import com.grappim.koillectionmobile.core.domain.KoillectionError
+import com.grappim.koillectionmobile.core.testing.FakeSessionStorage
 import com.grappim.koillectionmobile.feature.wishlists.domain.Wish
 import com.grappim.koillectionmobile.feature.wishlists.domain.WishField
 import com.grappim.koillectionmobile.feature.wishlists.domain.Wishlist

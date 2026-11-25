@@ -1,11 +1,11 @@
-package com.grappim.koillectionmobile.feature.items.data
+package com.grappim.koillectionmobile.core.testing
 
 import com.grappim.koillectionmobile.core.storage.Credentials
 import com.grappim.koillectionmobile.core.storage.SessionStorage
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 
-internal class FakeSessionStorage(
+class FakeSessionStorage(
     override var serverUrl: String = "",
     var credentials: Credentials? = null,
     var token: String? = null
@@ -13,6 +13,8 @@ internal class FakeSessionStorage(
 
     override val isLoggedIn: Flow<Boolean>
         get() = flowOf(credentials != null && token != null)
+
+    val savedTokens = mutableListOf<String>()
 
     override suspend fun saveServerUrl(url: String) {
         serverUrl = url
@@ -27,6 +29,7 @@ internal class FakeSessionStorage(
     override suspend fun getToken(): String? = token
 
     override suspend fun saveToken(token: String) {
+        savedTokens += token
         this.token = token
     }
 

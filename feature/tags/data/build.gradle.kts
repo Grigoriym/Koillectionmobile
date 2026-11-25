@@ -16,6 +16,8 @@ kotlin {
         // `jvmTest`: the tests serve the M1.1 fixture files.
         jvmTest.dependencies {
             implementation(kotlin("test"))
+            // `FakeSessionStorage`.
+            implementation(projects.core.testing)
             implementation(libs.ktor.client.mock)
             // `LogLevel` in `configureKoillectionClient`'s signature.
             implementation(libs.ktor.client.logging)

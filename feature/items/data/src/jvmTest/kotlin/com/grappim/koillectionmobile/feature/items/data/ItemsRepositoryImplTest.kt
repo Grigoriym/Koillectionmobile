@@ -5,6 +5,7 @@ import com.grappim.koillectionmobile.core.api.BaseUrlProvider
 import com.grappim.koillectionmobile.core.api.configureKoillectionClient
 import com.grappim.koillectionmobile.core.domain.KoillectionError
 import com.grappim.koillectionmobile.core.storage.Credentials
+import com.grappim.koillectionmobile.core.testing.FakeSessionStorage
 import com.grappim.koillectionmobile.feature.items.mapper.ItemMapper
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.mock.MockEngine

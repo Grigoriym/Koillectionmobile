@@ -16,6 +16,8 @@ kotlin {
         // `jvmTest`: mock-engine tests of the repository.
         jvmTest.dependencies {
             implementation(kotlin("test"))
+            // `FakeSessionStorage`.
+            implementation(projects.core.testing)
             implementation(libs.ktor.client.mock)
             // `LogLevel` in `configureKoillectionClient`'s signature.
             implementation(libs.ktor.client.logging)

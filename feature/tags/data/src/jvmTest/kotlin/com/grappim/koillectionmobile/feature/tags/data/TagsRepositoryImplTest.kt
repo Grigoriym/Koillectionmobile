@@ -4,6 +4,7 @@ import com.grappim.kit.testing.FakeCustomHeadersStorage
 import com.grappim.koillectionmobile.core.api.BaseUrlProvider
 import com.grappim.koillectionmobile.core.api.configureKoillectionClient
 import com.grappim.koillectionmobile.core.domain.KoillectionError
+import com.grappim.koillectionmobile.core.testing.FakeSessionStorage
 import com.grappim.koillectionmobile.feature.tags.domain.Tag
 import com.grappim.koillectionmobile.feature.tags.mapper.TagMapper
 import io.ktor.client.HttpClient

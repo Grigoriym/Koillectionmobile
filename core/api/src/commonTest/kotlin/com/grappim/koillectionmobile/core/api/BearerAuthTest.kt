@@ -3,6 +3,7 @@ package com.grappim.koillectionmobile.core.api
 import com.grappim.kit.testing.FakeCustomHeadersStorage
 import com.grappim.koillectionmobile.core.domain.KoillectionError
 import com.grappim.koillectionmobile.core.storage.Credentials
+import com.grappim.koillectionmobile.core.testing.FakeSessionStorage
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.MockRequestHandleScope
@@ -32,6 +33,7 @@ class BearerAuthTest {
     private val json = Json { ignoreUnknownKeys = true }
     private val requests = mutableListOf<HttpRequestData>()
     private val session = FakeSessionStorage(
+        serverUrl = "https://koi.example/sub",
         credentials = Credentials(username = "tester", password = "hunter2"),
         token = "old-jwt"
     )

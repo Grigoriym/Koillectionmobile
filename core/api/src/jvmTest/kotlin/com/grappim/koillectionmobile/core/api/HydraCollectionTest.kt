@@ -1,6 +1,7 @@
 package com.grappim.koillectionmobile.core.api
 
 import com.grappim.kit.testing.FakeCustomHeadersStorage
+import com.grappim.koillectionmobile.core.testing.FakeSessionStorage
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
@@ -146,7 +147,7 @@ class HydraCollectionTest {
             baseUrlProvider = object : BaseUrlProvider {
                 override fun getBaseUrl(): String = baseUrl
             },
-            sessionStorage = FakeSessionStorage(),
+            sessionStorage = FakeSessionStorage(serverUrl = "https://koi.example/sub"),
             customHeadersStorage = FakeCustomHeadersStorage(emptyList()),
             logLevel = LogLevel.NONE
         )

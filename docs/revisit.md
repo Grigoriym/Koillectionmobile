@@ -21,16 +21,6 @@ cold session can act on it. Delete an entry when it's fixed.
   report" step, ported from deskmate, which has the same step). Fix: bump to the newest
   `upload-artifact` major that targets Node 24, then check CI stays green.
   Verdict (user, 2026-11-25, M14.1): fix before release, M14.24.
-- 2026-11-15 (M1.6) — `FakeSessionStorage` now exists three times, copied by hand:
-  `core/api/src/commonTest/.../core/api/FakeSessionStorage.kt`,
-  `feature/auth/data/src/commonTest/.../auth/data/FakeSessionStorage.kt`,
-  `feature/collections/data/src/jvmTest/.../collections/data/FakeSessionStorage.kt`. M1.7 and M1.8
-  will add two more. Fix: one copy in a shared test module (or `core:storage` test fixtures) that
-  the `data` modules take as a test dependency. M1.7 added the fourth:
-  `feature/items/data/src/jvmTest/.../items/data/FakeSessionStorage.kt`.
-  M1.8 added the fifth: `feature/tags/data/src/jvmTest/.../tags/data/FakeSessionStorage.kt`.
-  M2.6 added `clearSession()` to `SessionStorage` and had to edit all five copies.
-  Verdict (user, 2026-11-25, M14.1): fix before release, M14.9.
 - 2026-11-15 (M1.9) — Write bodies send IRIs without the server's subpath (`/api/collections/<id>`,
   `/api/items/<id>`, `/api/tags/<id>`): `ItemsRepositoryImpl.createItem`/`itemIri` and
   `TagsRepositoryImpl.setItemTags`. The server's own IRIs carry its prefix (M1.4: `next` links).

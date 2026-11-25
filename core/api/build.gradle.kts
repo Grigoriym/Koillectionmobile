@@ -30,6 +30,8 @@ kotlin {
         }
         commonTest.dependencies {
             implementation(kotlin("test"))
+            // `FakeSessionStorage`.
+            implementation(projects.core.testing)
             implementation(libs.ktor.client.mock)
             // `FakeCustomHeadersStorage`, and `runTest` through its kotlinx-coroutines-test.
             implementation(libs.grappim.kit.testing)

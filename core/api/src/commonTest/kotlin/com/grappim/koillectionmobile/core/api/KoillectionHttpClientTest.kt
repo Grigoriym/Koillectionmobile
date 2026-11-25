@@ -5,6 +5,7 @@ import com.grappim.kit.logger.KitLogger
 import com.grappim.kit.logger.LogPriority
 import com.grappim.kit.testing.FakeCustomHeadersStorage
 import com.grappim.koillectionmobile.core.domain.KoillectionError
+import com.grappim.koillectionmobile.core.testing.FakeSessionStorage
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.mock.MockEngine
@@ -65,7 +66,7 @@ class KoillectionHttpClientTest {
             baseUrlProvider = object : BaseUrlProvider {
                 override fun getBaseUrl(): String = baseUrl
             },
-            sessionStorage = FakeSessionStorage(),
+            sessionStorage = FakeSessionStorage(serverUrl = "https://koi.example/sub"),
             customHeadersStorage = FakeCustomHeadersStorage(headers),
             logLevel = logLevel
         )
