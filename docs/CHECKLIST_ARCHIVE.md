@@ -1281,3 +1281,59 @@ step that touches the API. Model the code on `feature:loans` and `feature:albums
   3 / 3; 0 / 3). The open collections stayed open through landscape and back. The seed rerun
   stored 5 of 5 ticks, not 4: the server's item order changes between runs (plan §2,
   `docs/revisit.md`). The seed data is back, so "Comics shelf check" now has no unticked item.
+
+## M13 — logs
+
+View only (user, 2026-11-17), as a plain list (plan §5 decision 16, user 2026-11-25). Koillection
+1.8.5 `Log.php` has `Get` and `GetCollection` only, with no filter and no order. The API sends the
+oldest first, 30 per page; the test copy has 1040 rows on 35 pages (plan §2). The app shows the
+newest first: it reads the `last` page, then each `previous` page on scroll. Logs need no seed: the
+test copy has them. Re-read `Log.php` at the start of each step that touches the API. Model the
+code on `feature:inventories`.
+
+- [x] **M13.1** — Fixtures. Add a `logs` group to `fixtures/capture.py`: the first page
+  (`/api/logs`, for `view.last`), the last page, one middle page (it has `previous` and `next`)
+  and one log (`GET /api/logs/{id}`). Capture only that group.
+  **Verify:** the captured pages show the `view` keys and the ascending order that plan §2 says;
+  the older fixtures are unchanged (`git status` shows only the new files and `capture.py`).
+  Note: done 2026-11-25. `logs_page_middle.json` is page 34, the `previous` of the last page (35,
+  20 rows). The keys are plain `view`, `last`, `previous`, with no `hydra:` prefix. A run with no
+  group name now captures `logs` too.
+- [x] **M13.2** — Repository calls (new `feature:logs:{data,domain,dto,mapper}`). Add `last` and
+  `previous` to `core:api`'s `HydraViewDto`, each also read under its `hydra:` name. A newest-first
+  page call: the first call reads `api/logs` and then its `view.last` (one request when there is no
+  `view`); each later call reads the `previous` path it got. It returns the rows newest first and
+  the next path to read (null at the end). The mapper turns `type` into create, delete or unknown,
+  and `objectClass` into one of the 11 classes or unknown (from the short class name). Copy the
+  headers from `feature:inventories:data`. Add the new Koin modules' `includes` lines in `AppModule`.
+  **Verify:** mock-engine tests (paths for the first, a later and the last call, a list with no
+  `view`, a root-path base URL case); mapper tests on the M13.1 fixtures (order, type, class, an
+  unknown value); `KoinGraphTest` resolves the repository; mutation-check one path and one mapper
+  field.
+  Note: done 2026-11-25. `getLogs(path: String?)` returns a `LogPage` (`logs`, `nextPath`). The three
+  fixture pages hold 10 of the 11 classes (no `TagCategory`), so a separate test maps each class
+  name. No extra headers: `feature:inventories:data` sets none; the client's default `Accept`
+  applies. Mutations (no `last` follow; `delete` read as create) each failed tests.
+- [x] **M13.3** — Logs section in the drawer and the list screen (`feature:logs:ui`).
+  `DrawerDestination.Logs` with its own back stack. Each row: the action (created or deleted), the
+  object type, the label and the date with the time. The next page loads when the user scrolls near
+  the end; a row whose id is already in the list is dropped. Loading, empty and error states with
+  retry. A failed later page keeps the rows and shows a retry row at the end.
+  **Verify:** ViewModel tests (first load, next page, the end, a duplicate id, empty, failure and
+  retry for the first and a later page); mutation-check one.
+  Note: done 2026-11-25. Drawer label "Logs" (the web UI says "History"), icon `DateRange`. Each row:
+  "<type> created/deleted" over the label, then `yyyy-MM-dd HH:mm`. A failed later page stops the
+  scroll trigger until the user taps retry. 10 ViewModel tests; a mutation (no duplicate filter)
+  failed the duplicate test.
+- [x] **M13.4** — Device pass on the emulator (`emulator-testing` skill) against the local test
+  instance: open Logs, compare the first rows with the web `/history` page, scroll until at least
+  three pages have loaded, rotate once, then make an item on the web UI and restart the app.
+  **Verify:** the newest rows match the web page in order and text; paging shows no duplicate and
+  no gap across the page seams; the new item's log is on top after the restart; the test item is
+  deleted at the end.
+  Note: done 2026-11-25. The newest rows match the API's last page reversed. The web `/history`
+  page shows the same rows, but it sorts by `loggedAt` only, and the seed's rows share one second,
+  so their order there differs. A script compared each screen of rows with the API order: rows 0–141
+  (5 page seams) had no gap and no duplicate, before and after the rotation. The web-made item
+  (created 13:35) was the top row after a force-stop and a relaunch, and on the web page; it was
+  deleted through the API (204, then 404).
