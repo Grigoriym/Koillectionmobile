@@ -1,0 +1,106 @@
+{
+  "@context": "/api/contexts/Inventory",
+  "@id": "/api/inventories",
+  "@type": "Collection",
+  "totalItems": 2,
+  "member": [
+    {
+      "@id": "/api/inventories/01a21200-b8e9-70a7-86c3-017c367f3432",
+      "@type": "Inventory",
+      "id": "01a21200-b8e9-70a7-86c3-017c367f3432",
+      "name": "Comics shelf check",
+      "content": [
+        {
+          "id": "01a21200-af47-7623-af1b-62aa9f1f73da",
+          "title": "Comics",
+          "children": [
+            {
+              "id": "01a21200-afcc-7e4e-81a3-ff308e607ee6",
+              "title": "Franco-Belgian",
+              "children": [],
+              "items": [
+                {
+                  "id": "01a21200-b486-7aaa-9a85-499e1ff2d42d",
+                  "name": "Les Voyageurs, tome 2",
+                  "checked": false
+                },
+                {
+                  "id": "01a21200-b366-7269-826e-d0bbbdae9863",
+                  "name": "Les Voyageurs, tome 1",
+                  "checked": true
+                }
+              ],
+              "totalItems": 2,
+              "totalCheckedItems": 1
+            },
+            {
+              "id": "01a21200-af9b-7dd3-860a-a6728b414bd3",
+              "title": "Superheroes",
+              "children": [],
+              "items": [
+                {
+                  "id": "01a21200-affe-7d47-bce5-db1118f86406",
+                  "name": "Night Watch #1",
+                  "checked": true
+                },
+                {
+                  "id": "01a21200-b127-7596-93db-22e6d3b7fa78",
+                  "name": "Night Watch #2",
+                  "checked": true
+                },
+                {
+                  "id": "01a21200-b247-795c-a336-801b9bc50ae2",
+                  "name": "Night Watch: Collected",
+                  "checked": true
+                }
+              ],
+              "totalItems": 3,
+              "totalCheckedItems": 3
+            }
+          ],
+          "items": [],
+          "totalItems": 5,
+          "totalCheckedItems": 4
+        }
+      ],
+      "owner": "/api/users/01a15db0-8797-784e-9ea2-fcf934198f3b",
+      "createdAt": "2026-11-25T10:19:26+01:00",
+      "updatedAt": "2026-11-25T10:19:27+01:00"
+    },
+    {
+      "@id": "/api/inventories/01a21200-b92f-7254-9492-d05d83bb3ebe",
+      "@type": "Inventory",
+      "id": "01a21200-b92f-7254-9492-d05d83bb3ebe",
+      "name": "Board games check",
+      "content": [
+        {
+          "id": "01a21200-b5a6-7af6-83a7-8fbb4c872194",
+          "title": "Board games",
+          "children": [],
+          "items": [
+            {
+              "id": "01a21200-b6e5-7e11-a63b-c7e8445ac931",
+              "name": "Star Cartographers",
+              "checked": false
+            },
+            {
+              "id": "01a21200-b65e-7038-9b2a-5e284f3208f0",
+              "name": "Tower Siege",
+              "checked": false
+            },
+            {
+              "id": "01a21200-b5d4-7018-898f-7b36706da963",
+              "name": "River Traders",
+              "checked": false
+            }
+          ],
+          "totalItems": 3,
+          "totalCheckedItems": 0
+        }
+      ],
+      "owner": "/api/users/01a15db0-8797-784e-9ea2-fcf934198f3b",
+      "createdAt": "2026-11-25T10:19:27+01:00",
+      "updatedAt": null
+    }
+  ]
+}

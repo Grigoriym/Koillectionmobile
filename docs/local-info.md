@@ -52,7 +52,10 @@ catalogue (2026-11-24). The copy has no choice lists, wishes, albums, photos or 
   returned on "River Traders".
 - The wishlist `Books to find` with the child `Gift ideas` (5 wishes), and the album `Library
   shelves` with the child `Book fairs` (5 photos). The images are generated coloured JPEGs.
-- No inventory: Koillection 1.8.5 has no API `Post` for `Inventory`.
+- 2 inventories: "Comics shelf check" over `Comics` and both children (4 of 5 items ticked), and
+  "Board games check" (0 of 3). Koillection 1.8.5 has no API `Post` for `Inventory`, so the seed
+  logs in to the web UI and sends the web form and the tick route. The server stores 4 ticks for
+  the seed's 3 (plan §2, "Inventory ticks").
 
 `python3 -I fixtures/seed.py` refuses to run twice. `--clean` deletes the seed by its root names;
 after it the counts match the unseeded copy, except the log count. Run it again after a reset.
@@ -60,7 +63,10 @@ after it the counts match the unseeded copy, except the log count. Run it again 
 ## Fixtures
 
 `fixtures/capture.py` writes the JSON fixtures in `fixtures/koillection-1.8.5/` from this
-instance. It refuses nothing on its own: never change its `BASE` to the real server.
+instance. It refuses nothing on its own: never change its `BASE` to the real server. Give it a
+group name (`core`, `inventories`) to capture only that group. A run with no name rewrites the
+`core` files too, and those came from the older copy with other IDs. The `inventories` group
+needs the seed.
 
 ## Smoke run
 

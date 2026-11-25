@@ -285,6 +285,22 @@ start of any step that touches the API. Facts that shape the design:
   field keeps its old label. A `POST /api/data` with a duplicate label gets the normal 422 with
   `violations`. So the app cannot tell a label conflict on an edit from any other server failure:
   the edit form must catch duplicate labels before it sends.
+- Inventories (read in the 1.8.5 source and captured 2026-11-25, M12.1; fixtures
+  `inventories_page.json`, `inventory_one.json`). The API has `Get`, `GetCollection` and `Delete`
+  only. A member has `id`, `name`, `content`, `owner`, `createdAt` and `updatedAt`; the list page
+  embeds the full `content` of each member. `content` is a list of root collections. Each
+  collection node has `id`, `title`, `children`, `items`, `totalItems` and `totalCheckedItems`;
+  each item has `id`, `name` and `checked` (a JSON boolean). A node's totals include its children.
+  A parent that the user did not pick, or that has no items of its own, still comes as a node,
+  with `items: []` ("Comics" in the fixture). In 1.8.5 both keys are always present, but
+  `InventoryHandler::buildCollection` adds `children` only through an append, so the mapper reads
+  a missing key as an empty list. `content` is a copy made at creation: later item renames or
+  deletes do not change it.
+- Inventory ticks (web route, checked live 2026-11-25, M12.1). `POST /inventories/{id}/check`
+  (form fields `id`, `checked`) runs a regex over the JSON (`InventoryHandler::setCheckedValue`).
+  A tick of one item also ticks every later item in `content`: with items A, B, C in that order, a
+  tick of A ticked all three, a tick of B ticked B and C. So `fixtures/seed.py` sends three ticks
+  and the server stores four. The app does not tick; it shows what the server stores.
 - Known server-side trap: Koillection's Docker entrypoint can regenerate `JWT_PASSPHRASE` on
   restart, which breaks API login with a 500 while the website keeps working. Upstream issues
   #1600, #1400, #1410. The app should show a clear message for a 500 at login, not a

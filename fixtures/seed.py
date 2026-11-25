@@ -2,7 +2,9 @@
 """Seed the local Koillection test instance (docs/local-info.md) with sample data for every
 feature the app shows: choice lists, a template with every typed field, collections with child
 collections, items with typed fields, images and tags, loans, wishlists with wishes, and albums
-with photos. Inventories are not seeded: Koillection 1.8.5 has no API `Post` for them.
+with photos, and inventories. Koillection 1.8.5 has no API `Post` for an inventory, so the
+seed makes them through the web form (`/inventories/add`) and ticks items with the web route
+`/inventories/{id}/check`, as the web UI does.
 
 Request shapes are copied from the `feature:*:data` repositories and `feature:*:dto` classes.
 Never point BASE at the real server: it holds the user's working catalogue.
@@ -11,7 +13,7 @@ Usage:
     python3 -I fixtures/seed.py          # seed; refuses if a seed root already exists
     python3 -I fixtures/seed.py --clean  # delete everything the seed made (found by name)
 """
-import io, json, sys, urllib.error, urllib.request, uuid
+import http.cookiejar, io, json, re, sys, urllib.error, urllib.parse, urllib.request, uuid
 
 from PIL import Image, ImageDraw, ImageFont
 
@@ -25,6 +27,7 @@ ALBUM = "Library shelves"
 TEMPLATE = "Comic book"
 CHOICE_LISTS = ["Condition", "Format"]
 TAG = "Comics"
+INVENTORIES = ["Comics shelf check", "Board games check"]
 
 TOKEN = None
 
@@ -100,6 +103,51 @@ def upload(path, part, title, color):
 
 def iri_id(iri):
     return iri.rsplit("/", 1)[-1]
+
+
+def web_session():
+    """A logged-in web session (cookies), as the browser has it: the login form at `/`."""
+    web = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(http.cookiejar.CookieJar()))
+    page = web.open(BASE + "/").read().decode()
+    token = re.search(r'name="_csrf_token" value="([^"]+)"', page).group(1)
+    r = web.open(BASE + "/", urllib.parse.urlencode(
+        {"_login": USER, "_password": PASS, "_csrf_token": token}).encode())
+    if not r.geturl().rstrip("/").endswith("/collections"):
+        raise SystemExit(f"web login failed: landed on {r.geturl()}")
+    return web
+
+
+def web_post(web, path, fields):
+    r = urllib.request.Request(BASE + path, data=urllib.parse.urlencode(fields).encode(), method="POST",
+                               headers={"Origin": BASE, "Referer": BASE + path})
+    try:
+        return web.open(r)
+    except urllib.error.HTTPError as e:
+        raise SystemExit(f"web POST {path}: {e.code} {e.read().decode()[:400]}")
+
+
+def add_inventory(web, name, collection_ids):
+    """`InventoryType`: `content` is the comma-separated ids of the ticked collections."""
+    page = web.open(BASE + "/inventories/add").read().decode()
+    token = re.search(r'name="inventory\[_token\]"[^>]*value="([^"]+)"', page).group(1)
+    r = web_post(web, "/inventories/add", {
+        "inventory[name]": name, "inventory[content]": ",".join(collection_ids), "inventory[_token]": token})
+    m = re.search(r"/inventories/([0-9a-f-]{36})$", r.geturl())
+    if not m:
+        raise SystemExit(f"add inventory {name}: landed on {r.geturl()}")
+    return m.group(1)
+
+
+def seed_inventories(comics, children, games, checked_items):
+    web = web_session()
+    # Comics and both children: "Comics" has no items of its own.
+    inv = add_inventory(web, INVENTORIES[0], [comics["id"]] + [c["id"] for c in children])
+    # Koillection's `setCheckedValue` regex also ticks every later item in `content`, so the
+    # server stores more ticks than this sends. Return the count it stored.
+    for it in checked_items:
+        web_post(web, f"/inventories/{inv}/check", {"id": it["id"], "checked": "true"})
+    add_inventory(web, INVENTORIES[1], [games["id"]])
+    return sum(c["totalCheckedItems"] for c in req("GET", f"/api/inventories/{inv}")["content"])
 
 
 # --- seed -------------------------------------------------------------------------------------
@@ -200,6 +248,8 @@ def seed():
         ("Players", "text", "1-5", None), ("Year", "number", "2021", None), ("Rating", "rating", "9", None),
     ], [], image_datum=False)
 
+    ticked = seed_inventories(comics, [marvel, bd], games, [i1, i3, i4])
+
     # Loans (`NewLoanDto`; dates as `LoanMapper.toApi`, ISO dates): two open, two returned.
     post("/api/loans", {"item": i1["@id"], "lentTo": "Anna", "lentAt": "2026-10-02"})
     old = post("/api/loans", {"item": i1["@id"], "lentTo": "Ben", "lentAt": "2026-03-10"})
@@ -250,13 +300,17 @@ def seed():
         upload(f"/api/photos/{p['id']}/image", "file", title.replace(" ", "\n", 1), color)
 
     print("seeded: 2 choice lists, 1 template (14 fields), 1 tag, 4 collections, 8 items,"
-          " 4 loans, 2 wishlists, 5 wishes, 2 albums, 5 photos")
+          f" 2 inventories ({ticked} items ticked), 4 loans, 2 wishlists, 5 wishes, 2 albums, 5 photos")
 
 
 # --- clean ------------------------------------------------------------------------------------
 
 def clean():
     n = 0
+    # Inventories first: they copy item names, but nothing links them to the collections.
+    for inv in all_members("/api/inventories"):
+        if inv["name"] in INVENTORIES:
+            req("DELETE", inv["@id"]); n += 1
     for c in all_members("/api/collections"):
         if c["title"] in COLLECTIONS and not c.get("parent"):
             req("DELETE", c["@id"]); n += 1

@@ -4,9 +4,14 @@
 Writes into fixtures/koillection-<version>/. GET only, plus two failed logins for the 401
 bodies. Never point this at the real server: the repo is public.
 
-Usage: python3 -I fixtures/capture.py
+Usage:
+    python3 -I fixtures/capture.py              # every fixture
+    python3 -I fixtures/capture.py inventories  # only the named groups (here: the M12.1 files)
+
+Capture only the group you need: a full run rewrites the older fixtures, which came from an
+older copy of the catalogue with other IDs (docs/local-info.md), and their tests read them.
 """
-import json, os, urllib.error, urllib.request
+import json, os, sys, urllib.error, urllib.request
 
 BASE = "http://127.0.0.1:8290"
 USER, PASS = "tester", "koillection-test"
@@ -52,6 +57,17 @@ def main():
     def body(path):
         return json.loads(get(path)[1])
 
+    groups = sys.argv[1:] or ["core", "inventories"]
+    if set(groups) - {"core", "inventories"}:
+        raise SystemExit(f"unknown group: {set(groups) - {'core', 'inventories'}}")
+
+    if "core" in groups:
+        capture_core(get, body)
+    if "inventories" in groups:
+        capture_inventories(get, body)
+
+
+def capture_core(get, body):
     save("openapi.json", *get("/api/docs", accept="application/vnd.openapi+json"), 200)
     save("login_401_wrong_password.json", *login(USER, "wrong-password"), 401)
     save("login_401_unknown_user.json", *login("no-such-user", "x"), 401)
@@ -72,6 +88,16 @@ def main():
     save("item_tags.json", *get(item + "/tags"), 200)
     save("tags_page.json", *get("/api/tags"), 200)
     save("tag_categories.json", *get("/api/tag_categories"), 200)
+
+
+def capture_inventories(get, body):
+    # Needs the inventories from `fixtures/seed.py`: one over "Comics" (no items of its own)
+    # and its two children, with ticked items, and one over "Board games".
+    save("inventories_page.json", *get("/api/inventories"), 200)
+    named = {i["name"]: i["@id"] for i in body("/api/inventories")["member"]}
+    if "Comics shelf check" not in named:
+        raise SystemExit("no 'Comics shelf check' inventory: run fixtures/seed.py first")
+    save("inventory_one.json", *get(named["Comics shelf check"]), 200)
 
 
 if __name__ == "__main__":
