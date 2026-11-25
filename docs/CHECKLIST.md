@@ -1,6 +1,6 @@
 # koillectionmobile checklist
 
-**Current step:** M13 (break into steps). M12 done 2026-11-25. M12.5 done 2026-11-25. M12.4 done 2026-11-25. M12.3 done 2026-11-25. M12.2 done 2026-11-25. M12.1 done 2026-11-25. M12 broken into steps 2026-11-25. The user's UX notes from checking the app become steps in the UX pass below when they send them; the final review of the whole app comes after M12 and M13. M11.15 done 2026-11-25. M11.14 done 2026-11-24. M11.13 done 2026-11-24. M11.12 done 2026-11-24. M11.11 done 2026-11-23. M11.10 done 2026-11-23. M11.9 done 2026-11-23. M11 done 2026-11-23. M11.8 done 2026-11-23. M11.7 done 2026-11-23. M11.6 done 2026-11-23. M11.5 done 2026-11-23. M11.4 done 2026-11-23. M11.3 done 2026-11-23. M11.2 done 2026-11-23. M11.1 done 2026-11-23. M11 broken into steps 2026-11-23. M10 done 2026-11-23. M10.6 done 2026-11-23. M10.5 done 2026-11-22. M10.4 done 2026-11-22. M10.3 done 2026-11-22. M10.2 done 2026-11-22. M10.1 done 2026-11-22. M10 broken into steps 2026-11-22. M9 done 2026-11-22. M9.8 done 2026-11-22. M9.7 done 2026-11-22. M9.6 done 2026-11-22. M9.5 done 2026-11-21. M9.4 done 2026-11-21. M9.3 done 2026-11-21. M9.2 done 2026-11-21. M9.1 done 2026-11-21. M9 broken into steps 2026-11-19. M8 done 2026-11-19. M8.9 done 2026-11-19. M8.8 done 2026-11-19. M8.7 done 2026-11-19. M8.6 done 2026-11-18. M8.5 done 2026-11-18. M8.4 done 2026-11-18. M8.3 done 2026-11-17. M8.2 done 2026-11-17. M8.1 done 2026-11-17. M8 broken into steps 2026-11-17; the other areas became M9–M13 and the release moved to M14 (user, 2026-11-17). M7 done 2026-11-17. M7.7 done 2026-11-17. M7.6 done 2026-11-17. M7.5 done 2026-11-17. M7.4 done 2026-11-17. M7.3 done 2026-11-17. M7.2 done 2026-11-17. M7.1 done 2026-11-17. M7 broken into steps 2026-11-17. M6 done 2026-11-17. M6.6 done 2026-11-17. M6.5 done 2026-11-16. M6.4 done 2026-11-16. M6.3 done 2026-11-16. M6.2 done 2026-11-16. M6.1 done 2026-11-16. M6 broken into steps 2026-11-16. M5 done 2026-11-16. M5.7 done 2026-11-16. M5.6 done 2026-11-16. M5.5 done 2026-11-16. M5.4 done 2026-11-16. M5.3 done 2026-11-16. M5.2 done 2026-11-16. M5.1 done 2026-11-16. M5 broken into steps 2026-11-16. M4 done 2026-11-16. M4.4 done 2026-11-16. M4.3 done 2026-11-16. M4.2 done 2026-11-16. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 and 14 are settled.
+**Current step:** M13.1. M13 broken into steps 2026-11-25. M12 done 2026-11-25. M12.5 done 2026-11-25. M12.4 done 2026-11-25. M12.3 done 2026-11-25. M12.2 done 2026-11-25. M12.1 done 2026-11-25. M12 broken into steps 2026-11-25. The user's UX notes from checking the app become steps in the UX pass below when they send them; the final review of the whole app comes after M12 and M13. M11.15 done 2026-11-25. M11.14 done 2026-11-24. M11.13 done 2026-11-24. M11.12 done 2026-11-24. M11.11 done 2026-11-23. M11.10 done 2026-11-23. M11.9 done 2026-11-23. M11 done 2026-11-23. M11.8 done 2026-11-23. M11.7 done 2026-11-23. M11.6 done 2026-11-23. M11.5 done 2026-11-23. M11.4 done 2026-11-23. M11.3 done 2026-11-23. M11.2 done 2026-11-23. M11.1 done 2026-11-23. M11 broken into steps 2026-11-23. M10 done 2026-11-23. M10.6 done 2026-11-23. M10.5 done 2026-11-22. M10.4 done 2026-11-22. M10.3 done 2026-11-22. M10.2 done 2026-11-22. M10.1 done 2026-11-22. M10 broken into steps 2026-11-22. M9 done 2026-11-22. M9.8 done 2026-11-22. M9.7 done 2026-11-22. M9.6 done 2026-11-22. M9.5 done 2026-11-21. M9.4 done 2026-11-21. M9.3 done 2026-11-21. M9.2 done 2026-11-21. M9.1 done 2026-11-21. M9 broken into steps 2026-11-19. M8 done 2026-11-19. M8.9 done 2026-11-19. M8.8 done 2026-11-19. M8.7 done 2026-11-19. M8.6 done 2026-11-18. M8.5 done 2026-11-18. M8.4 done 2026-11-18. M8.3 done 2026-11-17. M8.2 done 2026-11-17. M8.1 done 2026-11-17. M8 broken into steps 2026-11-17; the other areas became M9–M13 and the release moved to M14 (user, 2026-11-17). M7 done 2026-11-17. M7.7 done 2026-11-17. M7.6 done 2026-11-17. M7.5 done 2026-11-17. M7.4 done 2026-11-17. M7.3 done 2026-11-17. M7.2 done 2026-11-17. M7.1 done 2026-11-17. M7 broken into steps 2026-11-17. M6 done 2026-11-17. M6.6 done 2026-11-17. M6.5 done 2026-11-16. M6.4 done 2026-11-16. M6.3 done 2026-11-16. M6.2 done 2026-11-16. M6.1 done 2026-11-16. M6 broken into steps 2026-11-16. M5 done 2026-11-16. M5.7 done 2026-11-16. M5.6 done 2026-11-16. M5.5 done 2026-11-16. M5.4 done 2026-11-16. M5.3 done 2026-11-16. M5.2 done 2026-11-16. M5.1 done 2026-11-16. M5 broken into steps 2026-11-16. M4 done 2026-11-16. M4.4 done 2026-11-16. M4.3 done 2026-11-16. M4.2 done 2026-11-16. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 and 16 are settled.
 
 ## How to use this
 
@@ -54,10 +54,44 @@ Usability fixes the user asks for while checking the app (user, 2026-11-25). Eac
   the emulator a group opens and closes, and stays open after a tag's items and Back.
   Note: done 2026-11-25. A mutation (toggle never closes) failed the toggle test.
 
-## M13 — logs (rough scope)
+## M13 — logs
 
-View only (user, 2026-11-17): `Log` has `Get` and `GetCollection` only. The test copy has 610
-rows: the list needs paging. Break into steps at the start.
+View only (user, 2026-11-17), as a plain list (plan §5 decision 16, user 2026-11-25). Koillection
+1.8.5 `Log.php` has `Get` and `GetCollection` only, with no filter and no order. The API sends the
+oldest first, 30 per page; the test copy has 1040 rows on 35 pages (plan §2). The app shows the
+newest first: it reads the `last` page, then each `previous` page on scroll. Logs need no seed: the
+test copy has them. Re-read `Log.php` at the start of each step that touches the API. Model the
+code on `feature:inventories`.
+
+- [ ] **M13.1** — Fixtures. Add a `logs` group to `fixtures/capture.py`: the first page
+  (`/api/logs`, for `view.last`), the last page, one middle page (it has `previous` and `next`)
+  and one log (`GET /api/logs/{id}`). Capture only that group.
+  **Verify:** the captured pages show the `view` keys and the ascending order that plan §2 says;
+  the older fixtures are unchanged (`git status` shows only the new files and `capture.py`).
+- [ ] **M13.2** — Repository calls (new `feature:logs:{data,domain,dto,mapper}`). Add `last` and
+  `previous` to `core:api`'s `HydraViewDto`, each also read under its `hydra:` name. A newest-first
+  page call: the first call reads `api/logs` and then its `view.last` (one request when there is no
+  `view`); each later call reads the `previous` path it got. It returns the rows newest first and
+  the next path to read (null at the end). The mapper turns `type` into create, delete or unknown,
+  and `objectClass` into one of the 11 classes or unknown (from the short class name). Copy the
+  headers from `feature:inventories:data`. Add the new Koin modules' `includes` lines in `AppModule`.
+  **Verify:** mock-engine tests (paths for the first, a later and the last call, a list with no
+  `view`, a root-path base URL case); mapper tests on the M13.1 fixtures (order, type, class, an
+  unknown value); `KoinGraphTest` resolves the repository; mutation-check one path and one mapper
+  field.
+- [ ] **M13.3** — Logs section in the drawer and the list screen (`feature:logs:ui`).
+  `DrawerDestination.Logs` with its own back stack. Each row: the action (created or deleted), the
+  object type, the label and the date with the time. The next page loads when the user scrolls near
+  the end; a row whose id is already in the list is dropped. Loading, empty and error states with
+  retry. A failed later page keeps the rows and shows a retry row at the end.
+  **Verify:** ViewModel tests (first load, next page, the end, a duplicate id, empty, failure and
+  retry for the first and a later page); mutation-check one.
+- [ ] **M13.4** — Device pass on the emulator (`emulator-testing` skill) against the local test
+  instance: open Logs, compare the first rows with the web `/history` page, scroll until at least
+  three pages have loaded, rotate once, then make an item on the web UI and restart the app.
+  **Verify:** the newest rows match the web page in order and text; paging shows no duplicate and
+  no gap across the page seams; the new item's log is on top after the restart; the test item is
+  deleted at the end.
 
 ## M14 — release
 

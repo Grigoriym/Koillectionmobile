@@ -303,6 +303,16 @@ start of any step that touches the API. Facts that shape the design:
   `$collection->getItems()` with no order, so the item order in `content` changes between seed
   runs. `fixtures/seed.py` sends three ticks; the server stored four in M12.1 and five after the
   M12.5 reseed. The app does not tick; it shows what the server stores.
+- Logs (read in the 1.8.5 source and checked live 2026-11-25, start of M13). `Log.php` has `Get`
+  and `GetCollection` only, with no filter and no order attribute. A member has `id`, `type`
+  (`create` or `delete`, `LogTypeEnum`), `loggedAt`, `objectId`, `objectLabel`, `objectClass`
+  (the full PHP class name, for example `App\Entity\Item`), `objectDeleted` and `owner`. The
+  list comes oldest first (ascending `id`, a UUID v7, so also ascending `loggedAt`), 30 per page;
+  `?order[loggedAt]=desc` is ignored. The `view` has `first`, `last` and `next` (and `previous`
+  after page 1). The test copy had 1040 rows, 35 pages, with 11 object classes: the
+  `HistoryFilterEnum::FILTERS_CLASS` list. The web `/history` page sorts newest first, 15 per
+  page. `LoggableListener` writes logs whether the user's `historyFeatureEnabled` is on or off,
+  and the API does not check that flag.
 - Known server-side trap: Koillection's Docker entrypoint can regenerate `JWT_PASSPHRASE` on
   restart, which breaks API login with a 500 while the website keeps working. Upstream issues
   #1600, #1400, #1410. The app should show a clear message for a 500 at login, not a
@@ -494,3 +504,10 @@ code without checking the licence terms are kept.
    keeps its `NavigationBackHandler` for the system back (`TemplateFormScreen`); every other screen
    uses `Back()`, which the shell maps to `goBackOrToStart`. The kit `Navigator.navigate` is single-top:
    a route already on the section's stack moves to the top, where `backStack.add` added a copy.
+16. **Logs** — *decided 2026-11-25 (user, start of M13)*: view only, a list and nothing else: no
+   filter, no tap that opens the object. Each row shows the action (created or deleted), the
+   object type, its label and the date. The list shows the newest first. The API sends the oldest
+   first (plan §2), so the app reads the `last` page first and then each `previous` page when the
+   user scrolls to the end, one request at a time. It reverses each page and drops a row whose id
+   it already shows, in case a new log shifts the pages. The user chose this over reading all
+   pages at once (about 35 requests) and over the server's oldest-first order.
