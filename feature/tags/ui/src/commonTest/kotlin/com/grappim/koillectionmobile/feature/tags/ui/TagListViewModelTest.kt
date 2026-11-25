@@ -153,6 +153,50 @@ class TagListViewModelTest {
     }
 
     @Test
+    fun `a load with several sections starts with all of them closed`() {
+        val sut = createSut()
+
+        answer()
+
+        assertEquals(emptySet(), sut.uiState.value.expandedGroups)
+    }
+
+    @Test
+    fun `a load with one section starts with it open`() {
+        val sut = createSut()
+
+        answer(tagList = Result.success(listOf(novel)))
+
+        assertEquals(setOf(0), sut.uiState.value.expandedGroups)
+    }
+
+    @Test
+    fun `toggling a section opens it and toggling again closes it`() {
+        val sut = createSut()
+        answer()
+
+        sut.uiState.value.onToggleGroup(1)
+        sut.uiState.value.onToggleGroup(2)
+        assertEquals(setOf(1, 2), sut.uiState.value.expandedGroups)
+
+        sut.uiState.value.onToggleGroup(1)
+        assertEquals(setOf(2), sut.uiState.value.expandedGroups)
+    }
+
+    @Test
+    fun `a reload after a failure starts closed again`() {
+        val sut = createSut()
+        answer()
+        sut.uiState.value.onToggleGroup(0)
+
+        tags.queue()
+        sut.uiState.value.onRetry()
+        assertEquals(setOf(0), sut.uiState.value.expandedGroups)
+        answer(tagList = Result.failure(KoillectionError.Network(IllegalStateException("timeout"))))
+        assertEquals(emptySet(), sut.uiState.value.expandedGroups)
+    }
+
+    @Test
     fun `retry while loading sends no second call`() {
         val sut = createSut()
 

@@ -382,7 +382,9 @@ code without checking the licence terms are kept.
    `ApiFilter` on any entity (re-checked 2026-11-17), so search runs in the app, by item name. Two
    places: a filter on the collection screen over the items it already loaded, and a global search
    screen that reads every item (`GET /api/items`, all pages; about 15 requests for 445 items) once
-   when it opens. The tag list groups tags by category, with the tags without a category last. A
+   when it opens. The tag list groups tags by category, with the tags without a category last. Each group is a
+   section that opens and closes on a tap; all start closed, a lone group starts open (user,
+   2026-11-25, M11.15). A
    tag created from the add-item form gets a label only. `Tag.label` is `NotBlank` but not unique
    on the server, so the form selects an existing tag with the same label (ignoring case) instead
    of creating a second one. The edit form gets the same action (user, 2026-11-17, M7.6).

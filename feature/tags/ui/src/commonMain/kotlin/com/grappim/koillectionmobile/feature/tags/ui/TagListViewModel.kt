@@ -19,15 +19,25 @@ import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.StringResource
 import org.koin.core.annotation.KoinViewModel
 
-/** Reads the tags and the tag categories once when the screen opens, and again on retry. */
+/**
+ * Reads the tags and the tag categories once when the screen opens, and again on retry. Opening and closing a group
+ * stays in this ViewModel, so it lasts while the user visits a tag's items and comes back.
+ */
 @KoinViewModel
 class TagListViewModel(private val tagsRepository: TagsRepository) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(TagListUiState(onRetry = ::retry))
+    private val _uiState = MutableStateFlow(TagListUiState(onToggleGroup = ::toggleGroup, onRetry = ::retry))
     val uiState: StateFlow<TagListUiState> = _uiState.asStateFlow()
 
     init {
         load()
+    }
+
+    private fun toggleGroup(index: Int) {
+        _uiState.update { state ->
+            val expanded = state.expandedGroups
+            state.copy(expandedGroups = if (index in expanded) expanded - index else expanded + index)
+        }
     }
 
     private fun retry() {
@@ -41,10 +51,18 @@ class TagListViewModel(private val tagsRepository: TagsRepository) : ViewModel()
             val result = tagsRepository.loadTagGroups()
             _uiState.update { state ->
                 result.fold(
-                    onSuccess = { state.copy(groups = it, isLoading = false, error = NativeText.Empty) },
+                    onSuccess = { groups ->
+                        state.copy(
+                            groups = groups,
+                            expandedGroups = if (groups.size == 1) setOf(0) else emptySet(),
+                            isLoading = false,
+                            error = NativeText.Empty
+                        )
+                    },
                     onFailure = {
                         state.copy(
                             groups = emptyList(),
+                            expandedGroups = emptySet(),
                             isLoading = false,
                             error = it.toMessage(RString.tags_error_unexpected)
                         )

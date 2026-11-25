@@ -71,6 +71,8 @@
     <string name="tags_title">Tags</string>
     <string name="tags_empty">There are no tags yet.</string>
     <string name="tags_no_category">No category</string>
+    <string name="tags_group_show">Show tags</string>
+    <string name="tags_group_hide">Hide tags</string>
     <string name="tags_retry">Try again</string>
     <string name="tags_error_network">The server does not answer. Check the network connection.</string>
     <string name="tags_error_http">The server answered with an error (HTTP %1$d).</string>
