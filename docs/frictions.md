@@ -98,3 +98,4 @@ entries get deleted — see /finalize.
 - 2026-11-24 — `GET /api/items?name=...` (seed check) returned an empty `member`: the items endpoint has no name filter in 1.8.5. Read the item from its collection's `/items` instead.
 - 2026-11-25 — (M12.4) Again no `grappim-kit-uikit` 0.1.9 sources jar in the Gradle cache. Guessed from call sites that `TopBarMenuItem` had no `enabled` and wrote that into a comment; `javap` on the cached `uikit-jvm.jar` showed `enabled`. Read the kit API from `../grappim-kit` or `javap`, not from usages.
 - 2026-11-25 — (M12.4) A Python `str.replace` in an edit script matched nothing (wrong indent in the needle) and failed silently; a grep after the script caught it.
+- 2026-11-25 — (M13 breakdown) A `docker exec ... sh -c` grep chain exited 2 with no output: one `ls` of a missing folder (`src/ApiPlatform`) failed the whole call. Run the probes one per command, or end with `|| true`.
