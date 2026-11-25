@@ -1,5 +1,6 @@
 package com.grappim.koillectionmobile.feature.inventories.ui
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -51,10 +52,15 @@ import org.koin.compose.viewmodel.koinViewModel
 
 /**
  * The root of the Inventories section. Each row shows the name, the created date as `yyyy-MM-dd`
- * and the checked / total items, with a delete action that asks first.
+ * and the checked / total items, with a delete action that asks first. A tap on a row opens the
+ * inventory.
  */
 @Composable
-fun InventoryListScreen(modifier: Modifier = Modifier, viewModel: InventoryListViewModel = koinViewModel()) {
+fun InventoryListScreen(
+    onInventoryClick: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: InventoryListViewModel = koinViewModel()
+) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val topBarController = LocalTopBarConfig.current
     LaunchedEffect(Unit) {
@@ -65,11 +71,15 @@ fun InventoryListScreen(modifier: Modifier = Modifier, viewModel: InventoryListV
             )
         )
     }
-    InventoryListContent(uiState = uiState, modifier = modifier)
+    InventoryListContent(uiState = uiState, onInventoryClick = onInventoryClick, modifier = modifier)
 }
 
 @Composable
-private fun InventoryListContent(uiState: InventoryListUiState, modifier: Modifier = Modifier) {
+private fun InventoryListContent(
+    uiState: InventoryListUiState,
+    onInventoryClick: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
     val contentModifier = modifier.fillMaxSize()
     when {
         uiState.isLoading -> Box(modifier = contentModifier, contentAlignment = Alignment.Center) {
@@ -88,6 +98,7 @@ private fun InventoryListContent(uiState: InventoryListUiState, modifier: Modifi
                     inventory = inventory,
                     isDeleting = uiState.deletingId == inventory.id,
                     isEnabled = uiState.deletingId == null,
+                    onClick = { onInventoryClick(inventory.id) },
                     onDelete = { uiState.onDeleteClick(inventory.id) }
                 )
             }
@@ -97,8 +108,15 @@ private fun InventoryListContent(uiState: InventoryListUiState, modifier: Modifi
 }
 
 @Composable
-private fun InventoryRow(inventory: Inventory, isDeleting: Boolean, isEnabled: Boolean, onDelete: () -> Unit) {
+private fun InventoryRow(
+    inventory: Inventory,
+    isDeleting: Boolean,
+    isEnabled: Boolean,
+    onClick: () -> Unit,
+    onDelete: () -> Unit
+) {
     ListItem(
+        modifier = Modifier.clickable(onClick = onClick),
         headlineContent = { Text(inventory.name) },
         supportingContent = {
             Column {

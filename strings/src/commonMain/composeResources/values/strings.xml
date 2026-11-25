@@ -460,4 +460,10 @@
     <string name="inventories_delete_failed_title">The inventory was not deleted</string>
     <string name="inventories_delete_failed_ok">OK</string>
     <string name="inventories_delete_error_unexpected">Deleting the inventory failed with an unexpected error.</string>
+    <string name="inventory_error_unexpected">Loading the inventory failed with an unexpected error.</string>
+    <string name="inventory_empty">This inventory has no collections.</string>
+    <string name="inventory_more">More actions</string>
+    <string name="inventory_collection_count">%1$d / %2$d</string>
+    <string name="inventory_collection_show">Show items</string>
+    <string name="inventory_collection_hide">Hide items</string>
 </resources>

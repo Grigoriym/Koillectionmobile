@@ -4,6 +4,7 @@ import com.grappim.kit.testing.MainDispatcherRule
 import com.grappim.kit.uikit.NativeText
 import com.grappim.koillectionmobile.core.domain.KoillectionError
 import com.grappim.koillectionmobile.feature.inventories.domain.Inventory
+import com.grappim.koillectionmobile.feature.inventories.domain.InventoryChanges
 import com.grappim.koillectionmobile.strings.RString
 import com.grappim.koillectionmobile.strings.generated.resources.error_proxy_rejected
 import com.grappim.koillectionmobile.strings.generated.resources.inventories_delete_error_unexpected
@@ -23,6 +24,7 @@ import kotlin.test.assertTrue
 class InventoryListViewModelTest {
 
     private val repository = FakeInventoriesRepository()
+    private val inventoryChanges = InventoryChanges()
     private val mainDispatcherRule = MainDispatcherRule()
 
     @BeforeTest
@@ -41,7 +43,7 @@ class InventoryListViewModelTest {
 
     private fun createSut(): InventoryListViewModel {
         queue()
-        return InventoryListViewModel(repository)
+        return InventoryListViewModel(repository, inventoryChanges)
     }
 
     private fun answer(result: Result<List<Inventory>>) {
@@ -254,6 +256,23 @@ class InventoryListViewModelTest {
 
         assertNull(sut.uiState.value.deleteConfirm)
         assertEquals(listOf(comics.id), repository.deleteCalls)
+    }
+
+    @Test
+    fun `a delete on the inventory screen reads the list again`() {
+        val sut = createSut()
+        answer(Result.success(listOf(comics, games)))
+
+        queue()
+        inventoryChanges.notifyDeleted(games.id)
+
+        assertTrue(sut.uiState.value.isLoading)
+        assertEquals(2, repository.listCalls)
+
+        answer(Result.success(listOf(comics)))
+
+        assertFalse(sut.uiState.value.isLoading)
+        assertEquals(listOf(comics), sut.uiState.value.inventories)
     }
 
     private val comics = inventory(

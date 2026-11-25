@@ -34,6 +34,8 @@ import com.grappim.koillectionmobile.feature.collections.ui.NewCollectionRoute
 import com.grappim.koillectionmobile.feature.collections.ui.NewCollectionScreen
 import com.grappim.koillectionmobile.feature.inventories.ui.InventoryListRoute
 import com.grappim.koillectionmobile.feature.inventories.ui.InventoryListScreen
+import com.grappim.koillectionmobile.feature.inventories.ui.InventoryRoute
+import com.grappim.koillectionmobile.feature.inventories.ui.InventoryScreen
 import com.grappim.koillectionmobile.feature.items.ui.AddItemRoute
 import com.grappim.koillectionmobile.feature.items.ui.AddItemScreen
 import com.grappim.koillectionmobile.feature.items.ui.EditItemRoute
@@ -156,7 +158,14 @@ internal fun MainNavHost(navigationState: NavigationState, navigator: Navigator,
                     )
                 }
                 entry<InventoryListRoute> {
-                    InventoryListScreen()
+                    InventoryListScreen(onInventoryClick = { id -> navigator.navigate(InventoryRoute(id)) })
+                }
+                entry<InventoryRoute> { route ->
+                    InventoryScreen(
+                        inventoryId = route.inventoryId,
+                        // The inventory is gone; the list reads again (InventoryChanges).
+                        onClose = { navigator.close(route) }
+                    )
                 }
                 entry<WishlistListRoute> {
                     WishlistListScreen(

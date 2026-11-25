@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.grappim.kit.uikit.NativeText
 import com.grappim.koillectionmobile.feature.inventories.domain.InventoriesRepository
 import com.grappim.koillectionmobile.feature.inventories.domain.Inventory
+import com.grappim.koillectionmobile.feature.inventories.domain.InventoryChanges
 import com.grappim.koillectionmobile.strings.RString
 import com.grappim.koillectionmobile.strings.generated.resources.inventories_delete_error_unexpected
 import com.grappim.koillectionmobile.strings.generated.resources.inventories_error_unexpected
@@ -18,10 +19,14 @@ import org.koin.core.annotation.KoinViewModel
 /**
  * The inventories of the user. The web UI lists them in database order (`ToolsController` calls
  * `findAll()`), which the API does not show, so the app shows the newest first. A delete asks
- * first and reads the list again on success.
+ * first and reads the list again on success. A delete on the inventory screen
+ * ([InventoryChanges]) reads the list again too, while the list waits lower on the back stack.
  */
 @KoinViewModel
-class InventoryListViewModel(private val repository: InventoriesRepository) : ViewModel() {
+class InventoryListViewModel(
+    private val repository: InventoriesRepository,
+    private val inventoryChanges: InventoryChanges
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(
         InventoryListUiState(
@@ -36,10 +41,17 @@ class InventoryListViewModel(private val repository: InventoriesRepository) : Vi
 
     init {
         load()
+        viewModelScope.launch {
+            inventoryChanges.deleted.collect { reload() }
+        }
     }
 
     private fun retry() {
         if (_uiState.value.isLoading) return
+        reload()
+    }
+
+    private fun reload() {
         _uiState.update { it.copy(isLoading = true, error = NativeText.Empty) }
         load()
     }
