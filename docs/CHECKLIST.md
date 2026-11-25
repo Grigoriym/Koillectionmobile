@@ -1,6 +1,6 @@
 # koillectionmobile checklist
 
-**Current step:** M12: break it into steps, then do them (user, 2026-11-25). The user's UX notes from checking the app become steps in the UX pass below when they send them; the final review of the whole app comes after M12 and M13. M11.15 done 2026-11-25. M11.14 done 2026-11-24. M11.13 done 2026-11-24. M11.12 done 2026-11-24. M11.11 done 2026-11-23. M11.10 done 2026-11-23. M11.9 done 2026-11-23. M11 done 2026-11-23. M11.8 done 2026-11-23. M11.7 done 2026-11-23. M11.6 done 2026-11-23. M11.5 done 2026-11-23. M11.4 done 2026-11-23. M11.3 done 2026-11-23. M11.2 done 2026-11-23. M11.1 done 2026-11-23. M11 broken into steps 2026-11-23. M10 done 2026-11-23. M10.6 done 2026-11-23. M10.5 done 2026-11-22. M10.4 done 2026-11-22. M10.3 done 2026-11-22. M10.2 done 2026-11-22. M10.1 done 2026-11-22. M10 broken into steps 2026-11-22. M9 done 2026-11-22. M9.8 done 2026-11-22. M9.7 done 2026-11-22. M9.6 done 2026-11-22. M9.5 done 2026-11-21. M9.4 done 2026-11-21. M9.3 done 2026-11-21. M9.2 done 2026-11-21. M9.1 done 2026-11-21. M9 broken into steps 2026-11-19. M8 done 2026-11-19. M8.9 done 2026-11-19. M8.8 done 2026-11-19. M8.7 done 2026-11-19. M8.6 done 2026-11-18. M8.5 done 2026-11-18. M8.4 done 2026-11-18. M8.3 done 2026-11-17. M8.2 done 2026-11-17. M8.1 done 2026-11-17. M8 broken into steps 2026-11-17; the other areas became M9–M13 and the release moved to M14 (user, 2026-11-17). M7 done 2026-11-17. M7.7 done 2026-11-17. M7.6 done 2026-11-17. M7.5 done 2026-11-17. M7.4 done 2026-11-17. M7.3 done 2026-11-17. M7.2 done 2026-11-17. M7.1 done 2026-11-17. M7 broken into steps 2026-11-17. M6 done 2026-11-17. M6.6 done 2026-11-17. M6.5 done 2026-11-16. M6.4 done 2026-11-16. M6.3 done 2026-11-16. M6.2 done 2026-11-16. M6.1 done 2026-11-16. M6 broken into steps 2026-11-16. M5 done 2026-11-16. M5.7 done 2026-11-16. M5.6 done 2026-11-16. M5.5 done 2026-11-16. M5.4 done 2026-11-16. M5.3 done 2026-11-16. M5.2 done 2026-11-16. M5.1 done 2026-11-16. M5 broken into steps 2026-11-16. M4 done 2026-11-16. M4.4 done 2026-11-16. M4.3 done 2026-11-16. M4.2 done 2026-11-16. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 and 14 are settled.
+**Current step:** M12.1. M12 broken into steps 2026-11-25. The user's UX notes from checking the app become steps in the UX pass below when they send them; the final review of the whole app comes after M12 and M13. M11.15 done 2026-11-25. M11.14 done 2026-11-24. M11.13 done 2026-11-24. M11.12 done 2026-11-24. M11.11 done 2026-11-23. M11.10 done 2026-11-23. M11.9 done 2026-11-23. M11 done 2026-11-23. M11.8 done 2026-11-23. M11.7 done 2026-11-23. M11.6 done 2026-11-23. M11.5 done 2026-11-23. M11.4 done 2026-11-23. M11.3 done 2026-11-23. M11.2 done 2026-11-23. M11.1 done 2026-11-23. M11 broken into steps 2026-11-23. M10 done 2026-11-23. M10.6 done 2026-11-23. M10.5 done 2026-11-22. M10.4 done 2026-11-22. M10.3 done 2026-11-22. M10.2 done 2026-11-22. M10.1 done 2026-11-22. M10 broken into steps 2026-11-22. M9 done 2026-11-22. M9.8 done 2026-11-22. M9.7 done 2026-11-22. M9.6 done 2026-11-22. M9.5 done 2026-11-21. M9.4 done 2026-11-21. M9.3 done 2026-11-21. M9.2 done 2026-11-21. M9.1 done 2026-11-21. M9 broken into steps 2026-11-19. M8 done 2026-11-19. M8.9 done 2026-11-19. M8.8 done 2026-11-19. M8.7 done 2026-11-19. M8.6 done 2026-11-18. M8.5 done 2026-11-18. M8.4 done 2026-11-18. M8.3 done 2026-11-17. M8.2 done 2026-11-17. M8.1 done 2026-11-17. M8 broken into steps 2026-11-17; the other areas became M9–M13 and the release moved to M14 (user, 2026-11-17). M7 done 2026-11-17. M7.7 done 2026-11-17. M7.6 done 2026-11-17. M7.5 done 2026-11-17. M7.4 done 2026-11-17. M7.3 done 2026-11-17. M7.2 done 2026-11-17. M7.1 done 2026-11-17. M7 broken into steps 2026-11-17. M6 done 2026-11-17. M6.6 done 2026-11-17. M6.5 done 2026-11-16. M6.4 done 2026-11-16. M6.3 done 2026-11-16. M6.2 done 2026-11-16. M6.1 done 2026-11-16. M6 broken into steps 2026-11-16. M5 done 2026-11-16. M5.7 done 2026-11-16. M5.6 done 2026-11-16. M5.5 done 2026-11-16. M5.4 done 2026-11-16. M5.3 done 2026-11-16. M5.2 done 2026-11-16. M5.1 done 2026-11-16. M5 broken into steps 2026-11-16. M4 done 2026-11-16. M4.4 done 2026-11-16. M4.3 done 2026-11-16. M4.2 done 2026-11-16. M4.1 done 2026-11-16 without its device checks (see its Note). The release moved to M9 (user, 2026-11-16). M3 done 2026-11-15, M2 done 2026-11-15, M1 done 2026-11-15, M0 done 2026-11-14 (all archived). Plan §5 decisions 1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 and 14 are settled.
 
 ## How to use this
 
@@ -53,10 +53,51 @@ Usability fixes the user asks for while checking the app (user, 2026-11-25). Eac
   the emulator a group opens and closes, and stays open after a tag's items and Back.
   Note: done 2026-11-25. A mutation (toggle never closes) failed the toggle test.
 
-## M12 — inventories (rough scope)
+## M12 — inventories
 
-View and delete (user, 2026-11-17). Koillection 1.8.5 has no `Post` for `Inventory`, so the app
-does not create one. Break into steps at the start.
+View and delete (user, 2026-11-17). Koillection 1.8.5 `Inventory.php` has `Get`, `GetCollection`
+and `Delete` only. The web UI makes an inventory (`/inventories/add`) and ticks its items
+(`/inventories/{id}/check`); both are web routes, not API, so the app does neither. `content` is
+JSON that `InventoryHandler::buildInventory` builds: a tree of collections (`id`, `title`,
+`children`, `items`, `totalItems`, `totalCheckedItems`), each item `id`, `name`, `checked`. The
+test copy has no inventories. Every write goes to the local test instance only
+(`docs/local-info.md`). Re-read `Inventory.php` and `InventoryHandler.php` at the start of each
+step that touches the API. Model the code on `feature:loans` and `feature:albums`.
+
+- [ ] **M12.1** — Test data and fixtures. Extend `fixtures/seed.py` to make two inventories through
+  the web form (log in to the web UI, CSRF token from the form page): one over the seed's
+  "Comics" root with its child collections, one over "Board games". Tick some items in the first
+  with `/inventories/{id}/check`. `--clean` deletes them. Then add the inventory calls to
+  `fixtures/capture.py` (list page, one inventory) and capture them.
+  **Verify:** the seed run makes both, the API list shows them with the ticked counts, `--clean`
+  removes them; the captured JSON shows the `content` tree as the API sends it (record its shape
+  in plan §2, including a parent collection that has no items of its own).
+- [ ] **M12.2** — Repository calls (new `feature:inventories:{data,domain,dto,mapper}`). The list
+  (`GET /api/inventories`, all pages), one inventory (`GET /api/inventories/{id}`), delete
+  (`DELETE /api/inventories/{id}`). The mapper turns `content` into a domain tree; a missing
+  `children` or `items` key is an empty list. Copy the headers from `feature:loans:data`. Add the
+  new Koin modules' `includes` lines in `AppModule`.
+  **Verify:** mock-engine tests per call (method, path), with a root-path base URL case; mapper
+  tests on the M12.1 fixtures (tree depth, counts, checked flags); `KoinGraphTest` resolves the
+  repository; mutation-check one path and one mapper field.
+- [ ] **M12.3** — Inventories section in the drawer and the list screen (`feature:inventories:ui`).
+  `DrawerDestination.Inventories` with its own back stack. Each row: name, created date, and
+  checked / total items. Loading, empty and error states with retry. A delete action per row
+  that asks first; on success the list reads again, a failure shows the error and keeps the list.
+  **Verify:** ViewModel tests (load, empty, failure and retry, delete success and failure);
+  mutation-check one.
+- [ ] **M12.4** — Inventory screen. A tap on a row opens it: the collection tree, each collection
+  with its checked / total count, each item with a read-only checked mark. Collections open and
+  close on a tap, as the M11.15 tag groups. Delete in the top bar menu, asks first, goes back to
+  the list on success. Loading and error states with retry.
+  **Verify:** ViewModel tests (load, failure and retry, toggle, delete success and failure);
+  mutation-check one.
+- [ ] **M12.5** — Device pass on the emulator (`emulator-testing` skill) against the local test
+  instance, with the M12.1 seed: open the list, open each inventory, open and close a child
+  collection, delete one inventory from the list and one from its screen. Rotate on the inventory
+  screen once. Compare the counts with the web UI before the deletes.
+  **Verify:** each action works on the device; the counts match the web UI; the instance ends as
+  it started (seed rerun or `--clean`).
 
 ## M13 — logs (rough scope)
 
