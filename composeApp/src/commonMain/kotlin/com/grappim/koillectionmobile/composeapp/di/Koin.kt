@@ -20,6 +20,8 @@ import com.grappim.koillectionmobile.feature.items.ui.ItemsUiModule
 import com.grappim.koillectionmobile.feature.loans.data.LoansDataModule
 import com.grappim.koillectionmobile.feature.loans.mapper.LoansMapperModule
 import com.grappim.koillectionmobile.feature.loans.ui.LoansUiModule
+import com.grappim.koillectionmobile.feature.logs.data.LogsDataModule
+import com.grappim.koillectionmobile.feature.logs.mapper.LogsMapperModule
 import com.grappim.koillectionmobile.feature.settings.ui.SettingsUiModule
 import com.grappim.koillectionmobile.feature.tags.data.TagsDataModule
 import com.grappim.koillectionmobile.feature.tags.mapper.TagsMapperModule
@@ -74,6 +76,8 @@ import org.koin.core.annotation.Module
         InventoriesMapperModule::class,
         InventoriesDataModule::class,
         InventoriesUiModule::class,
+        LogsMapperModule::class,
+        LogsDataModule::class,
         SettingsUiModule::class
     ]
 )

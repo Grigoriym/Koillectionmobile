@@ -13,6 +13,7 @@ import com.grappim.koillectionmobile.feature.items.domain.AddItemUseCase
 import com.grappim.koillectionmobile.feature.items.domain.ItemListChanges
 import com.grappim.koillectionmobile.feature.items.domain.ItemsRepository
 import com.grappim.koillectionmobile.feature.loans.domain.LoansRepository
+import com.grappim.koillectionmobile.feature.logs.domain.LogsRepository
 import com.grappim.koillectionmobile.feature.tags.domain.TagsRepository
 import com.grappim.koillectionmobile.feature.templates.domain.ChoiceListChanges
 import com.grappim.koillectionmobile.feature.templates.domain.SaveTemplateUseCase
@@ -50,7 +51,7 @@ class KoinGraphTest {
     /**
      * Covers the limit above for the provider chain `verify()` cannot see: `HttpClient` needs
      * `BaseUrlProvider`, `SessionStorage` and `CustomHeadersStorage`, all from provider functions.
-     * `AuthRepository`, `CollectionsRepository`, `ItemsRepository`, `TagsRepository`, `TemplatesRepository` (M8.1) and `WishlistsRepository` (M9.1) and `LoansRepository` (M10.1) and `AlbumsRepository` (M11.1) and `InventoriesRepository` (M12.2) are resolved, with the M8.4
+     * `AuthRepository`, `CollectionsRepository`, `ItemsRepository`, `TagsRepository`, `TemplatesRepository` (M8.1) and `WishlistsRepository` (M9.1) and `LoansRepository` (M10.1) and `AlbumsRepository` (M11.1) and `InventoriesRepository` (M12.2) and `LogsRepository` (M13.2) are resolved, with the M8.4
      * `SaveTemplateUseCase` and `TemplateChanges`, the M8.5 `ChoiceListChanges` and the M9.4 `WishlistChanges`, the M9.6 `WishChanges`, the M11.4 `AlbumChanges`, the M11.6 `PhotoChanges`,
      * too, and the M3.6 add-item bindings (`AddItemUseCase`, `ItemListChanges`, `PhotoFiles`), which
      * come from provider functions, and the M4.2 `CustomHeaderValidator`: `verify()` checks only what the graph defines, so a repository without its `@Single`
@@ -70,6 +71,7 @@ class KoinGraphTest {
             koin.get<LoansRepository>()
             koin.get<AlbumsRepository>()
             koin.get<InventoriesRepository>()
+            koin.get<LogsRepository>()
             koin.get<WishlistChanges>()
             koin.get<WishChanges>()
             koin.get<AlbumChanges>()

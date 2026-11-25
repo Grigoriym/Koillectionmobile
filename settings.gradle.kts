@@ -101,4 +101,10 @@ include(
     ":feature:inventories:mapper",
     ":feature:inventories:ui"
 )
+include(
+    ":feature:logs:data",
+    ":feature:logs:domain",
+    ":feature:logs:dto",
+    ":feature:logs:mapper"
+)
 include(":feature:settings:ui")

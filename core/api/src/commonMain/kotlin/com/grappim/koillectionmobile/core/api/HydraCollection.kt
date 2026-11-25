@@ -29,11 +29,19 @@ data class HydraCollectionDto<T>(
     val nextPage: String? get() = view?.next
 }
 
+/**
+ * The page links of a Hydra list. Each is an absolute path with the server's own prefix, or null
+ * when the page has no such neighbour. [previous] is absent on the first page.
+ */
 @OptIn(ExperimentalSerializationApi::class)
 @Serializable
 data class HydraViewDto(
     @JsonNames("hydra:next")
-    val next: String? = null
+    val next: String? = null,
+    @JsonNames("hydra:previous")
+    val previous: String? = null,
+    @JsonNames("hydra:last")
+    val last: String? = null
 )
 
 /**
