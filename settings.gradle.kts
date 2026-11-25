@@ -94,4 +94,10 @@ include(
     ":feature:albums:mapper",
     ":feature:albums:ui"
 )
+include(
+    ":feature:inventories:data",
+    ":feature:inventories:domain",
+    ":feature:inventories:dto",
+    ":feature:inventories:mapper"
+)
 include(":feature:settings:ui")

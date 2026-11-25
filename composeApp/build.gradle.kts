@@ -45,6 +45,8 @@ kotlin {
             implementation(projects.feature.loans.mapper)
             implementation(projects.feature.albums.data)
             implementation(projects.feature.albums.mapper)
+            implementation(projects.feature.inventories.data)
+            implementation(projects.feature.inventories.mapper)
 
             // Coil finds this network fetcher through its service loader. Collection and item
             // images are public files under `uploads/`: they need no token.
@@ -66,6 +68,7 @@ kotlin {
             implementation(projects.feature.wishlists.domain)
             implementation(projects.feature.loans.domain)
             implementation(projects.feature.albums.domain)
+            implementation(projects.feature.inventories.domain)
         }
     }
 }
