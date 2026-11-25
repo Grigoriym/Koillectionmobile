@@ -88,14 +88,14 @@ private fun InventoryContent(uiState: InventoryUiState, modifier: Modifier = Mod
     val topBarController = LocalTopBarConfig.current
     val moreLabel = stringResource(RString.inventory_more)
     val currentOnDeleteClick by rememberUpdatedState(uiState.onDeleteClick)
-    LaunchedEffect(uiState.name, uiState.canDelete, moreLabel) {
+    // While the delete runs, the menu stays and its Delete item is disabled.
+    val hasMenu = uiState.canDelete || uiState.isDeleting
+    LaunchedEffect(uiState.name, hasMenu, uiState.canDelete, moreLabel) {
         topBarController.update(
             TopBarConfig(
                 title = NativeText.Simple(uiState.name),
                 navigationIcon = NavigationIconConfig.Back(),
-                // The kit menu item has no disabled state, so the menu shows only while a delete
-                // can start.
-                actions = if (uiState.canDelete) {
+                actions = if (hasMenu) {
                     persistentListOf(
                         TopBarActionMenu(
                             imageVector = Icons.Filled.MoreVert,
@@ -103,6 +103,7 @@ private fun InventoryContent(uiState: InventoryUiState, modifier: Modifier = Mod
                             items = persistentListOf(
                                 TopBarMenuItem(
                                     text = NativeText.Resource(RString.inventories_delete),
+                                    enabled = uiState.canDelete,
                                     onClick = { currentOnDeleteClick() }
                                 )
                             )
