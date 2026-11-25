@@ -132,8 +132,8 @@ first — it is often for a problem this toolchain doesn't have.
   "BUILD SUCCESSFUL" without running. `--rerun` applies only to the task just before it:
   `:a:jvmTest --rerun :b:jvmTest --rerun`.
 - **A new Koin module needs its `includes` line in `AppModule`** (`composeApp/.../di/Koin.kt`).
-  Without it every JVM gate passes, `KoinGraphTest` too, and Android crashes with
-  `NoDefinitionFoundException`. Only a device run catches it.
+  Without it Android crashes with `NoDefinitionFoundException`, and `KoinGraphTest` still passes.
+  `AppModuleIncludesTest` (`composeApp` `jvmTest`) catches it for a `@Configuration` module.
 - **A URL check needs a root-path case** next to `core:api`'s `/sub` base URL: at a root-path
   server Ktor's merged path has no leading `/` inside a plugin.
 - **A check that looks the same whether the thing worked or not is not a check.** Name what it

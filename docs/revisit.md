@@ -92,14 +92,6 @@ cold session can act on it. Delete an entry when it's fixed.
   screens do not reload after a grant (the collection list needs Try again); the denied message at
   Log in has no "Open settings" action. `feature/auth/ui/.../permission/`.
   Verdict (user, 2026-11-25, M14.1): fix before release, M14.22.
-- 2026-11-16 (M4.2) — No JVM gate catches a module missing from `AppModule`'s `includes`
-  (`composeApp/src/commonMain/.../di/Koin.kt`). On the JVM the Koin plugin finds `@Configuration`
-  modules on its own, so `KoinGraphTest` passes; Android does not, and `SettingsUiModule` crashed
-  the app on device until it was added. Fix option: a `jvmTest` that lists every `@Configuration`
-  module class in the build (or every `*UiModule`/`*DataModule` in `settings.gradle.kts` modules)
-  and checks each is in `AppModule`'s `includes` (read the annotation by reflection). Effort: one
-  test, if the annotation keeps runtime retention; otherwise a source-text check of `Koin.kt`.
-  Verdict (user, 2026-11-25, M14.1): fix before release, M14.8.
 - 2026-11-16 (M4.5) — MASVS-PRIVACY-4: log out does not clear Coil's image disk cache.
   `AuthRepositoryImpl.logOut` (`feature/auth/data/.../AuthRepositoryImpl.kt:57`) clears only the
   session keys; the app uses Coil's default singleton `ImageLoader` (no `diskCache` config). A log

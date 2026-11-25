@@ -55,7 +55,7 @@ class KoinGraphTest {
      * `SaveTemplateUseCase` and `TemplateChanges`, the M8.5 `ChoiceListChanges` and the M9.4 `WishlistChanges`, the M9.6 `WishChanges`, the M11.4 `AlbumChanges`, the M11.6 `PhotoChanges`,
      * too, and the M3.6 add-item bindings (`AddItemUseCase`, `ItemListChanges`, `PhotoFiles`), which
      * come from provider functions, and the M4.2 `CustomHeaderValidator`: `verify()` checks only what the graph defines, so a repository without its `@Single`
-     * would not fail it (mutation-checked in M1.5). A missing `includes` line still passes here, as in M1.3.
+     * would not fail it (mutation-checked in M1.5). A missing `includes` line still passes here, as in M1.3; `AppModuleIncludesTest` catches it.
      * Resolving them creates no file: DataStore writes only on the first save.
      */
     @Test
