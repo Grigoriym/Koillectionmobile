@@ -299,8 +299,10 @@ start of any step that touches the API. Facts that shape the design:
 - Inventory ticks (web route, checked live 2026-11-25, M12.1). `POST /inventories/{id}/check`
   (form fields `id`, `checked`) runs a regex over the JSON (`InventoryHandler::setCheckedValue`).
   A tick of one item also ticks every later item in `content`: with items A, B, C in that order, a
-  tick of A ticked all three, a tick of B ticked B and C. So `fixtures/seed.py` sends three ticks
-  and the server stores four. The app does not tick; it shows what the server stores.
+  tick of A ticked all three, a tick of B ticked B and C. `buildCollection` takes the items from
+  `$collection->getItems()` with no order, so the item order in `content` changes between seed
+  runs. `fixtures/seed.py` sends three ticks; the server stored four in M12.1 and five after the
+  M12.5 reseed. The app does not tick; it shows what the server stores.
 - Known server-side trap: Koillection's Docker entrypoint can regenerate `JWT_PASSPHRASE` on
   restart, which breaks API login with a 500 while the website keeps working. Upstream issues
   #1600, #1400, #1410. The app should show a clear message for a 500 at login, not a

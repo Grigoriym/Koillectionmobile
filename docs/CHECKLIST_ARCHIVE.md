@@ -1217,3 +1217,67 @@ the app again before M12 starts (user, 2026-11-23). M11.9 and M11.10 each close 
   actions; Back with input on the edit-item, add-item and loan forms opened the discard dialog. A
   temporary child collection was created from "More actions", opened in Edit collection, and
   deleted from the bar. After `am kill` (pid empty) the item screen came back with its bar.
+
+## M12 — inventories
+
+View and delete (user, 2026-11-17). Koillection 1.8.5 `Inventory.php` has `Get`, `GetCollection`
+and `Delete` only. The web UI makes an inventory (`/inventories/add`) and ticks its items
+(`/inventories/{id}/check`); both are web routes, not API, so the app does neither. `content` is
+JSON that `InventoryHandler::buildInventory` builds: a tree of collections (`id`, `title`,
+`children`, `items`, `totalItems`, `totalCheckedItems`), each item `id`, `name`, `checked`. The
+seed (`fixtures/seed.py`, M12.1) makes two inventories. Every write goes to the local test instance only
+(`docs/local-info.md`). Re-read `Inventory.php` and `InventoryHandler.php` at the start of each
+step that touches the API. Model the code on `feature:loans` and `feature:albums`.
+
+- [x] **M12.1** — Test data and fixtures. Extend `fixtures/seed.py` to make two inventories through
+  the web form (log in to the web UI, CSRF token from the form page): one over the seed's
+  "Comics" root with its child collections, one over "Board games". Tick some items in the first
+  with `/inventories/{id}/check`. `--clean` deletes them. Then add the inventory calls to
+  `fixtures/capture.py` (list page, one inventory) and capture them.
+  **Verify:** the seed run makes both, the API list shows them with the ticked counts, `--clean`
+  removes them; the captured JSON shows the `content` tree as the API sends it (record its shape
+  in plan §2, including a parent collection that has no items of its own).
+  Note: done 2026-11-25. The tick route also ticks every later item in `content`: 3 ticks stored
+  4 (plan §2). `capture.py` now takes a group name, so the inventory capture leaves the older
+  fixtures alone.
+- [x] **M12.2** — Repository calls (new `feature:inventories:{data,domain,dto,mapper}`). The list
+  (`GET /api/inventories`, all pages), one inventory (`GET /api/inventories/{id}`), delete
+  (`DELETE /api/inventories/{id}`). The mapper turns `content` into a domain tree; a missing
+  `children` or `items` key is an empty list. Copy the headers from `feature:loans:data`. Add the
+  new Koin modules' `includes` lines in `AppModule`.
+  **Verify:** mock-engine tests per call (method, path), with a root-path base URL case; mapper
+  tests on the M12.1 fixtures (tree depth, counts, checked flags); `KoinGraphTest` resolves the
+  repository; mutation-check one path and one mapper field.
+  Note: done 2026-11-25. The domain keeps the server's `totalItems` and `totalCheckedItems` per node
+  and `createdAt` as a date only, as `LoanMapper` does. A DELETE without the id and a mapper that
+  read `totalItems` for the checked count each failed a test.
+- [x] **M12.3** — Inventories section in the drawer and the list screen (`feature:inventories:ui`).
+  `DrawerDestination.Inventories` with its own back stack. Each row: name, created date, and
+  checked / total items. Loading, empty and error states with retry. A delete action per row
+  that asks first; on success the list reads again, a failure shows the error and keeps the list.
+  **Verify:** ViewModel tests (load, empty, failure and retry, delete success and failure);
+  mutation-check one.
+  Note: done 2026-11-25. The web UI lists inventories in database order (`ToolsController`
+  `findAll()`), so the app sorts newest first, then by name. The row counts are the sums of the
+  root collections' server counts. Rows do not open yet: M12.4 adds the tap. A delete that did not
+  read the list again failed the delete test.
+- [x] **M12.4** — Inventory screen. A tap on a row opens it: the collection tree, each collection
+  with its checked / total count, each item with a read-only checked mark. Collections open and
+  close on a tap, as the M11.15 tag groups. Delete in the top bar menu, asks first, goes back to
+  the list on success. Loading and error states with retry.
+  **Verify:** ViewModel tests (load, failure and retry, toggle, delete success and failure);
+  mutation-check one.
+  Note: done 2026-11-25. An open collection shows its items, then its children, as the web UI does
+  (`Inventory/show.html.twig`). A lone root starts open, as a lone tag group does. A delete on the
+  screen tells the list through the new `InventoryChanges`, so the list reads again. A toggle that
+  never closed failed the close test.
+- [x] **M12.5** — Device pass on the emulator (`emulator-testing` skill) against the local test
+  instance, with the M12.1 seed: open the list, open each inventory, open and close a child
+  collection, delete one inventory from the list and one from its screen. Rotate on the inventory
+  screen once. Compare the counts with the web UI before the deletes.
+  **Verify:** each action works on the device; the counts match the web UI; the instance ends as
+  it started (seed rerun or `--clean`).
+  Note: done 2026-11-25. Every action worked; the app's counts matched the web UI (4 / 5, 1 / 2,
+  3 / 3; 0 / 3). The open collections stayed open through landscape and back. The seed rerun
+  stored 5 of 5 ticks, not 4: the server's item order changes between runs (plan §2,
+  `docs/revisit.md`). The seed data is back, so "Comics shelf check" now has no unticked item.

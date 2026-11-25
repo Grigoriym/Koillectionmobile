@@ -197,3 +197,11 @@ this app.
   image."): pick a solid-colour test JPEG (skill, Step 5). The album form's save returns to the screen it came from, not to the
   new album. The web UI has no photo page (`/photos/<id>` gives 404): read the photo from its album
   page, `/albums/<id>`.
+- Inventories (M12.5): "Inventories" in the drawer. Each row has a "Delete inventory" icon
+  (`content-desc`); the row's tap target is its name text. On the inventory screen a collection
+  opens and closes on a tap on its title; the arrow's `content-desc` is "Show items" or "Hide items".
+  "More actions" holds "Delete inventory". The item checkmarks have no `checked` in the dump: read
+  them from a screenshot. The delete dialog names the inventory in its body, but only a screenshot
+  shows it, as in M6.3. To compare with the web UI, log in with `curl` as in M2.5 and read
+  `/inventories/<id>`. The app has no way to make an inventory: rerun the seed after the deletes
+  (`--clean`, then a plain run), and read the new tick counts from the API.

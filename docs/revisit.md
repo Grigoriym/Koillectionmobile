@@ -143,3 +143,11 @@ cold session can act on it. Delete an entry when it's fixed.
   (`feature/loans/ui/.../LoansSection.kt:73`, `uiState.isLoading`). The page gets shorter, so
   the scroll position moves up and the loan just changed is off screen. Fix option: keep the old
   list on screen during a reload and show the spinner only when there is no list yet.
+- 2026-11-25 (M12.5) — `fixtures/seed.py` does not make the same inventory ticks on each run.
+  `seed_inventories` (`fixtures/seed.py:141`) ticks three items, and the server's tick regex also
+  ticks every later item in `content` (plan §2, "Inventory ticks"). The item order in `content`
+  comes from `InventoryHandler::buildCollection` (`$collection->getItems()`, no order), so it
+  changes between runs: M12.1 stored 4 of 5 ticks, the M12.5 reseed stored 5 of 5 (no unticked
+  item left in "Comics shelf check"). Fix option: read the order from `GET /api/inventories/{id}`
+  after the create and tick only the last items in that order, so the server stores exactly what
+  the seed sends.
