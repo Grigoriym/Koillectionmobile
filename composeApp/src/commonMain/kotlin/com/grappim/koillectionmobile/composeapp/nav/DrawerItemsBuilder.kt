@@ -5,6 +5,7 @@ import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.Create
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
@@ -17,6 +18,7 @@ import com.grappim.koillectionmobile.strings.generated.resources.albums_title
 import com.grappim.koillectionmobile.strings.generated.resources.collections_title
 import com.grappim.koillectionmobile.strings.generated.resources.drawer_log_out
 import com.grappim.koillectionmobile.strings.generated.resources.inventories_title
+import com.grappim.koillectionmobile.strings.generated.resources.logs_title
 import com.grappim.koillectionmobile.strings.generated.resources.settings_title
 import com.grappim.koillectionmobile.strings.generated.resources.tags_title
 import com.grappim.koillectionmobile.strings.generated.resources.templates_title
@@ -28,7 +30,7 @@ import org.koin.core.annotation.Factory
 
 /**
  * A class and not a constant, so the item list can later depend on state (wallosmobile's
- * `DrawerItemsBuilder`). `material-icons-core` has no tag, template, album or wish icon, so some
+ * `DrawerItemsBuilder`). `material-icons-core` has no tag, template, album, wish or log icon, so some
  * icons are only near the meaning.
  */
 @Factory
@@ -45,6 +47,7 @@ class DrawerItemsBuilder {
             RString.inventories_title,
             IconSource.Vector(Icons.AutoMirrored.Filled.List)
         ),
+        item(DrawerDestination.Logs, RString.logs_title, IconSource.Vector(Icons.Filled.DateRange)),
         item(DrawerDestination.Settings, RString.settings_title, IconSource.Vector(Icons.Filled.Settings)),
         DrawerItem.Divider,
         item(

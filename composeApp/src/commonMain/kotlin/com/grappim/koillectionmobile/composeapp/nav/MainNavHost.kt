@@ -45,6 +45,8 @@ import com.grappim.koillectionmobile.feature.items.ui.ItemScreen
 import com.grappim.koillectionmobile.feature.loans.ui.LoanFormRoute
 import com.grappim.koillectionmobile.feature.loans.ui.LoanFormScreen
 import com.grappim.koillectionmobile.feature.loans.ui.LoansSection
+import com.grappim.koillectionmobile.feature.logs.ui.LogListRoute
+import com.grappim.koillectionmobile.feature.logs.ui.LogListScreen
 import com.grappim.koillectionmobile.feature.settings.ui.SettingsRoute
 import com.grappim.koillectionmobile.feature.settings.ui.SettingsScreen
 import com.grappim.koillectionmobile.feature.tags.ui.TagItemsRoute
@@ -167,6 +169,7 @@ internal fun MainNavHost(navigationState: NavigationState, navigator: Navigator,
                         onClose = { navigator.close(route) }
                     )
                 }
+                entry<LogListRoute> { LogListScreen() }
                 entry<WishlistListRoute> {
                     WishlistListScreen(
                         onWishlistClick = { id -> navigator.navigate(WishlistRoute(id)) },

@@ -4,6 +4,7 @@ import androidx.navigation3.runtime.NavKey
 import com.grappim.koillectionmobile.feature.albums.ui.AlbumListRoute
 import com.grappim.koillectionmobile.feature.collections.ui.CollectionListRoute
 import com.grappim.koillectionmobile.feature.inventories.ui.InventoryListRoute
+import com.grappim.koillectionmobile.feature.logs.ui.LogListRoute
 import com.grappim.koillectionmobile.feature.settings.ui.SettingsRoute
 import com.grappim.koillectionmobile.feature.tags.ui.TagListRoute
 import com.grappim.koillectionmobile.feature.templates.ui.TemplateListRoute
@@ -20,6 +21,7 @@ enum class DrawerDestination(val route: NavKey?) {
     Wishlists(WishlistListRoute),
     Albums(AlbumListRoute),
     Inventories(InventoryListRoute),
+    Logs(LogListRoute),
     Settings(SettingsRoute),
     LogOut(null)
 }

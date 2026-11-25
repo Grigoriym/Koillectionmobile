@@ -20,6 +20,7 @@ import com.grappim.koillectionmobile.feature.items.ui.AddItemRoute
 import com.grappim.koillectionmobile.feature.items.ui.EditItemRoute
 import com.grappim.koillectionmobile.feature.items.ui.ItemRoute
 import com.grappim.koillectionmobile.feature.loans.ui.LoanFormRoute
+import com.grappim.koillectionmobile.feature.logs.ui.LogListRoute
 import com.grappim.koillectionmobile.feature.settings.ui.SettingsRoute
 import com.grappim.koillectionmobile.feature.tags.ui.TagItemsRoute
 import com.grappim.koillectionmobile.feature.tags.ui.TagListRoute
@@ -79,6 +80,7 @@ private val navKeySerializersModule = SerializersModule {
         subclass(EditPhotoRoute::class)
         subclass(InventoryListRoute::class)
         subclass(InventoryRoute::class)
+        subclass(LogListRoute::class)
     }
 }
 

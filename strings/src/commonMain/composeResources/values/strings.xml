@@ -466,4 +466,25 @@
     <string name="inventory_collection_count">%1$d / %2$d</string>
     <string name="inventory_collection_show">Show items</string>
     <string name="inventory_collection_hide">Hide items</string>
+    <string name="logs_title">Logs</string>
+    <string name="logs_empty">There are no logs yet.</string>
+    <string name="logs_retry">Try again</string>
+    <string name="logs_error_network">The server does not answer. Check the network connection.</string>
+    <string name="logs_error_http">The server answered with an error (HTTP %1$d).</string>
+    <string name="logs_error_unexpected">Loading the logs failed with an unexpected error.</string>
+    <string name="logs_action_create">%1$s created</string>
+    <string name="logs_action_delete">%1$s deleted</string>
+    <string name="logs_action_unknown">%1$s</string>
+    <string name="logs_type_collection">Collection</string>
+    <string name="logs_type_item">Item</string>
+    <string name="logs_type_template">Template</string>
+    <string name="logs_type_choice_list">Choice list</string>
+    <string name="logs_type_inventory">Inventory</string>
+    <string name="logs_type_tag">Tag</string>
+    <string name="logs_type_tag_category">Tag category</string>
+    <string name="logs_type_album">Album</string>
+    <string name="logs_type_photo">Photo</string>
+    <string name="logs_type_wishlist">Wishlist</string>
+    <string name="logs_type_wish">Wish</string>
+    <string name="logs_type_unknown">Unknown object</string>
 </resources>

@@ -105,6 +105,7 @@ include(
     ":feature:logs:data",
     ":feature:logs:domain",
     ":feature:logs:dto",
-    ":feature:logs:mapper"
+    ":feature:logs:mapper",
+    ":feature:logs:ui"
 )
 include(":feature:settings:ui")
