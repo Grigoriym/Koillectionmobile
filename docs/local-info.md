@@ -65,7 +65,7 @@ after it the counts match the unseeded copy, except the log count. Run it again 
 
 `fixtures/capture.py` writes the JSON fixtures in `fixtures/koillection-1.8.5/` from this
 instance. It refuses nothing on its own: never change its `BASE` to the real server. Give it a
-group name (`core`, `inventories`) to capture only that group. A run with no name rewrites the
+group name (`core`, `inventories`, `logs`) to capture only that group. A run with no name rewrites the
 `core` files too, and those came from the older copy with other IDs. The `inventories` group
 needs the seed.
 

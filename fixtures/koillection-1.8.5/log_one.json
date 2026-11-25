@@ -1,0 +1,13 @@
+{
+  "@context": "/api/contexts/Log",
+  "@id": "/api/logs/01a2122a-2671-7e58-b2f5-1518ee70917e",
+  "@type": "Log",
+  "id": "01a2122a-2671-7e58-b2f5-1518ee70917e",
+  "type": "create",
+  "loggedAt": "2026-11-25T11:04:41+01:00",
+  "objectId": "01a2122a-2670-7c41-9d08-72f501763434",
+  "objectLabel": "Comic con stall",
+  "objectClass": "App\\Entity\\Photo",
+  "objectDeleted": false,
+  "owner": "/api/users/01a15db0-8797-784e-9ea2-fcf934198f3b"
+}

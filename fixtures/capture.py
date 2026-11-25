@@ -7,6 +7,7 @@ bodies. Never point this at the real server: the repo is public.
 Usage:
     python3 -I fixtures/capture.py              # every fixture
     python3 -I fixtures/capture.py inventories  # only the named groups (here: the M12.1 files)
+    python3 -I fixtures/capture.py logs         # the M13.1 files
 
 Capture only the group you need: a full run rewrites the older fixtures, which came from an
 older copy of the catalogue with other IDs (docs/local-info.md), and their tests read them.
@@ -57,14 +58,17 @@ def main():
     def body(path):
         return json.loads(get(path)[1])
 
-    groups = sys.argv[1:] or ["core", "inventories"]
-    if set(groups) - {"core", "inventories"}:
-        raise SystemExit(f"unknown group: {set(groups) - {'core', 'inventories'}}")
+    known = {"core", "inventories", "logs"}
+    groups = sys.argv[1:] or sorted(known)
+    if set(groups) - known:
+        raise SystemExit(f"unknown group: {set(groups) - known}")
 
     if "core" in groups:
         capture_core(get, body)
     if "inventories" in groups:
         capture_inventories(get, body)
+    if "logs" in groups:
+        capture_logs(get, body)
 
 
 def capture_core(get, body):
@@ -98,6 +102,18 @@ def capture_inventories(get, body):
     if "Comics shelf check" not in named:
         raise SystemExit("no 'Comics shelf check' inventory: run fixtures/seed.py first")
     save("inventory_one.json", *get(named["Comics shelf check"]), 200)
+
+
+def capture_logs(get, body):
+    # The API sends logs oldest first (plan §2). The app reads `view.last`, then each `previous`.
+    save("logs_page_first.json", *get("/api/logs"), 200)
+    last = body("/api/logs")["view"]["last"]
+    save("logs_page_last.json", *get(last), 200)
+    # the page before the last one has both `previous` and `next`
+    middle = body(last)["view"]["previous"]
+    save("logs_page_middle.json", *get(middle), 200)
+    # the newest log: the last row of the last page
+    save("log_one.json", *get(body(last)["member"][-1]["@id"]), 200)
 
 
 if __name__ == "__main__":
