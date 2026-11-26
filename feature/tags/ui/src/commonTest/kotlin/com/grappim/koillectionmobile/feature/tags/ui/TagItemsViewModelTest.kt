@@ -8,9 +8,9 @@ import com.grappim.koillectionmobile.feature.items.domain.Item
 import com.grappim.koillectionmobile.feature.items.domain.ItemListChanges
 import com.grappim.koillectionmobile.feature.items.domain.ItemsRepository
 import com.grappim.koillectionmobile.strings.RString
+import com.grappim.koillectionmobile.strings.generated.resources.error_http
+import com.grappim.koillectionmobile.strings.generated.resources.error_network
 import com.grappim.koillectionmobile.strings.generated.resources.tag_items_error_unexpected
-import com.grappim.koillectionmobile.strings.generated.resources.tags_error_http
-import com.grappim.koillectionmobile.strings.generated.resources.tags_error_network
 import kotlinx.coroutines.CompletableDeferred
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
@@ -93,7 +93,7 @@ class TagItemsViewModelTest {
         answer(Result.failure(KoillectionError.Network(IllegalStateException("timeout"))))
 
         assertFalse(sut.uiState.value.isLoading)
-        assertEquals(NativeText.Resource(RString.tags_error_network), sut.uiState.value.error)
+        assertEquals(NativeText.Resource(RString.error_network), sut.uiState.value.error)
         assertTrue(sut.uiState.value.items.isEmpty())
     }
 
@@ -103,7 +103,7 @@ class TagItemsViewModelTest {
 
         answer(Result.failure(KoillectionError.Server(status = 503, message = null)))
 
-        assertEquals(NativeText.Arguments(RString.tags_error_http, listOf(503)), sut.uiState.value.error)
+        assertEquals(NativeText.Arguments(RString.error_http, listOf(503)), sut.uiState.value.error)
     }
 
     @Test

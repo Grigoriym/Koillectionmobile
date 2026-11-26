@@ -369,6 +369,9 @@ code without checking the licence terms are kept.
    `LoansSection` from `feature:loans:ui`.
    M14.9 (2026-11-25) added `core:testing`: test fakes that several modules share
    (`FakeSessionStorage`). A module takes it only as a test dependency.
+   M14.10 (2026-11-26) added `core:ui`: UI parts that are specific to this app and that several
+   `ui` modules share (`Throwable.toMessage`, `EmptyOrError`). It is not a local `uikit`:
+   generic widgets still come from `grappim-kit-uikit`.
 5. **MVP scope** — *decided 2026-11-15 (start of M2)*: login, collection list, item list, item
    detail, and log out (M2); "add item with photos" into a chosen collection (M3). The user
    accepted the proposal as it was and added log out, so a user can change server without

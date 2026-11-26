@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.grappim.kit.uikit.NativeText
 import com.grappim.koillectionmobile.core.domain.KoillectionError
+import com.grappim.koillectionmobile.core.ui.toMessage
 import com.grappim.koillectionmobile.feature.templates.domain.ChoiceListChanges
 import com.grappim.koillectionmobile.feature.templates.domain.TemplatesRepository
 import com.grappim.koillectionmobile.strings.RString

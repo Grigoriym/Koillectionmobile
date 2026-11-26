@@ -18,6 +18,7 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.grappim.koillectionmobile.core.ui.EmptyOrError
 import com.grappim.koillectionmobile.feature.albums.domain.PhotoField
 import com.grappim.koillectionmobile.strings.RString
 import com.grappim.koillectionmobile.strings.generated.resources.collection_form_edit_discard_title

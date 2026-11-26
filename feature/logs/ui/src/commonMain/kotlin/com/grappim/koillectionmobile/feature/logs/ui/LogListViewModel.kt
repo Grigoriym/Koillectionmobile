@@ -3,8 +3,11 @@ package com.grappim.koillectionmobile.feature.logs.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.grappim.kit.uikit.NativeText
+import com.grappim.koillectionmobile.core.ui.toMessage
 import com.grappim.koillectionmobile.feature.logs.domain.LogEntry
 import com.grappim.koillectionmobile.feature.logs.domain.LogsRepository
+import com.grappim.koillectionmobile.strings.RString
+import com.grappim.koillectionmobile.strings.generated.resources.logs_error_unexpected
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -49,7 +52,13 @@ class LogListViewModel(private val repository: LogsRepository) : ViewModel() {
                 }
                 .onFailure { e ->
                     nextPath = null
-                    _uiState.update { it.copy(logs = emptyList(), isLoading = false, error = e.toMessage()) }
+                    _uiState.update {
+                        it.copy(
+                            logs = emptyList(),
+                            isLoading = false,
+                            error = e.toMessage(RString.logs_error_unexpected)
+                        )
+                    }
                 }
         }
     }
@@ -71,7 +80,9 @@ class LogListViewModel(private val repository: LogsRepository) : ViewModel() {
                     _uiState.update { it.copy(logs = it.logs.plusNew(page.logs), isLoadingMore = false) }
                 }
                 .onFailure { e ->
-                    _uiState.update { it.copy(isLoadingMore = false, moreError = e.toMessage()) }
+                    _uiState.update {
+                        it.copy(isLoadingMore = false, moreError = e.toMessage(RString.logs_error_unexpected))
+                    }
                 }
         }
     }

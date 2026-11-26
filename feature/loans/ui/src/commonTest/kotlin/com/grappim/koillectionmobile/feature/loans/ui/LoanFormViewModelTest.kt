@@ -8,8 +8,8 @@ import com.grappim.koillectionmobile.feature.loans.domain.Loan
 import com.grappim.koillectionmobile.feature.loans.domain.LoanChange
 import com.grappim.koillectionmobile.feature.loans.domain.LoanChanges
 import com.grappim.koillectionmobile.strings.RString
+import com.grappim.koillectionmobile.strings.generated.resources.error_network
 import com.grappim.koillectionmobile.strings.generated.resources.loan_form_not_found
-import com.grappim.koillectionmobile.strings.generated.resources.loans_error_network
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -190,7 +190,7 @@ class LoanFormViewModelTest {
     @Test
     fun `a failed read shows its error and retry reads again`() {
         val sut = editSut(loaded = Result.failure(KoillectionError.Network(IllegalStateException("timeout"))))
-        assertEquals(NativeText.Resource(RString.loans_error_network), sut.uiState.value.error)
+        assertEquals(NativeText.Resource(RString.error_network), sut.uiState.value.error)
 
         repository.loans.clear()
         repository.loans.addLast(CompletableDeferred(Result.success(listOf(LENT))))
@@ -210,7 +210,7 @@ class LoanFormViewModelTest {
         answerSave(Result.failure(KoillectionError.Network(IllegalStateException("timeout"))))
 
         assertEquals(
-            LoanSaveStatus.Failed(NativeText.Resource(RString.loans_error_network)),
+            LoanSaveStatus.Failed(NativeText.Resource(RString.error_network)),
             sut.uiState.value.save
         )
         assertFalse(sut.uiState.value.isSaved)

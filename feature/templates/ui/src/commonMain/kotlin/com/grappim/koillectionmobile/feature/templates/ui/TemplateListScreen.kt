@@ -27,6 +27,7 @@ import com.grappim.kit.uikit.widgets.topbar.LocalTopBarConfig
 import com.grappim.kit.uikit.widgets.topbar.NavigationIconConfig
 import com.grappim.kit.uikit.widgets.topbar.TopBarActionVectorButton
 import com.grappim.kit.uikit.widgets.topbar.TopBarConfig
+import com.grappim.koillectionmobile.core.ui.EmptyOrError
 import com.grappim.koillectionmobile.feature.templates.domain.Template
 import com.grappim.koillectionmobile.strings.RString
 import com.grappim.koillectionmobile.strings.generated.resources.choice_lists_title

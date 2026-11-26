@@ -19,6 +19,9 @@
     <string name="login_error_http">The server answered with an error (HTTP %1$d).</string>
     <string name="login_error_unexpected">The login failed with an unexpected error.</string>
     <string name="error_proxy_rejected">A proxy in front of the server rejected the request (HTTP %1$d), so it did not reach Koillection. The proxy may want a header: add it in Settings, custom headers.</string>
+    <string name="error_network">The server does not answer. Check the network connection.</string>
+    <string name="error_http">The server answered with an error (HTTP %1$d).</string>
+    <string name="retry">Try again</string>
     <string name="login_error_local_network_denied">Not sent: this server is on your local network, and the app may not reach it. Turn on local network access for this app in the Android settings.</string>
 
     <string name="login_settings">Settings</string>
@@ -32,9 +35,6 @@
 
     <string name="collections_title">Collections</string>
     <string name="collections_empty">There are no collections yet.</string>
-    <string name="collections_retry">Try again</string>
-    <string name="collections_error_network">The server does not answer. Check the network connection.</string>
-    <string name="collections_error_http">The server answered with an error (HTTP %1$d).</string>
     <string name="collections_error_unexpected">Loading the collections failed with an unexpected error.</string>
 
     <string name="collection_empty">This collection has no collections and no items.</string>
@@ -73,17 +73,11 @@
     <string name="tags_no_category">No category</string>
     <string name="tags_group_show">Show tags</string>
     <string name="tags_group_hide">Hide tags</string>
-    <string name="tags_retry">Try again</string>
-    <string name="tags_error_network">The server does not answer. Check the network connection.</string>
-    <string name="tags_error_http">The server answered with an error (HTTP %1$d).</string>
     <string name="tags_error_unexpected">Loading the tags failed with an unexpected error.</string>
     <string name="tag_items_empty">No item has this tag.</string>
     <string name="tag_items_error_unexpected">Loading the items of the tag failed with an unexpected error.</string>
     <string name="templates_title">Templates</string>
     <string name="templates_empty">There are no templates yet.</string>
-    <string name="templates_retry">Try again</string>
-    <string name="templates_error_network">The server does not answer. Check the network connection.</string>
-    <string name="templates_error_http">The server answered with an error (HTTP %1$d).</string>
     <string name="templates_error_unexpected">Loading the templates failed with an unexpected error.</string>
     <string name="template_empty">This template has no fields.</string>
     <string name="template_field_choice_list">%1$s: %2$s</string>
@@ -192,9 +186,6 @@
     <string name="collection_form_templates_error">Loading the templates failed.</string>
 
     <string name="item_back">Back</string>
-    <string name="item_retry">Try again</string>
-    <string name="item_error_network">The server does not answer. Check the network connection.</string>
-    <string name="item_error_http">The server answered with an error (HTTP %1$d).</string>
     <string name="item_error_unexpected">Loading the item failed with an unexpected error.</string>
     <string name="item_section_tags">Tags</string>
     <string name="item_field_not_shown">Not shown (field type: %1$s)</string>
@@ -303,9 +294,6 @@
 
     <string name="wishlists_title">Wishlists</string>
     <string name="wishlists_empty">There are no wishlists yet.</string>
-    <string name="wishlists_retry">Try again</string>
-    <string name="wishlists_error_network">The server does not answer. Check the network connection.</string>
-    <string name="wishlists_error_http">The server answered with an error (HTTP %1$d).</string>
     <string name="wishlists_error_unexpected">Loading the wishlists failed with an unexpected error.</string>
     <string name="wishlist_error_unexpected">Loading the wishlist failed with an unexpected error.</string>
     <string name="wishlist_empty">This wishlist has no wishlists and no wishes.</string>
@@ -357,9 +345,6 @@
 
     <string name="albums_title">Albums</string>
     <string name="albums_empty">There are no albums yet.</string>
-    <string name="albums_retry">Try again</string>
-    <string name="albums_error_network">The server does not answer. Check the network connection.</string>
-    <string name="albums_error_http">The server answered with an error (HTTP %1$d).</string>
     <string name="albums_error_unexpected">Loading the albums failed with an unexpected error.</string>
     <string name="album_error_unexpected">Loading the album failed with an unexpected error.</string>
     <string name="album_empty">This album has no albums and no photos.</string>
@@ -415,8 +400,6 @@
     <string name="loans_lent_at">Lent on %1$s</string>
     <string name="loans_returned_at">Returned on %1$s</string>
     <string name="loans_not_returned">Not returned</string>
-    <string name="loans_error_network">The server does not answer. Check the network connection.</string>
-    <string name="loans_error_http">The server answered with an error (HTTP %1$d).</string>
     <string name="loans_error_unexpected">Loading the loans failed with an unexpected error.</string>
     <string name="loans_new">New loan</string>
     <string name="loans_mark_returned">Mark returned</string>
@@ -446,11 +429,8 @@
 
     <string name="inventories_title">Inventories</string>
     <string name="inventories_empty">There are no inventories yet. Make one in the Koillection web UI.</string>
-    <string name="inventories_retry">Try again</string>
     <string name="inventories_created_at">Created on %1$s</string>
     <string name="inventories_checked">%1$d of %2$d items checked</string>
-    <string name="inventories_error_network">The server does not answer. Check the network connection.</string>
-    <string name="inventories_error_http">The server answered with an error (HTTP %1$d).</string>
     <string name="inventories_error_unexpected">Loading the inventories failed with an unexpected error.</string>
     <string name="inventories_delete">Delete inventory</string>
     <string name="inventories_delete_title">Delete this inventory?</string>
@@ -468,9 +448,6 @@
     <string name="inventory_collection_hide">Hide items</string>
     <string name="logs_title">Logs</string>
     <string name="logs_empty">There are no logs yet.</string>
-    <string name="logs_retry">Try again</string>
-    <string name="logs_error_network">The server does not answer. Check the network connection.</string>
-    <string name="logs_error_http">The server answered with an error (HTTP %1$d).</string>
     <string name="logs_error_unexpected">Loading the logs failed with an unexpected error.</string>
     <string name="logs_action_create">%1$s created</string>
     <string name="logs_action_delete">%1$s deleted</string>

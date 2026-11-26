@@ -8,6 +8,7 @@ import com.grappim.kit.uikit.NativeText
 import com.grappim.koillectionmobile.core.photos.JPEG_MIME_TYPE
 import com.grappim.koillectionmobile.core.photos.PhotoFiles
 import com.grappim.koillectionmobile.core.photos.next
+import com.grappim.koillectionmobile.core.ui.toMessage
 import com.grappim.koillectionmobile.feature.albums.domain.AlbumsRepository
 import com.grappim.koillectionmobile.feature.albums.domain.PhotoChanges
 import com.grappim.koillectionmobile.feature.albums.domain.PhotoField

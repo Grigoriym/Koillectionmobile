@@ -15,7 +15,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
@@ -32,7 +31,6 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -43,6 +41,7 @@ import com.grappim.kit.uikit.widgets.topbar.NavigationIconConfig
 import com.grappim.kit.uikit.widgets.topbar.TopBarActionMenu
 import com.grappim.kit.uikit.widgets.topbar.TopBarConfig
 import com.grappim.kit.uikit.widgets.topbar.TopBarMenuItem
+import com.grappim.koillectionmobile.core.ui.EmptyOrError
 import com.grappim.koillectionmobile.feature.inventories.domain.InventoryCollection
 import com.grappim.koillectionmobile.strings.RString
 import com.grappim.koillectionmobile.strings.generated.resources.inventories_delete
@@ -52,7 +51,6 @@ import com.grappim.koillectionmobile.strings.generated.resources.inventories_del
 import com.grappim.koillectionmobile.strings.generated.resources.inventories_delete_failed_title
 import com.grappim.koillectionmobile.strings.generated.resources.inventories_delete_text
 import com.grappim.koillectionmobile.strings.generated.resources.inventories_delete_title
-import com.grappim.koillectionmobile.strings.generated.resources.inventories_retry
 import com.grappim.koillectionmobile.strings.generated.resources.inventory_collection_count
 import com.grappim.koillectionmobile.strings.generated.resources.inventory_collection_hide
 import com.grappim.koillectionmobile.strings.generated.resources.inventory_collection_show
@@ -132,6 +130,7 @@ private fun InventoryContent(uiState: InventoryUiState, modifier: Modifier = Mod
             uiState.error.isNotEmpty() || uiState.collections.isEmpty() -> EmptyOrError(
                 modifier = contentModifier,
                 error = uiState.error,
+                emptyText = stringResource(RString.inventory_empty),
                 onRetry = uiState.onRetry
             )
 
@@ -213,22 +212,6 @@ private fun CollectionHeader(
                     if (isExpanded) RString.inventory_collection_hide else RString.inventory_collection_show
                 )
             )
-        }
-    }
-}
-
-@Composable
-private fun EmptyOrError(error: NativeText, onRetry: () -> Unit, modifier: Modifier = Modifier) {
-    Column(
-        modifier = modifier.padding(PADDING),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(PADDING, Alignment.CenterVertically)
-    ) {
-        if (error.isNotEmpty()) {
-            Text(text = error.asString(), color = MaterialTheme.colorScheme.error, textAlign = TextAlign.Center)
-            Button(onClick = onRetry) { Text(stringResource(RString.inventories_retry)) }
-        } else {
-            Text(text = stringResource(RString.inventory_empty), textAlign = TextAlign.Center)
         }
     }
 }

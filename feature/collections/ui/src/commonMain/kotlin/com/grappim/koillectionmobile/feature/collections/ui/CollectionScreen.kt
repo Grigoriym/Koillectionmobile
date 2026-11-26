@@ -41,6 +41,7 @@ import com.grappim.kit.uikit.widgets.topbar.TopBarActionMenu
 import com.grappim.kit.uikit.widgets.topbar.TopBarActionVectorButton
 import com.grappim.kit.uikit.widgets.topbar.TopBarConfig
 import com.grappim.kit.uikit.widgets.topbar.TopBarMenuItem
+import com.grappim.koillectionmobile.core.ui.EmptyOrError
 import com.grappim.koillectionmobile.strings.RPlurals
 import com.grappim.koillectionmobile.strings.RString
 import com.grappim.koillectionmobile.strings.generated.resources.collection_add_item
@@ -171,8 +172,7 @@ private fun CollectionContent(
                 modifier = contentModifier,
                 error = uiState.error,
                 emptyText = stringResource(RString.collection_empty),
-                onRetry = uiState.onRetry,
-                retryEnabled = true
+                onRetry = uiState.onRetry
             )
 
             else -> Column(modifier = contentModifier) {

@@ -44,6 +44,7 @@ import com.grappim.kit.uikit.widgets.topbar.TopBarActionTextButton
 import com.grappim.kit.uikit.widgets.topbar.TopBarConfig
 import com.grappim.koillectionmobile.core.photos.PhotoPreview
 import com.grappim.koillectionmobile.core.photos.rememberPhotoSources
+import com.grappim.koillectionmobile.core.ui.EmptyOrError
 import com.grappim.koillectionmobile.strings.RString
 import com.grappim.koillectionmobile.strings.generated.resources.album_form_discard_text
 import com.grappim.koillectionmobile.strings.generated.resources.album_form_discard_title

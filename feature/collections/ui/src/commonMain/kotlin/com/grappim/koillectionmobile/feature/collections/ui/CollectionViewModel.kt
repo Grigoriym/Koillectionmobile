@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.grappim.kit.uikit.NativeText
+import com.grappim.koillectionmobile.core.ui.toMessage
 import com.grappim.koillectionmobile.feature.collections.domain.Collection
 import com.grappim.koillectionmobile.feature.collections.domain.CollectionChanges
 import com.grappim.koillectionmobile.feature.collections.domain.CollectionListChanges
@@ -13,6 +14,7 @@ import com.grappim.koillectionmobile.feature.items.domain.ItemsRepository
 import com.grappim.koillectionmobile.strings.RString
 import com.grappim.koillectionmobile.strings.generated.resources.collection_delete_count_error_unexpected
 import com.grappim.koillectionmobile.strings.generated.resources.collection_delete_error_unexpected
+import com.grappim.koillectionmobile.strings.generated.resources.collections_error_unexpected
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
@@ -176,7 +178,7 @@ class CollectionViewModel(
                         children = emptyList(),
                         items = emptyList(),
                         isLoading = false,
-                        error = failure.toMessage()
+                        error = failure.toMessage(RString.collections_error_unexpected)
                     )
                 } else {
                     state.copy(

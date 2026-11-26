@@ -6,9 +6,9 @@ import com.grappim.koillectionmobile.core.domain.KoillectionError
 import com.grappim.koillectionmobile.feature.wishlists.domain.Wishlist
 import com.grappim.koillectionmobile.feature.wishlists.domain.WishlistChanges
 import com.grappim.koillectionmobile.strings.RString
+import com.grappim.koillectionmobile.strings.generated.resources.error_http
+import com.grappim.koillectionmobile.strings.generated.resources.error_network
 import com.grappim.koillectionmobile.strings.generated.resources.error_proxy_rejected
-import com.grappim.koillectionmobile.strings.generated.resources.wishlists_error_http
-import com.grappim.koillectionmobile.strings.generated.resources.wishlists_error_network
 import com.grappim.koillectionmobile.strings.generated.resources.wishlists_error_unexpected
 import kotlinx.coroutines.CompletableDeferred
 import kotlin.test.AfterTest
@@ -112,7 +112,7 @@ class WishlistListViewModelTest {
         answer(Result.failure(KoillectionError.Network(IllegalStateException("timeout"))))
 
         assertFalse(sut.uiState.value.isLoading)
-        assertEquals(NativeText.Resource(RString.wishlists_error_network), sut.uiState.value.error)
+        assertEquals(NativeText.Resource(RString.error_network), sut.uiState.value.error)
         assertTrue(sut.uiState.value.wishlists.isEmpty())
     }
 
@@ -122,7 +122,7 @@ class WishlistListViewModelTest {
 
         answer(Result.failure(KoillectionError.Http(status = 500, message = null)))
 
-        assertEquals(NativeText.Arguments(RString.wishlists_error_http, listOf(500)), sut.uiState.value.error)
+        assertEquals(NativeText.Arguments(RString.error_http, listOf(500)), sut.uiState.value.error)
     }
 
     @Test

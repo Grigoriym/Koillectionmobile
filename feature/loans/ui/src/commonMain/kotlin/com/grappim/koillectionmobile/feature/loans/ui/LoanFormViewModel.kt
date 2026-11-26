@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.grappim.kit.uikit.NativeText
+import com.grappim.koillectionmobile.core.ui.toMessage
 import com.grappim.koillectionmobile.feature.loans.domain.LoanChanges
 import com.grappim.koillectionmobile.feature.loans.domain.LoansRepository
 import com.grappim.koillectionmobile.strings.RString

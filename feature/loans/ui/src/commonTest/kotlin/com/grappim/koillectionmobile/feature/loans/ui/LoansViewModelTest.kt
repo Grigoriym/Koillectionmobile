@@ -7,10 +7,10 @@ import com.grappim.koillectionmobile.feature.loans.domain.Loan
 import com.grappim.koillectionmobile.feature.loans.domain.LoanChange
 import com.grappim.koillectionmobile.feature.loans.domain.LoanChanges
 import com.grappim.koillectionmobile.strings.RString
+import com.grappim.koillectionmobile.strings.generated.resources.error_http
+import com.grappim.koillectionmobile.strings.generated.resources.error_network
 import com.grappim.koillectionmobile.strings.generated.resources.error_proxy_rejected
 import com.grappim.koillectionmobile.strings.generated.resources.loans_delete_error_unexpected
-import com.grappim.koillectionmobile.strings.generated.resources.loans_error_http
-import com.grappim.koillectionmobile.strings.generated.resources.loans_error_network
 import com.grappim.koillectionmobile.strings.generated.resources.loans_error_unexpected
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.datetime.LocalDate
@@ -90,7 +90,7 @@ class LoansViewModelTest {
         answer(Result.failure(KoillectionError.Network(IllegalStateException("timeout"))))
 
         assertFalse(sut.uiState.value.isLoading)
-        assertEquals(NativeText.Resource(RString.loans_error_network), sut.uiState.value.error)
+        assertEquals(NativeText.Resource(RString.error_network), sut.uiState.value.error)
         assertTrue(sut.uiState.value.loans.isEmpty())
     }
 
@@ -100,7 +100,7 @@ class LoansViewModelTest {
 
         answer(Result.failure(KoillectionError.Http(status = 500, message = null)))
 
-        assertEquals(NativeText.Arguments(RString.loans_error_http, listOf(500)), sut.uiState.value.error)
+        assertEquals(NativeText.Arguments(RString.error_http, listOf(500)), sut.uiState.value.error)
     }
 
     @Test
@@ -215,7 +215,7 @@ class LoansViewModelTest {
 
         assertNull(sut.uiState.value.busyLoanId)
         assertEquals(listOf(open2024), sut.uiState.value.loans)
-        assertEquals(NativeText.Arguments(RString.loans_error_http, listOf(500)), sut.uiState.value.actionError)
+        assertEquals(NativeText.Arguments(RString.error_http, listOf(500)), sut.uiState.value.actionError)
         assertEquals(1, repository.loansCalls.size)
 
         sut.uiState.value.onActionErrorShown()

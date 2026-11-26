@@ -3,24 +3,12 @@ package com.grappim.koillectionmobile.feature.albums.ui
 import com.grappim.kit.uikit.NativeText
 import com.grappim.koillectionmobile.core.domain.KoillectionError
 import com.grappim.koillectionmobile.strings.RString
-import com.grappim.koillectionmobile.strings.generated.resources.albums_error_http
-import com.grappim.koillectionmobile.strings.generated.resources.albums_error_network
 import com.grappim.koillectionmobile.strings.generated.resources.collection_form_save_error_http
 import com.grappim.koillectionmobile.strings.generated.resources.collection_form_save_error_network
 import com.grappim.koillectionmobile.strings.generated.resources.collection_form_save_error_quota
 import com.grappim.koillectionmobile.strings.generated.resources.collection_form_save_error_unexpected
 import com.grappim.koillectionmobile.strings.generated.resources.collection_form_save_error_validation
 import com.grappim.koillectionmobile.strings.generated.resources.error_proxy_rejected
-import org.jetbrains.compose.resources.StringResource
-
-/** The message of a failed load; [unexpected] is the text for an error the server did not send. */
-internal fun Throwable.toMessage(unexpected: StringResource): NativeText = when (this) {
-    is KoillectionError.Network -> NativeText.Resource(RString.albums_error_network)
-    is KoillectionError.ProxyRejection -> NativeText.Arguments(RString.error_proxy_rejected, listOf(status))
-    is KoillectionError.Server -> NativeText.Arguments(RString.albums_error_http, listOf(status))
-    is KoillectionError.Http -> NativeText.Arguments(RString.albums_error_http, listOf(status))
-    else -> NativeText.Resource(unexpected)
-}
 
 /** The message of a failed form save. An upload 500 usually means a full upload quota (plan §2), so that one is named. */
 internal fun Throwable.toSaveMessage(uploadFailed: Boolean): NativeText = when (this) {

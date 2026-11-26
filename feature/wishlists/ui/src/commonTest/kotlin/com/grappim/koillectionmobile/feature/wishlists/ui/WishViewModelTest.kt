@@ -7,9 +7,9 @@ import com.grappim.koillectionmobile.feature.wishlists.domain.Wish
 import com.grappim.koillectionmobile.feature.wishlists.domain.WishChange
 import com.grappim.koillectionmobile.feature.wishlists.domain.WishChanges
 import com.grappim.koillectionmobile.strings.RString
+import com.grappim.koillectionmobile.strings.generated.resources.error_network
 import com.grappim.koillectionmobile.strings.generated.resources.wish_delete_error_unexpected
 import com.grappim.koillectionmobile.strings.generated.resources.wish_error_unexpected
-import com.grappim.koillectionmobile.strings.generated.resources.wishlists_error_network
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -81,7 +81,7 @@ class WishViewModelTest {
         val state = sut.uiState.value
         assertFalse(state.isLoading)
         assertNull(state.wish)
-        assertEquals(NativeText.Resource(RString.wishlists_error_network), state.error)
+        assertEquals(NativeText.Resource(RString.error_network), state.error)
         assertFalse(state.canDelete)
     }
 

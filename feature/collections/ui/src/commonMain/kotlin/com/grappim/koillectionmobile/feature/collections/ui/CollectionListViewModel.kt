@@ -3,21 +3,17 @@ package com.grappim.koillectionmobile.feature.collections.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.grappim.kit.uikit.NativeText
-import com.grappim.koillectionmobile.core.domain.KoillectionError
+import com.grappim.koillectionmobile.core.ui.toMessage
 import com.grappim.koillectionmobile.feature.collections.domain.CollectionListChanges
 import com.grappim.koillectionmobile.feature.collections.domain.CollectionsRepository
 import com.grappim.koillectionmobile.strings.RString
-import com.grappim.koillectionmobile.strings.generated.resources.collections_error_http
-import com.grappim.koillectionmobile.strings.generated.resources.collections_error_network
 import com.grappim.koillectionmobile.strings.generated.resources.collections_error_unexpected
-import com.grappim.koillectionmobile.strings.generated.resources.error_proxy_rejected
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import org.jetbrains.compose.resources.StringResource
 import org.koin.core.annotation.KoinViewModel
 
 /**
@@ -64,19 +60,14 @@ class CollectionListViewModel(
                         )
                     },
                     onFailure = { error ->
-                        state.copy(isLoading = false, isRefreshing = false, error = error.toMessage())
+                        state.copy(
+                            isLoading = false,
+                            isRefreshing = false,
+                            error = error.toMessage(RString.collections_error_unexpected)
+                        )
                     }
                 )
             }
         }
     }
 }
-
-internal fun Throwable.toMessage(unexpected: StringResource = RString.collections_error_unexpected): NativeText =
-    when (this) {
-        is KoillectionError.Network -> NativeText.Resource(RString.collections_error_network)
-        is KoillectionError.ProxyRejection -> NativeText.Arguments(RString.error_proxy_rejected, listOf(status))
-        is KoillectionError.Server -> NativeText.Arguments(RString.collections_error_http, listOf(status))
-        is KoillectionError.Http -> NativeText.Arguments(RString.collections_error_http, listOf(status))
-        else -> NativeText.Resource(unexpected)
-    }

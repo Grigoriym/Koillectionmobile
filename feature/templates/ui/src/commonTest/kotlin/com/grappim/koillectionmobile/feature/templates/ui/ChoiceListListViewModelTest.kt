@@ -7,7 +7,7 @@ import com.grappim.koillectionmobile.feature.templates.domain.ChoiceList
 import com.grappim.koillectionmobile.feature.templates.domain.ChoiceListChanges
 import com.grappim.koillectionmobile.strings.RString
 import com.grappim.koillectionmobile.strings.generated.resources.choice_lists_error_unexpected
-import com.grappim.koillectionmobile.strings.generated.resources.templates_error_network
+import com.grappim.koillectionmobile.strings.generated.resources.error_network
 import kotlinx.coroutines.CompletableDeferred
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
@@ -86,7 +86,7 @@ class ChoiceListListViewModelTest {
     fun `retry after a failure loads again and clears the error`() {
         val sut = createSut()
         answer(Result.failure(KoillectionError.Network(IllegalStateException("timeout"))))
-        assertEquals(NativeText.Resource(RString.templates_error_network), sut.uiState.value.error)
+        assertEquals(NativeText.Resource(RString.error_network), sut.uiState.value.error)
         assertTrue(sut.uiState.value.choiceLists.isEmpty())
 
         queue()

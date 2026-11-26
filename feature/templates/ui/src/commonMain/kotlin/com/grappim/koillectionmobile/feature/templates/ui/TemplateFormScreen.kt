@@ -50,6 +50,7 @@ import com.grappim.kit.uikit.widgets.topbar.LocalTopBarConfig
 import com.grappim.kit.uikit.widgets.topbar.NavigationIconConfig
 import com.grappim.kit.uikit.widgets.topbar.TopBarActionTextButton
 import com.grappim.kit.uikit.widgets.topbar.TopBarConfig
+import com.grappim.koillectionmobile.core.ui.EmptyOrError
 import com.grappim.koillectionmobile.feature.templates.domain.ChoiceList
 import com.grappim.koillectionmobile.strings.RString
 import com.grappim.koillectionmobile.strings.generated.resources.collection_form_discard

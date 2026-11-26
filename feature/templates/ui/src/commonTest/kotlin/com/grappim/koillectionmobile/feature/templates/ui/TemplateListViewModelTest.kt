@@ -6,9 +6,9 @@ import com.grappim.koillectionmobile.core.domain.KoillectionError
 import com.grappim.koillectionmobile.feature.templates.domain.Template
 import com.grappim.koillectionmobile.feature.templates.domain.TemplateChanges
 import com.grappim.koillectionmobile.strings.RString
+import com.grappim.koillectionmobile.strings.generated.resources.error_http
+import com.grappim.koillectionmobile.strings.generated.resources.error_network
 import com.grappim.koillectionmobile.strings.generated.resources.error_proxy_rejected
-import com.grappim.koillectionmobile.strings.generated.resources.templates_error_http
-import com.grappim.koillectionmobile.strings.generated.resources.templates_error_network
 import com.grappim.koillectionmobile.strings.generated.resources.templates_error_unexpected
 import kotlinx.coroutines.CompletableDeferred
 import kotlin.test.AfterTest
@@ -86,7 +86,7 @@ class TemplateListViewModelTest {
         answer(Result.failure(KoillectionError.Network(IllegalStateException("timeout"))))
 
         assertFalse(sut.uiState.value.isLoading)
-        assertEquals(NativeText.Resource(RString.templates_error_network), sut.uiState.value.error)
+        assertEquals(NativeText.Resource(RString.error_network), sut.uiState.value.error)
         assertTrue(sut.uiState.value.templates.isEmpty())
     }
 
@@ -96,7 +96,7 @@ class TemplateListViewModelTest {
 
         answer(Result.failure(KoillectionError.Http(status = 500, message = null)))
 
-        assertEquals(NativeText.Arguments(RString.templates_error_http, listOf(500)), sut.uiState.value.error)
+        assertEquals(NativeText.Arguments(RString.error_http, listOf(500)), sut.uiState.value.error)
     }
 
     @Test

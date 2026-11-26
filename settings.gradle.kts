@@ -35,7 +35,7 @@ plugins {
 }
 
 include(":androidApp", ":composeApp")
-include(":core:api", ":core:domain", ":core:image", ":core:photos", ":core:storage", ":core:testing")
+include(":core:api", ":core:domain", ":core:image", ":core:photos", ":core:storage", ":core:testing", ":core:ui")
 include(":strings")
 
 include(

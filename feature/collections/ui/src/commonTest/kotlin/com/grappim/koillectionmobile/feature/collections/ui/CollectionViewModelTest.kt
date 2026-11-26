@@ -16,8 +16,8 @@ import com.grappim.koillectionmobile.feature.items.domain.ItemsRepository
 import com.grappim.koillectionmobile.strings.RString
 import com.grappim.koillectionmobile.strings.generated.resources.collection_delete_count_error_unexpected
 import com.grappim.koillectionmobile.strings.generated.resources.collection_delete_error_unexpected
-import com.grappim.koillectionmobile.strings.generated.resources.collections_error_http
-import com.grappim.koillectionmobile.strings.generated.resources.collections_error_network
+import com.grappim.koillectionmobile.strings.generated.resources.error_http
+import com.grappim.koillectionmobile.strings.generated.resources.error_network
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -216,7 +216,7 @@ class CollectionViewModelTest {
 
         val state = sut.uiState.value
         assertFalse(state.isLoading)
-        assertEquals(NativeText.Resource(RString.collections_error_network), state.error)
+        assertEquals(NativeText.Resource(RString.error_network), state.error)
         assertTrue(state.children.isEmpty())
         assertEquals("", state.title)
     }
@@ -228,7 +228,7 @@ class CollectionViewModelTest {
 
         answerAll(collection = Result.failure(KoillectionError.Http(status = 404, message = null)))
 
-        assertEquals(NativeText.Arguments(RString.collections_error_http, listOf(404)), sut.uiState.value.error)
+        assertEquals(NativeText.Arguments(RString.error_http, listOf(404)), sut.uiState.value.error)
     }
 
     @Test
@@ -388,7 +388,7 @@ class CollectionViewModelTest {
         sut.uiState.value.onDeleteClick()
 
         assertNull(sut.uiState.value.deleteSummary)
-        assertEquals(NativeText.Resource(RString.collections_error_network), sut.uiState.value.deleteError)
+        assertEquals(NativeText.Resource(RString.error_network), sut.uiState.value.deleteError)
         assertTrue(sut.uiState.value.canDelete)
     }
 
@@ -475,7 +475,7 @@ class CollectionViewModelTest {
         sut.uiState.value.onDeleteConfirm()
         collections.delete.complete(Result.failure(KoillectionError.Http(status = 403, message = null)))
 
-        assertEquals(NativeText.Arguments(RString.collections_error_http, listOf(403)), sut.uiState.value.deleteError)
+        assertEquals(NativeText.Arguments(RString.error_http, listOf(403)), sut.uiState.value.deleteError)
     }
 
     @Test

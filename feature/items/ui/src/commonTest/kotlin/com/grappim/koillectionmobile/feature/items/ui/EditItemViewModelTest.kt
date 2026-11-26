@@ -28,7 +28,7 @@ import com.grappim.koillectionmobile.strings.generated.resources.add_item_save_e
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_save_error_quota
 import com.grappim.koillectionmobile.strings.generated.resources.add_item_save_unfinished
 import com.grappim.koillectionmobile.strings.generated.resources.edit_item_save_error_duplicate_label
-import com.grappim.koillectionmobile.strings.generated.resources.item_error_network
+import com.grappim.koillectionmobile.strings.generated.resources.error_network
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -152,7 +152,7 @@ class EditItemViewModelTest {
 
         assertNull(sut.uiState.value.draft)
         assertFalse(sut.uiState.value.isLoading)
-        assertEquals(NativeText.Resource(RString.item_error_network), sut.uiState.value.error)
+        assertEquals(NativeText.Resource(RString.error_network), sut.uiState.value.error)
 
         items.item = Result.success(DUNE)
         sut.uiState.value.onRetry()

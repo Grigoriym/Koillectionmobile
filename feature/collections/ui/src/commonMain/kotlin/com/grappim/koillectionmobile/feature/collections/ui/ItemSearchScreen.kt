@@ -21,6 +21,7 @@ import com.grappim.kit.uikit.NativeText
 import com.grappim.kit.uikit.widgets.topbar.LocalTopBarConfig
 import com.grappim.kit.uikit.widgets.topbar.NavigationIconConfig
 import com.grappim.kit.uikit.widgets.topbar.TopBarConfig
+import com.grappim.koillectionmobile.core.ui.EmptyOrError
 import com.grappim.koillectionmobile.strings.RString
 import com.grappim.koillectionmobile.strings.generated.resources.collection_search_no_match
 import com.grappim.koillectionmobile.strings.generated.resources.item_search_empty
@@ -68,8 +69,7 @@ private fun ItemSearchContent(
                 modifier = contentModifier,
                 error = uiState.error,
                 emptyText = stringResource(RString.item_search_empty),
-                onRetry = uiState.onRetry,
-                retryEnabled = true
+                onRetry = uiState.onRetry
             )
 
             else -> Column(modifier = contentModifier) {

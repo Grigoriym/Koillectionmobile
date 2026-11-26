@@ -19,7 +19,7 @@ import com.grappim.koillectionmobile.strings.generated.resources.collection_form
 import com.grappim.koillectionmobile.strings.generated.resources.collection_form_save_error_quota
 import com.grappim.koillectionmobile.strings.generated.resources.collection_form_save_unfinished
 import com.grappim.koillectionmobile.strings.generated.resources.collection_form_templates_error
-import com.grappim.koillectionmobile.strings.generated.resources.collections_error_network
+import com.grappim.koillectionmobile.strings.generated.resources.error_network
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -254,7 +254,7 @@ class EditCollectionViewModelTest {
     fun `a failed load shows the error and the retry loads again`() {
         collections.getAnswer = { Result.failure(KoillectionError.Network(IllegalStateException("offline"))) }
         val sut = createSut()
-        assertEquals(NativeText.Resource(RString.collections_error_network), sut.uiState.value.error)
+        assertEquals(NativeText.Resource(RString.error_network), sut.uiState.value.error)
         assertNull(sut.uiState.value.original)
 
         collections.getAnswer = { Result.success(NOVELS) }

@@ -1,6 +1,5 @@
 package com.grappim.koillectionmobile.feature.logs.ui
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -9,7 +8,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
@@ -30,6 +28,7 @@ import com.grappim.kit.uikit.asString
 import com.grappim.kit.uikit.widgets.topbar.LocalTopBarConfig
 import com.grappim.kit.uikit.widgets.topbar.NavigationIconConfig
 import com.grappim.kit.uikit.widgets.topbar.TopBarConfig
+import com.grappim.koillectionmobile.core.ui.EmptyOrError
 import com.grappim.koillectionmobile.feature.logs.domain.LogAction
 import com.grappim.koillectionmobile.feature.logs.domain.LogEntry
 import com.grappim.koillectionmobile.feature.logs.domain.LogObjectType
@@ -38,7 +37,6 @@ import com.grappim.koillectionmobile.strings.generated.resources.logs_action_cre
 import com.grappim.koillectionmobile.strings.generated.resources.logs_action_delete
 import com.grappim.koillectionmobile.strings.generated.resources.logs_action_unknown
 import com.grappim.koillectionmobile.strings.generated.resources.logs_empty
-import com.grappim.koillectionmobile.strings.generated.resources.logs_retry
 import com.grappim.koillectionmobile.strings.generated.resources.logs_title
 import com.grappim.koillectionmobile.strings.generated.resources.logs_type_album
 import com.grappim.koillectionmobile.strings.generated.resources.logs_type_choice_list
@@ -52,6 +50,7 @@ import com.grappim.koillectionmobile.strings.generated.resources.logs_type_templ
 import com.grappim.koillectionmobile.strings.generated.resources.logs_type_unknown
 import com.grappim.koillectionmobile.strings.generated.resources.logs_type_wish
 import com.grappim.koillectionmobile.strings.generated.resources.logs_type_wishlist
+import com.grappim.koillectionmobile.strings.generated.resources.retry
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.format.char
@@ -85,6 +84,7 @@ fun LogListScreen(modifier: Modifier = Modifier, viewModel: LogListViewModel = k
         uiState.error.isNotEmpty() || uiState.logs.isEmpty() -> EmptyOrError(
             modifier = contentModifier,
             error = uiState.error,
+            emptyText = stringResource(RString.logs_empty),
             onRetry = uiState.onRetry
         )
 
@@ -141,23 +141,7 @@ private fun MoreFooter(uiState: LogListUiState) {
                 color = MaterialTheme.colorScheme.error,
                 textAlign = TextAlign.Center
             )
-            TextButton(onClick = uiState.onRetryMore) { Text(stringResource(RString.logs_retry)) }
-        }
-    }
-}
-
-@Composable
-private fun EmptyOrError(error: NativeText, onRetry: () -> Unit, modifier: Modifier = Modifier) {
-    Column(
-        modifier = modifier.padding(PADDING),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(PADDING, Alignment.CenterVertically)
-    ) {
-        if (error.isNotEmpty()) {
-            Text(text = error.asString(), color = MaterialTheme.colorScheme.error, textAlign = TextAlign.Center)
-            Button(onClick = onRetry) { Text(stringResource(RString.logs_retry)) }
-        } else {
-            Text(text = stringResource(RString.logs_empty), textAlign = TextAlign.Center)
+            TextButton(onClick = uiState.onRetryMore) { Text(stringResource(RString.retry)) }
         }
     }
 }

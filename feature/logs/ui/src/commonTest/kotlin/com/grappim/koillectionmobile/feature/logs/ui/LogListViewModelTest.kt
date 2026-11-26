@@ -5,8 +5,8 @@ import com.grappim.kit.uikit.NativeText
 import com.grappim.koillectionmobile.core.domain.KoillectionError
 import com.grappim.koillectionmobile.feature.logs.domain.LogPage
 import com.grappim.koillectionmobile.strings.RString
-import com.grappim.koillectionmobile.strings.generated.resources.logs_error_http
-import com.grappim.koillectionmobile.strings.generated.resources.logs_error_network
+import com.grappim.koillectionmobile.strings.generated.resources.error_http
+import com.grappim.koillectionmobile.strings.generated.resources.error_network
 import com.grappim.koillectionmobile.strings.generated.resources.logs_error_unexpected
 import kotlinx.coroutines.CompletableDeferred
 import kotlin.test.AfterTest
@@ -147,7 +147,7 @@ class LogListViewModelTest {
         val sut = createSut()
         answer(Result.failure(KoillectionError.Network(RuntimeException("down"))))
 
-        assertEquals(NativeText.Resource(RString.logs_error_network), sut.uiState.value.error)
+        assertEquals(NativeText.Resource(RString.error_network), sut.uiState.value.error)
         assertFalse(sut.uiState.value.isLoading)
         assertTrue(sut.uiState.value.logs.isEmpty())
 
@@ -169,7 +169,7 @@ class LogListViewModelTest {
         sut.uiState.value.onLoadMore()
 
         assertEquals(listOf<String?>(null), repository.calls)
-        assertEquals(NativeText.Arguments(RString.logs_error_http, listOf(404)), sut.uiState.value.error)
+        assertEquals(NativeText.Arguments(RString.error_http, listOf(404)), sut.uiState.value.error)
     }
 
     @Test

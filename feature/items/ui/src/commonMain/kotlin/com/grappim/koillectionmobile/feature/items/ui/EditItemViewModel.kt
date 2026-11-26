@@ -9,6 +9,7 @@ import com.grappim.koillectionmobile.core.image.Rotation
 import com.grappim.koillectionmobile.core.photos.JPEG_MIME_TYPE
 import com.grappim.koillectionmobile.core.photos.PhotoFiles
 import com.grappim.koillectionmobile.core.photos.next
+import com.grappim.koillectionmobile.core.ui.toMessage
 import com.grappim.koillectionmobile.feature.items.domain.Datum
 import com.grappim.koillectionmobile.feature.items.domain.EditItemProgress
 import com.grappim.koillectionmobile.feature.items.domain.EditItemResult

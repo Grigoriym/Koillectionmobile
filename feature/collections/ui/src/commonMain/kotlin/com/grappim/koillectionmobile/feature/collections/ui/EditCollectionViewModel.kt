@@ -8,6 +8,7 @@ import com.grappim.kit.uikit.NativeText
 import com.grappim.koillectionmobile.core.photos.JPEG_MIME_TYPE
 import com.grappim.koillectionmobile.core.photos.PhotoFiles
 import com.grappim.koillectionmobile.core.photos.next
+import com.grappim.koillectionmobile.core.ui.toMessage
 import com.grappim.koillectionmobile.feature.collections.domain.CollectionChanges
 import com.grappim.koillectionmobile.feature.collections.domain.CollectionListChanges
 import com.grappim.koillectionmobile.feature.collections.domain.CollectionsRepository
@@ -16,6 +17,7 @@ import com.grappim.koillectionmobile.strings.RString
 import com.grappim.koillectionmobile.strings.generated.resources.collection_form_save_error_photo
 import com.grappim.koillectionmobile.strings.generated.resources.collection_form_save_unfinished
 import com.grappim.koillectionmobile.strings.generated.resources.collection_form_templates_error
+import com.grappim.koillectionmobile.strings.generated.resources.collections_error_unexpected
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -142,7 +144,11 @@ class EditCollectionViewModel(
                         )
                     }
                 }
-                .onFailure { e -> _uiState.update { it.copy(isLoading = false, error = e.toMessage()) } }
+                .onFailure { e ->
+                    _uiState.update {
+                        it.copy(isLoading = false, error = e.toMessage(RString.collections_error_unexpected))
+                    }
+                }
         }
     }
 

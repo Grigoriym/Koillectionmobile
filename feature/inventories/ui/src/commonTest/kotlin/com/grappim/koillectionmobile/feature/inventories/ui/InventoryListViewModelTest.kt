@@ -6,10 +6,10 @@ import com.grappim.koillectionmobile.core.domain.KoillectionError
 import com.grappim.koillectionmobile.feature.inventories.domain.Inventory
 import com.grappim.koillectionmobile.feature.inventories.domain.InventoryChanges
 import com.grappim.koillectionmobile.strings.RString
+import com.grappim.koillectionmobile.strings.generated.resources.error_http
+import com.grappim.koillectionmobile.strings.generated.resources.error_network
 import com.grappim.koillectionmobile.strings.generated.resources.error_proxy_rejected
 import com.grappim.koillectionmobile.strings.generated.resources.inventories_delete_error_unexpected
-import com.grappim.koillectionmobile.strings.generated.resources.inventories_error_http
-import com.grappim.koillectionmobile.strings.generated.resources.inventories_error_network
 import com.grappim.koillectionmobile.strings.generated.resources.inventories_error_unexpected
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.datetime.LocalDate
@@ -104,7 +104,7 @@ class InventoryListViewModelTest {
         answer(Result.failure(KoillectionError.Network(IllegalStateException("timeout"))))
 
         assertFalse(sut.uiState.value.isLoading)
-        assertEquals(NativeText.Resource(RString.inventories_error_network), sut.uiState.value.error)
+        assertEquals(NativeText.Resource(RString.error_network), sut.uiState.value.error)
         assertTrue(sut.uiState.value.inventories.isEmpty())
     }
 
@@ -114,7 +114,7 @@ class InventoryListViewModelTest {
 
         answer(Result.failure(KoillectionError.Http(status = 500, message = null)))
 
-        assertEquals(NativeText.Arguments(RString.inventories_error_http, listOf(500)), sut.uiState.value.error)
+        assertEquals(NativeText.Arguments(RString.error_http, listOf(500)), sut.uiState.value.error)
     }
 
     @Test
@@ -239,7 +239,7 @@ class InventoryListViewModelTest {
         answerDelete(Result.failure(KoillectionError.Http(status = 404, message = null)))
 
         assertEquals(
-            NativeText.Arguments(RString.inventories_error_http, listOf(404)),
+            NativeText.Arguments(RString.error_http, listOf(404)),
             sut.uiState.value.deleteError
         )
     }

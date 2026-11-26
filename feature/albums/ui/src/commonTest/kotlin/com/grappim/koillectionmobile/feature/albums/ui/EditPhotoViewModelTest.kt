@@ -10,10 +10,10 @@ import com.grappim.koillectionmobile.feature.albums.domain.PhotoChange
 import com.grappim.koillectionmobile.feature.albums.domain.PhotoChanges
 import com.grappim.koillectionmobile.feature.albums.domain.PhotoField
 import com.grappim.koillectionmobile.strings.RString
-import com.grappim.koillectionmobile.strings.generated.resources.albums_error_network
 import com.grappim.koillectionmobile.strings.generated.resources.collection_form_save_error_network
 import com.grappim.koillectionmobile.strings.generated.resources.collection_form_save_error_quota
 import com.grappim.koillectionmobile.strings.generated.resources.collection_form_save_unfinished
+import com.grappim.koillectionmobile.strings.generated.resources.error_network
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -214,7 +214,7 @@ class EditPhotoViewModelTest {
     @Test
     fun `a failed load shows the error and the retry loads again`() {
         val sut = createSut(loaded = Result.failure(KoillectionError.Network(IllegalStateException("offline"))))
-        assertEquals(NativeText.Resource(RString.albums_error_network), sut.uiState.value.error)
+        assertEquals(NativeText.Resource(RString.error_network), sut.uiState.value.error)
         assertNull(sut.uiState.value.original)
         assertFalse(sut.uiState.value.canSave)
 

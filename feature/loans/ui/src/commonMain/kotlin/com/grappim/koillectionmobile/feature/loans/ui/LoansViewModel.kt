@@ -3,6 +3,7 @@ package com.grappim.koillectionmobile.feature.loans.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.grappim.kit.uikit.NativeText
+import com.grappim.koillectionmobile.core.ui.toMessage
 import com.grappim.koillectionmobile.feature.loans.domain.Loan
 import com.grappim.koillectionmobile.feature.loans.domain.LoanChange
 import com.grappim.koillectionmobile.feature.loans.domain.LoanChanges

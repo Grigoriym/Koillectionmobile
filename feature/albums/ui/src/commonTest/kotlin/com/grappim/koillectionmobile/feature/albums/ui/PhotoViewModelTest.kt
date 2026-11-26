@@ -7,7 +7,7 @@ import com.grappim.koillectionmobile.feature.albums.domain.Photo
 import com.grappim.koillectionmobile.feature.albums.domain.PhotoChange
 import com.grappim.koillectionmobile.feature.albums.domain.PhotoChanges
 import com.grappim.koillectionmobile.strings.RString
-import com.grappim.koillectionmobile.strings.generated.resources.albums_error_network
+import com.grappim.koillectionmobile.strings.generated.resources.error_network
 import com.grappim.koillectionmobile.strings.generated.resources.photo_delete_error_unexpected
 import com.grappim.koillectionmobile.strings.generated.resources.photo_error_unexpected
 import kotlinx.coroutines.CompletableDeferred
@@ -82,7 +82,7 @@ class PhotoViewModelTest {
         val state = sut.uiState.value
         assertFalse(state.isLoading)
         assertNull(state.photo)
-        assertEquals(NativeText.Resource(RString.albums_error_network), state.error)
+        assertEquals(NativeText.Resource(RString.error_network), state.error)
         assertFalse(state.canDelete)
     }
 

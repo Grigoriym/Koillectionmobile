@@ -9,10 +9,10 @@ import com.grappim.koillectionmobile.feature.wishlists.domain.Wishlist
 import com.grappim.koillectionmobile.feature.wishlists.domain.WishlistChange
 import com.grappim.koillectionmobile.feature.wishlists.domain.WishlistChanges
 import com.grappim.koillectionmobile.strings.RString
+import com.grappim.koillectionmobile.strings.generated.resources.error_network
 import com.grappim.koillectionmobile.strings.generated.resources.wishlist_delete_count_error_unexpected
 import com.grappim.koillectionmobile.strings.generated.resources.wishlist_delete_error_unexpected
 import com.grappim.koillectionmobile.strings.generated.resources.wishlist_error_unexpected
-import com.grappim.koillectionmobile.strings.generated.resources.wishlists_error_network
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -145,7 +145,7 @@ class WishlistViewModelTest {
 
         answer(wishlist = Result.failure(KoillectionError.Network(IllegalStateException("timeout"))))
 
-        assertFailedWith(sut, NativeText.Resource(RString.wishlists_error_network))
+        assertFailedWith(sut, NativeText.Resource(RString.error_network))
     }
 
     @Test

@@ -3,6 +3,7 @@ package com.grappim.koillectionmobile.feature.templates.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.grappim.kit.uikit.NativeText
+import com.grappim.koillectionmobile.core.ui.toMessage
 import com.grappim.koillectionmobile.feature.templates.domain.ChoiceListChanges
 import com.grappim.koillectionmobile.feature.templates.domain.TemplateChanges
 import com.grappim.koillectionmobile.feature.templates.domain.TemplatesRepository

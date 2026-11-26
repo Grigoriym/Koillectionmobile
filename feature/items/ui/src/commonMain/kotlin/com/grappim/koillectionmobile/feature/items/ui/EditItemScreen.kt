@@ -70,7 +70,7 @@ import com.grappim.koillectionmobile.strings.generated.resources.edit_item_read_
 import com.grappim.koillectionmobile.strings.generated.resources.edit_item_replace_photo
 import com.grappim.koillectionmobile.strings.generated.resources.edit_item_save_partial
 import com.grappim.koillectionmobile.strings.generated.resources.edit_item_title
-import com.grappim.koillectionmobile.strings.generated.resources.item_retry
+import com.grappim.koillectionmobile.strings.generated.resources.retry
 import kotlinx.collections.immutable.persistentListOf
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
@@ -175,7 +175,7 @@ private fun EditItemContent(uiState: EditItemUiState, onBack: () -> Unit, modifi
                     color = MaterialTheme.colorScheme.error,
                     textAlign = TextAlign.Center
                 )
-                Button(onClick = uiState.onRetry) { Text(stringResource(RString.item_retry)) }
+                Button(onClick = uiState.onRetry) { Text(stringResource(RString.retry)) }
             }
         }
     }

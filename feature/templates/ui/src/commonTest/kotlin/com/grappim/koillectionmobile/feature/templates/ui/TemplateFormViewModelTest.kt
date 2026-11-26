@@ -17,7 +17,7 @@ import com.grappim.koillectionmobile.feature.templates.domain.TemplateSnapshot
 import com.grappim.koillectionmobile.strings.RString
 import com.grappim.koillectionmobile.strings.generated.resources.collection_form_save_error_network
 import com.grappim.koillectionmobile.strings.generated.resources.collection_form_save_unfinished
-import com.grappim.koillectionmobile.strings.generated.resources.templates_error_network
+import com.grappim.koillectionmobile.strings.generated.resources.error_network
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
@@ -135,7 +135,7 @@ class TemplateFormViewModelTest {
         repository.fields.removeFirst().complete(Result.success(emptyList()))
         answerChoiceLists()
 
-        assertEquals(NativeText.Resource(RString.templates_error_network), sut.uiState.value.error)
+        assertEquals(NativeText.Resource(RString.error_network), sut.uiState.value.error)
         assertNull(sut.uiState.value.draft)
 
         repository.choiceLists.addLast(CompletableDeferred())

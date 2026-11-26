@@ -15,6 +15,8 @@ kotlin {
             // The wishlist form's photo: camera, picker, preview and `PhotoFiles`; `Rotation`.
             implementation(projects.core.photos)
             implementation(projects.strings)
+            // The shared error message and error view.
+            implementation(projects.core.ui)
             implementation(libs.grappim.kit.uikit)
             // `persistentListOf` for the shell top bar's actions.
             implementation(libs.kotlinx.collections)

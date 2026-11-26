@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.grappim.kit.uikit.NativeText
 import com.grappim.kit.uikit.asString
+import com.grappim.koillectionmobile.core.ui.EmptyOrError
 import com.grappim.koillectionmobile.strings.RString
 import com.grappim.koillectionmobile.strings.generated.resources.collection_form_default_template_hint
 import com.grappim.koillectionmobile.strings.generated.resources.collection_form_default_template_none
@@ -78,8 +79,7 @@ private fun EditCollectionContent(uiState: EditCollectionUiState, onBack: () -> 
                 modifier = contentModifier,
                 error = uiState.error,
                 emptyText = "",
-                onRetry = uiState.onRetry,
-                retryEnabled = true
+                onRetry = uiState.onRetry
             )
 
             save != null -> CollectionSaveView(

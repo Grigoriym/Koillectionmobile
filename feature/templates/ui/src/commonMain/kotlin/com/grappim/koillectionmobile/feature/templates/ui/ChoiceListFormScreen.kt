@@ -43,6 +43,7 @@ import com.grappim.kit.uikit.widgets.topbar.NavigationIconConfig
 import com.grappim.kit.uikit.widgets.topbar.TopBarActionTextButton
 import com.grappim.kit.uikit.widgets.topbar.TopBarActionVectorButton
 import com.grappim.kit.uikit.widgets.topbar.TopBarConfig
+import com.grappim.koillectionmobile.core.ui.EmptyOrError
 import com.grappim.koillectionmobile.strings.RString
 import com.grappim.koillectionmobile.strings.generated.resources.choice_list_delete
 import com.grappim.koillectionmobile.strings.generated.resources.choice_list_delete_text

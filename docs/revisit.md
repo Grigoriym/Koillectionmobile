@@ -34,17 +34,9 @@ cold session can act on it. Delete an entry when it's fixed.
   Answer (M14.1, 2026-11-25, read only): the user's server is served by `tailscale serve` at path
   `/` on its own port, so it has no subpath. Other users may have one. Verdict (user): check a
   subpath instance before release, M14.12.
-- 2026-11-15 (M2.5) — The error mapping and the error view exist twice, copied by hand:
-  `Throwable.toMessage()` in `feature/collections/ui/.../CollectionListViewModel.kt:74` and
-  `feature/items/ui/.../ItemViewModel.kt` (bottom), and `EmptyOrError` in
-  `feature/collections/ui/.../CollectionListScreen.kt:97` against the inline error `Column` in
-  `feature/items/ui/.../ItemScreen.kt`. Only the string resources differ. A third `ui` screen makes
-  it worth one shared copy (a `core:ui` module, or a `KoillectionError` → message function that
-  takes the strings).
-  M4.3 added a `KoillectionError.ProxyRejection` branch to all four mappings (login, collection
-  list, item, add item); they share one string, `error_proxy_rejected`.
-  M7.5 added a third `ui` copy of both: `toMessage` in `feature/tags/ui/.../TagListViewModel.kt`
-  and `EmptyOrError` in `feature/tags/ui/.../TagScreenParts.kt` (with the `tags_*` strings).
+- 2026-11-15 (M2.5) — Hand-copied UI parts across `ui` modules. The error mapping and the error
+  view are fixed (M14.10: `core:ui` `toMessage` and `EmptyOrError`). The forms and the nested
+  delete are still copied:
   M11.4 copied the name-and-image form a third time: `FormPhoto`, the save status, the form
   scaffold, `FormImageSection` and `toSaveMessage` exist in `feature/collections/ui`,
   `feature/wishlists/ui` (`WishlistFormScreen.kt`, `NewWishlistViewModel.kt`) and
@@ -58,7 +50,8 @@ cold session can act on it. Delete an entry when it's fixed.
   the count, `DeleteSummary` and `DeleteDialogs` in `AlbumViewModel.kt`, `AlbumUiState.kt` and
   `AlbumScreen.kt` differ only in types and strings. `descendantIds` could take `(id, parentId)`
   pairs and live in a shared module.
-  Verdict (user, 2026-11-25, M14.1): fix before release, M14.10 (error mapping and view) and M14.11 (forms and nested delete).
+  Verdict (user, 2026-11-25, M14.1): fix before release, M14.10 (error mapping and view, done
+  2026-11-26) and M14.11 (forms and nested delete).
 - 2026-11-15 (M3.6) — Add-item photo files in `cacheDir/photos/` are deleted on photo remove, on
   save, and when the form leaves the back stack (`AddItemViewModel.onCleared`). A form that never
   comes back (the task swiped away, so the saved draft is gone and `onCleared` never runs) leaves

@@ -7,9 +7,9 @@ import com.grappim.koillectionmobile.feature.collections.domain.Collection
 import com.grappim.koillectionmobile.feature.collections.domain.CollectionListChanges
 import com.grappim.koillectionmobile.feature.collections.domain.CollectionsRepository
 import com.grappim.koillectionmobile.strings.RString
-import com.grappim.koillectionmobile.strings.generated.resources.collections_error_http
-import com.grappim.koillectionmobile.strings.generated.resources.collections_error_network
 import com.grappim.koillectionmobile.strings.generated.resources.collections_error_unexpected
+import com.grappim.koillectionmobile.strings.generated.resources.error_http
+import com.grappim.koillectionmobile.strings.generated.resources.error_network
 import com.grappim.koillectionmobile.strings.generated.resources.error_proxy_rejected
 import kotlinx.coroutines.CompletableDeferred
 import kotlin.test.AfterTest
@@ -76,7 +76,7 @@ class CollectionListViewModelTest {
     @Test
     fun `a network failure has the network message`() {
         assertEquals(
-            NativeText.Resource(RString.collections_error_network),
+            NativeText.Resource(RString.error_network),
             errorFor(KoillectionError.Network(IllegalStateException("timeout")))
         )
     }
@@ -84,11 +84,11 @@ class CollectionListViewModelTest {
     @Test
     fun `a failure with an HTTP status names the status`() {
         assertEquals(
-            NativeText.Arguments(RString.collections_error_http, listOf(502)),
+            NativeText.Arguments(RString.error_http, listOf(502)),
             errorFor(KoillectionError.Server(status = 502, message = null))
         )
         assertEquals(
-            NativeText.Arguments(RString.collections_error_http, listOf(403)),
+            NativeText.Arguments(RString.error_http, listOf(403)),
             errorFor(KoillectionError.Http(status = 403, message = null))
         )
     }
@@ -136,7 +136,7 @@ class CollectionListViewModelTest {
 
         assertFalse(sut.uiState.value.isRefreshing)
         assertEquals(listOf(BOOKS), sut.uiState.value.collections)
-        assertEquals(NativeText.Resource(RString.collections_error_network), sut.uiState.value.error)
+        assertEquals(NativeText.Resource(RString.error_network), sut.uiState.value.error)
     }
 
     @Test

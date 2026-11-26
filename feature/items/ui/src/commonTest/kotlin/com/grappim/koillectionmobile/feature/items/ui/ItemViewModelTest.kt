@@ -13,9 +13,9 @@ import com.grappim.koillectionmobile.feature.tags.domain.Tag
 import com.grappim.koillectionmobile.feature.tags.domain.TagCategory
 import com.grappim.koillectionmobile.feature.tags.domain.TagsRepository
 import com.grappim.koillectionmobile.strings.RString
+import com.grappim.koillectionmobile.strings.generated.resources.error_http
+import com.grappim.koillectionmobile.strings.generated.resources.error_network
 import com.grappim.koillectionmobile.strings.generated.resources.item_delete_error_unexpected
-import com.grappim.koillectionmobile.strings.generated.resources.item_error_http
-import com.grappim.koillectionmobile.strings.generated.resources.item_error_network
 import com.grappim.koillectionmobile.strings.generated.resources.item_error_unexpected
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
@@ -192,7 +192,7 @@ class ItemViewModelTest {
 
         val state = sut.uiState.value
         assertFalse(state.isLoading)
-        assertEquals(NativeText.Resource(RString.item_error_network), state.error)
+        assertEquals(NativeText.Resource(RString.error_network), state.error)
         assertEquals("", state.name)
         assertNull(state.image)
         assertTrue(state.fields.isEmpty())
@@ -206,7 +206,7 @@ class ItemViewModelTest {
 
         answerAll(item = Result.failure(KoillectionError.Http(status = 404, message = null)))
 
-        assertEquals(NativeText.Arguments(RString.item_error_http, listOf(404)), sut.uiState.value.error)
+        assertEquals(NativeText.Arguments(RString.error_http, listOf(404)), sut.uiState.value.error)
     }
 
     @Test
@@ -350,7 +350,7 @@ class ItemViewModelTest {
         }
 
         val state = sut.uiState.value
-        assertEquals(NativeText.Arguments(RString.item_error_http, listOf(500)), state.deleteError)
+        assertEquals(NativeText.Arguments(RString.error_http, listOf(500)), state.deleteError)
         assertFalse(state.isDeleted)
         assertFalse(state.isDeleting)
         assertEquals("Dune", state.name)

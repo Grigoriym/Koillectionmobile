@@ -13,6 +13,8 @@ kotlin {
             // `KoillectionError`, to pick the error message.
             implementation(projects.core.domain)
             implementation(projects.strings)
+            // The shared error message and error view.
+            implementation(projects.core.ui)
             implementation(libs.grappim.kit.uikit)
             // `persistentListOf` for the shell top bar's actions.
             implementation(libs.kotlinx.collections)

@@ -9,10 +9,10 @@ import com.grappim.koillectionmobile.feature.templates.domain.Template
 import com.grappim.koillectionmobile.feature.templates.domain.TemplateChanges
 import com.grappim.koillectionmobile.feature.templates.domain.TemplateField
 import com.grappim.koillectionmobile.strings.RString
+import com.grappim.koillectionmobile.strings.generated.resources.error_http
+import com.grappim.koillectionmobile.strings.generated.resources.error_network
 import com.grappim.koillectionmobile.strings.generated.resources.template_delete_error_unexpected
 import com.grappim.koillectionmobile.strings.generated.resources.template_error_unexpected
-import com.grappim.koillectionmobile.strings.generated.resources.templates_error_http
-import com.grappim.koillectionmobile.strings.generated.resources.templates_error_network
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
@@ -123,7 +123,7 @@ class TemplateViewModelTest {
         answer(fieldList = Result.failure(KoillectionError.Network(IllegalStateException("timeout"))))
 
         assertFalse(sut.uiState.value.isLoading)
-        assertEquals(NativeText.Resource(RString.templates_error_network), sut.uiState.value.error)
+        assertEquals(NativeText.Resource(RString.error_network), sut.uiState.value.error)
         assertTrue(sut.uiState.value.fields.isEmpty())
     }
 
@@ -133,7 +133,7 @@ class TemplateViewModelTest {
 
         answer(choiceListList = Result.failure(KoillectionError.Server(status = 503, message = null)))
 
-        assertEquals(NativeText.Arguments(RString.templates_error_http, listOf(503)), sut.uiState.value.error)
+        assertEquals(NativeText.Arguments(RString.error_http, listOf(503)), sut.uiState.value.error)
         assertTrue(sut.uiState.value.fields.isEmpty())
     }
 
@@ -194,7 +194,7 @@ class TemplateViewModelTest {
 
         answer(template = Result.failure(KoillectionError.Network(IllegalStateException("timeout"))))
 
-        assertEquals(NativeText.Resource(RString.templates_error_network), sut.uiState.value.error)
+        assertEquals(NativeText.Resource(RString.error_network), sut.uiState.value.error)
         assertFalse(sut.uiState.value.canChange)
     }
 

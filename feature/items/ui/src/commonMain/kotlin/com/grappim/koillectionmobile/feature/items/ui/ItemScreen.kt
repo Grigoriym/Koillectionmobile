@@ -15,7 +15,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -34,7 +33,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
@@ -46,6 +44,7 @@ import com.grappim.kit.uikit.widgets.topbar.LocalTopBarConfig
 import com.grappim.kit.uikit.widgets.topbar.NavigationIconConfig
 import com.grappim.kit.uikit.widgets.topbar.TopBarActionVectorButton
 import com.grappim.kit.uikit.widgets.topbar.TopBarConfig
+import com.grappim.koillectionmobile.core.ui.EmptyOrError
 import com.grappim.koillectionmobile.feature.items.domain.Image
 import com.grappim.koillectionmobile.strings.RString
 import com.grappim.koillectionmobile.strings.generated.resources.item_delete
@@ -58,7 +57,6 @@ import com.grappim.koillectionmobile.strings.generated.resources.item_delete_tit
 import com.grappim.koillectionmobile.strings.generated.resources.item_edit
 import com.grappim.koillectionmobile.strings.generated.resources.item_field_not_shown
 import com.grappim.koillectionmobile.strings.generated.resources.item_image_full
-import com.grappim.koillectionmobile.strings.generated.resources.item_retry
 import com.grappim.koillectionmobile.strings.generated.resources.item_section_tags
 import kotlinx.collections.immutable.toPersistentList
 import org.jetbrains.compose.resources.stringResource
@@ -139,18 +137,12 @@ private fun ItemContent(
                 CircularProgressIndicator()
             }
 
-            uiState.error.isNotEmpty() -> Column(
-                modifier = contentModifier.padding(PADDING),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(PADDING, Alignment.CenterVertically)
-            ) {
-                Text(
-                    text = uiState.error.asString(),
-                    color = MaterialTheme.colorScheme.error,
-                    textAlign = TextAlign.Center
-                )
-                Button(onClick = uiState.onRetry) { Text(stringResource(RString.item_retry)) }
-            }
+            uiState.error.isNotEmpty() -> EmptyOrError(
+                modifier = contentModifier,
+                error = uiState.error,
+                emptyText = "",
+                onRetry = uiState.onRetry
+            )
 
             else -> ItemDetails(
                 uiState = uiState,

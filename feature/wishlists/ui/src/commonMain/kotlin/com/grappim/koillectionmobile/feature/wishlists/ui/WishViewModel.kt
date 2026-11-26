@@ -3,6 +3,7 @@ package com.grappim.koillectionmobile.feature.wishlists.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.grappim.kit.uikit.NativeText
+import com.grappim.koillectionmobile.core.ui.toMessage
 import com.grappim.koillectionmobile.feature.wishlists.domain.WishChanges
 import com.grappim.koillectionmobile.feature.wishlists.domain.WishlistsRepository
 import com.grappim.koillectionmobile.strings.RString

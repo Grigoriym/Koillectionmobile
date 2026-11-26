@@ -3,6 +3,7 @@ package com.grappim.koillectionmobile.feature.inventories.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.grappim.kit.uikit.NativeText
+import com.grappim.koillectionmobile.core.ui.toMessage
 import com.grappim.koillectionmobile.feature.inventories.domain.InventoriesRepository
 import com.grappim.koillectionmobile.feature.inventories.domain.Inventory
 import com.grappim.koillectionmobile.feature.inventories.domain.InventoryChanges
