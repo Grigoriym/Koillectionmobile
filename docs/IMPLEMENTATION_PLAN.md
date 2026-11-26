@@ -105,8 +105,18 @@ start of any step that touches the API. Facts that shape the design:
 - Read side checked live 2026-11-15 (M1.11, `./gradlew :composeApp:smokeRun`, JVM, local test
   instance at the root path): login, all collections, 445 items of one collection over every page
   (matches the server's `totalItems`, so the `next` links work), one item and its 23 fields. A
-  resolved image URL returned 200 `image/jpeg` without a JWT. Not checked: a server behind a
-  subpath.
+  resolved image URL returned 200 `image/jpeg` without a JWT. A server behind a subpath: see the
+  next bullet.
+- Subpath (checked 2026-11-26, M14.12, emulator, local test instance behind an nginx `location
+  /sub/` that strips the prefix and sends `X-Forwarded-Prefix: /sub`). Koillection uses the prefix
+  only when it trusts the proxy: `SYMFONY_TRUSTED_PROXIES` and `SYMFONY_TRUSTED_HEADERS` with
+  `x-forwarded-prefix` (Symfony `framework.trusted_*`, unset in the image). Without them the server
+  answers `/api/...` IRIs and `next` links, and its own web UI links leave the subpath. With them
+  every IRI and `next` link starts with `/sub/`; image paths stay relative (`uploads/...`). The app
+  at `http://10.0.2.2:<port>/sub` logged in, browsed (thumbnails, `Books` over all 15 pages), and
+  created, edited and deleted an item with a tag and a main image. Every request went under
+  `/sub/`, none failed, and the unprefixed IRIs in the write bodies were accepted. Not checked:
+  the other areas' writes (templates, wishlists, loans, albums) behind a subpath.
 - Android HTTP engine (checked 2026-11-15, M2.2, emulator against the local test instance): Ktor's
   engine autodiscovery works. `HttpClient {}` without an engine picks OkHttp, the only engine on
   the Android classpath (`KmpNetworkConventionPlugin`). A wrong password got the server's 401 and a
@@ -129,7 +139,7 @@ start of any step that touches the API. Facts that shape the design:
   (`Assert\IsNull`), so the app leaves the key out. `PATCH /api/items/{id}` with `{"tags": [...]}`
   replaces the tag set: `Item` has `addTag`/`removeTag`, so the serializer adds and removes to
   match the list. A body names other resources by IRI; the app sends `/api/...` without the
-  server's subpath, as `add_book.py` does. Behind a subpath this is unchecked (`docs/revisit.md`).
+  server's subpath, as `add_book.py` does. Behind a subpath the server accepts them (M14.12).
   `POST /api/collections` needs only `title` (`collection:write`, `NotBlank`); `parent` is an
   optional IRI, and `ColorListener` picks the colour. The image goes up as multipart part `file`
   to `POST /api/collections/{id}/image`; `PATCH` with `{"deleteImage": true}` removes it

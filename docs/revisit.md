@@ -21,19 +21,6 @@ cold session can act on it. Delete an entry when it's fixed.
   report" step, ported from deskmate, which has the same step). Fix: bump to the newest
   `upload-artifact` major that targets Node 24, then check CI stays green.
   Verdict (user, 2026-11-25, M14.1): fix before release, M14.24.
-- 2026-11-15 (M1.9) — Write bodies send IRIs without the server's subpath (`/api/collections/<id>`,
-  `/api/items/<id>`, `/api/tags/<id>`): `ItemsRepositoryImpl.createItem`/`itemIri` and
-  `TagsRepositoryImpl.setItemTags`. The server's own IRIs carry its prefix (M1.4: `next` links).
-  Whether API Platform accepts an unprefixed IRI on a server behind a subpath is not checked:
-  the source has no `vendor/`, and the local test instance runs at the root. `add_book.py` uses
-  unprefixed IRIs against the user's server, but whether that server has a subpath is not
-  recorded here. Check once against a subpath instance (or the user's setup) before release (M14).
-  User, 2026-11-15: their server is reached through Tailscale, with no subpath ("I presume").
-  Deferred by the user (2026-11-15): not part of M3.7. Confirm it later from the server URL
-  itself, read only.
-  Answer (M14.1, 2026-11-25, read only): the user's server is served by `tailscale serve` at path
-  `/` on its own port, so it has no subpath. Other users may have one. Verdict (user): check a
-  subpath instance before release, M14.12.
 - 2026-11-15 (M2.5) — Hand-copied UI parts across `ui` modules. M14.10 (`core:ui` `toMessage`,
   `EmptyOrError`) and M14.11 (`core:form`; `core:ui` `DeleteSummary`, `descendantIds`,
   `DeleteDialogs`) moved the shared parts. Two copies are left, outside M14.11's list:

@@ -185,3 +185,34 @@ From the emulator: `http://10.0.2.2:8295`, custom header `X-Proxy-Token: secret`
 the header the front answers 401 HTML; with it, Koillection answers. `docker logs
 koillection-proxyfront` shows each request's status, also the app's (user agent
 `ktor-client`). Remove it with `docker rm -f koillection-proxyfront`.
+
+### Subpath front
+
+The same throwaway nginx, with the instance under `/sub/` (M14.12). Koillection uses the prefix
+only when it trusts the proxy, so recreate the instance with two more environment values for the
+check. Pass them in a second compose file outside the repo:
+
+    services:
+      koillection:
+        environment:
+          SYMFONY_TRUSTED_PROXIES: private_ranges
+          SYMFONY_TRUSTED_HEADERS: x-forwarded-for,x-forwarded-proto,x-forwarded-port,x-forwarded-prefix
+
+    docker compose -f <instance compose.yaml> -f override.yaml up -d koillection
+
+The front's `nginx.conf`:
+
+    server {
+        listen 8299;
+        client_max_body_size 20m;
+        location /sub/ {
+            proxy_set_header Host $http_host;
+            proxy_set_header X-Forwarded-Prefix /sub;
+            proxy_pass http://<instance container>:80/;
+        }
+        location / { return 404 "outside /sub/\n"; }
+    }
+
+From the emulator: `http://10.0.2.2:8299/sub`. `docker logs koillection-proxyfront` shows each
+request's path; the app's lines carry `ktor-client`. After the check, remove the front and run
+`docker compose -f <instance compose.yaml> up -d koillection` to drop the extra values.

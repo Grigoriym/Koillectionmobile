@@ -105,3 +105,5 @@ entries get deleted — see /finalize.
 - 2026-11-25 — (M14.8) `javap` on `koin-annotations-jvm-4.2.2.jar` under `~/.gradle/caches/*/transforms/` found no classes: that copy held only `META-INF`. The `-sources.jar` under `caches/modules-2/` had the annotation source.
 - 2026-11-26 — (M14.11) ktlint `compose:parameter-naming` failed `ktlintCheck` for a new `@Composable` parameter `onErrorShown` (past tense); renamed to `onErrorDismiss`. Second time (M10.5).
 - 2026-11-26 — (M14.11) `ktlintCheck` passed with about 40 unused imports left by moving code out of three files: no gate here reports them. A script that drops imports whose name the file never uses found them.
+- 2026-11-26 — (M14.12) `GET /api/items?name=M14.12` ignored the `name` filter and returned page 1 of all items; read the collection's `/items` instead.
+- 2026-11-26 — (M14.12) `ffmpeg -vf crop=1:1:x:y` failed on a JPEG ("Invalid too big or non positive size"): a 1x1 crop is below the yuv420 chroma size. `crop=2:2:x:y,scale=1:1` worked.
