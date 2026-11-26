@@ -1,6 +1,12 @@
 package com.grappim.koillectionmobile.composeapp.di
 
+import coil3.ImageLoader
+import coil3.PlatformContext
+import coil3.network.ktor3.KtorNetworkFetcherFactory
+import com.grappim.kit.customheaders.CustomHeadersStorage
+import com.grappim.koillectionmobile.core.api.BaseUrlProvider
 import com.grappim.koillectionmobile.core.api.NetworkModule
+import com.grappim.koillectionmobile.core.api.configureImageClient
 import com.grappim.koillectionmobile.core.photos.PlatformPhotoModule
 import com.grappim.koillectionmobile.core.storage.PlatformStorageModule
 import com.grappim.koillectionmobile.feature.albums.data.AlbumsDataModule
@@ -33,10 +39,12 @@ import com.grappim.koillectionmobile.feature.templates.ui.TemplatesUiModule
 import com.grappim.koillectionmobile.feature.wishlists.data.WishlistsDataModule
 import com.grappim.koillectionmobile.feature.wishlists.mapper.WishlistsMapperModule
 import com.grappim.koillectionmobile.feature.wishlists.ui.WishlistsUiModule
+import io.ktor.client.HttpClient
 import org.koin.core.annotation.ComponentScan
 import org.koin.core.annotation.Configuration
 import org.koin.core.annotation.KoinApplication
 import org.koin.core.annotation.Module
+import org.koin.core.annotation.Single
 
 /**
  * The whole graph, listed once. Each feature's module class goes into `includes` here as it
@@ -85,7 +93,30 @@ import org.koin.core.annotation.Module
 )
 @Configuration
 @ComponentScan("com.grappim.koillectionmobile.composeapp")
-class AppModule
+class AppModule {
+
+    /**
+     * The app's one `ImageLoader`. On Android `KoillectionApp` hands it to Coil as the singleton.
+     * Its fetcher uses its own `HttpClient` with the user's custom headers for the server origin
+     * (M14.13), not the API client: that one sends the token and maps errors for the API.
+     */
+    @Single
+    fun provideImageLoader(
+        context: PlatformContext,
+        baseUrlProvider: BaseUrlProvider,
+        customHeadersStorage: CustomHeadersStorage
+    ): ImageLoader = ImageLoader.Builder(context)
+        .components {
+            add(
+                KtorNetworkFetcherFactory(
+                    HttpClient {
+                        configureImageClient(baseUrlProvider, customHeadersStorage)
+                    }
+                )
+            )
+        }
+        .build()
+}
 
 @KoinApplication
 object KoinApp

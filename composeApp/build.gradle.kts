@@ -52,8 +52,8 @@ kotlin {
             implementation(projects.feature.logs.data)
             implementation(projects.feature.logs.mapper)
 
-            // Coil finds this network fetcher through its service loader. Collection and item
-            // images are public files under `uploads/`: they need no token.
+            // The network fetcher of the app's `ImageLoader` (`AppModule.provideImageLoader`).
+            // Collection and item images are public files under `uploads/`: they need no token.
             implementation(libs.coil.ktor)
         }
         // `KoinGraphTest` uses `verify()`, which koin-test ships for the JVM only.

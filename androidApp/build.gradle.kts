@@ -21,6 +21,9 @@ dependencies {
     implementation(libs.koin.android)
     implementation(libs.koin.annotations)
 
+    // `SingletonImageLoader.Factory` in `KoillectionApp`.
+    implementation(libs.coil.singleton)
+
     implementation(libs.androidx.activity.compose)
     implementation(libs.jetbrains.compose.ui.tooling.preview)
     debugImplementation(libs.jetbrains.compose.ui.tooling)

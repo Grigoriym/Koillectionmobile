@@ -54,7 +54,7 @@ cold session can act on it. Delete an entry when it's fixed.
   Verdict (user, 2026-11-25, M14.1): fix before release, M14.22.
 - 2026-11-16 (M4.5) — MASVS-PRIVACY-4: log out does not clear Coil's image disk cache.
   `AuthRepositoryImpl.logOut` (`feature/auth/data/.../AuthRepositoryImpl.kt:57`) clears only the
-  session keys; the app uses Coil's default singleton `ImageLoader` (no `diskCache` config). A log
+  session keys; the app's `ImageLoader` (`AppModule.provideImageLoader`, M14.13) has no `diskCache` config. A log
   in to another server keeps the first server's images on the device. Fix option: clear the
   `ImageLoader`'s disk and memory cache on log out.
   Verdict (user, 2026-11-25, M14.1): fix before release, M14.14.
@@ -62,13 +62,6 @@ cold session can act on it. Delete an entry when it's fixed.
   (`androidApp/src/main/AndroidManifest.xml:5`) has no user in app code. Coil's network fetcher
   may use it. Check the merged release manifest (M14.2) and the libraries before removing it.
   Verdict (user, 2026-11-25, M14.1): fix before release, M14.2.
-- 2026-11-16 (M4.5) — Images do not get the custom headers (M4.2). Coil loads them with its own
-  Ktor client (`coil-network-ktor3`, `composeApp/build.gradle.kts:30`), not the app's
-  `HttpClient`, so the `CustomHeaders` plugin does not run. Behind a header-checking proxy
-  (`docs/local-info.md`, "Proxy front") the thumbnails and item images will fail. Not checked on
-  device. Fix option: a singleton `ImageLoader` whose fetcher uses a client with the
-  `CustomHeaders` plugin (server origin only).
-  Verdict (user, 2026-11-25, M14.1): fix before release, M14.13.
 - 2026-11-16 (M5.3) — A delete that gets HTTP 404 shows "The item was not deleted" and keeps the
   item screen. `ItemViewModel.delete` (`feature/items/ui/.../ItemViewModel.kt`) treats every
   failure the same. A 404 means the item is already gone: a retry after a lost answer, or a delete
