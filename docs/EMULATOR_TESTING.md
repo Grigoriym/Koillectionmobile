@@ -214,3 +214,9 @@ this app.
   nothing without its filter: send every `search_history[classes][]` and both
   `search_history[types][]` values. To make an item through the web form with `curl`, send
   `item[tags]=[]` and `item[relatedItems]=[]`; without them the server answers 500.
+- Nested delete pass (M14.11): build the tree through the API with `Content-Type:
+  application/ld+json`: `POST /api/wishlists` `{"name","parent"}`, `/api/wishes` `{"name","wishlist"}`,
+  `/api/albums` `{"title","parent"}`, `/api/photos` `{"title","album"}` (no image needed), and
+  `/api/items` `{"name","collection"}`. Items one level down count too, so put one in a child. The
+  counts are only in a screenshot, as in M6.3. A `GET` with `Accept: application/json` returns page 1
+  only, so a cleanup check of `/api/items` by name is not proof on the 445-item instance.

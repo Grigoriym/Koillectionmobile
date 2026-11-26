@@ -103,3 +103,5 @@ entries get deleted — see /finalize.
 - 2026-11-25 — (M13.4) The web `/history` page returned an empty table with no query: it lists rows only with its filter params set.
 - 2026-11-25 — (M13.4) A curl post of the web add-item form gave 500 with nothing in `docker logs`; the cause (`json_decode` of a missing `item[tags]`) was only in the container's `var/log` file.
 - 2026-11-25 — (M14.8) `javap` on `koin-annotations-jvm-4.2.2.jar` under `~/.gradle/caches/*/transforms/` found no classes: that copy held only `META-INF`. The `-sources.jar` under `caches/modules-2/` had the annotation source.
+- 2026-11-26 — (M14.11) ktlint `compose:parameter-naming` failed `ktlintCheck` for a new `@Composable` parameter `onErrorShown` (past tense); renamed to `onErrorDismiss`. Second time (M10.5).
+- 2026-11-26 — (M14.11) `ktlintCheck` passed with about 40 unused imports left by moving code out of three files: no gate here reports them. A script that drops imports whose name the file never uses found them.
