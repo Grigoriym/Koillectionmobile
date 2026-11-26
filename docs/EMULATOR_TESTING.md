@@ -175,6 +175,10 @@ this app.
   login form with the keyboard already closed leaves the app; the relaunch shows an empty form.
   To make the header wrong while logged in, edit its value in Settings (tap the value field,
   `KEYCODE_MOVE_END`, a run of `KEYCODE_DEL`), save, and pull the list down to refresh.
+- Images behind the header port (M14.13): `Books` item thumbnails and an item's main image are
+  `/uploads/` requests in the front's log (401 without the header, 200 with it). `docker logs`
+  keeps lines across `docker restart`, so a before/after run in one container mixes both results:
+  split the log by its timestamps, or recreate the container between runs.
 - Cleartext warning (M4.4): an `http://` server URL adds a red line under the URL field, which
   moves Username, Password and Log in down. Tap fields from a dump taken after the URL is typed.
 - Wishlists (M9.8): "Wishlists" in the drawer; the list's FAB is "New wishlist"

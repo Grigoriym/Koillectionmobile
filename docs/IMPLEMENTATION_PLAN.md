@@ -94,7 +94,11 @@ start of any step that touches the API. Facts that shape the design:
   on an item and on a Datum are paths relative to the server root. The server serves `/uploads/*`
   as static files (`docker/Caddyfile`), so an image URL needs no JWT (a `curl` without a token
   got 200, M2.3). `feature:items` resolves
-  the paths to full URLs. `GET /api/items/{id}/data` has no guaranteed `position` order: the
+  the paths to full URLs. Coil loads them with the app's own `ImageLoader`
+  (`AppModule.provideImageLoader`, M14.13): its Ktor fetcher sends no token but does send the
+  custom headers to the server origin, so a header-checking proxy passes the images too. The
+  explicitly added `KtorNetworkFetcherFactory` wins over Coil's service-loaded one (checked on the
+  emulator: 200 behind the proxy, 401 before). `GET /api/items/{id}/data` has no guaranteed `position` order: the
   `OrderBy` on `Item::$data` is a Doctrine collection setting, and API Platform reads the Datum
   rows with its own query (`Datum.php` sets no `order`). So `feature:items` sorts by `position`.
   Not checked against a server with reordered fields: the fixture is already in `position` order.
