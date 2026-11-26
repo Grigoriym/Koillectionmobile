@@ -163,6 +163,11 @@ Don't `cd` into a subfolder in a Bash call: the shell stays there, and the auto-
 then gives no verdict on the next calls that start with `cd` to the repo root. Run from the root
 with paths. A slip costs a call or two; it is not logged as a friction.
 
+## Shared UI parts
+
+A `ui` module takes its load-error message and its error-or-empty view from `core:ui`
+(`toMessage`, `EmptyOrError`, M14.10). Don't add a per-module copy or per-area error strings.
+
 ## Test names
 
 No comma in a backtick test name in `commonTest`. It passes `jvmTest` and fails
