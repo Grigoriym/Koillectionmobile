@@ -1,27 +1,9 @@
 package com.grappim.koillectionmobile.feature.albums.ui
 
 import com.grappim.kit.uikit.NativeText
-import com.grappim.koillectionmobile.core.image.Rotation
+import com.grappim.koillectionmobile.core.form.FormPhoto
+import com.grappim.koillectionmobile.core.form.FormSaveStatus
 import kotlinx.serialization.Serializable
-
-/** The form's image: a content [uri] and the user's extra [rotation] on top of the EXIF orientation. */
-@Serializable
-data class FormPhoto(val uri: String, val rotation: Rotation = Rotation.NONE)
-
-/** The save, once it has started. While it is set, the screen shows it instead of the form. */
-sealed interface AlbumSaveStatus {
-    /** The photo is being turned into upload bytes. */
-    data object Preparing : AlbumSaveStatus
-
-    /** [done] of [total] server calls are finished. */
-    data class Sending(val done: Int, val total: Int) : AlbumSaveStatus
-
-    /**
-     * The save stopped. [isPartial]: a call went through, so only a retry (which sends the rest) is
-     * offered, not a return to the form.
-     */
-    data class Failed(val message: NativeText, val isPartial: Boolean) : AlbumSaveStatus
-}
 
 /**
  * The new-album form: the [title] and an optional [photo] (plan §5 decision 14). [isSaved] is set
@@ -30,7 +12,7 @@ sealed interface AlbumSaveStatus {
 data class NewAlbumUiState(
     val title: String = "",
     val photo: FormPhoto? = null,
-    val save: AlbumSaveStatus? = null,
+    val save: FormSaveStatus? = null,
     val isSaved: Boolean = false,
     val onTitleChange: (String) -> Unit = {},
     val onPhotosAdd: (List<String>) -> Unit = {},
@@ -71,7 +53,7 @@ data class EditAlbumUiState(
     val title: String = "",
     val photo: FormPhoto? = null,
     val imageUrl: String? = null,
-    val save: AlbumSaveStatus? = null,
+    val save: FormSaveStatus? = null,
     val isSaved: Boolean = false,
     val onRetry: () -> Unit = {},
     val onTitleChange: (String) -> Unit = {},

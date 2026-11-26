@@ -10,14 +10,12 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -26,20 +24,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.grappim.kit.uikit.NativeText
-import com.grappim.kit.uikit.asString
 import com.grappim.kit.uikit.widgets.topbar.LocalTopBarConfig
 import com.grappim.kit.uikit.widgets.topbar.NavigationIconConfig
 import com.grappim.kit.uikit.widgets.topbar.TopBarActionMenu
 import com.grappim.kit.uikit.widgets.topbar.TopBarActionVectorButton
 import com.grappim.kit.uikit.widgets.topbar.TopBarConfig
 import com.grappim.kit.uikit.widgets.topbar.TopBarMenuItem
+import com.grappim.koillectionmobile.core.ui.DeleteDialogs
+import com.grappim.koillectionmobile.core.ui.DeleteTexts
 import com.grappim.koillectionmobile.core.ui.EmptyOrError
 import com.grappim.koillectionmobile.feature.wishlists.domain.Wish
 import com.grappim.koillectionmobile.strings.RPlurals
 import com.grappim.koillectionmobile.strings.RString
-import com.grappim.koillectionmobile.strings.generated.resources.collection_delete_cancel
-import com.grappim.koillectionmobile.strings.generated.resources.collection_delete_confirm
-import com.grappim.koillectionmobile.strings.generated.resources.collection_delete_failed_ok
 import com.grappim.koillectionmobile.strings.generated.resources.wish_new
 import com.grappim.koillectionmobile.strings.generated.resources.wishlist_delete
 import com.grappim.koillectionmobile.strings.generated.resources.wishlist_delete_children
@@ -54,7 +50,6 @@ import com.grappim.koillectionmobile.strings.generated.resources.wishlist_new
 import com.grappim.koillectionmobile.strings.generated.resources.wishlist_section_children
 import com.grappim.koillectionmobile.strings.generated.resources.wishlist_section_wishes
 import kotlinx.collections.immutable.persistentListOf
-import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -189,45 +184,21 @@ private fun WishlistContent(
             }
         }
     }
-    DeleteDialogs(uiState)
-}
-
-@Composable
-private fun DeleteDialogs(uiState: WishlistUiState) {
-    uiState.deleteSummary?.let { summary ->
-        AlertDialog(
-            onDismissRequest = uiState.onDeleteDismiss,
-            title = { Text(stringResource(RString.wishlist_delete_title)) },
-            text = {
-                val children =
-                    pluralStringResource(RPlurals.wishlist_delete_children, summary.childCount, summary.childCount)
-                val wishes = pluralStringResource(RPlurals.wishlist_delete_wishes, summary.wishCount, summary.wishCount)
-                Text(stringResource(RString.wishlist_delete_text, uiState.name, children, wishes))
-            },
-            confirmButton = {
-                TextButton(onClick = uiState.onDeleteConfirm) {
-                    Text(stringResource(RString.collection_delete_confirm))
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = uiState.onDeleteDismiss) {
-                    Text(stringResource(RString.collection_delete_cancel))
-                }
-            }
-        )
-    }
-    if (uiState.deleteError.isNotEmpty()) {
-        AlertDialog(
-            onDismissRequest = uiState.onDeleteErrorShown,
-            title = { Text(stringResource(RString.wishlist_delete_failed_title)) },
-            text = { Text(uiState.deleteError.asString()) },
-            confirmButton = {
-                TextButton(onClick = uiState.onDeleteErrorShown) {
-                    Text(stringResource(RString.collection_delete_failed_ok))
-                }
-            }
-        )
-    }
+    DeleteDialogs(
+        summary = uiState.deleteSummary,
+        error = uiState.deleteError,
+        name = uiState.name,
+        texts = DeleteTexts(
+            title = RString.wishlist_delete_title,
+            text = RString.wishlist_delete_text,
+            children = RPlurals.wishlist_delete_children,
+            contents = RPlurals.wishlist_delete_wishes,
+            failedTitle = RString.wishlist_delete_failed_title
+        ),
+        onConfirm = uiState.onDeleteConfirm,
+        onDismiss = uiState.onDeleteDismiss,
+        onErrorDismiss = uiState.onDeleteErrorShown
+    )
 }
 
 @Composable

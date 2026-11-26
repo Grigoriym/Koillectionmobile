@@ -4,6 +4,8 @@ import androidx.lifecycle.SavedStateHandle
 import com.grappim.kit.testing.MainDispatcherRule
 import com.grappim.kit.uikit.NativeText
 import com.grappim.koillectionmobile.core.domain.KoillectionError
+import com.grappim.koillectionmobile.core.form.FormPhoto
+import com.grappim.koillectionmobile.core.form.FormSaveStatus
 import com.grappim.koillectionmobile.core.image.Rotation
 import com.grappim.koillectionmobile.core.photos.PhotoFiles
 import com.grappim.koillectionmobile.feature.collections.domain.Collection
@@ -191,7 +193,7 @@ class EditCollectionViewModelTest {
         sut.uiState.value.onSave()
 
         assertEquals(
-            CollectionSaveStatus.Failed(
+            FormSaveStatus.Failed(
                 NativeText.Resource(RString.collection_form_save_error_network),
                 isPartial = false
             ),
@@ -214,7 +216,7 @@ class EditCollectionViewModelTest {
         sut.uiState.value.onSave()
         val failed = sut.uiState.value.save
         assertEquals(
-            CollectionSaveStatus.Failed(
+            FormSaveStatus.Failed(
                 NativeText.Resource(RString.collection_form_save_error_quota),
                 isPartial = true
             ),
@@ -243,7 +245,7 @@ class EditCollectionViewModelTest {
         collections.renameAnswer = { rename.await() }
 
         sut.uiState.value.onSave()
-        assertEquals(CollectionSaveStatus.Sending(done = 0, total = 2), sut.uiState.value.save)
+        assertEquals(FormSaveStatus.Sending(done = 0, total = 2), sut.uiState.value.save)
         rename.complete(Result.success(NOVELS))
 
         assertEquals(listOf("get:novels", "rename:novels:Old novels", "deleteImage:novels"), collections.calls)
@@ -289,7 +291,7 @@ class EditCollectionViewModelTest {
 
         val restored = createSut(restoredHandle())
         assertEquals(
-            CollectionSaveStatus.Failed(NativeText.Resource(RString.collection_form_save_unfinished), isPartial = true),
+            FormSaveStatus.Failed(NativeText.Resource(RString.collection_form_save_unfinished), isPartial = true),
             restored.uiState.value.save
         )
         collections.deleteImageAnswer = { Result.success(NOVELS) }

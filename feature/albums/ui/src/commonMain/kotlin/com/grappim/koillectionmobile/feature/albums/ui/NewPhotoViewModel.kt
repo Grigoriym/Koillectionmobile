@@ -5,6 +5,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.grappim.kit.logger.logcat
 import com.grappim.kit.uikit.NativeText
+import com.grappim.koillectionmobile.core.form.FormPhoto
+import com.grappim.koillectionmobile.core.form.FormSaveStatus
+import com.grappim.koillectionmobile.core.form.toSaveMessage
 import com.grappim.koillectionmobile.core.photos.JPEG_MIME_TYPE
 import com.grappim.koillectionmobile.core.photos.PhotoFiles
 import com.grappim.koillectionmobile.core.photos.next
@@ -67,7 +70,7 @@ class NewPhotoViewModel(
             photo = draft.photo,
             isSaved = record.isSaved,
             save = if (record.createdId != null && !record.isSaved) {
-                AlbumSaveStatus.Failed(
+                FormSaveStatus.Failed(
                     NativeText.Resource(RString.collection_form_save_unfinished),
                     isPartial = true
                 )
@@ -127,14 +130,14 @@ class NewPhotoViewModel(
     }
 
     private fun retrySave() {
-        if (_uiState.value.save !is AlbumSaveStatus.Failed) return
+        if (_uiState.value.save !is FormSaveStatus.Failed) return
         runSave()
     }
 
     /** Only when nothing exists on the server yet: the form can still change. */
     private fun editForm() {
         val status = _uiState.value.save
-        if (status !is AlbumSaveStatus.Failed || status.isPartial) return
+        if (status !is FormSaveStatus.Failed || status.isPartial) return
         _uiState.update { it.copy(save = null) }
     }
 
@@ -143,7 +146,7 @@ class NewPhotoViewModel(
         val values = form.values
         // Save needs a photo (canSave). The form cannot change while a save is shown.
         val photo = form.photo ?: return
-        _uiState.update { it.copy(save = if (pendingImage == null) AlbumSaveStatus.Preparing else sending()) }
+        _uiState.update { it.copy(save = if (pendingImage == null) FormSaveStatus.Preparing else sending()) }
         viewModelScope.launch {
             val image = pendingImage ?: try {
                 photoFiles.prepare(photo.uri, photo.rotation)
@@ -187,12 +190,12 @@ class NewPhotoViewModel(
     }
 
     /** Two calls: the create, then the upload. */
-    private fun sending(): AlbumSaveStatus =
-        AlbumSaveStatus.Sending(done = if (record.createdId == null) 0 else 1, total = 2)
+    private fun sending(): FormSaveStatus =
+        FormSaveStatus.Sending(done = if (record.createdId == null) 0 else 1, total = 2)
 
     private fun fail(message: NativeText) {
         _uiState.update {
-            it.copy(save = AlbumSaveStatus.Failed(message, isPartial = record.createdId != null))
+            it.copy(save = FormSaveStatus.Failed(message, isPartial = record.createdId != null))
         }
     }
 

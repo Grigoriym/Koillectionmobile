@@ -1,6 +1,7 @@
 package com.grappim.koillectionmobile.feature.albums.ui
 
 import com.grappim.kit.uikit.NativeText
+import com.grappim.koillectionmobile.core.ui.DeleteSummary
 import com.grappim.koillectionmobile.feature.albums.domain.Album
 import com.grappim.koillectionmobile.feature.albums.domain.Photo
 
@@ -37,9 +38,3 @@ data class AlbumUiState(
         get() = !isLoading && error.isEmpty() && !isCountingDelete && deleteSummary == null && !isDeleting &&
             !isDeleted
 }
-
-/**
- * What the server deletes with an album: [childCount] albums inside it (every level), and
- * [photoCount] photos in it and in those albums.
- */
-data class DeleteSummary(val childCount: Int, val photoCount: Int)

@@ -20,6 +20,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.grappim.koillectionmobile.core.form.FormImageSection
+import com.grappim.koillectionmobile.core.form.FormPhoto
+import com.grappim.koillectionmobile.core.form.FormSaveView
+import com.grappim.koillectionmobile.core.form.FormScaffold
 import com.grappim.koillectionmobile.core.ui.EmptyOrError
 import com.grappim.koillectionmobile.feature.wishlists.domain.WishField
 import com.grappim.koillectionmobile.strings.RString
@@ -55,7 +59,7 @@ fun NewWishScreen(
     LaunchedEffect(uiState.isSaved) {
         if (uiState.isSaved) currentOnClose()
     }
-    WishlistFormScaffold(
+    FormScaffold(
         topTitle = stringResource(RString.wish_form_new_title),
         hasInput = uiState.hasInput,
         canSave = uiState.canSave,
@@ -79,7 +83,7 @@ fun NewWishScreen(
                 modifier = contentModifier
             )
         } else {
-            WishlistSaveView(
+            FormSaveView(
                 status = save,
                 partialText = stringResource(RString.wish_form_save_partial),
                 onRetry = uiState.onRetrySave,
@@ -104,7 +108,7 @@ fun EditWishScreen(
     LaunchedEffect(uiState.isSaved) {
         if (uiState.isSaved) currentOnClose()
     }
-    WishlistFormScaffold(
+    FormScaffold(
         topTitle = stringResource(RString.wish_form_edit_title),
         hasInput = uiState.changes.isNotEmpty(),
         canSave = uiState.canSave,
@@ -128,7 +132,7 @@ fun EditWishScreen(
                 onRetry = uiState.onRetry
             )
 
-            save != null -> WishlistSaveView(
+            save != null -> FormSaveView(
                 status = save,
                 partialText = stringResource(RString.collection_form_edit_partial),
                 onRetry = uiState.onRetrySave,

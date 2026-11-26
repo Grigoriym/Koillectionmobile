@@ -4,6 +4,8 @@ import androidx.lifecycle.SavedStateHandle
 import com.grappim.kit.testing.MainDispatcherRule
 import com.grappim.kit.uikit.NativeText
 import com.grappim.koillectionmobile.core.domain.KoillectionError
+import com.grappim.koillectionmobile.core.form.FormPhoto
+import com.grappim.koillectionmobile.core.form.FormSaveStatus
 import com.grappim.koillectionmobile.core.image.Rotation
 import com.grappim.koillectionmobile.feature.albums.domain.Photo
 import com.grappim.koillectionmobile.feature.albums.domain.PhotoChange
@@ -174,7 +176,7 @@ class EditPhotoViewModelTest {
         sut.uiState.value.onSave()
 
         assertEquals(
-            AlbumSaveStatus.Failed(
+            FormSaveStatus.Failed(
                 NativeText.Resource(RString.collection_form_save_error_network),
                 isPartial = false
             ),
@@ -196,7 +198,7 @@ class EditPhotoViewModelTest {
         sut.uiState.value.onSave()
         val failed = sut.uiState.value.save
         assertEquals(
-            AlbumSaveStatus.Failed(NativeText.Resource(RString.collection_form_save_error_quota), isPartial = true),
+            FormSaveStatus.Failed(NativeText.Resource(RString.collection_form_save_error_quota), isPartial = true),
             failed
         )
         sut.uiState.value.onEditForm()
@@ -252,7 +254,7 @@ class EditPhotoViewModelTest {
 
         val restored = createSut(restoredHandle())
         assertEquals(
-            AlbumSaveStatus.Failed(NativeText.Resource(RString.collection_form_save_unfinished), isPartial = true),
+            FormSaveStatus.Failed(NativeText.Resource(RString.collection_form_save_unfinished), isPartial = true),
             restored.uiState.value.save
         )
         repository.uploadPhotoAnswer = { Result.success(BEACH) }

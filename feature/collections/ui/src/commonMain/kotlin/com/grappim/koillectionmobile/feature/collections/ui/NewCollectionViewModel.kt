@@ -5,21 +5,17 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.grappim.kit.logger.logcat
 import com.grappim.kit.uikit.NativeText
-import com.grappim.koillectionmobile.core.domain.KoillectionError
+import com.grappim.koillectionmobile.core.form.FormPhoto
+import com.grappim.koillectionmobile.core.form.FormSaveStatus
+import com.grappim.koillectionmobile.core.form.toSaveMessage
 import com.grappim.koillectionmobile.core.photos.JPEG_MIME_TYPE
 import com.grappim.koillectionmobile.core.photos.PhotoFiles
 import com.grappim.koillectionmobile.core.photos.next
 import com.grappim.koillectionmobile.feature.collections.domain.CollectionListChanges
 import com.grappim.koillectionmobile.feature.collections.domain.CollectionsRepository
 import com.grappim.koillectionmobile.strings.RString
-import com.grappim.koillectionmobile.strings.generated.resources.collection_form_save_error_http
-import com.grappim.koillectionmobile.strings.generated.resources.collection_form_save_error_network
 import com.grappim.koillectionmobile.strings.generated.resources.collection_form_save_error_photo
-import com.grappim.koillectionmobile.strings.generated.resources.collection_form_save_error_quota
-import com.grappim.koillectionmobile.strings.generated.resources.collection_form_save_error_unexpected
-import com.grappim.koillectionmobile.strings.generated.resources.collection_form_save_error_validation
 import com.grappim.koillectionmobile.strings.generated.resources.collection_form_save_unfinished
-import com.grappim.koillectionmobile.strings.generated.resources.error_proxy_rejected
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -73,7 +69,7 @@ class NewCollectionViewModel(
             photo = draft.photo,
             savedCollectionId = record.savedCollectionId,
             save = if (record.createdId != null && record.savedCollectionId == null) {
-                CollectionSaveStatus.Failed(
+                FormSaveStatus.Failed(
                     NativeText.Resource(RString.collection_form_save_unfinished),
                     isPartial = true
                 )
@@ -133,14 +129,14 @@ class NewCollectionViewModel(
     }
 
     private fun retrySave() {
-        if (_uiState.value.save !is CollectionSaveStatus.Failed) return
+        if (_uiState.value.save !is FormSaveStatus.Failed) return
         runSave()
     }
 
     /** Only when nothing exists on the server yet: the form can still change. */
     private fun editForm() {
         val status = _uiState.value.save
-        if (status !is CollectionSaveStatus.Failed || status.isPartial) return
+        if (status !is FormSaveStatus.Failed || status.isPartial) return
         _uiState.update { it.copy(save = null) }
     }
 
@@ -153,7 +149,7 @@ class NewCollectionViewModel(
                 save = if (photo != null &&
                     pendingImage == null
                 ) {
-                    CollectionSaveStatus.Preparing
+                    FormSaveStatus.Preparing
                 } else {
                     sending(total)
                 }
@@ -188,7 +184,7 @@ class NewCollectionViewModel(
             }
 
             if (image != null) {
-                _uiState.update { it.copy(save = CollectionSaveStatus.Sending(done = 1, total = total)) }
+                _uiState.update { it.copy(save = FormSaveStatus.Sending(done = 1, total = total)) }
                 collectionsRepository.uploadCollectionImage(id, image, IMAGE_FILE_NAME, JPEG_MIME_TYPE)
                     .onFailure {
                         fail(it.toSaveMessage(uploadFailed = true))
@@ -203,15 +199,15 @@ class NewCollectionViewModel(
         }
     }
 
-    private fun sending(total: Int): CollectionSaveStatus = if (record.createdId == null) {
-        CollectionSaveStatus.Sending(done = 0, total = total)
+    private fun sending(total: Int): FormSaveStatus = if (record.createdId == null) {
+        FormSaveStatus.Sending(done = 0, total = total)
     } else {
-        CollectionSaveStatus.Sending(done = 1, total = total)
+        FormSaveStatus.Sending(done = 1, total = total)
     }
 
     private fun fail(message: NativeText) {
         _uiState.update {
-            it.copy(save = CollectionSaveStatus.Failed(message, isPartial = record.createdId != null))
+            it.copy(save = FormSaveStatus.Failed(message, isPartial = record.createdId != null))
         }
     }
 
@@ -236,39 +232,9 @@ private data class NewCollectionDraft(val title: String = "", val photo: FormPho
 @Serializable
 private data class NewCollectionRecord(val createdId: String? = null, val savedCollectionId: String? = null)
 
-/** An upload 500 usually means a full upload quota (plan §2), so that one is named. */
-internal fun Throwable.toSaveMessage(uploadFailed: Boolean): NativeText = when (this) {
-    is KoillectionError.Network -> NativeText.Resource(RString.collection_form_save_error_network)
-
-    is KoillectionError.Server -> if (uploadFailed && status == HTTP_INTERNAL_ERROR) {
-        NativeText.Resource(RString.collection_form_save_error_quota)
-    } else {
-        NativeText.Arguments(RString.collection_form_save_error_http, listOf(status))
-    }
-
-    is KoillectionError.ProxyRejection -> NativeText.Arguments(RString.error_proxy_rejected, listOf(status))
-
-    is KoillectionError.Http -> NativeText.Arguments(RString.collection_form_save_error_http, listOf(status))
-
-    is KoillectionError.Unauthorized ->
-        NativeText.Arguments(RString.collection_form_save_error_http, listOf(HTTP_UNAUTHORIZED))
-
-    is KoillectionError.NotFound -> NativeText.Arguments(
-        RString.collection_form_save_error_http,
-        listOf(HTTP_NOT_FOUND)
-    )
-
-    is KoillectionError.Validation -> NativeText.Resource(RString.collection_form_save_error_validation)
-
-    else -> NativeText.Resource(RString.collection_form_save_error_unexpected)
-}
-
 private const val DRAFT_KEY = "new_collection_draft"
 private const val SAVE_KEY = "new_collection_save"
 private const val IMAGE_FILE_NAME = "collection.jpg"
 private const val TAG = "NewCollectionViewModel"
-private const val HTTP_INTERNAL_ERROR = 500
-private const val HTTP_UNAUTHORIZED = 401
-private const val HTTP_NOT_FOUND = 404
 
 private val json = Json { ignoreUnknownKeys = true }

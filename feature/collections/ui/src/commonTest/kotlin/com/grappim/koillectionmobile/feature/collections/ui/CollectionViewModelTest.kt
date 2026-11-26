@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import com.grappim.kit.testing.MainDispatcherRule
 import com.grappim.kit.uikit.NativeText
 import com.grappim.koillectionmobile.core.domain.KoillectionError
+import com.grappim.koillectionmobile.core.ui.DeleteSummary
 import com.grappim.koillectionmobile.feature.collections.domain.Collection
 import com.grappim.koillectionmobile.feature.collections.domain.CollectionChanges
 import com.grappim.koillectionmobile.feature.collections.domain.CollectionListChanges
@@ -351,7 +352,7 @@ class CollectionViewModelTest {
 
         sut.uiState.value.onDeleteClick()
 
-        assertEquals(DeleteSummary(childCount = 2, itemCount = 543), sut.uiState.value.deleteSummary)
+        assertEquals(DeleteSummary(childCount = 2, contentCount = 543), sut.uiState.value.deleteSummary)
         assertEquals(setOf(BOOKS.id, NOVELS.id, SCI_FI.id), collections.countCalls.toSet())
         assertEquals(3, collections.countCalls.size)
         assertFalse(sut.uiState.value.isCountingDelete)
@@ -366,7 +367,7 @@ class CollectionViewModelTest {
 
         sut.uiState.value.onDeleteClick()
 
-        assertEquals(DeleteSummary(childCount = 0, itemCount = 0), sut.uiState.value.deleteSummary)
+        assertEquals(DeleteSummary(childCount = 0, contentCount = 0), sut.uiState.value.deleteSummary)
     }
 
     @Test

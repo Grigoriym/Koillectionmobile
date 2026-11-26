@@ -3,6 +3,8 @@ package com.grappim.koillectionmobile.feature.wishlists.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.grappim.kit.uikit.NativeText
+import com.grappim.koillectionmobile.core.ui.DeleteSummary
+import com.grappim.koillectionmobile.core.ui.descendantIds
 import com.grappim.koillectionmobile.core.ui.toMessage
 import com.grappim.koillectionmobile.feature.wishlists.domain.WishChanges
 import com.grappim.koillectionmobile.feature.wishlists.domain.Wishlist
@@ -102,12 +104,19 @@ class WishlistViewModel(
      */
     private suspend fun countDeleted(): Result<DeleteSummary> = coroutineScope {
         val all = repository.getWishlists().getOrElse { return@coroutineScope Result.failure(it) }
-        val descendants = descendantIds(wishlistId, all)
+        val descendants = descendantIds(wishlistId, all.map { it.id to it.parentId })
         val wishes = (listOf(wishlistId) + descendants)
             .map { id -> async { repository.getWishes(id) } }
             .awaitAll()
         wishes.firstNotNullOfOrNull { it.exceptionOrNull() }?.let { return@coroutineScope Result.failure(it) }
-        Result.success(DeleteSummary(childCount = descendants.size, wishCount = wishes.sumOf { it.getOrThrow().size }))
+        Result.success(
+            DeleteSummary(
+                childCount = descendants.size,
+                contentCount = wishes.sumOf {
+                    it.getOrThrow().size
+                }
+            )
+        )
     }
 
     private fun dismissDelete() {
@@ -168,18 +177,4 @@ class WishlistViewModel(
             }
         }
     }
-}
-
-/** The ids of every wishlist under [rootId] in [all], at every level. [rootId] itself is not in it. */
-internal fun descendantIds(rootId: String, all: List<Wishlist>): List<String> {
-    val childrenByParent = all.groupBy { it.parentId }
-    val found = mutableListOf<String>()
-    val queue = ArrayDeque(listOf(rootId))
-    while (queue.isNotEmpty()) {
-        childrenByParent[queue.removeFirst()].orEmpty().forEach { child ->
-            found += child.id
-            queue.addLast(child.id)
-        }
-    }
-    return found
 }

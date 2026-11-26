@@ -5,6 +5,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.grappim.kit.logger.logcat
 import com.grappim.kit.uikit.NativeText
+import com.grappim.koillectionmobile.core.form.FormPhoto
+import com.grappim.koillectionmobile.core.form.FormSaveStatus
+import com.grappim.koillectionmobile.core.form.toSaveMessage
 import com.grappim.koillectionmobile.core.photos.JPEG_MIME_TYPE
 import com.grappim.koillectionmobile.core.photos.PhotoFiles
 import com.grappim.koillectionmobile.core.photos.next
@@ -81,7 +84,7 @@ class EditCollectionViewModel(
             isSaved = record.isSaved,
             // A save that a process death stopped: what went through is not known, so only a retry.
             save = if (record.isStarted && !record.isSaved) {
-                CollectionSaveStatus.Failed(
+                FormSaveStatus.Failed(
                     NativeText.Resource(RString.collection_form_save_unfinished),
                     isPartial = true
                 )
@@ -222,14 +225,14 @@ class EditCollectionViewModel(
     }
 
     private fun retrySave() {
-        if (_uiState.value.save !is CollectionSaveStatus.Failed) return
+        if (_uiState.value.save !is FormSaveStatus.Failed) return
         runSave()
     }
 
     /** Only when no call went through: the form can still change. */
     private fun editForm() {
         val status = _uiState.value.save
-        if (status !is CollectionSaveStatus.Failed || status.isPartial) return
+        if (status !is FormSaveStatus.Failed || status.isPartial) return
         keepRecord(EditCollectionRecord())
         _uiState.update { it.copy(save = null) }
     }
@@ -244,7 +247,7 @@ class EditCollectionViewModel(
         _uiState.update {
             it.copy(
                 save = if (needsImage && pendingImage == null) {
-                    CollectionSaveStatus.Preparing
+                    FormSaveStatus.Preparing
                 } else {
                     sending(steps)
                 }
@@ -297,12 +300,12 @@ class EditCollectionViewModel(
         }
     }
 
-    private fun sending(steps: List<CollectionEditStep>): CollectionSaveStatus =
-        CollectionSaveStatus.Sending(done = steps.count { it in record.done }, total = steps.size)
+    private fun sending(steps: List<CollectionEditStep>): FormSaveStatus =
+        FormSaveStatus.Sending(done = steps.count { it in record.done }, total = steps.size)
 
     private fun fail(message: NativeText) {
         _uiState.update {
-            it.copy(save = CollectionSaveStatus.Failed(message, isPartial = record.done.isNotEmpty()))
+            it.copy(save = FormSaveStatus.Failed(message, isPartial = record.done.isNotEmpty()))
         }
     }
 

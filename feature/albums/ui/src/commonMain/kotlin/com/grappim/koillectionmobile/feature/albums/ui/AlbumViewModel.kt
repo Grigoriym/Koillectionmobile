@@ -3,6 +3,8 @@ package com.grappim.koillectionmobile.feature.albums.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.grappim.kit.uikit.NativeText
+import com.grappim.koillectionmobile.core.ui.DeleteSummary
+import com.grappim.koillectionmobile.core.ui.descendantIds
 import com.grappim.koillectionmobile.core.ui.toMessage
 import com.grappim.koillectionmobile.feature.albums.domain.Album
 import com.grappim.koillectionmobile.feature.albums.domain.AlbumChanges
@@ -102,13 +104,13 @@ class AlbumViewModel(
      */
     private suspend fun countDeleted(): Result<DeleteSummary> = coroutineScope {
         val all = repository.getAlbums().getOrElse { return@coroutineScope Result.failure(it) }
-        val descendants = descendantIds(albumId, all)
+        val descendants = descendantIds(albumId, all.map { it.id to it.parentId })
         val photos = (listOf(albumId) + descendants)
             .map { id -> async { repository.getPhotos(id) } }
             .awaitAll()
         photos.firstNotNullOfOrNull { it.exceptionOrNull() }?.let { return@coroutineScope Result.failure(it) }
         Result.success(
-            DeleteSummary(childCount = descendants.size, photoCount = photos.sumOf { it.getOrThrow().size })
+            DeleteSummary(childCount = descendants.size, contentCount = photos.sumOf { it.getOrThrow().size })
         )
     }
 
@@ -170,18 +172,4 @@ class AlbumViewModel(
             }
         }
     }
-}
-
-/** The ids of every album under [rootId] in [all], at every level. [rootId] itself is not in it. */
-internal fun descendantIds(rootId: String, all: List<Album>): List<String> {
-    val childrenByParent = all.groupBy { it.parentId }
-    val found = mutableListOf<String>()
-    val queue = ArrayDeque(listOf(rootId))
-    while (queue.isNotEmpty()) {
-        childrenByParent[queue.removeFirst()].orEmpty().forEach { child ->
-            found += child.id
-            queue.addLast(child.id)
-        }
-    }
-    return found
 }

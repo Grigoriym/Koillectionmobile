@@ -5,6 +5,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.grappim.kit.logger.logcat
 import com.grappim.kit.uikit.NativeText
+import com.grappim.koillectionmobile.core.form.FormPhoto
+import com.grappim.koillectionmobile.core.form.FormSaveStatus
+import com.grappim.koillectionmobile.core.form.toSaveMessage
 import com.grappim.koillectionmobile.core.photos.JPEG_MIME_TYPE
 import com.grappim.koillectionmobile.core.photos.PhotoFiles
 import com.grappim.koillectionmobile.core.photos.next
@@ -71,7 +74,7 @@ class EditWishViewModel(
             isSaved = record.isSaved,
             // A save that a process death stopped: what went through is not known, so only a retry.
             save = if (record.isStarted && !record.isSaved) {
-                WishlistSaveStatus.Failed(
+                FormSaveStatus.Failed(
                     NativeText.Resource(RString.collection_form_save_unfinished),
                     isPartial = true
                 )
@@ -159,14 +162,14 @@ class EditWishViewModel(
     }
 
     private fun retrySave() {
-        if (_uiState.value.save !is WishlistSaveStatus.Failed) return
+        if (_uiState.value.save !is FormSaveStatus.Failed) return
         runSave()
     }
 
     /** Only when no call went through: the form can still change. */
     private fun editForm() {
         val status = _uiState.value.save
-        if (status !is WishlistSaveStatus.Failed || status.isPartial) return
+        if (status !is FormSaveStatus.Failed || status.isPartial) return
         keepRecord(EditWishRecord())
         _uiState.update { it.copy(save = null) }
     }
@@ -179,7 +182,7 @@ class EditWishViewModel(
         keepRecord(record.copy(isStarted = true))
         val needsImage = WishEditStep.UPLOAD_IMAGE in steps && WishEditStep.UPLOAD_IMAGE !in record.done
         _uiState.update {
-            it.copy(save = if (needsImage && pendingImage == null) WishlistSaveStatus.Preparing else sending(steps))
+            it.copy(save = if (needsImage && pendingImage == null) FormSaveStatus.Preparing else sending(steps))
         }
         viewModelScope.launch {
             if (needsImage && photo != null && pendingImage == null) {
@@ -222,12 +225,12 @@ class EditWishViewModel(
         }
     }
 
-    private fun sending(steps: List<WishEditStep>): WishlistSaveStatus =
-        WishlistSaveStatus.Sending(done = steps.count { it in record.done }, total = steps.size)
+    private fun sending(steps: List<WishEditStep>): FormSaveStatus =
+        FormSaveStatus.Sending(done = steps.count { it in record.done }, total = steps.size)
 
     private fun fail(message: NativeText) {
         _uiState.update {
-            it.copy(save = WishlistSaveStatus.Failed(message, isPartial = record.done.isNotEmpty()))
+            it.copy(save = FormSaveStatus.Failed(message, isPartial = record.done.isNotEmpty()))
         }
     }
 

@@ -3,6 +3,7 @@ package com.grappim.koillectionmobile.feature.wishlists.ui
 import com.grappim.kit.testing.MainDispatcherRule
 import com.grappim.kit.uikit.NativeText
 import com.grappim.koillectionmobile.core.domain.KoillectionError
+import com.grappim.koillectionmobile.core.ui.DeleteSummary
 import com.grappim.koillectionmobile.feature.wishlists.domain.Wish
 import com.grappim.koillectionmobile.feature.wishlists.domain.WishChanges
 import com.grappim.koillectionmobile.feature.wishlists.domain.Wishlist
@@ -222,7 +223,7 @@ class WishlistViewModelTest {
 
         sut.uiState.value.onDeleteClick()
 
-        assertEquals(DeleteSummary(childCount = 3, wishCount = 6), sut.uiState.value.deleteSummary)
+        assertEquals(DeleteSummary(childCount = 3, contentCount = 6), sut.uiState.value.deleteSummary)
         assertFalse(sut.uiState.value.isCountingDelete)
         assertEquals(
             setOf(TRAVEL.id, japan.id, asia.id, tokyo.id),

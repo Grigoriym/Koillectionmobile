@@ -3,6 +3,7 @@ package com.grappim.koillectionmobile.feature.albums.ui
 import com.grappim.kit.testing.MainDispatcherRule
 import com.grappim.kit.uikit.NativeText
 import com.grappim.koillectionmobile.core.domain.KoillectionError
+import com.grappim.koillectionmobile.core.ui.DeleteSummary
 import com.grappim.koillectionmobile.feature.albums.domain.Album
 import com.grappim.koillectionmobile.feature.albums.domain.AlbumChange
 import com.grappim.koillectionmobile.feature.albums.domain.AlbumChanges
@@ -220,7 +221,7 @@ class AlbumViewModelTest {
 
         sut.uiState.value.onDeleteClick()
 
-        assertEquals(DeleteSummary(childCount = 3, photoCount = 6), sut.uiState.value.deleteSummary)
+        assertEquals(DeleteSummary(childCount = 3, contentCount = 6), sut.uiState.value.deleteSummary)
         assertFalse(sut.uiState.value.isCountingDelete)
         assertEquals(
             setOf(TRIPS.id, japan.id, asia.id, tokyo.id),

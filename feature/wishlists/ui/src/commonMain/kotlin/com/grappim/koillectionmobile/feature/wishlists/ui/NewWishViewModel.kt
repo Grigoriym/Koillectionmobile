@@ -5,6 +5,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.grappim.kit.logger.logcat
 import com.grappim.kit.uikit.NativeText
+import com.grappim.koillectionmobile.core.form.FormPhoto
+import com.grappim.koillectionmobile.core.form.FormSaveStatus
+import com.grappim.koillectionmobile.core.form.toSaveMessage
 import com.grappim.koillectionmobile.core.photos.JPEG_MIME_TYPE
 import com.grappim.koillectionmobile.core.photos.PhotoFiles
 import com.grappim.koillectionmobile.core.photos.next
@@ -65,7 +68,7 @@ class NewWishViewModel(
             photo = draft.photo,
             isSaved = record.isSaved,
             save = if (record.createdId != null && !record.isSaved) {
-                WishlistSaveStatus.Failed(
+                FormSaveStatus.Failed(
                     NativeText.Resource(RString.collection_form_save_unfinished),
                     isPartial = true
                 )
@@ -125,14 +128,14 @@ class NewWishViewModel(
     }
 
     private fun retrySave() {
-        if (_uiState.value.save !is WishlistSaveStatus.Failed) return
+        if (_uiState.value.save !is FormSaveStatus.Failed) return
         runSave()
     }
 
     /** Only when nothing exists on the server yet: the form can still change. */
     private fun editForm() {
         val status = _uiState.value.save
-        if (status !is WishlistSaveStatus.Failed || status.isPartial) return
+        if (status !is FormSaveStatus.Failed || status.isPartial) return
         _uiState.update { it.copy(save = null) }
     }
 
@@ -142,7 +145,7 @@ class NewWishViewModel(
         val photo = form.photo
         val total = if (photo == null) 1 else 2
         _uiState.update {
-            it.copy(save = if (photo != null && pendingImage == null) WishlistSaveStatus.Preparing else sending(total))
+            it.copy(save = if (photo != null && pendingImage == null) FormSaveStatus.Preparing else sending(total))
         }
         viewModelScope.launch {
             val image = if (photo == null) {
@@ -179,7 +182,7 @@ class NewWishViewModel(
             }
 
             if (image != null) {
-                _uiState.update { it.copy(save = WishlistSaveStatus.Sending(done = 1, total = total)) }
+                _uiState.update { it.copy(save = FormSaveStatus.Sending(done = 1, total = total)) }
                 repository.uploadWishImage(id, image, WISH_IMAGE_FILE_NAME, JPEG_MIME_TYPE)
                     .onFailure {
                         fail(it.toSaveMessage(uploadFailed = true))
@@ -194,12 +197,12 @@ class NewWishViewModel(
         }
     }
 
-    private fun sending(total: Int): WishlistSaveStatus =
-        WishlistSaveStatus.Sending(done = if (record.createdId == null) 0 else 1, total = total)
+    private fun sending(total: Int): FormSaveStatus =
+        FormSaveStatus.Sending(done = if (record.createdId == null) 0 else 1, total = total)
 
     private fun fail(message: NativeText) {
         _uiState.update {
-            it.copy(save = WishlistSaveStatus.Failed(message, isPartial = record.createdId != null))
+            it.copy(save = FormSaveStatus.Failed(message, isPartial = record.createdId != null))
         }
     }
 

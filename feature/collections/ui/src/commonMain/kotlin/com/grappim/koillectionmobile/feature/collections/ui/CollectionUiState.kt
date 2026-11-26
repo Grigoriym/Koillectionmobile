@@ -1,6 +1,7 @@
 package com.grappim.koillectionmobile.feature.collections.ui
 
 import com.grappim.kit.uikit.NativeText
+import com.grappim.koillectionmobile.core.ui.DeleteSummary
 import com.grappim.koillectionmobile.feature.collections.domain.Collection
 import com.grappim.koillectionmobile.feature.items.domain.Item
 
@@ -47,9 +48,3 @@ data class CollectionUiState(
             if (q.isEmpty()) items else items.filter { it.name.contains(q, ignoreCase = true) }
         }
 }
-
-/**
- * What the server deletes with a collection: [childCount] collections inside it (every level),
- * and [itemCount] items in it and in those collections.
- */
-data class DeleteSummary(val childCount: Int, val itemCount: Int)

@@ -5,21 +5,17 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.grappim.kit.logger.logcat
 import com.grappim.kit.uikit.NativeText
-import com.grappim.koillectionmobile.core.domain.KoillectionError
+import com.grappim.koillectionmobile.core.form.FormPhoto
+import com.grappim.koillectionmobile.core.form.FormSaveStatus
+import com.grappim.koillectionmobile.core.form.toSaveMessage
 import com.grappim.koillectionmobile.core.photos.JPEG_MIME_TYPE
 import com.grappim.koillectionmobile.core.photos.PhotoFiles
 import com.grappim.koillectionmobile.core.photos.next
 import com.grappim.koillectionmobile.feature.wishlists.domain.WishlistChanges
 import com.grappim.koillectionmobile.feature.wishlists.domain.WishlistsRepository
 import com.grappim.koillectionmobile.strings.RString
-import com.grappim.koillectionmobile.strings.generated.resources.collection_form_save_error_http
-import com.grappim.koillectionmobile.strings.generated.resources.collection_form_save_error_network
 import com.grappim.koillectionmobile.strings.generated.resources.collection_form_save_error_photo
-import com.grappim.koillectionmobile.strings.generated.resources.collection_form_save_error_quota
-import com.grappim.koillectionmobile.strings.generated.resources.collection_form_save_error_unexpected
-import com.grappim.koillectionmobile.strings.generated.resources.collection_form_save_error_validation
 import com.grappim.koillectionmobile.strings.generated.resources.collection_form_save_unfinished
-import com.grappim.koillectionmobile.strings.generated.resources.error_proxy_rejected
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -73,7 +69,7 @@ class NewWishlistViewModel(
             photo = draft.photo,
             isSaved = record.isSaved,
             save = if (record.createdId != null && !record.isSaved) {
-                WishlistSaveStatus.Failed(
+                FormSaveStatus.Failed(
                     NativeText.Resource(RString.collection_form_save_unfinished),
                     isPartial = true
                 )
@@ -133,14 +129,14 @@ class NewWishlistViewModel(
     }
 
     private fun retrySave() {
-        if (_uiState.value.save !is WishlistSaveStatus.Failed) return
+        if (_uiState.value.save !is FormSaveStatus.Failed) return
         runSave()
     }
 
     /** Only when nothing exists on the server yet: the form can still change. */
     private fun editForm() {
         val status = _uiState.value.save
-        if (status !is WishlistSaveStatus.Failed || status.isPartial) return
+        if (status !is FormSaveStatus.Failed || status.isPartial) return
         _uiState.update { it.copy(save = null) }
     }
 
@@ -149,7 +145,7 @@ class NewWishlistViewModel(
         val photo = form.photo
         val total = if (photo == null) 1 else 2
         _uiState.update {
-            it.copy(save = if (photo != null && pendingImage == null) WishlistSaveStatus.Preparing else sending(total))
+            it.copy(save = if (photo != null && pendingImage == null) FormSaveStatus.Preparing else sending(total))
         }
         viewModelScope.launch {
             val image = if (photo == null) {
@@ -180,7 +176,7 @@ class NewWishlistViewModel(
             }
 
             if (image != null) {
-                _uiState.update { it.copy(save = WishlistSaveStatus.Sending(done = 1, total = total)) }
+                _uiState.update { it.copy(save = FormSaveStatus.Sending(done = 1, total = total)) }
                 repository.uploadWishlistImage(id, image, IMAGE_FILE_NAME, JPEG_MIME_TYPE)
                     .onFailure {
                         fail(it.toSaveMessage(uploadFailed = true))
@@ -195,12 +191,12 @@ class NewWishlistViewModel(
         }
     }
 
-    private fun sending(total: Int): WishlistSaveStatus =
-        WishlistSaveStatus.Sending(done = if (record.createdId == null) 0 else 1, total = total)
+    private fun sending(total: Int): FormSaveStatus =
+        FormSaveStatus.Sending(done = if (record.createdId == null) 0 else 1, total = total)
 
     private fun fail(message: NativeText) {
         _uiState.update {
-            it.copy(save = WishlistSaveStatus.Failed(message, isPartial = record.createdId != null))
+            it.copy(save = FormSaveStatus.Failed(message, isPartial = record.createdId != null))
         }
     }
 
@@ -225,39 +221,9 @@ private data class NewWishlistDraft(val name: String = "", val photo: FormPhoto?
 @Serializable
 private data class NewWishlistRecord(val createdId: String? = null, val isSaved: Boolean = false)
 
-/** An upload 500 usually means a full upload quota (plan §2), so that one is named. */
-internal fun Throwable.toSaveMessage(uploadFailed: Boolean): NativeText = when (this) {
-    is KoillectionError.Network -> NativeText.Resource(RString.collection_form_save_error_network)
-
-    is KoillectionError.Server -> if (uploadFailed && status == HTTP_INTERNAL_ERROR) {
-        NativeText.Resource(RString.collection_form_save_error_quota)
-    } else {
-        NativeText.Arguments(RString.collection_form_save_error_http, listOf(status))
-    }
-
-    is KoillectionError.ProxyRejection -> NativeText.Arguments(RString.error_proxy_rejected, listOf(status))
-
-    is KoillectionError.Http -> NativeText.Arguments(RString.collection_form_save_error_http, listOf(status))
-
-    is KoillectionError.Unauthorized ->
-        NativeText.Arguments(RString.collection_form_save_error_http, listOf(HTTP_UNAUTHORIZED))
-
-    is KoillectionError.NotFound -> NativeText.Arguments(
-        RString.collection_form_save_error_http,
-        listOf(HTTP_NOT_FOUND)
-    )
-
-    is KoillectionError.Validation -> NativeText.Resource(RString.collection_form_save_error_validation)
-
-    else -> NativeText.Resource(RString.collection_form_save_error_unexpected)
-}
-
 internal const val IMAGE_FILE_NAME = "wishlist.jpg"
 private const val DRAFT_KEY = "new_wishlist_draft"
 private const val SAVE_KEY = "new_wishlist_save"
 private const val TAG = "NewWishlistViewModel"
-private const val HTTP_INTERNAL_ERROR = 500
-private const val HTTP_UNAUTHORIZED = 401
-private const val HTTP_NOT_FOUND = 404
 
 private val json = Json { ignoreUnknownKeys = true }

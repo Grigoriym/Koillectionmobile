@@ -1,6 +1,8 @@
 package com.grappim.koillectionmobile.feature.wishlists.ui
 
 import com.grappim.kit.uikit.NativeText
+import com.grappim.koillectionmobile.core.form.FormPhoto
+import com.grappim.koillectionmobile.core.form.FormSaveStatus
 import com.grappim.koillectionmobile.feature.wishlists.domain.WishField
 import kotlinx.serialization.Serializable
 
@@ -11,7 +13,7 @@ import kotlinx.serialization.Serializable
 data class NewWishUiState(
     val values: WishFormValues = WishFormValues(),
     val photo: FormPhoto? = null,
-    val save: WishlistSaveStatus? = null,
+    val save: FormSaveStatus? = null,
     val isSaved: Boolean = false,
     val onFieldChange: (WishField, String) -> Unit = { _, _ -> },
     val onPhotosAdd: (List<String>) -> Unit = {},
@@ -51,7 +53,7 @@ data class EditWishUiState(
     val error: NativeText = NativeText.Empty,
     val values: WishFormValues = WishFormValues(),
     val photo: FormPhoto? = null,
-    val save: WishlistSaveStatus? = null,
+    val save: FormSaveStatus? = null,
     val isSaved: Boolean = false,
     val onRetry: () -> Unit = {},
     val onFieldChange: (WishField, String) -> Unit = { _, _ -> },

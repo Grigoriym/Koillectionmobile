@@ -1,27 +1,9 @@
 package com.grappim.koillectionmobile.feature.wishlists.ui
 
 import com.grappim.kit.uikit.NativeText
-import com.grappim.koillectionmobile.core.image.Rotation
+import com.grappim.koillectionmobile.core.form.FormPhoto
+import com.grappim.koillectionmobile.core.form.FormSaveStatus
 import kotlinx.serialization.Serializable
-
-/** The form's image: a content [uri] and the user's extra [rotation] on top of the EXIF orientation. */
-@Serializable
-data class FormPhoto(val uri: String, val rotation: Rotation = Rotation.NONE)
-
-/** The save, once it has started. While it is set, the screen shows it instead of the form. */
-sealed interface WishlistSaveStatus {
-    /** The photo is being turned into upload bytes. */
-    data object Preparing : WishlistSaveStatus
-
-    /** [done] of [total] server calls are finished. */
-    data class Sending(val done: Int, val total: Int) : WishlistSaveStatus
-
-    /**
-     * The save stopped. [isPartial]: a call went through, so only a retry (which sends the rest) is
-     * offered, not a return to the form.
-     */
-    data class Failed(val message: NativeText, val isPartial: Boolean) : WishlistSaveStatus
-}
 
 /**
  * The new-wishlist form: the [name] and an optional [photo] (plan §5 decision 12). [isSaved] is set
@@ -30,7 +12,7 @@ sealed interface WishlistSaveStatus {
 data class NewWishlistUiState(
     val name: String = "",
     val photo: FormPhoto? = null,
-    val save: WishlistSaveStatus? = null,
+    val save: FormSaveStatus? = null,
     val isSaved: Boolean = false,
     val onNameChange: (String) -> Unit = {},
     val onPhotosAdd: (List<String>) -> Unit = {},
@@ -72,7 +54,7 @@ data class EditWishlistUiState(
     val name: String = "",
     val photo: FormPhoto? = null,
     val imageUrl: String? = null,
-    val save: WishlistSaveStatus? = null,
+    val save: FormSaveStatus? = null,
     val isSaved: Boolean = false,
     val onRetry: () -> Unit = {},
     val onNameChange: (String) -> Unit = {},

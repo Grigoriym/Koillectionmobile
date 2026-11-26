@@ -5,6 +5,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.grappim.kit.logger.logcat
 import com.grappim.kit.uikit.NativeText
+import com.grappim.koillectionmobile.core.form.FormPhoto
+import com.grappim.koillectionmobile.core.form.FormSaveStatus
+import com.grappim.koillectionmobile.core.form.toSaveMessage
 import com.grappim.koillectionmobile.core.photos.JPEG_MIME_TYPE
 import com.grappim.koillectionmobile.core.photos.PhotoFiles
 import com.grappim.koillectionmobile.core.photos.next
@@ -72,7 +75,7 @@ class EditAlbumViewModel(
             isSaved = record.isSaved,
             // A save that a process death stopped: what went through is not known, so only a retry.
             save = if (record.isStarted && !record.isSaved) {
-                AlbumSaveStatus.Failed(
+                FormSaveStatus.Failed(
                     NativeText.Resource(RString.collection_form_save_unfinished),
                     isPartial = true
                 )
@@ -166,14 +169,14 @@ class EditAlbumViewModel(
     }
 
     private fun retrySave() {
-        if (_uiState.value.save !is AlbumSaveStatus.Failed) return
+        if (_uiState.value.save !is FormSaveStatus.Failed) return
         runSave()
     }
 
     /** Only when no call went through: the form can still change. */
     private fun editForm() {
         val status = _uiState.value.save
-        if (status !is AlbumSaveStatus.Failed || status.isPartial) return
+        if (status !is FormSaveStatus.Failed || status.isPartial) return
         keepRecord(EditAlbumRecord())
         _uiState.update { it.copy(save = null) }
     }
@@ -186,7 +189,7 @@ class EditAlbumViewModel(
         keepRecord(record.copy(isStarted = true))
         val needsImage = AlbumEditStep.UPLOAD_IMAGE in steps && AlbumEditStep.UPLOAD_IMAGE !in record.done
         _uiState.update {
-            it.copy(save = if (needsImage && pendingImage == null) AlbumSaveStatus.Preparing else sending(steps))
+            it.copy(save = if (needsImage && pendingImage == null) FormSaveStatus.Preparing else sending(steps))
         }
         viewModelScope.launch {
             if (needsImage && photo != null && pendingImage == null) {
@@ -231,12 +234,12 @@ class EditAlbumViewModel(
         }
     }
 
-    private fun sending(steps: List<AlbumEditStep>): AlbumSaveStatus =
-        AlbumSaveStatus.Sending(done = steps.count { it in record.done }, total = steps.size)
+    private fun sending(steps: List<AlbumEditStep>): FormSaveStatus =
+        FormSaveStatus.Sending(done = steps.count { it in record.done }, total = steps.size)
 
     private fun fail(message: NativeText) {
         _uiState.update {
-            it.copy(save = AlbumSaveStatus.Failed(message, isPartial = record.done.isNotEmpty()))
+            it.copy(save = FormSaveStatus.Failed(message, isPartial = record.done.isNotEmpty()))
         }
     }
 

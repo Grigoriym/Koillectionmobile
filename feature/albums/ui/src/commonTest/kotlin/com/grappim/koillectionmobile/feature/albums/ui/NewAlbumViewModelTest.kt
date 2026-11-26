@@ -4,6 +4,8 @@ import androidx.lifecycle.SavedStateHandle
 import com.grappim.kit.testing.MainDispatcherRule
 import com.grappim.kit.uikit.NativeText
 import com.grappim.koillectionmobile.core.domain.KoillectionError
+import com.grappim.koillectionmobile.core.form.FormPhoto
+import com.grappim.koillectionmobile.core.form.FormSaveStatus
 import com.grappim.koillectionmobile.core.image.Rotation
 import com.grappim.koillectionmobile.feature.albums.domain.Album
 import com.grappim.koillectionmobile.feature.albums.domain.AlbumChange
@@ -118,7 +120,7 @@ class NewAlbumViewModelTest {
         repository.uploadAnswer = { upload.await() }
 
         sut.uiState.value.onSave()
-        assertEquals(AlbumSaveStatus.Sending(done = 1, total = 2), sut.uiState.value.save)
+        assertEquals(FormSaveStatus.Sending(done = 1, total = 2), sut.uiState.value.save)
         upload.complete(Result.success(album(CREATED_ID, "Japan")))
 
         assertTrue(sut.uiState.value.isSaved)
@@ -133,7 +135,7 @@ class NewAlbumViewModelTest {
         sut.uiState.value.onSave()
 
         assertEquals(
-            AlbumSaveStatus.Failed(
+            FormSaveStatus.Failed(
                 NativeText.Resource(RString.collection_form_save_error_network),
                 isPartial = false
             ),
@@ -156,7 +158,7 @@ class NewAlbumViewModelTest {
         sut.uiState.value.onSave()
         val failed = sut.uiState.value.save
         assertEquals(
-            AlbumSaveStatus.Failed(NativeText.Resource(RString.collection_form_save_error_quota), isPartial = true),
+            FormSaveStatus.Failed(NativeText.Resource(RString.collection_form_save_error_quota), isPartial = true),
             failed
         )
         sut.uiState.value.onEditForm()
@@ -184,7 +186,7 @@ class NewAlbumViewModelTest {
         sut.uiState.value.onSave()
 
         assertEquals(
-            AlbumSaveStatus.Failed(NativeText.Resource(RString.collection_form_save_error_photo), isPartial = false),
+            FormSaveStatus.Failed(NativeText.Resource(RString.collection_form_save_error_photo), isPartial = false),
             sut.uiState.value.save
         )
         assertTrue(repository.writes.isEmpty())
@@ -236,7 +238,7 @@ class NewAlbumViewModelTest {
 
         val restored = createSut(handle = restoredHandle())
         assertEquals(
-            AlbumSaveStatus.Failed(NativeText.Resource(RString.collection_form_save_unfinished), isPartial = true),
+            FormSaveStatus.Failed(NativeText.Resource(RString.collection_form_save_unfinished), isPartial = true),
             restored.uiState.value.save
         )
         repository.uploadAnswer = { Result.success(album(CREATED_ID, "Japan")) }

@@ -24,6 +24,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.grappim.kit.uikit.NativeText
 import com.grappim.kit.uikit.asString
+import com.grappim.koillectionmobile.core.form.FormSaveView
+import com.grappim.koillectionmobile.core.form.FormScaffold
 import com.grappim.koillectionmobile.core.ui.EmptyOrError
 import com.grappim.koillectionmobile.strings.RString
 import com.grappim.koillectionmobile.strings.generated.resources.collection_form_default_template_hint
@@ -58,7 +60,7 @@ fun EditCollectionScreen(
 
 @Composable
 private fun EditCollectionContent(uiState: EditCollectionUiState, onBack: () -> Unit, modifier: Modifier = Modifier) {
-    CollectionFormScaffold(
+    FormScaffold(
         topTitle = stringResource(RString.collection_form_edit_title),
         hasInput = uiState.changes.isNotEmpty(),
         canSave = uiState.canSave,
@@ -82,7 +84,7 @@ private fun EditCollectionContent(uiState: EditCollectionUiState, onBack: () -> 
                 onRetry = uiState.onRetry
             )
 
-            save != null -> CollectionSaveView(
+            save != null -> FormSaveView(
                 status = save,
                 partialText = stringResource(RString.collection_form_edit_partial),
                 onRetry = uiState.onRetrySave,

@@ -4,6 +4,8 @@ import androidx.lifecycle.SavedStateHandle
 import com.grappim.kit.testing.MainDispatcherRule
 import com.grappim.kit.uikit.NativeText
 import com.grappim.koillectionmobile.core.domain.KoillectionError
+import com.grappim.koillectionmobile.core.form.FormPhoto
+import com.grappim.koillectionmobile.core.form.FormSaveStatus
 import com.grappim.koillectionmobile.core.image.Rotation
 import com.grappim.koillectionmobile.feature.wishlists.domain.Wish
 import com.grappim.koillectionmobile.feature.wishlists.domain.WishChange
@@ -178,7 +180,7 @@ class EditWishViewModelTest {
         sut.uiState.value.onSave()
 
         assertEquals(
-            WishlistSaveStatus.Failed(
+            FormSaveStatus.Failed(
                 NativeText.Resource(RString.collection_form_save_error_network),
                 isPartial = false
             ),
@@ -200,7 +202,7 @@ class EditWishViewModelTest {
         sut.uiState.value.onSave()
         val failed = sut.uiState.value.save
         assertEquals(
-            WishlistSaveStatus.Failed(NativeText.Resource(RString.collection_form_save_error_quota), isPartial = true),
+            FormSaveStatus.Failed(NativeText.Resource(RString.collection_form_save_error_quota), isPartial = true),
             failed
         )
         sut.uiState.value.onEditForm()
@@ -256,7 +258,7 @@ class EditWishViewModelTest {
 
         val restored = createSut(restoredHandle())
         assertEquals(
-            WishlistSaveStatus.Failed(NativeText.Resource(RString.collection_form_save_unfinished), isPartial = true),
+            FormSaveStatus.Failed(NativeText.Resource(RString.collection_form_save_unfinished), isPartial = true),
             restored.uiState.value.save
         )
         repository.uploadWishAnswer = { Result.success(TENT) }

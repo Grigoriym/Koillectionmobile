@@ -17,14 +17,12 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -35,13 +33,14 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.grappim.kit.uikit.NativeText
-import com.grappim.kit.uikit.asString
 import com.grappim.kit.uikit.widgets.topbar.LocalTopBarConfig
 import com.grappim.kit.uikit.widgets.topbar.NavigationIconConfig
 import com.grappim.kit.uikit.widgets.topbar.TopBarActionMenu
 import com.grappim.kit.uikit.widgets.topbar.TopBarActionVectorButton
 import com.grappim.kit.uikit.widgets.topbar.TopBarConfig
 import com.grappim.kit.uikit.widgets.topbar.TopBarMenuItem
+import com.grappim.koillectionmobile.core.ui.DeleteDialogs
+import com.grappim.koillectionmobile.core.ui.DeleteTexts
 import com.grappim.koillectionmobile.core.ui.EmptyOrError
 import com.grappim.koillectionmobile.feature.albums.domain.Photo
 import com.grappim.koillectionmobile.strings.RPlurals
@@ -58,12 +57,8 @@ import com.grappim.koillectionmobile.strings.generated.resources.album_more
 import com.grappim.koillectionmobile.strings.generated.resources.album_new
 import com.grappim.koillectionmobile.strings.generated.resources.album_section_children
 import com.grappim.koillectionmobile.strings.generated.resources.album_section_photos
-import com.grappim.koillectionmobile.strings.generated.resources.collection_delete_cancel
-import com.grappim.koillectionmobile.strings.generated.resources.collection_delete_confirm
-import com.grappim.koillectionmobile.strings.generated.resources.collection_delete_failed_ok
 import com.grappim.koillectionmobile.strings.generated.resources.photo_new
 import kotlinx.collections.immutable.persistentListOf
-import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -212,46 +207,21 @@ private fun AlbumContent(
             }
         }
     }
-    DeleteDialogs(uiState)
-}
-
-@Composable
-private fun DeleteDialogs(uiState: AlbumUiState) {
-    uiState.deleteSummary?.let { summary ->
-        AlertDialog(
-            onDismissRequest = uiState.onDeleteDismiss,
-            title = { Text(stringResource(RString.album_delete_title)) },
-            text = {
-                val children =
-                    pluralStringResource(RPlurals.album_delete_children, summary.childCount, summary.childCount)
-                val photos =
-                    pluralStringResource(RPlurals.album_delete_photos, summary.photoCount, summary.photoCount)
-                Text(stringResource(RString.album_delete_text, uiState.title, children, photos))
-            },
-            confirmButton = {
-                TextButton(onClick = uiState.onDeleteConfirm) {
-                    Text(stringResource(RString.collection_delete_confirm))
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = uiState.onDeleteDismiss) {
-                    Text(stringResource(RString.collection_delete_cancel))
-                }
-            }
-        )
-    }
-    if (uiState.deleteError.isNotEmpty()) {
-        AlertDialog(
-            onDismissRequest = uiState.onDeleteErrorShown,
-            title = { Text(stringResource(RString.album_delete_failed_title)) },
-            text = { Text(uiState.deleteError.asString()) },
-            confirmButton = {
-                TextButton(onClick = uiState.onDeleteErrorShown) {
-                    Text(stringResource(RString.collection_delete_failed_ok))
-                }
-            }
-        )
-    }
+    DeleteDialogs(
+        summary = uiState.deleteSummary,
+        error = uiState.deleteError,
+        name = uiState.title,
+        texts = DeleteTexts(
+            title = RString.album_delete_title,
+            text = RString.album_delete_text,
+            children = RPlurals.album_delete_children,
+            contents = RPlurals.album_delete_photos,
+            failedTitle = RString.album_delete_failed_title
+        ),
+        onConfirm = uiState.onDeleteConfirm,
+        onDismiss = uiState.onDeleteDismiss,
+        onErrorDismiss = uiState.onDeleteErrorShown
+    )
 }
 
 private fun LazyGridScope.fullWidth(key: String, content: @Composable () -> Unit) {

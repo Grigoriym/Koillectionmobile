@@ -5,6 +5,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.grappim.kit.logger.logcat
 import com.grappim.kit.uikit.NativeText
+import com.grappim.koillectionmobile.core.form.FormPhoto
+import com.grappim.koillectionmobile.core.form.FormSaveStatus
+import com.grappim.koillectionmobile.core.form.toSaveMessage
 import com.grappim.koillectionmobile.core.photos.JPEG_MIME_TYPE
 import com.grappim.koillectionmobile.core.photos.PhotoFiles
 import com.grappim.koillectionmobile.core.photos.next
@@ -66,7 +69,7 @@ class NewAlbumViewModel(
             photo = draft.photo,
             isSaved = record.isSaved,
             save = if (record.createdId != null && !record.isSaved) {
-                AlbumSaveStatus.Failed(
+                FormSaveStatus.Failed(
                     NativeText.Resource(RString.collection_form_save_unfinished),
                     isPartial = true
                 )
@@ -126,14 +129,14 @@ class NewAlbumViewModel(
     }
 
     private fun retrySave() {
-        if (_uiState.value.save !is AlbumSaveStatus.Failed) return
+        if (_uiState.value.save !is FormSaveStatus.Failed) return
         runSave()
     }
 
     /** Only when nothing exists on the server yet: the form can still change. */
     private fun editForm() {
         val status = _uiState.value.save
-        if (status !is AlbumSaveStatus.Failed || status.isPartial) return
+        if (status !is FormSaveStatus.Failed || status.isPartial) return
         _uiState.update { it.copy(save = null) }
     }
 
@@ -142,7 +145,7 @@ class NewAlbumViewModel(
         val photo = form.photo
         val total = if (photo == null) 1 else 2
         _uiState.update {
-            it.copy(save = if (photo != null && pendingImage == null) AlbumSaveStatus.Preparing else sending(total))
+            it.copy(save = if (photo != null && pendingImage == null) FormSaveStatus.Preparing else sending(total))
         }
         viewModelScope.launch {
             val image = if (photo == null) {
@@ -173,7 +176,7 @@ class NewAlbumViewModel(
             }
 
             if (image != null) {
-                _uiState.update { it.copy(save = AlbumSaveStatus.Sending(done = 1, total = total)) }
+                _uiState.update { it.copy(save = FormSaveStatus.Sending(done = 1, total = total)) }
                 repository.uploadAlbumImage(id, image, IMAGE_FILE_NAME, JPEG_MIME_TYPE)
                     .onFailure {
                         fail(it.toSaveMessage(uploadFailed = true))
@@ -188,12 +191,12 @@ class NewAlbumViewModel(
         }
     }
 
-    private fun sending(total: Int): AlbumSaveStatus =
-        AlbumSaveStatus.Sending(done = if (record.createdId == null) 0 else 1, total = total)
+    private fun sending(total: Int): FormSaveStatus =
+        FormSaveStatus.Sending(done = if (record.createdId == null) 0 else 1, total = total)
 
     private fun fail(message: NativeText) {
         _uiState.update {
-            it.copy(save = AlbumSaveStatus.Failed(message, isPartial = record.createdId != null))
+            it.copy(save = FormSaveStatus.Failed(message, isPartial = record.createdId != null))
         }
     }
 

@@ -4,6 +4,8 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.grappim.kit.uikit.NativeText
+import com.grappim.koillectionmobile.core.ui.DeleteSummary
+import com.grappim.koillectionmobile.core.ui.descendantIds
 import com.grappim.koillectionmobile.core.ui.toMessage
 import com.grappim.koillectionmobile.feature.collections.domain.Collection
 import com.grappim.koillectionmobile.feature.collections.domain.CollectionChanges
@@ -126,12 +128,12 @@ class CollectionViewModel(
      */
     private suspend fun countDeleted(): Result<DeleteSummary> = coroutineScope {
         val all = collectionsRepository.getCollections().getOrElse { return@coroutineScope Result.failure(it) }
-        val descendants = descendantIds(collectionId, all)
+        val descendants = descendantIds(collectionId, all.map { it.id to it.parentId })
         val counts = (listOf(collectionId) + descendants)
             .map { id -> async { collectionsRepository.countItems(id) } }
             .awaitAll()
         counts.firstNotNullOfOrNull { it.exceptionOrNull() }?.let { return@coroutineScope Result.failure(it) }
-        Result.success(DeleteSummary(childCount = descendants.size, itemCount = counts.sumOf { it.getOrThrow() }))
+        Result.success(DeleteSummary(childCount = descendants.size, contentCount = counts.sumOf { it.getOrThrow() }))
     }
 
     private fun dismissDelete() {
@@ -195,17 +197,3 @@ class CollectionViewModel(
 }
 
 private const val QUERY_KEY = "collection_query"
-
-/** The ids of every collection under [rootId] in [all], at every level. [rootId] itself is not in it. */
-internal fun descendantIds(rootId: String, all: List<Collection>): List<String> {
-    val childrenByParent = all.groupBy { it.parentId }
-    val found = mutableListOf<String>()
-    val queue = ArrayDeque(listOf(rootId))
-    while (queue.isNotEmpty()) {
-        childrenByParent[queue.removeFirst()].orEmpty().forEach { child ->
-            found += child.id
-            queue.addLast(child.id)
-        }
-    }
-    return found
-}

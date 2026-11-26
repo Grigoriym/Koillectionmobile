@@ -21,6 +21,8 @@ kotlin {
             implementation(projects.strings)
             // The shared error message and error view.
             implementation(projects.core.ui)
+            // The shared name-and-image form (M14.11).
+            implementation(projects.core.form)
             implementation(libs.grappim.kit.uikit)
             // `persistentListOf` for the shell top bar's actions.
             implementation(libs.kotlinx.collections)

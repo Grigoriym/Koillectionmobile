@@ -1,6 +1,8 @@
 package com.grappim.koillectionmobile.feature.collections.ui
 
 import com.grappim.kit.uikit.NativeText
+import com.grappim.koillectionmobile.core.form.FormPhoto
+import com.grappim.koillectionmobile.core.form.FormSaveStatus
 import com.grappim.koillectionmobile.feature.templates.domain.Template
 import kotlinx.serialization.Serializable
 
@@ -45,7 +47,7 @@ data class EditCollectionUiState(
     val imageUrl: String? = null,
     val defaultTemplateId: String? = null,
     val templates: TemplatesUi = TemplatesUi(),
-    val save: CollectionSaveStatus? = null,
+    val save: FormSaveStatus? = null,
     val isSaved: Boolean = false,
     val onRetry: () -> Unit = {},
     val onTitleChange: (String) -> Unit = {},

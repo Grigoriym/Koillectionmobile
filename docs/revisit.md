@@ -34,24 +34,14 @@ cold session can act on it. Delete an entry when it's fixed.
   Answer (M14.1, 2026-11-25, read only): the user's server is served by `tailscale serve` at path
   `/` on its own port, so it has no subpath. Other users may have one. Verdict (user): check a
   subpath instance before release, M14.12.
-- 2026-11-15 (M2.5) — Hand-copied UI parts across `ui` modules. The error mapping and the error
-  view are fixed (M14.10: `core:ui` `toMessage` and `EmptyOrError`). The forms and the nested
-  delete are still copied:
-  M11.4 copied the name-and-image form a third time: `FormPhoto`, the save status, the form
-  scaffold, `FormImageSection` and `toSaveMessage` exist in `feature/collections/ui`,
-  `feature/wishlists/ui` (`WishlistFormScreen.kt`, `NewWishlistViewModel.kt`) and
-  `feature/albums/ui` (`AlbumFormScreen.kt`, `AlbumFormUiState.kt`, `AlbumMessages.kt`). Only the
-  strings and the repository calls differ. M11.7 (photo form) reused the album form parts inside
-  `feature/albums/ui` (made `internal`; `FormImageSection` got `isServerImageRemovable`, as in
-  `feature/wishlists/ui`), but `NewPhotoViewModel` and `EditPhotoViewModel` copy
-  `NewWishViewModel` and `EditWishViewModel`, and `PhotoFormValues` copies `WishFormValues`.
-  Fix option: move the form parts to a shared UI module that `core:photos` could host.
-  M11.5 copied the nested-delete parts from `feature/wishlists/ui` (M9.5): `descendantIds`,
-  the count, `DeleteSummary` and `DeleteDialogs` in `AlbumViewModel.kt`, `AlbumUiState.kt` and
-  `AlbumScreen.kt` differ only in types and strings. `descendantIds` could take `(id, parentId)`
-  pairs and live in a shared module.
-  Verdict (user, 2026-11-25, M14.1): fix before release, M14.10 (error mapping and view, done
-  2026-11-26) and M14.11 (forms and nested delete).
+- 2026-11-15 (M2.5) — Hand-copied UI parts across `ui` modules. M14.10 (`core:ui` `toMessage`,
+  `EmptyOrError`) and M14.11 (`core:form`; `core:ui` `DeleteSummary`, `descendantIds`,
+  `DeleteDialogs`) moved the shared parts. Two copies are left, outside M14.11's list:
+  `NewPhotoViewModel` and `EditPhotoViewModel` (`feature/albums/ui`) copy `NewWishViewModel` and
+  `EditWishViewModel` (`feature/wishlists/ui`), and `PhotoFormValues` copies `WishFormValues`.
+  `AddItemViewModel.kt` (`feature/items/ui`, `Throwable.toSaveMessage`) is the same mapping as
+  `core:form`'s `toSaveMessage` with the `add_item_save_error_*` strings, whose text may differ.
+  Verdict (user, 2026-11-25, M14.1) covered M14.10 and M14.11; these two copies need their own.
 - 2026-11-15 (M3.6) — Add-item photo files in `cacheDir/photos/` are deleted on photo remove, on
   save, and when the form leaves the back stack (`AddItemViewModel.onCleared`). A form that never
   comes back (the task swiped away, so the saved draft is gone and `onCleared` never runs) leaves

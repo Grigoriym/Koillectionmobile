@@ -1,6 +1,7 @@
 package com.grappim.koillectionmobile.feature.wishlists.ui
 
 import com.grappim.kit.uikit.NativeText
+import com.grappim.koillectionmobile.core.ui.DeleteSummary
 import com.grappim.koillectionmobile.feature.wishlists.domain.Wish
 import com.grappim.koillectionmobile.feature.wishlists.domain.Wishlist
 
@@ -37,9 +38,3 @@ data class WishlistUiState(
         get() = !isLoading && error.isEmpty() && !isCountingDelete && deleteSummary == null && !isDeleting &&
             !isDeleted
 }
-
-/**
- * What the server deletes with a wishlist: [childCount] wishlists inside it (every level), and
- * [wishCount] wishes in it and in those wishlists.
- */
-data class DeleteSummary(val childCount: Int, val wishCount: Int)
