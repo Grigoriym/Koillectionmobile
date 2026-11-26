@@ -101,7 +101,9 @@ start of any step that touches the API. Facts that shape the design:
 - `GET /api/items` (checked live 2026-11-17, M7.2) lists every item of the user: 30 per page, a
   `view.next` link per page, 15 pages for the 445 items of the test instance. Two full reads gave
   445 distinct ids in the same order. An item's `collection` is an IRI only, so the search screen
-  reads `GET /api/collections` for the titles.
+  reads `GET /api/collections` for the titles. A query such as `?name=...` is ignored (no
+  `#[ApiFilter]`): it returns page 1 of all items, or nothing. To find a new item from a script,
+  read its collection's `/items` (tripped three times: M8.9, the seed check, M14.12).
 - Read side checked live 2026-11-15 (M1.11, `./gradlew :composeApp:smokeRun`, JVM, local test
   instance at the root path): login, all collections, 445 items of one collection over every page
   (matches the server's `totalItems`, so the `next` links work), one item and its 23 fields. A

@@ -220,3 +220,7 @@ this app.
   `/api/items` `{"name","collection"}`. Items one level down count too, so put one in a child. The
   counts are only in a screenshot, as in M6.3. A `GET` with `Accept: application/json` returns page 1
   only, so a cleanup check of `/api/items` by name is not proof on the 445-item instance.
+- Subpath (M14.12): run the subpath front (`docs/local-info.md`, "Subpath front") and log in to
+  `http://10.0.2.2:8299/sub`. Its access log is the proof that every request stays under `/sub/`.
+  Without the trusted-proxy values on the instance, the server's `next` links lose `/sub/`, so
+  paging fails at the front, not in the app.

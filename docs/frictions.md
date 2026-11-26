@@ -60,8 +60,6 @@ entries get deleted — see /finalize.
 - 2026-11-18 — A lambda in a `MutableStateFlow(...)` initializer that used `_uiState` itself (M8.5)
   failed with "Type checking has run into a recursive problem", plus a false "needs opt-in" and "No
   parameter with name" error on the same line. A method reference (`::dismissActionError`) fixed it.
-- 2026-11-19 — `GET /api/items?name=M89` ignored the filter and returned an unrelated `Books` item
-  (`Item.php` has no `#[ApiFilter]`). Read `/api/collections/<id>/items` instead.
 - 2026-11-21 — Two smoke files in one package (M9.2) each declared `private class Created`; the
   compile failed "Redeclaration": a private top-level class is still one JVM class per package.
   Renamed to `WishlistRunCreated`.
@@ -95,7 +93,6 @@ entries get deleted — see /finalize.
 - 2026-11-24 — `find ~/.gradle/caches -name "grappim-kit-uikit*0.1.9*sources*.jar"` (M11.14) found
   nothing, so the `unzip` after it failed. The kit source was readable in the local
   `../grappim-kit` checkout instead (`uikit/src/commonMain/.../topbar/`).
-- 2026-11-24 — `GET /api/items?name=...` (seed check) returned an empty `member`: the items endpoint has no name filter in 1.8.5. Read the item from its collection's `/items` instead.
 - 2026-11-25 — (M12.4) Again no `grappim-kit-uikit` 0.1.9 sources jar in the Gradle cache. Guessed from call sites that `TopBarMenuItem` had no `enabled` and wrote that into a comment; `javap` on the cached `uikit-jvm.jar` showed `enabled`. Read the kit API from `../grappim-kit` or `javap`, not from usages.
 - 2026-11-25 — (M12.4) A Python `str.replace` in an edit script matched nothing (wrong indent in the needle) and failed silently; a grep after the script caught it.
 - 2026-11-25 — (M13 breakdown) A `docker exec ... sh -c` grep chain exited 2 with no output: one `ls` of a missing folder (`src/ApiPlatform`) failed the whole call. Run the probes one per command, or end with `|| true`.
@@ -105,5 +102,4 @@ entries get deleted — see /finalize.
 - 2026-11-25 — (M14.8) `javap` on `koin-annotations-jvm-4.2.2.jar` under `~/.gradle/caches/*/transforms/` found no classes: that copy held only `META-INF`. The `-sources.jar` under `caches/modules-2/` had the annotation source.
 - 2026-11-26 — (M14.11) ktlint `compose:parameter-naming` failed `ktlintCheck` for a new `@Composable` parameter `onErrorShown` (past tense); renamed to `onErrorDismiss`. Second time (M10.5).
 - 2026-11-26 — (M14.11) `ktlintCheck` passed with about 40 unused imports left by moving code out of three files: no gate here reports them. A script that drops imports whose name the file never uses found them.
-- 2026-11-26 — (M14.12) `GET /api/items?name=M14.12` ignored the `name` filter and returned page 1 of all items; read the collection's `/items` instead.
 - 2026-11-26 — (M14.12) `ffmpeg -vf crop=1:1:x:y` failed on a JPEG ("Invalid too big or non positive size"): a 1x1 crop is below the yuv420 chroma size. `crop=2:2:x:y,scale=1:1` worked.
