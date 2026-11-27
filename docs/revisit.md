@@ -52,12 +52,12 @@ cold session can act on it. Delete an entry when it's fixed.
   screens do not reload after a grant (the collection list needs Try again); the denied message at
   Log in has no "Open settings" action. `feature/auth/ui/.../permission/`.
   Verdict (user, 2026-11-25, M14.1): fix before release, M14.22.
-- 2026-11-16 (M4.5) — MASVS-PRIVACY-4: log out does not clear Coil's image disk cache.
-  `AuthRepositoryImpl.logOut` (`feature/auth/data/.../AuthRepositoryImpl.kt:57`) clears only the
-  session keys; the app's `ImageLoader` (`AppModule.provideImageLoader`, M14.13) has no `diskCache` config. A log
-  in to another server keeps the first server's images on the device. Fix option: clear the
-  `ImageLoader`'s disk and memory cache on log out.
-  Verdict (user, 2026-11-25, M14.1): fix before release, M14.14.
+- 2026-11-27 (M14.14) — MASVS-PRIVACY-4: a session that ends because the server rejects the
+  silent re-login keeps the image caches. `BearerAuth.logIn` (`core/api/.../BearerAuth.kt:80`) calls
+  `sessionStorage.clearSession()`, and the app swaps to the login screen; only the drawer's Log out
+  (`DrawerViewModel.logOut`, `composeApp`) clears the `ImageLoader`'s memory and disk caches.
+  `core:api` has no `ImageLoader`. Fix option: clear the caches where the app reacts to
+  `SessionStorage.isLoggedIn` turning `false`, which covers both paths.
 - 2026-11-16 (M4.5) — MASVS-PRIVACY-1: `ACCESS_NETWORK_STATE`
   (`androidApp/src/main/AndroidManifest.xml:5`) has no user in app code. Coil's network fetcher
   may use it. Check the merged release manifest (M14.2) and the libraries before removing it.

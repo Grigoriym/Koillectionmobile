@@ -48,7 +48,7 @@ reason. No row here is a claim of compliance: see "Needs a device or an APK".
 | MASVS-PRIVACY-1 | Open | `ACCESS_NETWORK_STATE` is declared (`androidApp/src/main/AndroidManifest.xml:5`); no app code uses it. |
 | MASVS-PRIVACY-2 | Pass (source) | No analytics, ad id, crash reporter or telemetry dependency (grep of `*.kts`/`*.toml`). The app talks to the user's server only. |
 | MASVS-PRIVACY-3 | Pass (source) | Nothing is collected. The privacy policy is M14.3. |
-| MASVS-PRIVACY-4 | Open | Log out clears the username, password and JWT (`SessionStorageImpl.kt:67-73`), but not Coil's image cache. |
+| MASVS-PRIVACY-4 | Open | Log out clears the username, password and JWT (`SessionStorageImpl.kt:67-73`), and since M14.14 the image loader's memory and disk caches (`DrawerViewModel.logOut`; on the emulator only Coil's `journal` stays in `cache/coil3_disk_cache/`). Still open: a session that ends because the server rejects the re-login (`BearerAuth.kt:80`) keeps the image cache. |
 
 ## Accepted deviations
 
@@ -68,7 +68,7 @@ The STORAGE-2 (`allowBackup`), PLATFORM-3, CODE-1 and CODE-2 rows: accepted by t
 
 | Control | Finding | Where | Severity |
 |---|---|---|---|
-| MASVS-PRIVACY-4 | Log out leaves Coil's image disk cache; a user who logs in to another server keeps the first server's images on the device until Android clears the cache. | `CollectionListViewModel.logOut` → `AuthRepositoryImpl.logOut` (`AuthRepositoryImpl.kt:57-58`); no `diskCache` config | Low |
+| MASVS-PRIVACY-4 | The drawer's Log out clears the image caches (M14.14). A session that ends because the server rejects the silent re-login does not: the app shows the login screen, and a login to another server keeps the first server's images until Android clears the cache. | `BearerAuth.kt:80` (`core:api` has no `ImageLoader`) | Low |
 | MASVS-PRIVACY-1 | `ACCESS_NETWORK_STATE` declared but unused by app code. A library may use it (Coil's network fetcher checks connectivity when the permission is granted): check the merged manifest before removing it. | `androidApp/src/main/AndroidManifest.xml:5` | Low |
 
 Each Open row has a `docs/revisit.md` entry.
