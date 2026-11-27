@@ -161,7 +161,9 @@ this app.
   `ui.py tap Text <n>` opens the 17-type menu. A `choice-list` type adds "Pick a choice list". In
   the item forms the `checkbox` switch and the `choice-list` chips have no label in the dump: find
   them by `checkable="true"` in a fresh dump (the chip's `checked` is on that node). The item
-  screen shows the raw stored values (`1`, `["Novel"]`). A choice list that an item still uses
+  screen shows a `checkbox` as Yes or No and a `choice-list` as its picks joined by commas (M14.15).
+  The seed's comic items each have one pick: to see two, PATCH the datum on the local instance
+  and put it back after. A choice list that an item still uses
   cannot be deleted (500, the app names the cause): delete the item or its collection first.
 - Local network permission (M4.1): `10.0.2.2` is the emulator's own gateway, so a check of
   `ACCESS_LOCAL_NETWORK` needs another private host address. The test instance listens on

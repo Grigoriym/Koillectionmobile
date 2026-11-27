@@ -104,3 +104,4 @@ entries get deleted — see /finalize.
 - 2026-11-26 — (M14.11) `ktlintCheck` passed with about 40 unused imports left by moving code out of three files: no gate here reports them. A script that drops imports whose name the file never uses found them.
 - 2026-11-26 — (M14.12) `ffmpeg -vf crop=1:1:x:y` failed on a JPEG ("Invalid too big or non positive size"): a 1x1 crop is below the yuv420 chroma size. `crop=2:2:x:y,scale=1:1` worked.
 - 2026-11-26 — (M14.13) `docker logs --since 1m` after `docker restart` of the proxy front still showed the baseline run's 401s next to the new 200s; the old log survives a restart. The per-line timestamps split them.
+- 2026-11-27 — (M14.15) The AVD's app still held a session from an earlier step whose server did not answer ("The server does not answer" on the collection list); `pm clear` and a fresh login at `10.0.2.2:8290` fixed it.
