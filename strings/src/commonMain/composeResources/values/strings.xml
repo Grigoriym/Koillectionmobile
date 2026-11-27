@@ -189,6 +189,8 @@
     <string name="item_error_unexpected">Loading the item failed with an unexpected error.</string>
     <string name="item_section_tags">Tags</string>
     <string name="item_field_not_shown">Not shown (field type: %1$s)</string>
+    <string name="item_field_yes">Yes</string>
+    <string name="item_field_no">No</string>
     <string name="item_image_full">Full image. Tap to close.</string>
     <string name="item_delete">Delete item</string>
     <string name="item_delete_title">Delete this item?</string>

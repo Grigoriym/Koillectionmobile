@@ -55,7 +55,9 @@ import com.grappim.koillectionmobile.strings.generated.resources.item_delete_fai
 import com.grappim.koillectionmobile.strings.generated.resources.item_delete_text
 import com.grappim.koillectionmobile.strings.generated.resources.item_delete_title
 import com.grappim.koillectionmobile.strings.generated.resources.item_edit
+import com.grappim.koillectionmobile.strings.generated.resources.item_field_no
 import com.grappim.koillectionmobile.strings.generated.resources.item_field_not_shown
+import com.grappim.koillectionmobile.strings.generated.resources.item_field_yes
 import com.grappim.koillectionmobile.strings.generated.resources.item_image_full
 import com.grappim.koillectionmobile.strings.generated.resources.item_section_tags
 import kotlinx.collections.immutable.toPersistentList
@@ -230,6 +232,11 @@ private fun Field(field: ItemField, onImageClick: (String) -> Unit, modifier: Mo
         Label(field.label)
         when (field) {
             is ItemField.Text -> Text(text = field.value, style = MaterialTheme.typography.bodyLarge)
+
+            is ItemField.Checkbox -> Text(
+                text = stringResource(if (field.isChecked) RString.item_field_yes else RString.item_field_no),
+                style = MaterialTheme.typography.bodyLarge
+            )
 
             is ItemField.Picture -> ItemImage(image = field.image, onClick = onImageClick)
 

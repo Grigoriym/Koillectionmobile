@@ -114,6 +114,7 @@ class ItemViewModelTest {
 
     @Test
     fun `every text-like type shows its value as text`() {
+        // A checkbox and a choice-list have their own display: ItemFieldTest.
         val types = listOf(
             "text",
             "textarea",
@@ -123,9 +124,7 @@ class ItemViewModelTest {
             "number",
             "price",
             "link",
-            "list",
-            "choice-list",
-            "checkbox"
+            "list"
         )
         queueAll()
         val sut = createSut()

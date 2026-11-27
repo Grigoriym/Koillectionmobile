@@ -96,14 +96,6 @@ cold session can act on it. Delete an entry when it's fixed.
   new-collection form has the same gap, and so has the M8.5 choice list form
   (`ChoiceListFormViewModel.save`: a create stopped by a process death is sent again).
   Verdict (user, 2026-11-25, M14.1): fix before release, M14.20 for (1), M14.18 for (2).
-- 2026-11-18 (M8.6) — The item screen shows a typed value as the server stores it: a `checkbox` as
-  `1` or `0`, a `choice-list` as a JSON array (`["Hardcover","Ebook"]`)
-  (`feature/items/ui/.../ItemField.kt`, `Datum.toField`: every text type becomes
-  `ItemField.Text` with the raw `value`). The item forms show them with their own input since
-  M8.6. Fix option: a checkmark (or yes/no) for `checkbox` and the picks joined by commas for
-  `choice-list`, with `pickedChoices` from `FieldInput.kt`. Seen on the device in M8.9: "Read" showed
-  `1`, then `0`, and "Genre" showed `["Novel","Poem"]`; the web item page shows a cross and a list.
-  Verdict (user, 2026-11-25, M14.1): fix before release, M14.15.
 - 2026-11-23 (M10.6) — The item screen jumps up after each loan action (save, mark returned,
   delete). While the section reads again, `LoansContent` shows only a spinner in place of the list
   (`feature/loans/ui/.../LoansSection.kt:73`, `uiState.isLoading`). The page gets shorter, so
@@ -119,3 +111,9 @@ cold session can act on it. Delete an entry when it's fixed.
   after the create and tick only the last items in that order, so the server stores exactly what
   the seed sends.
   Verdict (user, 2026-11-25, M14.1): fix before release, M14.25.
+- 2026-11-27 (M14.15) — The item screen shows a `list` value as the server stores it, a JSON array
+  (`["Night Watch"]` for the seed's "Characters" field)
+  (`feature/items/ui/.../ItemField.kt`, `Datum.toField`: a `list` falls through to the raw
+  `value`). M14.15 fixed only `checkbox` and `choice-list`. Fix option: join the entries with
+  commas, as for `choice-list` (`pickedChoices` reads the same JSON array). Check what the web
+  item page shows first. `date` is also shown unformatted (`2024-01-31`).
