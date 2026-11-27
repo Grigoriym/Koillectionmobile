@@ -50,6 +50,10 @@ this app.
   Templates, Wishlists and Albums have it too (M11.12, M11.13).
   An edge swipe is the system back on this AVD (gesture navigation), not a drawer swipe. Back at
   the root of any other section goes to Collections; back at the Collections root leaves the app.
+- Image cache (M14.14): Coil's disk cache is `cache/coil3_disk_cache/` (`<key>.0` and `<key>.1` per
+  image, plus `journal`). The collection list alone fills it, so no item needs opening. List it with
+  `run-as com.grappim.koillectionmobile.debug sh -c 'cd /data/data/com.grappim.koillectionmobile.debug/cache && find . -type f'`.
+  After Log out only `journal` stays.
 - Log out (M2.6) is "Log out" in the drawer. After it the
   login form shows only the server URL. A collection made through the API shows in the list after a
   pull to refresh: `input swipe 540 400 540 1800 800`. A 300 ms swipe from y 600 did not refresh

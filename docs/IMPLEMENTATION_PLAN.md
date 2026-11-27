@@ -98,7 +98,8 @@ start of any step that touches the API. Facts that shape the design:
   (`AppModule.provideImageLoader`, M14.13): its Ktor fetcher sends no token but does send the
   custom headers to the server origin, so a header-checking proxy passes the images too. The
   explicitly added `KtorNetworkFetcherFactory` wins over Coil's service-loaded one (checked on the
-  emulator: 200 behind the proxy, 401 before). `GET /api/items/{id}/data` has no guaranteed `position` order: the
+  emulator: 200 behind the proxy, 401 before). The drawer's Log out empties its memory and disk
+  caches (`DrawerViewModel`, M14.14); a session ended by a rejected re-login does not (`docs/revisit.md`). `GET /api/items/{id}/data` has no guaranteed `position` order: the
   `OrderBy` on `Item::$data` is a Doctrine collection setting, and API Platform reads the Datum
   rows with its own query (`Datum.php` sets no `order`). So `feature:items` sorts by `position`.
   Not checked against a server with reordered fields: the fixture is already in `position` order.
